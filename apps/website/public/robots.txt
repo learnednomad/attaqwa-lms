@@ -1,0 +1,46 @@
+# Robots.txt for Masjid At-Taqwa
+# Optimized for Islamic content discovery and search engine crawling
+
+# Allow all search engines to crawl the site
+User-agent: *
+
+# Allow all public Islamic content
+Allow: /
+
+# Block admin areas and private content
+Disallow: /admin/
+Disallow: /api/auth/
+Disallow: /login
+Disallow: /_next/
+Disallow: /private/
+
+# Allow API endpoints for structured data
+Allow: /api/prayer-times
+Allow: /api/events
+Allow: /api/announcements
+Allow: /api/education
+
+# Special considerations for Islamic content
+# Allow prayer times and Islamic resources
+Allow: /prayer-times
+Allow: /education
+Allow: /events
+Allow: /calendar
+
+# Block temporary and development files
+Disallow: /*.tmp$
+Disallow: /*.bak$
+Disallow: /*.log$
+
+# Crawl delay for respectful crawling
+Crawl-delay: 1
+
+# XML Sitemaps
+Sitemap: https://attaqwa.org/sitemap.xml
+Sitemap: https://attaqwa.org/sitemap-islamic-content.xml
+Sitemap: https://attaqwa.org/sitemap-prayer-times.xml
+Sitemap: https://attaqwa.org/sitemap-events.xml
+Sitemap: https://attaqwa.org/sitemap-education.xml
+
+# Host directive for consistency
+Host: https://attaqwa.org

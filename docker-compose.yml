@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: attaqwa-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: attaqwa_lms
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Strapi Backend API
+  api:
+    build:
+      context: .
+      target: api
+    container_name: attaqwa-api
+    restart: unless-stopped
+    environment:
+      HOST: 0.0.0.0
+      PORT: 1337
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: attaqwa_lms
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_SSL: false
+      APP_KEYS: gKqShoiW6YDp/9ZjOogJTQ==,rq5NV3ZSr14Fp3FNxh8hcA==,Mc3QWBXxiQMw0uhxMqKf2w==,y7HKpVcvl46XPnHIIfeX2Q==
+      API_TOKEN_SALT: y8zX2Dpo7wwIyyWZCOX3vQ==
+      ADMIN_JWT_SECRET: 4DQHyJc+M07ibsYwNvWORg==
+      TRANSFER_TOKEN_SALT: TKMOrV1jJ1JPWTKDq44fBQ==
+      ENCRYPTION_KEY: bCuGCOln7gvbDl2WjXs1Kg==
+      NODE_ENV: production
+    ports:
+      - "1337:1337"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - api_uploads:/app/apps/api/public/uploads
+
+  # Admin Portal
+  admin:
+    build:
+      context: .
+      target: admin
+    container_name: attaqwa-admin
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      NEXT_PUBLIC_API_URL: http://localhost:1337
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+  # Website
+  website:
+    build:
+      context: .
+      target: website
+    container_name: attaqwa-website
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      NEXT_PUBLIC_API_URL: http://localhost:1337
+    ports:
+      - "3001:3001"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
+    driver: local
+  api_uploads:
+    driver: local

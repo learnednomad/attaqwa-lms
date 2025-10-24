@@ -1,0 +1,33 @@
+{
+  "name": "attaqwa-lms",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AttaqwaMasjid Learning Management System - Web Monorepo",
+  "packageManager": "pnpm@10.12.3",
+  "scripts": {
+    "dev": "pnpm --parallel --filter './apps/*' dev",
+    "dev:admin": "pnpm --filter admin dev",
+    "dev:website": "pnpm --filter website dev",
+    "dev:api": "pnpm --filter api develop",
+    "build": "pnpm --filter './apps/*' build",
+    "build:admin": "pnpm --filter admin build",
+    "build:website": "pnpm --filter website build",
+    "build:api": "pnpm --filter api build",
+    "clean": "pnpm --parallel --filter './apps/*' clean && rm -rf node_modules",
+    "lint": "pnpm --parallel --filter './apps/*' lint",
+    "type-check": "pnpm --parallel --filter './apps/*' type-check"
+  },
+  "engines": {
+    "node": ">=18.0.0 <=22.x.x",
+    "pnpm": ">=10.0.0"
+  },
+  "keywords": [
+    "lms",
+    "islamic-education",
+    "strapi",
+    "nextjs",
+    "monorepo"
+  ],
+  "author": "AttaqwaMasjid",
+  "license": "UNLICENSED"
+}

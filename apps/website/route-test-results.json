@@ -1,0 +1,314 @@
+{
+  "timestamp": "2025-09-22T00:52:18.220Z",
+  "baseUrl": "http://localhost:3000",
+  "working_routes": [
+    {
+      "route": "/",
+      "url": "http://localhost:3000/",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/contact",
+      "url": "http://localhost:3000/contact",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/calendar",
+      "url": "http://localhost:3000/calendar",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/donate",
+      "url": "http://localhost:3000/donate",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/resources/qibla-direction",
+      "url": "http://localhost:3000/resources/qibla-direction",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/resources/islamic-calendar",
+      "url": "http://localhost:3000/resources/islamic-calendar",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/resources",
+      "url": "http://localhost:3000/resources",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/education/progress",
+      "url": "http://localhost:3000/education/progress",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/education/quiz/test-param",
+      "url": "http://localhost:3000/education/quiz/test-param",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/education/content/test-param",
+      "url": "http://localhost:3000/education/content/test-param",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/education/seerah",
+      "url": "http://localhost:3000/education/seerah",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/education/browse",
+      "url": "http://localhost:3000/education/browse",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/education",
+      "url": "http://localhost:3000/education",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/terms",
+      "url": "http://localhost:3000/terms",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/student/test",
+      "url": "http://localhost:3000/student/test",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/admin/education/content",
+      "url": "http://localhost:3000/admin/education/content",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/admin/education",
+      "url": "http://localhost:3000/admin/education",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/admin/announcements/new",
+      "url": "http://localhost:3000/admin/announcements/new",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/admin/announcements/test-param/edit",
+      "url": "http://localhost:3000/admin/announcements/test-param/edit",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/admin/announcements",
+      "url": "http://localhost:3000/admin/announcements",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/admin/events/new",
+      "url": "http://localhost:3000/admin/events/new",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/admin/events/test-param/edit",
+      "url": "http://localhost:3000/admin/events/test-param/edit",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/admin/events",
+      "url": "http://localhost:3000/admin/events",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/admin",
+      "url": "http://localhost:3000/admin",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/admin/login",
+      "url": "http://localhost:3000/admin/login",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/admin/prayer-times",
+      "url": "http://localhost:3000/admin/prayer-times",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/announcements",
+      "url": "http://localhost:3000/announcements",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/about",
+      "url": "http://localhost:3000/about",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/dashboard",
+      "url": "http://localhost:3000/dashboard",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/events",
+      "url": "http://localhost:3000/events",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/services/halal-food-program",
+      "url": "http://localhost:3000/services/halal-food-program",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/services/scholarship-program",
+      "url": "http://localhost:3000/services/scholarship-program",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/services/zakat-charity",
+      "url": "http://localhost:3000/services/zakat-charity",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/services/funeral-services",
+      "url": "http://localhost:3000/services/funeral-services",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/services/salah-prayer",
+      "url": "http://localhost:3000/services/salah-prayer",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/services/hajj-umrah",
+      "url": "http://localhost:3000/services/hajj-umrah",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/services/quran-learning",
+      "url": "http://localhost:3000/services/quran-learning",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/services/help-the-poor",
+      "url": "http://localhost:3000/services/help-the-poor",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/services",
+      "url": "http://localhost:3000/services",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    },
+    {
+      "route": "/prayer-times",
+      "url": "http://localhost:3000/prayer-times",
+      "status": 200,
+      "statusText": "HTTP/1.1 200 OK\r"
+    }
+  ],
+  "broken_routes": [
+    {
+      "route": "/api/health",
+      "url": "http://localhost:3000/api/health",
+      "status": 500,
+      "statusText": "HTTP/1.1 500 Internal Server Error\r",
+      "type": "API Error"
+    },
+    {
+      "route": "/api/prayer-times",
+      "url": "http://localhost:3000/api/prayer-times",
+      "status": 404,
+      "statusText": "HTTP/1.1 404 Not Found\r",
+      "type": "API Error"
+    },
+    {
+      "route": "/api/announcements",
+      "url": "http://localhost:3000/api/announcements",
+      "status": 404,
+      "statusText": "HTTP/1.1 404 Not Found\r",
+      "type": "API Error"
+    }
+  ],
+  "error_routes": [
+    {
+      "route": "/privacy",
+      "url": "http://localhost:3000/privacy",
+      "status": 500,
+      "statusText": "HTTP/1.1 500 Internal Server Error\r",
+      "type": "Server Error"
+    },
+    {
+      "route": "/resources/quran-study",
+      "url": "http://localhost:3000/resources/quran-study",
+      "status": 500,
+      "statusText": "HTTP/1.1 500 Internal Server Error\r",
+      "type": "Server Error"
+    },
+    {
+      "route": "/resources/hadith-collections",
+      "url": "http://localhost:3000/resources/hadith-collections",
+      "status": 500,
+      "statusText": "HTTP/1.1 500 Internal Server Error\r",
+      "type": "Server Error"
+    },
+    {
+      "route": "/education/seerah/test-param",
+      "url": "http://localhost:3000/education/seerah/test-param",
+      "status": 500,
+      "statusText": "HTTP/1.1 500 Internal Server Error\r",
+      "type": "Server Error"
+    },
+    {
+      "route": "/student/dashboard",
+      "url": "http://localhost:3000/student/dashboard",
+      "status": 500,
+      "statusText": "HTTP/1.1 500 Internal Server Error\r",
+      "type": "Server Error"
+    },
+    {
+      "route": "/student/login",
+      "url": "http://localhost:3000/student/login",
+      "status": 500,
+      "statusText": "HTTP/1.1 500 Internal Server Error\r",
+      "type": "Server Error"
+    }
+  ],
+  "total_tested": 49
+}
