@@ -40,3 +40,6 @@ coverage/
 # Temporary files
 *.tmp
 .cache/
+# BMAD (local only)
+.bmad-core/
+.bmad-*/
