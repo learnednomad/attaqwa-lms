@@ -5,7 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { AgeTier } from '@attaqwa/shared';
+
+// Local type definition matching Strapi schema
+type AgeTier = 'children' | 'youth' | 'adults' | 'all';
 
 interface AgeTierFilterProps {
   selectedTier?: AgeTier;
@@ -15,36 +17,35 @@ interface AgeTierFilterProps {
   className?: string;
 }
 
-const AGE_TIER_CONFIG = {
-  [AgeTier.CHILDREN]: {
+const AGE_TIER_CONFIG: Record<AgeTier, {
+  label: string;
+  description: string;
+  icon: string;
+  color: string;
+  borderColor: string;
+}> = {
+  'children': {
     label: 'Children',
     description: 'Ages 5-12',
     icon: '👶',
     color: 'bg-blue-100 text-blue-800',
     borderColor: 'border-blue-200 hover:border-blue-300',
   },
-  [AgeTier.YOUTH]: {
+  'youth': {
     label: 'Youth',
     description: 'Ages 13-17',
     icon: '🧑',
     color: 'bg-green-100 text-green-800',
     borderColor: 'border-green-200 hover:border-green-300',
   },
-  [AgeTier.ADULTS]: {
+  'adults': {
     label: 'Adults',
     description: 'Ages 18+',
     icon: '👨',
     color: 'bg-purple-100 text-purple-800',
     borderColor: 'border-purple-200 hover:border-purple-300',
   },
-  [AgeTier.SENIORS]: {
-    label: 'Seniors',
-    description: 'Ages 60+',
-    icon: '👴',
-    color: 'bg-orange-100 text-orange-800',
-    borderColor: 'border-orange-200 hover:border-orange-300',
-  },
-  [AgeTier.ALL_AGES]: {
+  'all': {
     label: 'All Ages',
     description: 'Suitable for everyone',
     icon: '👥',
@@ -84,7 +85,7 @@ export function AgeTierFilter({
         )}
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {Object.entries(AGE_TIER_CONFIG).map(([tier, config]) => {
             const tierKey = tier as AgeTier;
             const isSelected = selectedTier === tierKey;
@@ -130,19 +131,16 @@ export function AgeTierFilter({
 
                 {/* Islamic Education Guidance for Each Age Group */}
                 <div className="mt-3 text-xs text-gray-500">
-                  {tier === AgeTier.CHILDREN && (
+                  {tier === 'children' && (
                     <span>Basic Islamic stories, prayers, and moral values</span>
                   )}
-                  {tier === AgeTier.YOUTH && (
+                  {tier === 'youth' && (
                     <span>Islamic identity, contemporary issues, and guidance</span>
                   )}
-                  {tier === AgeTier.ADULTS && (
+                  {tier === 'adults' && (
                     <span>In-depth Islamic knowledge and practical application</span>
                   )}
-                  {tier === AgeTier.SENIORS && (
-                    <span>Wisdom, reflection, and life experience sharing</span>
-                  )}
-                  {tier === AgeTier.ALL_AGES && (
+                  {tier === 'all' && (
                     <span>Universal Islamic teachings for the whole family</span>
                   )}
                 </div>
@@ -157,8 +155,8 @@ export function AgeTierFilter({
             🌟 Age-Appropriate Islamic Education
           </h4>
           <p className="text-sm text-islamic-green-700">
-            Our content is carefully curated to match Islamic educational principles and 
-            developmental stages. Each age group receives content that is both engaging 
+            Our content is carefully curated to match Islamic educational principles and
+            developmental stages. Each age group receives content that is both engaging
             and appropriate for their level of understanding and spiritual growth.
           </p>
         </div>
@@ -169,36 +167,30 @@ export function AgeTierFilter({
               Learning Focus for {AGE_TIER_CONFIG[selectedTier].label}
             </h5>
             <p className="text-sm text-blue-700">
-              {selectedTier === AgeTier.CHILDREN && (
+              {selectedTier === 'children' && (
                 <>
-                  Focus on foundational Islamic concepts through stories, interactive 
-                  activities, and simple prayers. Content emphasizes love for Allah, 
+                  Focus on foundational Islamic concepts through stories, interactive
+                  activities, and simple prayers. Content emphasizes love for Allah,
                   Prophet Muhammad (ﷺ), and basic Islamic manners.
                 </>
               )}
-              {selectedTier === AgeTier.YOUTH && (
+              {selectedTier === 'youth' && (
                 <>
-                  Addresses questions about Islamic identity, peer pressure, and 
-                  contemporary challenges. Includes guidance on worship, relationships, 
+                  Addresses questions about Islamic identity, peer pressure, and
+                  contemporary challenges. Includes guidance on worship, relationships,
                   and preparing for adult responsibilities.
                 </>
               )}
-              {selectedTier === AgeTier.ADULTS && (
+              {selectedTier === 'adults' && (
                 <>
-                  Comprehensive Islamic education covering jurisprudence, theology, 
-                  family life, career guidance, and community responsibilities from 
+                  Comprehensive Islamic education covering jurisprudence, theology,
+                  family life, career guidance, and community responsibilities from
                   an Islamic perspective.
                 </>
               )}
-              {selectedTier === AgeTier.SENIORS && (
+              {selectedTier === 'all' && (
                 <>
-                  Wisdom-focused content on reflection, legacy, preparing for the 
-                  hereafter, and sharing life experiences with younger generations.
-                </>
-              )}
-              {selectedTier === AgeTier.ALL_AGES && (
-                <>
-                  Family-friendly content that can be enjoyed and learned from by 
+                  Family-friendly content that can be enjoyed and learned from by
                   all family members together, promoting Islamic family bonding.
                 </>
               )}
@@ -211,20 +203,29 @@ export function AgeTierFilter({
 }
 
 // Component for displaying age tier badge
-export function AgeTierBadge({ 
-  tier, 
+export function AgeTierBadge({
+  tier,
   showDescription = false,
-  className 
-}: { 
-  tier: AgeTier; 
+  className
+}: {
+  tier: AgeTier;
   showDescription?: boolean;
   className?: string;
 }) {
   const config = AGE_TIER_CONFIG[tier];
 
+  // Fallback if tier doesn't exist in config
+  if (!config) {
+    return (
+      <Badge variant="secondary" className={className}>
+        {tier}
+      </Badge>
+    );
+  }
+
   return (
-    <Badge 
-      variant="secondary" 
+    <Badge
+      variant="secondary"
       className={cn(config.color, className)}
     >
       <span className="mr-1">{config.icon}</span>
@@ -244,19 +245,18 @@ export function useAgeTierFilter() {
 
   const filterContentByAge = React.useCallback((content: any[]) => {
     if (!selectedTier) return content;
-    
-    return content.filter(item => 
-      item.ageTier === selectedTier || item.ageTier === AgeTier.ALL_AGES
+
+    return content.filter(item =>
+      item.ageTier === selectedTier || item.ageTier === 'all'
     );
   }, [selectedTier]);
 
   const getRecommendedTier = React.useCallback((userAge?: number): AgeTier => {
-    if (!userAge) return AgeTier.ALL_AGES;
-    
-    if (userAge <= 12) return AgeTier.CHILDREN;
-    if (userAge <= 17) return AgeTier.YOUTH;
-    if (userAge <= 59) return AgeTier.ADULTS;
-    return AgeTier.SENIORS;
+    if (!userAge) return 'all';
+
+    if (userAge <= 12) return 'children';
+    if (userAge <= 17) return 'youth';
+    return 'adults';
   }, []);
 
   return {

@@ -3,8 +3,13 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { AgeTier, IslamicSubject, DifficultyLevel, EducationContentType } from '@attaqwa/shared';
 import { AgeTierBadge } from './AgeTierFilter';
+
+// Local type definitions matching Strapi schema
+type AgeTier = 'children' | 'youth' | 'adults' | 'all';
+type IslamicSubject = 'quran' | 'hadith' | 'fiqh' | 'aqeedah' | 'seerah' | 'arabic' | 'islamic_history' | 'akhlaq' | 'tajweed';
+type DifficultyLevel = 'beginner' | 'intermediate' | 'advanced';
+type EducationContentType = 'LESSON' | 'QUIZ' | 'VIDEO' | 'ARTICLE';
 
 interface EducationContent {
   id: string;
@@ -55,33 +60,34 @@ export function EducationContentCard({ content, onClick }: EducationContentCardP
   };
 
   const getSubjectDisplay = (subject: IslamicSubject) => {
-    const subjectMap = {
-      [IslamicSubject.QURAN]: 'Quran',
-      [IslamicSubject.HADITH]: 'Hadith',
-      [IslamicSubject.FIQH]: 'Fiqh',
-      [IslamicSubject.WORSHIP]: 'Worship',
-      [IslamicSubject.HISTORY]: 'History',
-      [IslamicSubject.ETHICS]: 'Ethics',
-      [IslamicSubject.ARABIC]: 'Arabic',
+    const subjectMap: Record<string, string> = {
+      'quran': 'Quran',
+      'hadith': 'Hadith',
+      'fiqh': 'Fiqh',
+      'aqeedah': 'Aqeedah',
+      'seerah': 'Seerah',
+      'arabic': 'Arabic',
+      'islamic_history': 'Islamic History',
+      'akhlaq': 'Akhlaq',
     };
     return subjectMap[subject] || subject;
   };
 
   const getDifficultyColor = (level: DifficultyLevel) => {
-    const colorMap = {
-      [DifficultyLevel.BEGINNER]: 'bg-green-100 text-green-800',
-      [DifficultyLevel.INTERMEDIATE]: 'bg-yellow-100 text-yellow-800',
-      [DifficultyLevel.ADVANCED]: 'bg-red-100 text-red-800',
+    const colorMap: Record<string, string> = {
+      'beginner': 'bg-green-100 text-green-800',
+      'intermediate': 'bg-yellow-100 text-yellow-800',
+      'advanced': 'bg-red-100 text-red-800',
     };
     return colorMap[level] || 'bg-gray-100 text-gray-800';
   };
 
   const getContentTypeIcon = (type: EducationContentType) => {
-    const iconMap = {
-      [EducationContentType.LESSON]: '📖',
-      [EducationContentType.QUIZ]: '❓',
-      [EducationContentType.VIDEO]: '🎥',
-      [EducationContentType.ARTICLE]: '📄',
+    const iconMap: Record<string, string> = {
+      'LESSON': '📖',
+      'QUIZ': '❓',
+      'VIDEO': '🎥',
+      'ARTICLE': '📄',
     };
     return iconMap[type] || '📖';
   };

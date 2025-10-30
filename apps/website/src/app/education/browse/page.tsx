@@ -1,219 +1,123 @@
 'use client';
 
-import React, { useState } from 'react';
-import { FeatureFlagService } from '@attaqwa/shared/feature-flags';
-import Link from 'next/link';
+import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Search, 
-  Filter, 
-  SortAsc, 
-  Grid, 
+import {
+  Search,
+  Filter,
+  Grid,
   List,
-  Clock,
-  User,
   BookOpen,
-  Play,
-  FileText
+  Loader2
 } from 'lucide-react';
-import { AgeTierFilter } from '@/components/features/education/AgeTierFilter';
 import { EducationContentCard } from '@/components/features/education/EducationContentCard';
-import type { AgeTier, IslamicSubject, DifficultyLevel, EducationContentType } from '@attaqwa/shared';
+import { useCourses } from '@/lib/hooks/use-strapi-courses';
 
-// Mock expanded content data
-const mockEducationContent = [
-  {
-    id: '1',
-    title: 'Introduction to Quran',
-    description: 'Learn the basics of Quranic reading and understanding with proper pronunciation and meaning. This comprehensive course covers Arabic letters, pronunciation rules, and basic Tajweed principles.',
-    subject: 'QURAN' as IslamicSubject,
-    ageTier: 'CHILDREN' as AgeTier,
-    difficultyLevel: 'BEGINNER' as DifficultyLevel,
-    contentType: 'LESSON' as EducationContentType,
-    estimatedDuration: 30,
-    thumbnailUrl: '/images/quran-basics.jpg',
-    isPublished: true,
-    tags: ['basics', 'reading', 'pronunciation', 'tajweed'],
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-20'),
-    author: { id: '1', name: 'Imam Abdullah' },
-    _count: { userProgress: 24, quizAttempts: 18 },
-    arabicContent: 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ',
-    transliteration: 'Bismillah ar-Rahman ar-Raheem'
-  },
-  {
-    id: '2',
-    title: 'Five Pillars of Islam Quiz',
-    description: 'Test your knowledge of the fundamental pillars that form the foundation of Islamic faith and practice.',
-    subject: 'AQIDAH' as IslamicSubject,
-    ageTier: 'YOUTH' as AgeTier,
-    difficultyLevel: 'BEGINNER' as DifficultyLevel,
-    contentType: 'QUIZ' as EducationContentType,
-    estimatedDuration: 15,
-    isPublished: true,
-    tags: ['pillars', 'faith', 'practice', 'assessment'],
-    createdAt: new Date('2024-01-10'),
-    updatedAt: new Date('2024-01-15'),
-    author: { id: '2', name: 'Sister Aisha' },
-    _count: { userProgress: 31, quizAttempts: 25 }
-  },
-  {
-    id: '3',
-    title: 'Prayer (Salah) Fundamentals',
-    description: 'Learn the correct way to perform the five daily prayers with proper movements and recitations.',
-    subject: 'WORSHIP' as IslamicSubject,
-    ageTier: 'ALL_AGES' as AgeTier,
-    difficultyLevel: 'BEGINNER' as DifficultyLevel,
-    contentType: 'VIDEO' as EducationContentType,
-    estimatedDuration: 25,
-    isPublished: true,
-    tags: ['salah', 'prayer', 'worship', 'movements'],
-    createdAt: new Date('2024-01-05'),
-    updatedAt: new Date('2024-01-10'),
-    author: { id: '1', name: 'Imam Abdullah' },
-    _count: { userProgress: 45, quizAttempts: 0 }
-  },
-  {
-    id: '4',
-    title: 'Stories of the Prophets',
-    description: 'Engaging stories from the lives of the Prophets (peace be upon them) with moral lessons and historical context.',
-    subject: 'SEERAH' as IslamicSubject,
-    ageTier: 'CHILDREN' as AgeTier,
-    difficultyLevel: 'BEGINNER' as DifficultyLevel,
-    contentType: 'AUDIO' as EducationContentType,
-    estimatedDuration: 40,
-    isPublished: true,
-    tags: ['prophets', 'stories', 'history', 'morals'],
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-01-05'),
-    author: { id: '3', name: 'Ustadh Omar' },
-    _count: { userProgress: 18, quizAttempts: 8 }
-  },
-  {
-    id: '5',
-    title: 'Islamic Jurisprudence Basics',
-    description: 'An introduction to Islamic law covering essential rulings for daily life including worship, transactions, and family matters.',
-    subject: 'FIQH' as IslamicSubject,
-    ageTier: 'ADULTS' as AgeTier,
-    difficultyLevel: 'INTERMEDIATE' as DifficultyLevel,
-    contentType: 'READING' as EducationContentType,
-    estimatedDuration: 60,
-    isPublished: true,
-    tags: ['law', 'rulings', 'worship', 'transactions'],
-    createdAt: new Date('2023-12-20'),
-    updatedAt: new Date('2023-12-25'),
-    author: { id: '4', name: 'Sheikh Mansoor' },
-    _count: { userProgress: 12, quizAttempts: 5 }
-  },
-  {
-    id: '6',
-    title: 'Arabic Alphabet Interactive',
-    description: 'Interactive lesson to learn the Arabic alphabet with pronunciation, writing practice, and letter recognition games.',
-    subject: 'ARABIC_LANGUAGE' as IslamicSubject,
-    ageTier: 'CHILDREN' as AgeTier,
-    difficultyLevel: 'BEGINNER' as DifficultyLevel,
-    contentType: 'INTERACTIVE' as EducationContentType,
-    estimatedDuration: 35,
-    isPublished: true,
-    tags: ['alphabet', 'writing', 'pronunciation', 'interactive'],
-    createdAt: new Date('2023-12-15'),
-    updatedAt: new Date('2023-12-20'),
-    author: { id: '5', name: 'Ustadha Fatima' },
-    _count: { userProgress: 28, quizAttempts: 12 }
-  }
+// Local type definitions matching Strapi schema
+type AgeTier = 'children' | 'youth' | 'adults' | 'all';
+type IslamicSubject = 'quran' | 'hadith' | 'fiqh' | 'aqeedah' | 'seerah' | 'arabic' | 'islamic_history' | 'akhlaq' | 'tajweed';
+type DifficultyLevel = 'beginner' | 'intermediate' | 'advanced';
+type EducationContentType = 'LESSON' | 'QUIZ' | 'VIDEO' | 'ARTICLE';
+
+// Strapi uses lowercase values
+const subjects: { value: string; label: string }[] = [
+  { value: 'quran', label: 'Quran' },
+  { value: 'hadith', label: 'Hadith' },
+  { value: 'fiqh', label: 'Fiqh' },
+  { value: 'aqeedah', label: 'Aqeedah' },
+  { value: 'seerah', label: 'Seerah' },
+  { value: 'arabic', label: 'Arabic' },
+  { value: 'islamic_history', label: 'Islamic History' },
+  { value: 'akhlaq', label: 'Akhlaq' },
+  { value: 'tajweed', label: 'Tajweed' }
 ];
 
-const subjects: { value: IslamicSubject; label: string }[] = [
-  { value: 'QURAN', label: 'Quran' },
-  { value: 'HADITH', label: 'Hadith' },
-  { value: 'FIQH', label: 'Fiqh' },
-  { value: 'AQIDAH', label: 'Aqidah' },
-  { value: 'SEERAH', label: 'Seerah' },
-  { value: 'WORSHIP', label: 'Worship' },
-  { value: 'ARABIC_LANGUAGE', label: 'Arabic Language' },
-  { value: 'ISLAMIC_HISTORY', label: 'Islamic History' }
+const ageTiers: { value: string; label: string }[] = [
+  { value: 'children', label: 'Children' },
+  { value: 'youth', label: 'Youth' },
+  { value: 'adults', label: 'Adults' },
+  { value: 'all', label: 'All Ages' }
 ];
 
-const contentTypes: { value: EducationContentType; label: string; icon: any }[] = [
-  { value: 'LESSON', label: 'Lesson', icon: BookOpen },
-  { value: 'QUIZ', label: 'Quiz', icon: FileText },
-  { value: 'VIDEO', label: 'Video', icon: Play },
-  { value: 'AUDIO', label: 'Audio', icon: '🎵' },
-  { value: 'READING', label: 'Reading', icon: '📖' },
-  { value: 'INTERACTIVE', label: 'Interactive', icon: '🎮' }
-];
-
-const difficultyLevels: { value: DifficultyLevel; label: string; color: string }[] = [
-  { value: 'BEGINNER', label: 'Beginner', color: 'bg-green-100 text-green-800' },
-  { value: 'INTERMEDIATE', label: 'Intermediate', color: 'bg-yellow-100 text-yellow-800' },
-  { value: 'ADVANCED', label: 'Advanced', color: 'bg-red-100 text-red-800' },
-  { value: 'SCHOLAR', label: 'Scholar', color: 'bg-purple-100 text-purple-800' }
+const difficultyLevels: { value: string; label: string; color: string }[] = [
+  { value: 'beginner', label: 'Beginner', color: 'bg-green-100 text-green-800' },
+  { value: 'intermediate', label: 'Intermediate', color: 'bg-yellow-100 text-yellow-800' },
+  { value: 'advanced', label: 'Advanced', color: 'bg-red-100 text-red-800' }
 ];
 
 export default function EducationBrowsePage() {
-  // Feature flag protection
-  if (!FeatureFlagService.canAccessEducationUI()) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-4xl font-bold text-islamic-navy-800 mb-4">Education Browser</h1>
-          <div className="bg-islamic-gold-50 border border-islamic-gold-200 rounded-lg p-6 mb-6">
-            <h2 className="text-xl font-semibold text-islamic-gold-800 mb-2">🚧 Under Development</h2>
-            <p className="text-islamic-gold-700">Educational content browsing is being enhanced.</p>
-          </div>
-          <Link href="/"><Button className="bg-islamic-green-600 hover:bg-islamic-green-700">Return to Home</Button></Link>
-        </div>
-      </div>
-    );
-  }
-
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedAgeTier, setSelectedAgeTier] = useState<AgeTier | undefined>();
-  const [selectedSubject, setSelectedSubject] = useState<IslamicSubject | undefined>();
-  const [selectedContentType, setSelectedContentType] = useState<EducationContentType | undefined>();
-  const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyLevel | undefined>();
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'popular' | 'duration'>('newest');
+  const [selectedAgeTier, setSelectedAgeTier] = useState<string | undefined>();
+  const [selectedSubject, setSelectedSubject] = useState<string | undefined>();
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string | undefined>();
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'duration'>('newest');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
 
-  const filteredContent = mockEducationContent.filter(content => {
-    const matchesSearch = !searchQuery || 
-      content.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      content.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      content.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    const matchesAge = !selectedAgeTier || content.ageTier === selectedAgeTier || content.ageTier === 'ALL_AGES';
-    const matchesSubject = !selectedSubject || content.subject === selectedSubject;
-    const matchesContentType = !selectedContentType || content.contentType === selectedContentType;
-    const matchesDifficulty = !selectedDifficulty || content.difficultyLevel === selectedDifficulty;
-    
-    return matchesSearch && matchesAge && matchesSubject && matchesContentType && matchesDifficulty;
-  }).sort((a, b) => {
-    switch (sortBy) {
-      case 'newest':
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      case 'oldest':
-        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-      case 'popular':
-        return b._count.userProgress - a._count.userProgress;
-      case 'duration':
-        return a.estimatedDuration - b.estimatedDuration;
-      default:
-        return 0;
-    }
+  // Fetch courses with API filters
+  const { data: coursesResponse, isLoading, isError, error } = useCourses({
+    subject: selectedSubject,
+    age_tier: selectedAgeTier,
+    difficulty: selectedDifficulty, // Changed from difficulty_level
+    search: searchQuery,
   });
+
+  // Transform Strapi courses to match EducationContentCard format
+  const courses = useMemo(() => {
+    if (!coursesResponse?.data) return [];
+
+    return coursesResponse.data
+      .filter(course => course.subject && course.age_tier && course.difficulty)
+      .map(course => ({
+        id: course.documentId,
+        title: course.title,
+        description: course.description,
+        subject: course.subject as IslamicSubject, // Keep lowercase to match Strapi
+        ageTier: course.age_tier as AgeTier, // Keep lowercase to match Strapi
+        difficultyLevel: course.difficulty as DifficultyLevel, // Keep lowercase to match Strapi
+        contentType: 'LESSON' as EducationContentType, // Courses contain lessons
+        estimatedDuration: (course.duration_weeks || 0) * 60, // Convert weeks to minutes approximation
+        thumbnailUrl: course.thumbnail?.url,
+        isPublished: true,
+        tags: course.prerequisites || [],
+        createdAt: new Date(course.createdAt),
+        updatedAt: new Date(course.updatedAt),
+        author: { id: '1', name: course.instructor || 'Instructor' },
+        _count: {
+          userProgress: course.lessons?.length || 0,
+          quizAttempts: 0,
+        },
+      }));
+  }, [coursesResponse]);
+
+  // Client-side sorting
+  const sortedCourses = useMemo(() => {
+    const sorted = [...courses];
+    sorted.sort((a, b) => {
+      switch (sortBy) {
+        case 'newest':
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        case 'oldest':
+          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        case 'duration':
+          return a.estimatedDuration - b.estimatedDuration;
+        default:
+          return 0;
+      }
+    });
+    return sorted;
+  }, [courses, sortBy]);
 
   const clearFilters = () => {
     setSelectedAgeTier(undefined);
     setSelectedSubject(undefined);
-    setSelectedContentType(undefined);
     setSelectedDifficulty(undefined);
     setSearchQuery('');
   };
 
-  const activeFiltersCount = [selectedAgeTier, selectedSubject, selectedContentType, selectedDifficulty].filter(Boolean).length;
+  const activeFiltersCount = [selectedAgeTier, selectedSubject, selectedDifficulty].filter(Boolean).length;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -268,7 +172,6 @@ export default function EducationBrowsePage() {
               >
                 <option value="newest">Newest First</option>
                 <option value="oldest">Oldest First</option>
-                <option value="popular">Most Popular</option>
                 <option value="duration">Shortest First</option>
               </select>
 
@@ -296,11 +199,22 @@ export default function EducationBrowsePage() {
           {/* Filters Panel */}
           {showFilters && (
             <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {/* Age Tier Filter */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Age Group</label>
-                  <AgeTierFilter value={selectedAgeTier} onChange={setSelectedAgeTier} />
+                  <select
+                    value={selectedAgeTier || ''}
+                    onChange={(e) => setSelectedAgeTier(e.target.value || undefined)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-islamic-green-500"
+                  >
+                    <option value="">All Ages</option>
+                    {ageTiers.map((tier) => (
+                      <option key={tier.value} value={tier.value}>
+                        {tier.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 {/* Subject Filter */}
@@ -308,30 +222,13 @@ export default function EducationBrowsePage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
                   <select
                     value={selectedSubject || ''}
-                    onChange={(e) => setSelectedSubject(e.target.value as IslamicSubject || undefined)}
+                    onChange={(e) => setSelectedSubject(e.target.value || undefined)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-islamic-green-500"
                   >
                     <option value="">All Subjects</option>
-                    {subjects.map(subject => (
+                    {subjects.map((subject) => (
                       <option key={subject.value} value={subject.value}>
                         {subject.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Content Type Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Content Type</label>
-                  <select
-                    value={selectedContentType || ''}
-                    onChange={(e) => setSelectedContentType(e.target.value as EducationContentType || undefined)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-islamic-green-500"
-                  >
-                    <option value="">All Types</option>
-                    {contentTypes.map(type => (
-                      <option key={type.value} value={type.value}>
-                        {type.label}
                       </option>
                     ))}
                   </select>
@@ -342,11 +239,11 @@ export default function EducationBrowsePage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Difficulty</label>
                   <select
                     value={selectedDifficulty || ''}
-                    onChange={(e) => setSelectedDifficulty(e.target.value as DifficultyLevel || undefined)}
+                    onChange={(e) => setSelectedDifficulty(e.target.value || undefined)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-islamic-green-500"
                   >
                     <option value="">All Levels</option>
-                    {difficultyLevels.map(level => (
+                    {difficultyLevels.map((level) => (
                       <option key={level.value} value={level.value}>
                         {level.label}
                       </option>
@@ -358,7 +255,7 @@ export default function EducationBrowsePage() {
               {activeFiltersCount > 0 && (
                 <div className="mt-4 flex justify-between items-center">
                   <p className="text-sm text-gray-600">
-                    {filteredContent.length} results found with current filters
+                    {sortedCourses.length} result{sortedCourses.length !== 1 ? 's' : ''} found with current filters
                   </p>
                   <Button variant="ghost" onClick={clearFilters} size="sm">
                     Clear All Filters
@@ -370,43 +267,77 @@ export default function EducationBrowsePage() {
         </CardContent>
       </Card>
 
-      {/* Results */}
-      <div className="mb-4 flex justify-between items-center">
-        <p className="text-gray-600">
-          Showing {filteredContent.length} of {mockEducationContent.length} results
-        </p>
-      </div>
-
-      {/* Content Grid/List */}
-      {filteredContent.length > 0 ? (
-        <div className={viewMode === 'grid' 
-          ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
-          : "space-y-4"
-        }>
-          {filteredContent.map((content) => (
-            <div key={content.id} className={viewMode === 'list' ? "w-full" : ""}>
-              <EducationContentCard 
-                content={content}
-                onClick={(content) => {
-                  window.location.href = `/education/content/${content.id}`;
-                }}
-              />
-            </div>
-          ))}
+      {/* Loading State */}
+      {isLoading && (
+        <div className="flex justify-center items-center py-12">
+          <Loader2 className="h-12 w-12 animate-spin text-islamic-green-600" />
+          <span className="ml-4 text-lg text-gray-600">Loading courses...</span>
         </div>
-      ) : (
+      )}
+
+      {/* Error State */}
+      {isError && (
         <Card>
           <CardContent className="py-12 text-center">
-            <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-600 mb-2">No content found</h3>
+            <div className="h-16 w-16 text-red-400 mx-auto mb-4">⚠️</div>
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">Failed to load courses</h3>
             <p className="text-gray-500 mb-4">
-              Try adjusting your search terms or filters to find what you're looking for.
+              {error?.message || 'Something went wrong. Please try again later.'}
             </p>
-            <Button variant="outline" onClick={clearFilters}>
-              Clear All Filters
+            <Button
+              variant="outline"
+              onClick={() => window.location.reload()}
+            >
+              Retry
             </Button>
           </CardContent>
         </Card>
+      )}
+
+      {/* Results */}
+      {!isLoading && !isError && (
+        <>
+          <div className="mb-4 flex justify-between items-center">
+            <p className="text-gray-600">
+              Showing {sortedCourses.length} course{sortedCourses.length !== 1 ? 's' : ''}
+            </p>
+          </div>
+
+          {/* Content Grid/List */}
+          {sortedCourses.length > 0 ? (
+            <div
+              className={
+                viewMode === 'grid'
+                  ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+                  : 'space-y-4'
+              }
+            >
+              {sortedCourses.map((content) => (
+                <div key={content.id} className={viewMode === 'list' ? 'w-full' : ''}>
+                  <EducationContentCard
+                    content={content}
+                    onClick={(content) => {
+                      window.location.href = `/education/courses/${content.id}`;
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-600 mb-2">No courses found</h3>
+                <p className="text-gray-500 mb-4">
+                  Try adjusting your search terms or filters to find what you're looking for.
+                </p>
+                <Button variant="outline" onClick={clearFilters}>
+                  Clear All Filters
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </>
       )}
     </div>
   );
