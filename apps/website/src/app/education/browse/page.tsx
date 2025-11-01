@@ -81,7 +81,7 @@ export default function EducationBrowsePage() {
         estimatedDuration: (course.duration_weeks || 0) * 60, // Convert weeks to minutes approximation
         thumbnailUrl: course.thumbnail?.url,
         isPublished: true,
-        tags: course.prerequisites || [],
+        tags: undefined, // Tags not available in Strapi course schema
         createdAt: new Date(course.createdAt),
         updatedAt: new Date(course.updatedAt),
         author: { id: '1', name: course.instructor || 'Instructor' },

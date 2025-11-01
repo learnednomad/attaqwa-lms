@@ -43,3 +43,4 @@ coverage/
 # BMAD (local only)
 .bmad-core/
 .bmad-*/
+.playwright-mcp/

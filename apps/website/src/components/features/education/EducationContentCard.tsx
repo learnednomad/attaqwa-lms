@@ -22,14 +22,14 @@ interface EducationContent {
   estimatedDuration: number;
   thumbnailUrl?: string;
   isPublished: boolean;
-  tags: string[];
+  tags?: string[];
   createdAt: Date;
   updatedAt: Date;
-  author: {
+  author?: {
     id: string;
     name: string;
   };
-  _count: {
+  _count?: {
     userProgress: number;
     quizAttempts: number;
   };
@@ -127,30 +127,34 @@ export function EducationContentCard({ content, onClick }: EducationContentCardP
             <Badge variant="secondary">{getSubjectDisplay(content.subject)}</Badge>
           </div>
           
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">By:</span>
-            <span className="font-medium">{content.author.name}</span>
-          </div>
-          
+          {content.author && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">By:</span>
+              <span className="font-medium">{content.author.name}</span>
+            </div>
+          )}
+
           {content.userProgress && (
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-600">Progress:</span>
               <span className="font-medium">{content.userProgress.progress}%</span>
             </div>
           )}
-          
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">Learners:</span>
-            <span>{content._count.userProgress}</span>
-          </div>
+
+          {content._count && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">Learners:</span>
+              <span>{content._count.userProgress}</span>
+            </div>
+          )}
         </div>
-        
-        {content.tags.length > 0 && (
+
+        {content.tags && content.tags.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-1">
             {content.tags.map((tag) => (
-              <Badge 
-                key={tag} 
-                variant="outline" 
+              <Badge
+                key={tag}
+                variant="outline"
                 className="text-xs"
               >
                 #{tag}

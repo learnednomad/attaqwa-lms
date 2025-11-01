@@ -375,12 +375,27 @@ export const lessonsApi = {
 // Quizzes API
 // ============================================================================
 
+/**
+ * Transform Strapi quiz questions to frontend format
+ */
+function transformQuizQuestions(strapiQuestions: any[]): QuizQuestion[] {
+  return strapiQuestions.map((q, index) => ({
+    id: `q-${index}`, // Generate ID using index
+    question_text: q.question, // Map 'question' to 'question_text'
+    question_type: q.type?.toLowerCase() as 'multiple_choice' | 'true_false' | 'short_answer', // Convert MULTIPLE_CHOICE to multiple_choice
+    options: q.options,
+    correct_answer: q.correct_answer,
+    explanation: q.explanation,
+    points: q.points || 10, // Default to 10 points if not specified
+  }));
+}
+
 export const quizzesApi = {
   /**
    * Get quiz by ID
    */
   getById: async (id: string): Promise<Quiz> => {
-    const response = await fetchStrapi<Quiz>(`/quizzes/${id}`, {
+    const response = await fetchStrapi<any>(`/quizzes/${id}`, {
       populate: {
         lesson: {
           populate: ['course'],
@@ -388,14 +403,20 @@ export const quizzesApi = {
       },
     });
 
-    return response.data;
+    // Transform questions to match frontend interface
+    const quiz = response.data;
+    if (quiz.questions) {
+      quiz.questions = transformQuizQuestions(quiz.questions);
+    }
+
+    return quiz as Quiz;
   },
 
   /**
    * Get quiz for a lesson
    */
   getByLesson: async (lessonSlug: string): Promise<Quiz | null> => {
-    const response = await fetchStrapi<Quiz[]>('/quizzes', {
+    const response = await fetchStrapi<any[]>('/quizzes', {
       filters: {
         lesson: {
           slug: { $eq: lessonSlug },
@@ -408,7 +429,13 @@ export const quizzesApi = {
       },
     });
 
-    return response.data[0] || null;
+    // Transform questions to match frontend interface
+    const quiz = response.data[0];
+    if (quiz && quiz.questions) {
+      quiz.questions = transformQuizQuestions(quiz.questions);
+    }
+
+    return quiz as Quiz || null;
   },
 };
 
