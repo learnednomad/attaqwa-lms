@@ -4,7 +4,6 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:16-alpine
-    container_name: attaqwa-postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: attaqwa_lms
@@ -25,7 +24,6 @@ services:
     build:
       context: .
       target: api
-    container_name: attaqwa-api
     restart: unless-stopped
     environment:
       HOST: 0.0.0.0
@@ -56,7 +54,6 @@ services:
     build:
       context: .
       target: admin
-    container_name: attaqwa-admin
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -72,7 +69,6 @@ services:
     build:
       context: .
       target: website
-    container_name: attaqwa-website
     restart: unless-stopped
     environment:
       NODE_ENV: production
