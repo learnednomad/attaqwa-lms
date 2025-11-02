@@ -2,14 +2,10 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ['localhost', 'your-strapi-domain.com'],
     remotePatterns: [
-      {
-        protocol: 'http',
-        hostname: 'localhost',
-        port: '1337',
-        pathname: '/uploads/**',
-      },
+      { protocol: 'https', hostname: 'cms.learnednomad.com' },
+      { protocol: 'https', hostname: 'cdn.learnednomad.com' },
+      { protocol: 'http', hostname: 'localhost', port: '1337', pathname: '/uploads/**' },
     ],
   },
   experimental: {

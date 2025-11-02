@@ -4,7 +4,10 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   reactStrictMode: true,
   images: {
-    domains: ['localhost'],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'cms.learnednomad.com' },
+      { protocol: 'https', hostname: 'cdn.learnednomad.com' },
+    ],
   },
   // experimental: {
   //   // Enable for better performance in production

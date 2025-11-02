@@ -1,0 +1,34 @@
+{
+  "name": "@attaqwa/coolify-mcp",
+  "version": "1.0.0",
+  "description": "Enhanced Coolify MCP Server for deployment and infrastructure management",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "coolify-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "mcp",
+    "coolify",
+    "deployment",
+    "infrastructure"
+  ],
+  "author": "Masjid At-Taqwa",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "zod": "^3.23.8",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "typescript": "^5.5.3"
+  }
+}

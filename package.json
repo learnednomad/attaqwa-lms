@@ -18,7 +18,8 @@
     "type-check": "pnpm --parallel --filter './apps/*' type-check",
     "bmad:refresh": "bmad-method install -f -i codex",
     "bmad:list": "bmad-method list:agents",
-    "bmad:validate": "bmad-method validate"
+    "bmad:validate": "bmad-method validate",
+    "mcp:coolify": "node scripts/coolify-mcp.mjs"
   },
   "engines": {
     "node": ">=18.0.0 <=22.x.x",
