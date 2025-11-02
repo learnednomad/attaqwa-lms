@@ -1,0 +1,154 @@
+name: CI Quality Checks
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+jobs:
+  quality-checks:
+    name: Code Quality & Type Safety
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.3
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run ESLint
+        run: pnpm run lint
+        continue-on-error: false
+
+      - name: Run TypeScript type checking
+        run: pnpm run type-check
+        continue-on-error: true # Allow failure until React version alignment (Epic 1)
+
+      - name: Run tests (website)
+        run: |
+          cd apps/website
+          pnpm test:coverage
+        continue-on-error: true # Allow failure until module resolution fixed
+
+      - name: Upload test coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: apps/website/coverage/
+          retention-days: 7
+
+  build-validation:
+    name: Build Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.3
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build admin app
+        run: pnpm run build:admin
+        continue-on-error: true # Allow failure until type errors fixed (Priority #0)
+
+      - name: Build website app
+        run: pnpm run build:website
+        continue-on-error: true # Allow failure until module exports fixed (Priority #0)
+
+      - name: Check build status
+        if: always()
+        run: |
+          echo "⚠️ Build validation complete"
+          echo "Note: Builds currently failing - see BASELINES.md Priority #0"
+          echo "Admin build: TypeScript errors in Strapi client"
+          echo "Website build: Missing exports from @attaqwa/shared"
+
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.3
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: |
+          cd apps/website
+          pnpm exec playwright install --with-deps chromium
+
+      - name: Run Playwright E2E tests
+        run: |
+          cd apps/website
+          pnpm exec playwright test --project=chromium
+        continue-on-error: true # Allow failure until apps fully working
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/website/playwright-report/
+          retention-days: 7

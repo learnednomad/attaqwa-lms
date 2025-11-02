@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FeatureFlagService } from '@attaqwa/shared/feature-flags';
+import { FeatureFlagService } from '@attaqwa/shared';
 import { Button } from '@/components/ui/button';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -18,7 +18,8 @@ import {
   Eye,
   AlertCircle
 } from 'lucide-react';
-import type { QuestionType } from '@attaqwa/shared';
+// TODO: Move these to @attaqwa/shared-types in Epic 2
+type QuestionType = 'MULTIPLE_CHOICE' | 'TRUE_FALSE' | 'SHORT_ANSWER' | 'FILL_BLANK';
 
 interface QuizQuestion {
   id: string;

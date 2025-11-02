@@ -130,10 +130,9 @@ export default function PrayerTimesPage() {
               <h2 id="prayer-times-today" className="mb-6 text-2xl font-bold text-islamic-navy-800">
                 Today's Prayer Schedule
               </h2>
-              <PrayerTimesWidget 
-                prayerTimes={mockPrayerTimes} 
+              <PrayerTimesWidget
+                prayerTimes={mockPrayerTimes}
                 currentPrayer="dhuhr"
-                showQibla={true}
               />
             </section>
 

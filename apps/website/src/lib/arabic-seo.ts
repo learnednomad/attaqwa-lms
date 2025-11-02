@@ -120,7 +120,7 @@ export const ArabicTextUtils = {
     arabic: string;
     transliteration: string;
     translation: string;
-    keywords: string[];
+    keywords: readonly string[];
     seoContent: string;
   } {
     const phrase = this.ISLAMIC_PHRASES[arabicText as keyof typeof this.ISLAMIC_PHRASES];
@@ -188,7 +188,7 @@ export const MultilingualSEO = {
   generateLanguageMetaTags(language: 'en' | 'ar', content: {
     title: string;
     description: string;
-    keywords: string[];
+    keywords: readonly string[];
   }) {
     const lang = this.SUPPORTED_LANGUAGES[language];
     

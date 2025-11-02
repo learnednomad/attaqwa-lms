@@ -24,9 +24,13 @@ export default function PrayerTimesPage() {
   const [view, setView] = useState<'today' | 'week' | 'month'>('today');
   const [currentMonth, setCurrentMonth] = useState(new Date().toISOString().slice(0, 7));
 
-  const { data: todayData, isLoading: todayLoading, refetch: refetchToday } = useTodayPrayerTimes({ city, country, method });
-  const { data: weekData, isLoading: weekLoading, refetch: refetchWeek } = useWeekPrayerTimes({ city, country, method });
-  const { data: monthData, isLoading: monthLoading, refetch: refetchMonth } = useMonthPrayerTimes(currentMonth, { city, country, method });
+  // Toronto coordinates - TODO: Add city-to-coordinates lookup
+  const latitude = 43.6532;
+  const longitude = -79.3832;
+
+  const { data: todayData, isLoading: todayLoading, refetch: refetchToday } = useTodayPrayerTimes(latitude, longitude);
+  const { data: weekData, isLoading: weekLoading, refetch: refetchWeek } = useWeekPrayerTimes(latitude, longitude);
+  const { data: monthData, isLoading: monthLoading, refetch: refetchMonth } = useMonthPrayerTimes(latitude, longitude);
 
   const handleSettingsUpdate = () => {
     refetchToday();
@@ -121,9 +125,9 @@ export default function PrayerTimesPage() {
                 <MapPin className="w-4 h-4" />
                 <span>{city}, {country}</span>
               </div>
-              {todayData?.data && (
+              {todayData && (
                 <div className="flex items-center space-x-2 text-sm text-gray-600 mt-1">
-                  <span>Qibla: {todayData.data.qibla}°</span>
+                  <span>Qibla: {todayData.qibla}°</span>
                 </div>
               )}
             </div>
@@ -164,7 +168,7 @@ export default function PrayerTimesPage() {
           )}
 
           {/* Today's Prayer Times */}
-          {view === 'today' && todayData?.data && (
+          {view === 'today' && todayData && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
@@ -177,7 +181,7 @@ export default function PrayerTimesPage() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                  {Object.entries(todayData.data)
+                  {Object.entries(todayData)
                     .filter(([key]) => key !== 'date' && key !== 'qibla')
                     .map(([prayer, time]) => (
                       <Card key={prayer} className="text-center">
@@ -197,7 +201,7 @@ export default function PrayerTimesPage() {
           )}
 
           {/* Week View */}
-          {view === 'week' && weekData?.data && (
+          {view === 'week' && weekData && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
@@ -220,7 +224,7 @@ export default function PrayerTimesPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {weekData.data.map((day) => (
+                      {weekData.map((day) => (
                         <tr key={day.date} className="border-b hover:bg-gray-50">
                           <td className="py-3 font-medium">
                             {new Date(day.date).toLocaleDateString('en-US', {
@@ -229,12 +233,12 @@ export default function PrayerTimesPage() {
                               day: 'numeric'
                             })}
                           </td>
-                          <td className="py-3 text-center font-mono">{formatTime(day.fajr)}</td>
-                          <td className="py-3 text-center font-mono">{formatTime(day.sunrise)}</td>
-                          <td className="py-3 text-center font-mono">{formatTime(day.dhuhr)}</td>
-                          <td className="py-3 text-center font-mono">{formatTime(day.asr)}</td>
-                          <td className="py-3 text-center font-mono">{formatTime(day.maghrib)}</td>
-                          <td className="py-3 text-center font-mono">{formatTime(day.isha)}</td>
+                          <td className="py-3 text-center font-mono">{formatTime(day.prayerTimes.fajr)}</td>
+                          <td className="py-3 text-center font-mono">{formatTime(day.prayerTimes.sunrise)}</td>
+                          <td className="py-3 text-center font-mono">{formatTime(day.prayerTimes.dhuhr)}</td>
+                          <td className="py-3 text-center font-mono">{formatTime(day.prayerTimes.asr)}</td>
+                          <td className="py-3 text-center font-mono">{formatTime(day.prayerTimes.maghrib)}</td>
+                          <td className="py-3 text-center font-mono">{formatTime(day.prayerTimes.isha)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -245,7 +249,7 @@ export default function PrayerTimesPage() {
           )}
 
           {/* Month View */}
-          {view === 'month' && monthData?.data && (
+          {view === 'month' && monthData && (
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center space-x-2">
@@ -276,7 +280,7 @@ export default function PrayerTimesPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {monthData.data.map((day) => (
+                      {monthData.map((day) => (
                         <tr key={day.date} className="border-b hover:bg-gray-50">
                           <td className="py-2 font-medium">
                             {new Date(day.date).toLocaleDateString('en-US', {
@@ -284,12 +288,12 @@ export default function PrayerTimesPage() {
                               day: 'numeric'
                             })}
                           </td>
-                          <td className="py-2 text-center font-mono text-xs">{formatTime(day.fajr)}</td>
-                          <td className="py-2 text-center font-mono text-xs">{formatTime(day.sunrise)}</td>
-                          <td className="py-2 text-center font-mono text-xs">{formatTime(day.dhuhr)}</td>
-                          <td className="py-2 text-center font-mono text-xs">{formatTime(day.asr)}</td>
-                          <td className="py-2 text-center font-mono text-xs">{formatTime(day.maghrib)}</td>
-                          <td className="py-2 text-center font-mono text-xs">{formatTime(day.isha)}</td>
+                          <td className="py-2 text-center font-mono text-xs">{formatTime(day.prayerTimes.fajr)}</td>
+                          <td className="py-2 text-center font-mono text-xs">{formatTime(day.prayerTimes.sunrise)}</td>
+                          <td className="py-2 text-center font-mono text-xs">{formatTime(day.prayerTimes.dhuhr)}</td>
+                          <td className="py-2 text-center font-mono text-xs">{formatTime(day.prayerTimes.asr)}</td>
+                          <td className="py-2 text-center font-mono text-xs">{formatTime(day.prayerTimes.maghrib)}</td>
+                          <td className="py-2 text-center font-mono text-xs">{formatTime(day.prayerTimes.isha)}</td>
                         </tr>
                       ))}
                     </tbody>

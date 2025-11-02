@@ -73,6 +73,14 @@ export interface UserProfile {
 
 export type AgeTier = 'children' | 'youth' | 'adults' | 'all';
 
+// Runtime const for AgeTier
+export const AgeTier = {
+  CHILDREN: 'children' as const,
+  YOUTH: 'youth' as const,
+  ADULTS: 'adults' as const,
+  ALL: 'all' as const,
+} as const;
+
 // ============================================================================
 // Course Types
 // ============================================================================
@@ -85,7 +93,27 @@ export type CourseCategory =
   | 'aqeedah'
   | 'general';
 
+// Runtime const for CourseCategory
+export const CourseCategory = {
+  QURAN: 'quran' as const,
+  HADITH: 'hadith' as const,
+  FIQH: 'fiqh' as const,
+  SEERAH: 'seerah' as const,
+  AQEEDAH: 'aqeedah' as const,
+  GENERAL: 'general' as const,
+} as const;
+
 export type CourseDifficulty = 'beginner' | 'intermediate' | 'advanced';
+
+// Runtime const for CourseDifficulty
+export const CourseDifficulty = {
+  BEGINNER: 'beginner' as const,
+  INTERMEDIATE: 'intermediate' as const,
+  ADVANCED: 'advanced' as const,
+} as const;
+
+// Alias for backward compatibility
+export const DifficultyLevel = CourseDifficulty;
 
 export interface Course {
   id: string;
@@ -123,10 +151,20 @@ export interface Instructor {
 
 export type LessonType = 'article' | 'video' | 'audio' | 'quiz' | 'interactive';
 
+// Runtime const for LessonType
+export const LessonType = {
+  ARTICLE: 'article' as const,
+  VIDEO: 'video' as const,
+  AUDIO: 'audio' as const,
+  QUIZ: 'quiz' as const,
+  INTERACTIVE: 'interactive' as const,
+} as const;
+
 export interface Lesson {
   id: string;
   documentId?: string;
   title: string;
+  description?: string; // Short description of the lesson
   content: string; // Rich text content
   type: LessonType;
   course: Pick<Course, 'id' | 'title'>;
@@ -136,6 +174,7 @@ export interface Lesson {
   attachments?: StrapiMedia[];
   quiz?: Quiz;
   isLocked: boolean; // Requires previous lessons to be completed
+  isRequired?: boolean; // Lesson is required for course completion
   createdAt: string;
   updatedAt: string;
 }
@@ -157,6 +196,13 @@ export interface Quiz {
 }
 
 export type QuestionType = 'multiple_choice' | 'true_false' | 'fill_blank';
+
+// Runtime const for QuestionType
+export const QuestionType = {
+  MULTIPLE_CHOICE: 'multiple_choice' as const,
+  TRUE_FALSE: 'true_false' as const,
+  FILL_BLANK: 'fill_blank' as const,
+} as const;
 
 export interface QuizQuestion {
   id: string;

@@ -69,7 +69,7 @@ const queryClient = new QueryClient({
     queries: {
       retry: false,
       staleTime: 0, // Disable caching for mock data
-      cacheTime: 0, // Disable caching for mock data
+      gcTime: 0, // Disable caching for mock data
       refetchOnWindowFocus: false, // Performance optimization for demo
       refetchOnMount: true, // Ensure fresh data on component mount
     },
@@ -245,9 +245,8 @@ function TestIslamicDashboard({ className }: { className?: string }) {
       return mockPrayerTimes;
     },
     staleTime: 0,
-    cacheTime: 0,
+    gcTime: 0,
     enabled: isAuthenticated && !isInitialLoad,
-    keepPreviousData: true // Smooth transitions
   });
 
   const { data: educationProgress, isLoading: educationLoading } = useQuery({
@@ -258,9 +257,8 @@ function TestIslamicDashboard({ className }: { className?: string }) {
       return mockEducationProgress;
     },
     staleTime: 0,
-    cacheTime: 0,
+    gcTime: 0,
     enabled: isAuthenticated && !!user?.id && !isInitialLoad,
-    keepPreviousData: true // Smooth transitions
   });
 
   const { data: dashboardStats, isLoading: statsLoading } = useQuery({
@@ -271,9 +269,8 @@ function TestIslamicDashboard({ className }: { className?: string }) {
       return mockDashboardStats;
     },
     staleTime: 0,
-    cacheTime: 0,
+    gcTime: 0,
     enabled: isAuthenticated && !!user?.id && !isInitialLoad,
-    keepPreviousData: true // Smooth transitions
   });
 
   if (!isAuthenticated) {
@@ -375,8 +372,8 @@ function TestIslamicDashboard({ className }: { className?: string }) {
                   month: 'long', 
                   day: 'numeric',
                   calendar: 'islamic'
-                }).replace(/\d+/g, match => 
-                  ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'][match] || match
+                }).replace(/\d+/g, match =>
+                  ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'][parseInt(match, 10)] || match
                 )}
               </div>
             </div>
@@ -397,7 +394,7 @@ function TestIslamicDashboard({ className }: { className?: string }) {
         ) : (
           <>
             <Card className="group border-islamic-green/20 bg-gradient-to-br from-islamic-green/5 to-transparent hover:shadow-xl hover:shadow-islamic-green/10 focus-within:shadow-xl focus-within:shadow-islamic-green/10 focus-within:ring-2 focus-within:ring-islamic-green/30 focus-within:ring-offset-2 transition-all duration-500 hover:scale-105 hover:-translate-y-1 focus-within:scale-105 focus-within:-translate-y-1 cursor-pointer relative overflow-hidden" 
-                  tabIndex="0" 
+                  tabIndex={0} 
                   role="button" 
                   aria-label="Prayer statistics: 28 prayers completed this week"
                   onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.click()}>
@@ -432,7 +429,7 @@ function TestIslamicDashboard({ className }: { className?: string }) {
             </Card>
 
             <Card className="group border-islamic-gold/20 bg-gradient-to-br from-islamic-gold/5 to-transparent hover:shadow-xl hover:shadow-islamic-gold/10 focus-within:shadow-xl focus-within:shadow-islamic-gold/10 focus-within:ring-2 focus-within:ring-islamic-gold/30 focus-within:ring-offset-2 transition-all duration-500 hover:scale-105 hover:-translate-y-1 focus-within:scale-105 focus-within:-translate-y-1 cursor-pointer relative overflow-hidden" 
-                  tabIndex="0" 
+                  tabIndex={0} 
                   role="button" 
                   aria-label="Learning statistics: 12 educational hours completed this month"
                   onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.click()}>
@@ -466,7 +463,7 @@ function TestIslamicDashboard({ className }: { className?: string }) {
             </Card>
 
             <Card className="group border-islamic-navy/20 bg-gradient-to-br from-islamic-navy/5 to-transparent hover:shadow-xl hover:shadow-islamic-navy/10 focus-within:shadow-xl focus-within:shadow-islamic-navy/10 focus-within:ring-2 focus-within:ring-islamic-navy/30 focus-within:ring-offset-2 transition-all duration-500 hover:scale-105 hover:-translate-y-1 focus-within:scale-105 focus-within:-translate-y-1 cursor-pointer relative overflow-hidden" 
-                  tabIndex="0" 
+                  tabIndex={0} 
                   role="button" 
                   aria-label="Streak statistics: 7 days current learning streak"
                   onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.click()}>
@@ -500,7 +497,7 @@ function TestIslamicDashboard({ className }: { className?: string }) {
             </Card>
 
             <Card className="group border-green-500/20 bg-gradient-to-br from-green-500/5 to-transparent hover:shadow-xl hover:shadow-green-500/10 focus-within:shadow-xl focus-within:shadow-green-500/10 focus-within:ring-2 focus-within:ring-green-500/30 focus-within:ring-offset-2 transition-all duration-500 hover:scale-105 hover:-translate-y-1 focus-within:scale-105 focus-within:-translate-y-1 cursor-pointer relative overflow-hidden" 
-                  tabIndex="0" 
+                  tabIndex={0} 
                   role="button" 
                   aria-label="Achievement statistics: 3 courses completed"
                   onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.click()}>
@@ -542,7 +539,7 @@ function TestIslamicDashboard({ className }: { className?: string }) {
         {/* Prayer Time & Qibla Section */}
         <div className="lg:col-span-1 space-y-4">
           <Card className="border-islamic-green/20 card-prayer-time relative overflow-hidden group hover:shadow-xl hover:shadow-islamic-green/15 focus-within:shadow-xl focus-within:shadow-islamic-green/15 focus-within:ring-2 focus-within:ring-islamic-green/30 focus-within:ring-offset-2 transition-all duration-500" 
-                tabIndex="0" 
+                tabIndex={0} 
                 role="region" 
                 aria-labelledby="prayer-time-heading"
                 onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.focus()}>
@@ -702,7 +699,7 @@ function TestIslamicDashboard({ className }: { className?: string }) {
           <Card className="border-islamic-navy/20 focus-within:ring-2 focus-within:ring-islamic-navy/30 focus-within:ring-offset-2 transition-all duration-300" 
                 role="region" 
                 aria-labelledby="learning-journey-heading"
-                tabIndex="0">
+                tabIndex={0}>
             <CardHeader>
               <CardTitle id="learning-journey-heading" className="flex items-center gap-2 text-islamic-navy">
                 <BookOpen className="h-5 w-5" aria-hidden="true" />
@@ -742,7 +739,7 @@ function TestIslamicDashboard({ className }: { className?: string }) {
                   {educationProgress.slice(0, 3).map((course, index) => (
                     <div key={course.id} 
                          className={`relative border-l-4 border-islamic-green/30 pl-6 transition-all duration-300 hover:border-islamic-green/60 hover:bg-islamic-green/5 focus-within:border-islamic-green/60 focus-within:bg-islamic-green/5 focus-within:ring-2 focus-within:ring-islamic-green/30 focus-within:ring-offset-2 rounded-r-lg ${index % 2 === 0 ? 'animate-slide-up' : 'animate-fade-in'}`}
-                         tabIndex="0"
+                         tabIndex={0}
                          role="article"
                          aria-labelledby={`course-title-${course.id}`}
                          aria-describedby={`course-progress-${course.id}`}>
@@ -907,7 +904,7 @@ function TestIslamicDashboard({ className }: { className?: string }) {
 
       {/* Community Activity Section with Premium Polish */}
       <Card className="border-islamic-gold/30 bg-gradient-to-br from-islamic-gold/10 via-islamic-gold/5 to-transparent hover:shadow-2xl hover:shadow-islamic-gold/20 focus-within:shadow-2xl focus-within:shadow-islamic-gold/20 focus-within:ring-4 focus-within:ring-islamic-gold/20 focus-within:ring-offset-4 transition-all duration-700 hover:scale-[1.01] focus-within:scale-[1.01] relative overflow-hidden" 
-            tabIndex="0" 
+            tabIndex={0} 
             role="region" 
             aria-labelledby="community-activity-heading">
         {/* Premium background effects */}
@@ -954,7 +951,7 @@ function TestIslamicDashboard({ className }: { className?: string }) {
             <div className="group text-center p-4 rounded-lg border border-islamic-gold/20 bg-gradient-to-br from-islamic-gold/5 to-transparent hover:border-islamic-gold/40 hover:shadow-md transition-all duration-300 hover:scale-105">
               <div className="relative mb-2">
                 <Award className="h-8 w-8 text-islamic-gold/60 mx-auto mb-2 group-hover:animate-pulse" />
-                {dashboardStats?.communityRank <= 50 && (
+                {(dashboardStats?.communityRank ?? Infinity) <= 50 && (
                   <div className="absolute -top-1 -right-4 w-2 h-2 bg-islamic-gold rounded-full animate-ping"></div>
                 )}
               </div>
@@ -963,7 +960,7 @@ function TestIslamicDashboard({ className }: { className?: string }) {
               </p>
               <p className="text-sm text-gray-600">Community Ranking</p>
               <div className="text-xs text-islamic-gold/80 mt-1">
-                {dashboardStats?.communityRank <= 50 ? 'Top Learner! 🌟' : 'Keep Learning!'}
+                {(dashboardStats?.communityRank ?? Infinity) <= 50 ? 'Top Learner! 🌟' : 'Keep Learning!'}
               </div>
             </div>
             

@@ -1,0 +1,170 @@
+name: Bundle Size Tracking
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+jobs:
+  bundle-analysis:
+    name: Analyze Bundle Sizes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.3
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build admin app (for bundle analysis)
+        id: admin-build
+        run: |
+          echo "Building admin app..."
+          pnpm run build:admin 2>&1 | tee admin-build.log || true
+          if [ -d "apps/admin/.next" ]; then
+            echo "admin_built=true" >> $GITHUB_OUTPUT
+          else
+            echo "admin_built=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build website app (for bundle analysis)
+        id: website-build
+        run: |
+          echo "Building website app..."
+          pnpm run build:website 2>&1 | tee website-build.log || true
+          if [ -d "apps/website/.next" ]; then
+            echo "website_built=true" >> $GITHUB_OUTPUT
+          else
+            echo "website_built=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Analyze admin bundle (if built)
+        if: steps.admin-build.outputs.admin_built == 'true'
+        run: |
+          echo "Analyzing admin bundle..."
+          cd apps/admin
+
+          # Create bundle size report
+          mkdir -p bundle-reports
+
+          # Get .next build directory size
+          du -sh .next > bundle-reports/admin-total-size.txt
+
+          # Get detailed chunk sizes
+          find .next/static -name "*.js" -exec du -h {} \; | sort -hr > bundle-reports/admin-chunks.txt || true
+
+          # Get pages sizes
+          find .next/server/pages -name "*.js" -exec du -h {} \; | sort -hr > bundle-reports/admin-pages.txt || true
+
+          echo "Admin bundle analysis complete"
+          cat bundle-reports/admin-total-size.txt
+
+      - name: Analyze website bundle (if built)
+        if: steps.website-build.outputs.website_built == 'true'
+        run: |
+          echo "Analyzing website bundle..."
+          cd apps/website
+
+          # Create bundle size report
+          mkdir -p bundle-reports
+
+          # Get .next build directory size
+          du -sh .next > bundle-reports/website-total-size.txt
+
+          # Get detailed chunk sizes
+          find .next/static -name "*.js" -exec du -h {} \; | sort -hr > bundle-reports/website-chunks.txt || true
+
+          # Get pages sizes
+          find .next/server/pages -name "*.js" -exec du -h {} \; | sort -hr > bundle-reports/website-pages.txt || true
+
+          echo "Website bundle analysis complete"
+          cat bundle-reports/website-total-size.txt
+
+      - name: Generate bundle size summary
+        if: always()
+        run: |
+          echo "# 📦 Bundle Size Report" > bundle-summary.md
+          echo "" >> bundle-summary.md
+          echo "**Generated:** $(date)" >> bundle-summary.md
+          echo "" >> bundle-summary.md
+
+          if [ "${{ steps.admin-build.outputs.admin_built }}" == "true" ]; then
+            echo "## Admin App" >> bundle-summary.md
+            echo "\`\`\`" >> bundle-summary.md
+            cat apps/admin/bundle-reports/admin-total-size.txt >> bundle-summary.md || echo "No size data" >> bundle-summary.md
+            echo "\`\`\`" >> bundle-summary.md
+            echo "" >> bundle-summary.md
+          else
+            echo "## Admin App" >> bundle-summary.md
+            echo "❌ Build failed - see BASELINES.md Priority #0" >> bundle-summary.md
+            echo "" >> bundle-summary.md
+          fi
+
+          if [ "${{ steps.website-build.outputs.website_built }}" == "true" ]; then
+            echo "## Website App" >> bundle-summary.md
+            echo "\`\`\`" >> bundle-summary.md
+            cat apps/website/bundle-reports/website-total-size.txt >> bundle-summary.md || echo "No size data" >> bundle-summary.md
+            echo "\`\`\`" >> bundle-summary.md
+          else
+            echo "## Website App" >> bundle-summary.md
+            echo "❌ Build failed - see BASELINES.md Priority #0" >> bundle-summary.md
+          fi
+
+          echo "" >> bundle-summary.md
+          echo "---" >> bundle-summary.md
+          echo "**Note:** Bundle analysis will be accurate once build issues are resolved (Epic 1)" >> bundle-summary.md
+
+          cat bundle-summary.md
+
+      - name: Upload bundle reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-size-reports
+          path: |
+            apps/admin/bundle-reports/
+            apps/website/bundle-reports/
+            bundle-summary.md
+            admin-build.log
+            website-build.log
+          retention-days: 30
+
+      - name: Comment PR with bundle size
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('bundle-summary.md', 'utf8');
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });

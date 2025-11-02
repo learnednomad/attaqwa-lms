@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FeatureFlagService } from '@attaqwa/shared/feature-flags';
+import { FeatureFlagService } from '@attaqwa/shared';
 import { Button } from '@/components/ui/button';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -19,7 +19,13 @@ import {
   Star,
   Eye
 } from 'lucide-react';
-import type { IslamicSubject, DifficultyLevel, EducationContentType, AgeTier } from '@attaqwa/shared';
+import type { CourseDifficulty, AgeTier as AgeTierType } from '@attaqwa/shared-types';
+
+// TODO: Move these to @attaqwa/shared-types in Epic 2
+type IslamicSubject = 'QURAN' | 'HADITH' | 'FIQH' | 'AQIDAH' | 'SEERAH' | 'WORSHIP' | 'ARABIC_LANGUAGE' | 'ISLAMIC_HISTORY';
+type EducationContentType = 'LESSON' | 'VIDEO' | 'AUDIO' | 'QUIZ' | 'ARTICLE' | 'INTERACTIVE';
+type DifficultyLevel = CourseDifficulty;
+type AgeTier = AgeTierType;
 
 interface EducationContent {
   id: string;
@@ -229,11 +235,10 @@ export default function EducationContentPage() {
   };
 
   const getDifficultyColor = (level: DifficultyLevel) => {
-    const colors = {
-      BEGINNER: 'bg-green-100 text-green-800',
-      INTERMEDIATE: 'bg-yellow-100 text-yellow-800',
-      ADVANCED: 'bg-orange-100 text-orange-800',
-      SCHOLAR: 'bg-red-100 text-red-800'
+    const colors: Record<DifficultyLevel, string> = {
+      beginner: 'bg-green-100 text-green-800',
+      intermediate: 'bg-yellow-100 text-yellow-800',
+      advanced: 'bg-orange-100 text-orange-800'
     };
     return colors[level] || 'bg-gray-100 text-gray-800';
   };

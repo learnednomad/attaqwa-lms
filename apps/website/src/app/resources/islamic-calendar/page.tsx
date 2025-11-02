@@ -76,7 +76,7 @@ export default function IslamicCalendarPage() {
   const loadIslamicDate = async () => {
     setLoading(true);
     try {
-      const data = await fetchIslamicCalendar(currentDate);
+      const data = await fetchIslamicCalendar(currentDate ?? undefined);
       setIslamicDate(data);
       if (data && data.month) {
         setSelectedMonth(data.month.number);
@@ -194,7 +194,7 @@ export default function IslamicCalendarPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {islamicDate && (
+                {islamicDate && currentDate && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Islamic Date */}
                     <div className="text-center md:text-left">

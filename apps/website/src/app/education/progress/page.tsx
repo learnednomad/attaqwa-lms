@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FeatureFlagService } from '@attaqwa/shared/feature-flags';
+import { FeatureFlagService } from '@attaqwa/shared';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

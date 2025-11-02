@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, Calendar, MapPin, Clock, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { formatDate, formatTime, truncateText } from '@attaqwa/shared';
+import type { Event } from '@/types';
 
 export default function EventsPage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -62,7 +63,7 @@ export default function EventsPage() {
     );
   }
 
-  const events = data?.data || [];
+  const events: Event[] = data?.data || [];
   const pagination = data?.pagination;
 
   return (

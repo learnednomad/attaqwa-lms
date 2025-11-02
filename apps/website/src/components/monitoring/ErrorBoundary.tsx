@@ -27,11 +27,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error to our monitoring system
-    logReactError(error, errorInfo);
-    
+    logReactError(error, { componentStack: errorInfo.componentStack || '' });
+
     // Call custom error handler if provided
     this.props.onError?.(error, errorInfo);
-    
+
     this.setState({ error, errorInfo });
   }
 

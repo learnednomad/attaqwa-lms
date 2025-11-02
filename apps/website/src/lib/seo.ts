@@ -157,7 +157,7 @@ export function generateSEOMetadata(config: SEOPageConfig): Metadata {
     openGraph: {
       title: fullTitle,
       description,
-      type,
+      type: type === 'event' || type === 'organization' ? 'website' : type,
       url: canonicalUrl,
       siteName: MOSQUE_INFO.name,
       locale: 'en_US',

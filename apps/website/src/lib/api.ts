@@ -1,16 +1,34 @@
-import { 
-  API_ENDPOINTS, 
-  ERROR_MESSAGES,
-  type ApiResponse,
-  type PaginatedResponse,
-  type ErrorResponse,
-  type Announcement,
-  type Event,
-  type PrayerTimes,
-  type AuthUser,
-  type LoginInput,
-  type RegisterInput
+import {
+  API_ENDPOINTS,
+  ERROR_MESSAGES
 } from '@attaqwa/shared';
+import type {
+  ApiResponse,
+  PaginatedResponse,
+  ErrorResponse,
+  Announcement,
+  Event,
+  PrayerTime
+} from '@/types';
+
+// Auth types - TODO: Move to @attaqwa/shared-types in Epic 2
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  role: 'admin' | 'user';
+}
+
+export interface LoginInput {
+  email: string;
+  password: string;
+}
+
+export interface RegisterInput {
+  email: string;
+  password: string;
+  name: string;
+}
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -22,12 +40,12 @@ export class ApiError extends Error {
 }
 
 async function makeRequest<T>(
-  endpoint: string, 
+  endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
-  
-  const defaultHeaders = {
+
+  const defaultHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
   };
 
@@ -49,8 +67,8 @@ async function makeRequest<T>(
   });
 
   if (!response.ok) {
-    let errorMessage = ERROR_MESSAGES.SERVER_ERROR;
-    
+    let errorMessage: string = ERROR_MESSAGES.SERVER_ERROR;
+
     try {
       const errorData: ErrorResponse = await response.json();
       errorMessage = errorData.message || errorData.error;
@@ -58,7 +76,7 @@ async function makeRequest<T>(
       // Fallback to status text if JSON parsing fails
       errorMessage = response.statusText || `HTTP ${response.status}`;
     }
-    
+
     throw new ApiError(response.status, errorMessage);
   }
 
@@ -69,49 +87,49 @@ async function makeRequest<T>(
 export const authApi = {
   login: async (credentials: LoginInput): Promise<{ user: AuthUser; token: string }> => {
     const response = await makeRequest<{ user: AuthUser; token: string }>(
-      API_ENDPOINTS.AUTH.LOGIN,
+      API_ENDPOINTS.LOGIN,
       {
         method: 'POST',
         body: JSON.stringify(credentials),
       }
     );
-    
+
     // Store token in localStorage for client-side usage
     if (typeof window !== 'undefined' && response.token) {
       localStorage.setItem('auth_token', response.token);
     }
-    
+
     return response;
   },
 
   register: async (userData: RegisterInput): Promise<{ user: AuthUser; token: string }> => {
     const response = await makeRequest<{ user: AuthUser; token: string }>(
-      API_ENDPOINTS.AUTH.REGISTER,
+      API_ENDPOINTS.REGISTER,
       {
         method: 'POST',
         body: JSON.stringify(userData),
       }
     );
-    
+
     if (typeof window !== 'undefined' && response.token) {
       localStorage.setItem('auth_token', response.token);
     }
-    
+
     return response;
   },
 
   logout: async (): Promise<void> => {
-    await makeRequest(API_ENDPOINTS.AUTH.LOGOUT, {
+    await makeRequest(API_ENDPOINTS.LOGOUT, {
       method: 'POST',
     });
-    
+
     if (typeof window !== 'undefined') {
       localStorage.removeItem('auth_token');
     }
   },
 
   getMe: async (): Promise<{ user: AuthUser }> => {
-    return makeRequest<{ user: AuthUser }>(API_ENDPOINTS.AUTH.ME);
+    return makeRequest<{ user: AuthUser }>(API_ENDPOINTS.ME);
   },
 };
 
@@ -211,7 +229,7 @@ export const prayerTimesApi = {
     city?: string;
     country?: string;
     method?: string;
-  }): Promise<ApiResponse<PrayerTimes>> => {
+  }): Promise<ApiResponse<PrayerTime>> => {
     const searchParams = new URLSearchParams();
     if (params?.city) searchParams.append('city', params.city);
     if (params?.country) searchParams.append('country', params.country);
@@ -220,14 +238,14 @@ export const prayerTimesApi = {
     const query = searchParams.toString();
     const endpoint = query ? `${API_ENDPOINTS.PRAYER_TIMES}?${query}` : API_ENDPOINTS.PRAYER_TIMES;
     
-    return makeRequest<ApiResponse<PrayerTimes>>(endpoint);
+    return makeRequest<ApiResponse<PrayerTime>>(endpoint);
   },
 
   getWeek: async (params?: {
     city?: string;
     country?: string;
     method?: string;
-  }): Promise<ApiResponse<PrayerTimes[]>> => {
+  }): Promise<ApiResponse<PrayerTime[]>> => {
     const searchParams = new URLSearchParams();
     if (params?.city) searchParams.append('city', params.city);
     if (params?.country) searchParams.append('country', params.country);
@@ -236,7 +254,7 @@ export const prayerTimesApi = {
     const query = searchParams.toString();
     const endpoint = query ? `${API_ENDPOINTS.PRAYER_TIMES}/week?${query}` : `${API_ENDPOINTS.PRAYER_TIMES}/week`;
     
-    return makeRequest<ApiResponse<PrayerTimes[]>>(endpoint);
+    return makeRequest<ApiResponse<PrayerTime[]>>(endpoint);
   },
 
   getMonth: async (params?: {
@@ -244,7 +262,7 @@ export const prayerTimesApi = {
     city?: string;
     country?: string;
     method?: string;
-  }): Promise<ApiResponse<PrayerTimes[]>> => {
+  }): Promise<ApiResponse<PrayerTime[]>> => {
     const searchParams = new URLSearchParams();
     if (params?.month) searchParams.append('month', params.month);
     if (params?.city) searchParams.append('city', params.city);
@@ -254,7 +272,7 @@ export const prayerTimesApi = {
     const query = searchParams.toString();
     const endpoint = query ? `${API_ENDPOINTS.PRAYER_TIMES}/month?${query}` : `${API_ENDPOINTS.PRAYER_TIMES}/month`;
     
-    return makeRequest<ApiResponse<PrayerTimes[]>>(endpoint);
+    return makeRequest<ApiResponse<PrayerTime[]>>(endpoint);
   },
 };
 
