@@ -3,6 +3,11 @@ import {
   ERROR_MESSAGES
 } from '@attaqwa/shared';
 import type {
+  AuthUser,
+  LoginInput,
+  RegisterInput,
+} from '@attaqwa/shared';
+import type {
   ApiResponse,
   PaginatedResponse,
   ErrorResponse,
@@ -11,24 +16,8 @@ import type {
   PrayerTime
 } from '@/types';
 
-// Auth types - TODO: Move to @attaqwa/shared-types in Epic 2
-export interface AuthUser {
-  id: string;
-  email: string;
-  name: string;
-  role: 'admin' | 'user';
-}
-
-export interface LoginInput {
-  email: string;
-  password: string;
-}
-
-export interface RegisterInput {
-  email: string;
-  password: string;
-  name: string;
-}
+// Auth types now consolidated in @attaqwa/shared-types
+export type { AuthUser, LoginInput, RegisterInput };
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 

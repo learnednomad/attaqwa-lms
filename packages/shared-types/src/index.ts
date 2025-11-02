@@ -81,6 +81,27 @@ export const AgeTier = {
   ALL: 'all' as const,
 } as const;
 
+/**
+ * Authentication types for website and admin apps
+ */
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  role: 'admin' | 'user';
+}
+
+export interface LoginInput {
+  email: string;
+  password: string;
+}
+
+export interface RegisterInput {
+  email: string;
+  password: string;
+  name: string;
+}
+
 // ============================================================================
 // Course Types
 // ============================================================================

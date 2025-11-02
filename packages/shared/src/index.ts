@@ -132,6 +132,11 @@ export type {
   UserRole,
   UserProfile,
 
+  // Auth types
+  AuthUser,
+  LoginInput,
+  RegisterInput,
+
   // Course types
   Course,
   Instructor,
