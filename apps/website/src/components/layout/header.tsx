@@ -15,8 +15,8 @@ const navigation = [
   { name: 'Announcements', href: '/announcements' },
   { name: 'Calendar', href: '/calendar' },
   { name: 'Prayer Times', href: '/prayer-times' },
-  { 
-    name: 'Resources', 
+  {
+    name: 'Resources',
     href: '/resources',
     submenu: [
       { name: 'Quran Study', href: '/resources/quran-study' },
@@ -25,6 +25,7 @@ const navigation = [
       { name: 'Islamic Calendar', href: '/resources/islamic-calendar' },
     ]
   },
+  { name: 'Documentation', href: '/docs' },
   { name: 'Contact', href: '/contact' },
 ];
 
