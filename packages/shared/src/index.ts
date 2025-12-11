@@ -1,6 +1,57 @@
 // ============================================================================
-// API ENDPOINTS
+// API VERSION CONFIGURATION
 // ============================================================================
+export const API_CONFIG = {
+  CURRENT_VERSION: 'v1',
+  SUPPORTED_VERSIONS: ['v1'] as const,
+  DEPRECATION_DATE: '2025-12-01', // 12 months deprecation period
+} as const;
+
+// ============================================================================
+// API ENDPOINTS - VERSIONED (v1) - RECOMMENDED
+// ============================================================================
+export const API_V1_ENDPOINTS = {
+  // Auth (Strapi standard - no version prefix needed)
+  LOGIN: '/api/auth/local',
+  REGISTER: '/api/auth/local/register',
+  ME: '/api/users/me',
+  LOGOUT: '/api/auth/logout',
+
+  // LMS Core Resources
+  COURSES: '/api/v1/courses',
+  LESSONS: '/api/v1/lessons',
+  QUIZZES: '/api/v1/quizzes',
+  ACHIEVEMENTS: '/api/v1/achievements',
+  LEADERBOARDS: '/api/v1/leaderboards',
+  STREAKS: '/api/v1/streaks',
+
+  // User-Centric Resources
+  USER_PROGRESS: '/api/v1/users/me/progress',
+  USER_ENROLLMENTS: '/api/v1/users/me/enrollments',
+  USER_ACHIEVEMENTS: '/api/v1/users/me/achievements',
+
+  // Islamic Content (flattened hierarchy)
+  PRAYER_TIMES: '/api/v1/prayer-times',
+  PRAYER_TIMES_WEEK: '/api/v1/prayer-times/week',
+  PRAYER_TIMES_MONTH: '/api/v1/prayer-times/month',
+  AYAHS: '/api/v1/ayahs',
+  AYAH_DAILY: '/api/v1/ayahs/daily',
+  HADITHS: '/api/v1/hadiths',
+  HIJRI_CALENDAR: '/api/v1/hijri-calendar',
+
+  // Community Resources
+  ANNOUNCEMENTS: '/api/v1/announcements',
+  EVENTS: '/api/v1/events',
+  EDUCATION_CONTENT: '/api/v1/education-contents',
+} as const;
+
+// ============================================================================
+// API ENDPOINTS - LEGACY (deprecated, will be removed 2025-12-01)
+// ============================================================================
+/**
+ * @deprecated Use API_V1_ENDPOINTS instead. Legacy endpoints will be removed in v2.0 (Dec 2025).
+ * Migration guide: docs/api-migration-plan.md
+ */
 export const API_ENDPOINTS = {
   // Auth
   LOGIN: '/api/auth/local',

@@ -7,6 +7,91 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added - 2025-12-10
+
+#### API Architecture & Versioning
+- **Versioned API Endpoints (v1)**: All API endpoints now use `/api/v1/` prefix for proper versioning
+- **API Configuration Constants**: Added `API_CONFIG` with version info and deprecation date
+- **`API_V1_ENDPOINTS`**: New versioned endpoint constants in `@attaqwa/shared`:
+  - LMS Core: `/api/v1/courses`, `/api/v1/lessons`, `/api/v1/quizzes`
+  - User-Centric: `/api/v1/users/me/progress`, `/api/v1/users/me/enrollments`
+  - Islamic Services: `/api/v1/prayer-times`, `/api/v1/ayahs`, `/api/v1/hadiths`
+  - Community: `/api/v1/announcements`, `/api/v1/events`
+
+#### v1 Route Implementations (Next.js BFF)
+- `apps/website/src/app/api/v1/prayer-times/route.ts` - Versioned prayer times with Strapi v5 response format
+- `apps/website/src/app/api/v1/ayahs/route.ts` - Quran ayahs (flattened from /islamic/ayah)
+- `apps/website/src/app/api/v1/ayahs/daily/route.ts` - Daily featured ayah
+- `apps/website/src/app/api/v1/hadiths/route.ts` - Hadiths with pagination
+- `apps/website/src/app/api/v1/announcements/route.ts` - Announcements with Strapi v5 format
+- `apps/website/src/app/api/v1/courses/route.ts` - Courses with filtering, pagination, caching
+- `apps/website/src/app/api/v1/lessons/route.ts` - Lessons by course with order sorting
+- `apps/website/src/app/api/v1/quizzes/route.ts` - Quizzes with lesson/course filtering
+- `apps/website/src/app/api/v1/events/route.ts` - Community events with category filtering
+- `apps/website/src/app/api/v1/users/me/progress/route.ts` - User progress tracking
+- `apps/website/src/app/api/v1/users/me/enrollments/route.ts` - User course enrollments
+- `apps/website/src/app/api/v1/users/me/achievements/route.ts` - User earned achievements
+
+#### Strapi v1 Route Prefixes
+- Updated `apps/api/src/api/course/routes/course.ts` with `/v1` prefix
+- Updated `apps/api/src/api/lesson/routes/lesson.ts` with `/v1` prefix
+- Updated `apps/api/src/api/quiz/routes/quiz.ts` with `/v1` prefix
+- Created `apps/api/src/api/achievement/routes/achievement.ts` with `/v1` prefix
+- Created `apps/api/src/api/course-enrollment/routes/course-enrollment.ts` with `/v1` prefix
+- Created `apps/api/src/api/leaderboard/routes/leaderboard.ts` with `/v1` prefix
+- Created `apps/api/src/api/streak/routes/streak.ts` with `/v1` prefix
+- Created `apps/api/src/api/user-achievement/routes/user-achievement.ts` with `/v1` prefix
+- Created `apps/api/src/api/user-progress/routes/user-progress.ts` with `/v1` prefix
+
+#### Rate Limiting Middleware
+- **Global rate limiter**: `apps/api/src/middlewares/rate-limit.ts`
+  - Anonymous users: 100 requests/minute
+  - Authenticated users: 500 requests/minute
+  - Admin users: 1000 requests/minute
+- Rate limit headers: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`
+- Per-entity middleware wrappers for all 9 content types (courses, lessons, quizzes, achievements, course-enrollments, leaderboards, streaks, user-achievements, user-progress)
+
+#### OpenAPI Documentation
+- **`docs/openapi.yaml`**: Complete OpenAPI 3.1.0 specification (800+ lines)
+  - All v1 endpoints documented with schemas
+  - Authentication, rate limiting, pagination
+  - Request/response examples
+- Updated `/api/docs` endpoint to serve OpenAPI info via `?format=openapi`
+- Added **Swagger UI page** at `/docs/api` with interactive API explorer
+  - Installed `swagger-ui-react` and `js-yaml` dependencies
+  - Custom Islamic green theme styling
+  - Try-it-out functionality enabled
+
+#### Architecture Documentation
+- **`docs/architecture.md`**: Full brownfield enhancement architecture document
+- **`docs/api-migration-plan.md`**: 3-phase migration plan with rollback strategies
+- **`docs/architect-checklist-results.md`**: 96% validation pass rate report
+
+### Changed - 2025-12-10
+
+#### API Client Updates
+- Updated `apps/website/src/lib/api.ts` to use `API_V1_ENDPOINTS`
+- All API methods now call versioned endpoints
+
+#### Deprecation Headers
+- Added deprecation headers to legacy endpoints (sunset: 2025-12-01):
+  - `/api/prayer-times` → `/api/v1/prayer-times`
+  - `/api/announcements` → `/api/v1/announcements`
+  - `/api/islamic/ayah` → `/api/v1/ayahs`
+  - `/api/islamic/hadith` → `/api/v1/hadiths`
+- Headers: `Deprecation: true`, `Sunset`, `Link: rel="successor-version"`
+
+### Deprecated - 2025-12-10
+
+#### Legacy API Endpoints (Remove by 2025-12-01)
+- `API_ENDPOINTS` constant - Use `API_V1_ENDPOINTS` instead
+- `/api/prayer-times` - Use `/api/v1/prayer-times`
+- `/api/announcements` - Use `/api/v1/announcements`
+- `/api/islamic/ayah` - Use `/api/v1/ayahs`
+- `/api/islamic/hadith` - Use `/api/v1/hadiths`
+
+---
+
 ### Added - 2025-01-30
 
 #### Strapi API Integration

@@ -17,8 +17,8 @@ import { useAuth } from '@/lib/hooks/use-auth';
 
 export default function LoginPage() {
   const { signIn } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('instructor1@attaqwa.test');
+  const [password, setPassword] = useState('Instructor123!');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 

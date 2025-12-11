@@ -916,11 +916,53 @@ const getPrayerTimes = async () => {
 /**
  * GET /api/docs
  * Returns complete documentation
+ *
+ * Query parameters:
+ * - section: Get a specific documentation section
+ * - search: Search documentation content
+ * - format: 'json' (default) or 'openapi' for OpenAPI spec
  */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const section = searchParams.get('section');
   const search = searchParams.get('search');
+  const format = searchParams.get('format');
+
+  // Return OpenAPI specification
+  if (format === 'openapi') {
+    return NextResponse.json({
+      openApiUrl: '/docs/openapi.yaml',
+      swaggerUiUrl: '/api/docs/swagger',
+      message: 'OpenAPI specification available at /docs/openapi.yaml',
+      version: '1.0.0',
+      apiVersion: 'v1',
+      endpoints: {
+        spec: '/docs/openapi.yaml',
+        json: '/api/docs',
+        swagger: '/api/docs?format=swagger-config',
+      },
+    });
+  }
+
+  // Return Swagger UI configuration
+  if (format === 'swagger-config') {
+    return NextResponse.json({
+      openapi: '3.1.0',
+      info: {
+        title: 'At-Taqwa LMS API',
+        version: '1.0.0',
+        description: 'RESTful API for At-Taqwa Islamic LMS',
+      },
+      servers: [
+        { url: 'http://localhost:3003', description: 'Local Development' },
+        { url: 'https://api.masjidattaqwaatlanta.org', description: 'Production' },
+      ],
+      externalDocs: {
+        description: 'Full OpenAPI Specification',
+        url: '/docs/openapi.yaml',
+      },
+    });
+  }
 
   // If specific section requested
   if (section && section in documentation) {
@@ -940,8 +982,15 @@ export async function GET(request: Request) {
     });
   }
 
-  // Return complete documentation
-  return NextResponse.json(documentation);
+  // Return complete documentation with OpenAPI link
+  return NextResponse.json({
+    ...documentation,
+    openapi: {
+      specUrl: '/docs/openapi.yaml',
+      version: '3.1.0',
+      apiVersion: 'v1',
+    },
+  });
 }
 
 /**

@@ -466,7 +466,7 @@ export default function Home() {
                   <p className="text-sm text-islamic-navy-600 mt-2 flex items-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
                     <Activity className="h-3 w-3 animate-pulse" />
                     <span className="font-medium">Stay connected with your community</span>
-                    <div className="w-1 h-1 rounded-full bg-islamic-green animate-pulse"></div>
+                    <span className="w-1 h-1 rounded-full bg-islamic-green animate-pulse"></span>
                     <span className="text-xs opacity-70">أبق على تواصل مع مجتمعك</span>
                   </p>
                 </div>
@@ -574,7 +574,7 @@ export default function Home() {
                   <p className="text-sm text-islamic-navy-600 mt-2 flex items-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
                     <Sparkles className="h-3 w-3 animate-pulse text-islamic-gold-500" />
                     <span className="font-medium">Join our vibrant community gatherings</span>
-                    <div className="w-1 h-1 rounded-full bg-islamic-gold animate-pulse"></div>
+                    <span className="w-1 h-1 rounded-full bg-islamic-gold animate-pulse"></span>
                     <span className="text-xs opacity-70">انضم إلى تجمعاتنا المجتمعية</span>
                   </p>
                 </div>
@@ -682,7 +682,7 @@ export default function Home() {
                   <p className="text-sm text-islamic-navy-600 mt-2 flex items-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
                     <Zap className="h-3 w-3 animate-pulse text-islamic-navy-500" />
                     <span className="font-medium">Essential Islamic resources</span>
-                    <div className="w-1 h-1 rounded-full bg-islamic-navy animate-pulse"></div>
+                    <span className="w-1 h-1 rounded-full bg-islamic-navy animate-pulse"></span>
                     <span className="text-xs opacity-70">المصادر الإسلامية الأساسية</span>
                   </p>
                 </div>

@@ -1,4 +1,5 @@
 import {
+  API_V1_ENDPOINTS,
   API_ENDPOINTS,
   ERROR_MESSAGES
 } from '@attaqwa/shared';
@@ -19,7 +20,7 @@ import type {
 // Auth types now consolidated in @attaqwa/shared-types
 export type { AuthUser, LoginInput, RegisterInput };
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
 
 export class ApiError extends Error {
   constructor(public statusCode: number, message: string) {
@@ -72,11 +73,11 @@ async function makeRequest<T>(
   return response.json();
 }
 
-// Auth API
+// Auth API (using v1 endpoints)
 export const authApi = {
   login: async (credentials: LoginInput): Promise<{ user: AuthUser; token: string }> => {
     const response = await makeRequest<{ user: AuthUser; token: string }>(
-      API_ENDPOINTS.LOGIN,
+      API_V1_ENDPOINTS.LOGIN,
       {
         method: 'POST',
         body: JSON.stringify(credentials),
@@ -93,7 +94,7 @@ export const authApi = {
 
   register: async (userData: RegisterInput): Promise<{ user: AuthUser; token: string }> => {
     const response = await makeRequest<{ user: AuthUser; token: string }>(
-      API_ENDPOINTS.REGISTER,
+      API_V1_ENDPOINTS.REGISTER,
       {
         method: 'POST',
         body: JSON.stringify(userData),
@@ -108,7 +109,7 @@ export const authApi = {
   },
 
   logout: async (): Promise<void> => {
-    await makeRequest(API_ENDPOINTS.LOGOUT, {
+    await makeRequest(API_V1_ENDPOINTS.LOGOUT, {
       method: 'POST',
     });
 
@@ -118,11 +119,11 @@ export const authApi = {
   },
 
   getMe: async (): Promise<{ user: AuthUser }> => {
-    return makeRequest<{ user: AuthUser }>(API_ENDPOINTS.ME);
+    return makeRequest<{ user: AuthUser }>(API_V1_ENDPOINTS.ME);
   },
 };
 
-// Announcements API
+// Announcements API (using v1 endpoints)
 export const announcementsApi = {
   getAll: async (params?: {
     page?: number;
@@ -135,39 +136,39 @@ export const announcementsApi = {
     if (params?.limit) searchParams.append('limit', params.limit.toString());
     if (params?.isEvent !== undefined) searchParams.append('isEvent', params.isEvent.toString());
     if (params?.isActive !== undefined) searchParams.append('isActive', params.isActive.toString());
-    
+
     const query = searchParams.toString();
-    const endpoint = query ? `${API_ENDPOINTS.ANNOUNCEMENTS}?${query}` : API_ENDPOINTS.ANNOUNCEMENTS;
-    
+    const endpoint = query ? `${API_V1_ENDPOINTS.ANNOUNCEMENTS}?${query}` : API_V1_ENDPOINTS.ANNOUNCEMENTS;
+
     return makeRequest<PaginatedResponse<Announcement>>(endpoint);
   },
 
   getById: async (id: string): Promise<ApiResponse<Announcement>> => {
-    return makeRequest<ApiResponse<Announcement>>(`${API_ENDPOINTS.ANNOUNCEMENTS}/${id}`);
+    return makeRequest<ApiResponse<Announcement>>(`${API_V1_ENDPOINTS.ANNOUNCEMENTS}/${id}`);
   },
 
   create: async (data: Omit<Announcement, 'id' | 'authorId' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Announcement>> => {
-    return makeRequest<ApiResponse<Announcement>>(API_ENDPOINTS.ANNOUNCEMENTS, {
+    return makeRequest<ApiResponse<Announcement>>(API_V1_ENDPOINTS.ANNOUNCEMENTS, {
       method: 'POST',
       body: JSON.stringify(data),
     });
   },
 
   update: async (id: string, data: Partial<Announcement>): Promise<ApiResponse<Announcement>> => {
-    return makeRequest<ApiResponse<Announcement>>(`${API_ENDPOINTS.ANNOUNCEMENTS}/${id}`, {
+    return makeRequest<ApiResponse<Announcement>>(`${API_V1_ENDPOINTS.ANNOUNCEMENTS}/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
   },
 
   delete: async (id: string): Promise<ApiResponse<{ message: string }>> => {
-    return makeRequest<ApiResponse<{ message: string }>>(`${API_ENDPOINTS.ANNOUNCEMENTS}/${id}`, {
+    return makeRequest<ApiResponse<{ message: string }>>(`${API_V1_ENDPOINTS.ANNOUNCEMENTS}/${id}`, {
       method: 'DELETE',
     });
   },
 };
 
-// Events API
+// Events API (using v1 endpoints)
 export const eventsApi = {
   getAll: async (params?: {
     page?: number;
@@ -180,39 +181,39 @@ export const eventsApi = {
     if (params?.limit) searchParams.append('limit', params.limit.toString());
     if (params?.upcoming !== undefined) searchParams.append('upcoming', params.upcoming.toString());
     if (params?.isActive !== undefined) searchParams.append('isActive', params.isActive.toString());
-    
+
     const query = searchParams.toString();
-    const endpoint = query ? `${API_ENDPOINTS.EVENTS}?${query}` : API_ENDPOINTS.EVENTS;
-    
+    const endpoint = query ? `${API_V1_ENDPOINTS.EVENTS}?${query}` : API_V1_ENDPOINTS.EVENTS;
+
     return makeRequest<PaginatedResponse<Event>>(endpoint);
   },
 
   getById: async (id: string): Promise<ApiResponse<Event>> => {
-    return makeRequest<ApiResponse<Event>>(`${API_ENDPOINTS.EVENTS}/${id}`);
+    return makeRequest<ApiResponse<Event>>(`${API_V1_ENDPOINTS.EVENTS}/${id}`);
   },
 
   create: async (data: Omit<Event, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Event>> => {
-    return makeRequest<ApiResponse<Event>>(API_ENDPOINTS.EVENTS, {
+    return makeRequest<ApiResponse<Event>>(API_V1_ENDPOINTS.EVENTS, {
       method: 'POST',
       body: JSON.stringify(data),
     });
   },
 
   update: async (id: string, data: Partial<Event>): Promise<ApiResponse<Event>> => {
-    return makeRequest<ApiResponse<Event>>(`${API_ENDPOINTS.EVENTS}/${id}`, {
+    return makeRequest<ApiResponse<Event>>(`${API_V1_ENDPOINTS.EVENTS}/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
   },
 
   delete: async (id: string): Promise<ApiResponse<{ message: string }>> => {
-    return makeRequest<ApiResponse<{ message: string }>>(`${API_ENDPOINTS.EVENTS}/${id}`, {
+    return makeRequest<ApiResponse<{ message: string }>>(`${API_V1_ENDPOINTS.EVENTS}/${id}`, {
       method: 'DELETE',
     });
   },
 };
 
-// Prayer Times API
+// Prayer Times API (using v1 endpoints)
 export const prayerTimesApi = {
   getToday: async (params?: {
     city?: string;
@@ -223,10 +224,10 @@ export const prayerTimesApi = {
     if (params?.city) searchParams.append('city', params.city);
     if (params?.country) searchParams.append('country', params.country);
     if (params?.method) searchParams.append('method', params.method);
-    
+
     const query = searchParams.toString();
-    const endpoint = query ? `${API_ENDPOINTS.PRAYER_TIMES}?${query}` : API_ENDPOINTS.PRAYER_TIMES;
-    
+    const endpoint = query ? `${API_V1_ENDPOINTS.PRAYER_TIMES}?${query}` : API_V1_ENDPOINTS.PRAYER_TIMES;
+
     return makeRequest<ApiResponse<PrayerTime>>(endpoint);
   },
 
@@ -239,10 +240,10 @@ export const prayerTimesApi = {
     if (params?.city) searchParams.append('city', params.city);
     if (params?.country) searchParams.append('country', params.country);
     if (params?.method) searchParams.append('method', params.method);
-    
+
     const query = searchParams.toString();
-    const endpoint = query ? `${API_ENDPOINTS.PRAYER_TIMES}/week?${query}` : `${API_ENDPOINTS.PRAYER_TIMES}/week`;
-    
+    const endpoint = query ? `${API_V1_ENDPOINTS.PRAYER_TIMES_WEEK}?${query}` : API_V1_ENDPOINTS.PRAYER_TIMES_WEEK;
+
     return makeRequest<ApiResponse<PrayerTime[]>>(endpoint);
   },
 
@@ -257,10 +258,10 @@ export const prayerTimesApi = {
     if (params?.city) searchParams.append('city', params.city);
     if (params?.country) searchParams.append('country', params.country);
     if (params?.method) searchParams.append('method', params.method);
-    
+
     const query = searchParams.toString();
-    const endpoint = query ? `${API_ENDPOINTS.PRAYER_TIMES}/month?${query}` : `${API_ENDPOINTS.PRAYER_TIMES}/month`;
-    
+    const endpoint = query ? `${API_V1_ENDPOINTS.PRAYER_TIMES_MONTH}?${query}` : API_V1_ENDPOINTS.PRAYER_TIMES_MONTH;
+
     return makeRequest<ApiResponse<PrayerTime[]>>(endpoint);
   },
 };
