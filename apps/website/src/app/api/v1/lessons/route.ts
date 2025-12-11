@@ -24,18 +24,16 @@ export async function GET(request: NextRequest) {
     const contentType = searchParams.get('content_type');
 
     if (courseId) strapiParams.set('filters[course][documentId][$eq]', courseId);
-    if (contentType) strapiParams.set('filters[content_type][$eq]', contentType);
+    if (contentType) strapiParams.set('filters[lesson_type][$eq]', contentType);
 
-    // Published filter
-    strapiParams.set('filters[is_published][$eq]', 'true');
-
-    // Sorting by order
-    const sort = searchParams.get('sort') || 'order:asc';
+    // Sorting by lesson_order
+    const sort = searchParams.get('sort') || 'lesson_order:asc';
     strapiParams.set('sort', sort);
 
-    // Populate relations
-    const populate = searchParams.get('populate') || 'course,quizzes';
-    strapiParams.set('populate', populate);
+    // Populate relations (Strapi v5 array syntax)
+    // Note: relation name is 'quiz' (singular) per lesson schema
+    strapiParams.set('populate[0]', 'course');
+    strapiParams.set('populate[1]', 'quiz');
 
     // Fetch from Strapi v1 endpoint
     const response = await fetch(`${STRAPI_URL}/api/v1/lessons?${strapiParams.toString()}`, {
