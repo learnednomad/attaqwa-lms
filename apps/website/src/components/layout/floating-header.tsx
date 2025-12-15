@@ -20,7 +20,15 @@ type NavItem = {
 
 const navigation: NavItem[] = [
   { name: 'Home', href: '/' },
-  { name: 'Education', href: '/education' },
+  {
+    name: 'Education',
+    submenu: [
+      { name: 'Programs', href: '/education' },
+      { name: 'Student Portal', href: '/student/dashboard' },
+      { name: 'Teacher Portal', href: '/teacher/dashboard' },
+      { name: 'Quran Study', href: '/resources/quran-study' },
+    ],
+  },
   { name: 'Services', href: '/services' },
   {
     name: 'Community',

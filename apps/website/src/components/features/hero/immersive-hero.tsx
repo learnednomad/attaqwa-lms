@@ -152,45 +152,45 @@ export function ImmersiveHero({ className }: ImmersiveHeroProps) {
       {/* Floating Glass Morphic Card - Mosque Etiquette (GIC-inspired) */}
       <div
         className={cn(
-          'absolute left-4 md:left-8 lg:left-16 bottom-32 md:bottom-40 z-20',
+          'absolute left-4 md:left-8 lg:left-16 bottom-28 md:bottom-36 z-20',
           'hidden md:block',
           'transition-all duration-1000',
           mounted ? 'opacity-100 translate-y-0 delay-1000' : 'opacity-0 translate-y-8'
         )}
       >
-        <div className="w-72 lg:w-80 p-6 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl">
+        <div className="w-80 lg:w-96 p-7 lg:p-8 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/30 shadow-2xl">
           {/* Header */}
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-amber-500/20">
-              <Moon className="h-5 w-5 text-amber-300" />
+          <div className="flex items-center gap-4 mb-6">
+            <div className="p-3 rounded-xl bg-amber-500/30">
+              <Moon className="h-6 w-6 text-amber-300" />
             </div>
-            <h3 className="font-semibold text-lg text-white">Mosque Etiquette</h3>
+            <h3 className="font-bold text-xl lg:text-2xl text-white">Mosque Etiquette</h3>
           </div>
 
           {/* Guidelines List */}
-          <ul className="space-y-3 text-sm text-white/80">
-            <li className="flex items-start gap-3">
-              <Check className="h-4 w-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+          <ul className="space-y-4 text-base lg:text-lg text-white">
+            <li className="flex items-start gap-4">
+              <Check className="h-5 w-5 lg:h-6 lg:w-6 text-emerald-400 mt-0.5 flex-shrink-0" />
               <span>Remove shoes before entering the prayer hall</span>
             </li>
-            <li className="flex items-start gap-3">
-              <Check className="h-4 w-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+            <li className="flex items-start gap-4">
+              <Check className="h-5 w-5 lg:h-6 lg:w-6 text-emerald-400 mt-0.5 flex-shrink-0" />
               <span>Maintain silence during prayer services</span>
             </li>
-            <li className="flex items-start gap-3">
-              <Check className="h-4 w-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+            <li className="flex items-start gap-4">
+              <Check className="h-5 w-5 lg:h-6 lg:w-6 text-emerald-400 mt-0.5 flex-shrink-0" />
               <span>Dress modestly and appropriately</span>
             </li>
-            <li className="flex items-start gap-3">
-              <Check className="h-4 w-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+            <li className="flex items-start gap-4">
+              <Check className="h-5 w-5 lg:h-6 lg:w-6 text-emerald-400 mt-0.5 flex-shrink-0" />
               <span>Turn off mobile devices during prayers</span>
             </li>
           </ul>
 
           {/* Jummah Info */}
-          <div className="mt-5 pt-4 border-t border-white/10">
-            <p className="text-xs text-white/50 uppercase tracking-wider mb-1">Jummah Prayer</p>
-            <p className="text-white font-medium">Fridays at 2:00 PM & 2:30 PM</p>
+          <div className="mt-6 pt-5 border-t border-white/20">
+            <p className="text-sm text-white/70 uppercase tracking-wider mb-2">Jummah Prayer</p>
+            <p className="text-white text-lg lg:text-xl font-semibold">Fridays at 2:00 PM & 2:30 PM</p>
           </div>
         </div>
       </div>

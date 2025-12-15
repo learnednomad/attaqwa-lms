@@ -120,37 +120,37 @@ export function MosquePrayerTimesSection({
 
         {/* Prayer Times Grid - Full Width Below */}
         <div className="mt-16 pt-8 border-t border-gray-200">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+          <div className="flex items-center justify-between mb-10">
+            <h3 className="text-base md:text-lg font-semibold text-gray-500 uppercase tracking-wider">
               Today&apos;s Prayer Times
             </h3>
             <Link
               href="/prayer-times"
-              className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 font-medium text-sm group"
+              className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 font-medium text-base md:text-lg group"
             >
               Full Schedule
-              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-5 gap-6 md:gap-8">
+          <div className="grid grid-cols-5 gap-6 md:gap-10">
             {prayers.map((prayer) => (
               <div
                 key={prayer.key}
                 className="text-center"
               >
-                <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
+                <p className="text-sm md:text-base font-medium text-gray-500 uppercase tracking-wider mb-3">
                   {prayer.name}
                 </p>
-                <p className="text-2xl md:text-3xl font-bold text-gray-900 font-mono"
+                <p className="text-3xl md:text-5xl font-bold text-gray-900 font-mono"
                    style={{ fontVariantNumeric: 'tabular-nums' }}>
                   {prayer.time.replace(' AM', '').replace(' PM', '')}
                 </p>
-                <p className="text-sm text-gray-400 mt-1">
+                <p className="text-base md:text-lg text-gray-400 mt-1">
                   {prayer.time.includes('AM') ? 'AM' : 'PM'}
                 </p>
                 {prayer.iqama && (
-                  <p className="text-sm text-emerald-600 mt-2 font-medium">
+                  <p className="text-base md:text-lg text-emerald-600 mt-3 font-medium">
                     Iqama: {prayer.iqama}
                   </p>
                 )}
@@ -160,18 +160,18 @@ export function MosquePrayerTimesSection({
 
           {/* Jummah Times */}
           {prayerTimes.jummah && prayerTimes.jummah.length > 0 && (
-            <div className="mt-8 pt-6 border-t border-gray-100">
-              <div className="flex items-center justify-center gap-8 md:gap-16">
-                <p className="text-lg font-semibold text-amber-700">
+            <div className="mt-10 pt-8 border-t border-gray-100">
+              <div className="flex items-center justify-center gap-10 md:gap-20">
+                <p className="text-xl md:text-2xl font-semibold text-amber-700">
                   Jumu&apos;ah Prayer
                 </p>
-                <div className="flex gap-6 md:gap-12">
+                <div className="flex gap-8 md:gap-16">
                   {prayerTimes.jummah.map((time, index) => (
                     <div key={index} className="text-center">
-                      <p className="text-sm text-gray-500 mb-1">
+                      <p className="text-base md:text-lg text-gray-500 mb-2">
                         {index === 0 ? '1st' : '2nd'} Khutbah
                       </p>
-                      <p className="text-xl md:text-2xl font-bold text-amber-700 font-mono">
+                      <p className="text-2xl md:text-3xl font-bold text-amber-700 font-mono">
                         {time}
                       </p>
                     </div>

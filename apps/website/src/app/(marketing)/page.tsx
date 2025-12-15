@@ -238,10 +238,10 @@ export default function Home() {
           <IslamicServicesGrid />
         </section>
 
-        {/* Main content grid */}
-        <div className="mt-12 md:mt-16 grid gap-8 lg:grid-cols-3">
+        {/* Main content grid - balanced 7:5 ratio */}
+        <div className="mt-12 md:mt-16 grid gap-6 lg:gap-8 lg:grid-cols-12">
           {/* Main Content Column */}
-          <article className="lg:col-span-2 space-y-12">
+          <article className="lg:col-span-7 space-y-8">
             {/* Announcements Section */}
             <section aria-labelledby="announcements-heading">
               <SectionHeader
@@ -282,7 +282,7 @@ export default function Home() {
           </article>
 
           {/* Sidebar */}
-          <aside className="space-y-8 animate-fade-in-up" style={{ animationDelay: '600ms' }}>
+          <aside className="lg:col-span-5 space-y-6 animate-fade-in-up" style={{ animationDelay: '600ms' }}>
             {/* Prayer Times Widget */}
             <section className="rounded-xl overflow-hidden bg-gradient-to-br from-islamic-green-50 via-white to-islamic-gold-50/30 p-1 shadow-xl shadow-islamic-green/10">
               <div className="bg-white rounded-lg">
@@ -290,65 +290,6 @@ export default function Home() {
                   <PrayerTimesWidget prayerTimes={mockPrayerTimes} currentPrayer="dhuhr" />
                 </Suspense>
               </div>
-            </section>
-
-            {/* Quick Actions */}
-            <section className="rounded-xl overflow-hidden bg-gradient-to-br from-white via-islamic-navy-50/30 to-islamic-gold-50/20 border border-islamic-navy/10 shadow-xl p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Zap className="h-6 w-6 text-islamic-navy-600" />
-                <h3 className="font-bold text-lg text-islamic-navy-800">Quick Actions</h3>
-              </div>
-
-              <nav className="space-y-3">
-                <Link href="/donate" className="block">
-                  <Button className="w-full justify-start gap-3 border border-islamic-green/20 bg-gradient-to-r from-islamic-green-50 to-transparent hover:from-islamic-green-100" variant="outline">
-                    <span className="text-lg">💚</span>
-                    <span className="text-islamic-navy-700 font-medium">Make a Donation</span>
-                  </Button>
-                </Link>
-
-                <Link href="/contact" className="block">
-                  <Button className="w-full justify-start gap-3 border border-islamic-navy/20 bg-gradient-to-r from-islamic-navy-50 to-transparent hover:from-islamic-navy-100" variant="outline">
-                    <span className="text-lg">📧</span>
-                    <span className="text-islamic-navy-700 font-medium">Contact Us</span>
-                  </Button>
-                </Link>
-
-                <Link href="/education" className="block">
-                  <Button className="w-full justify-start gap-3 border border-islamic-green/20 bg-gradient-to-r from-islamic-green-50 to-transparent hover:from-islamic-green-100" variant="outline">
-                    <span className="text-lg">📚</span>
-                    <span className="text-islamic-navy-700 font-medium">Islamic Education</span>
-                  </Button>
-                </Link>
-              </nav>
-            </section>
-
-            {/* Islamic Resources */}
-            <section className="rounded-xl overflow-hidden bg-gradient-to-br from-white via-islamic-navy-50/30 to-islamic-green-50/20 border border-islamic-navy/10 shadow-xl p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <BookOpen className="h-6 w-6 text-islamic-green-600" />
-                <h3 className="font-bold text-lg text-islamic-green-700">Islamic Resources</h3>
-              </div>
-
-              <nav className="space-y-3">
-                <Link href="/resources/quran-study" className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-islamic-green-50 to-transparent border border-islamic-green/10 hover:border-islamic-green/30 transition-all duration-300 group">
-                  <span className="text-lg">📖</span>
-                  <span className="text-sm font-medium text-islamic-navy-700 group-hover:text-islamic-green-700">Quran Study & Tafsir</span>
-                  <ArrowRight className="h-3 w-3 ml-auto text-islamic-green-600 opacity-0 group-hover:opacity-100 transition-all" />
-                </Link>
-
-                <Link href="/resources/hadith-collections" className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-islamic-navy-50 to-transparent border border-islamic-navy/10 hover:border-islamic-navy/30 transition-all duration-300 group">
-                  <span className="text-lg">📚</span>
-                  <span className="text-sm font-medium text-islamic-navy-700 group-hover:text-islamic-navy-800">Hadith Collections</span>
-                  <ArrowRight className="h-3 w-3 ml-auto text-islamic-navy-600 opacity-0 group-hover:opacity-100 transition-all" />
-                </Link>
-
-                <Link href="/resources/qibla-direction" className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-islamic-gold-50 to-transparent border border-islamic-gold/10 hover:border-islamic-gold/30 transition-all duration-300 group">
-                  <span className="text-lg">🧭</span>
-                  <span className="text-sm font-medium text-islamic-navy-700 group-hover:text-islamic-gold-700">Qibla Direction</span>
-                  <ArrowRight className="h-3 w-3 ml-auto text-islamic-gold-600 opacity-0 group-hover:opacity-100 transition-all" />
-                </Link>
-              </nav>
             </section>
           </aside>
         </div>
