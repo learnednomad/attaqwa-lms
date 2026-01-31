@@ -240,7 +240,7 @@ export default function TeacherLessonsPage() {
               <div
                 key={lesson.id}
                 className="flex items-center gap-4 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
-                onClick={() => router.push(`/teacher/lessons/${lesson.documentId}`)}
+                onClick={() => router.push(`/teacher/lessons/${lesson.documentId || lesson.id}`)}
               >
                 <GripVertical className="h-5 w-5 text-gray-300 cursor-grab" />
                 <div className="p-2 bg-gray-100 rounded-lg">
@@ -270,10 +270,10 @@ export default function TeacherLessonsPage() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => router.push(`/teacher/lessons/${lesson.documentId}`)}>
+                    <DropdownMenuItem onClick={() => router.push(`/teacher/lessons/${lesson.documentId || lesson.id}`)}>
                       <Eye className="h-4 w-4 mr-2" /> View
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => router.push(`/teacher/lessons/${lesson.documentId}/edit`)}>
+                    <DropdownMenuItem onClick={() => router.push(`/teacher/lessons/${lesson.documentId || lesson.id}/edit`)}>
                       <Edit className="h-4 w-4 mr-2" /> Edit
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />

@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { StudentLayout } from '@/components/layout/student-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,6 +14,7 @@ import { studentApi, Course as ApiCourse } from '@/lib/student-api';
 
 interface CourseData {
   id: string;
+  documentId?: string;
   title: string;
   instructor: string;
   instructorTitle: string;
@@ -107,6 +110,7 @@ const mockCourses: CourseData[] = [
 ];
 
 export default function CoursesPage() {
+  const router = useRouter();
   const [courses, setCourses] = useState<CourseData[]>([]);
   const [loading, setLoading] = useState(true);
   const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
@@ -137,6 +141,7 @@ export default function CoursesPage() {
 
             return {
               id: String(course.id),
+              documentId: course.documentId,
               title: course.title,
               instructor: course.instructor,
               instructorTitle: course.subject === 'quran' || course.subject === 'tajweed' ? 'Hafiz' : 'Ph.D',
@@ -302,7 +307,10 @@ export default function CoursesPage() {
                     <p className="text-xs text-gray-400">{course.schedule}</p>
                   </div>
 
-                  <Button className="w-full mt-3 bg-emerald-600 hover:bg-emerald-700">
+                  <Button
+                    className="w-full mt-3 bg-emerald-600 hover:bg-emerald-700"
+                    onClick={() => router.push(`/student/courses/${course.documentId || course.id}`)}
+                  >
                     Continue Learning
                   </Button>
                 </div>
@@ -342,7 +350,11 @@ export default function CoursesPage() {
                     <span>{course.students} Students</span>
                   </div>
 
-                  <Button variant="outline" className="w-full mt-3">
+                  <Button
+                    variant="outline"
+                    className="w-full mt-3"
+                    onClick={() => router.push(`/student/courses/${course.documentId || course.id}`)}
+                  >
                     View Certificate
                   </Button>
                 </div>
@@ -359,9 +371,11 @@ export default function CoursesPage() {
             <BookOpen className="h-12 w-12 mx-auto text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No Courses Yet</h3>
             <p className="text-gray-500 mb-4">Browse our catalog to enroll in your first course.</p>
-            <Button className="bg-emerald-600 hover:bg-emerald-700">
-              Browse Courses
-            </Button>
+            <Link href="/student/browse">
+              <Button className="bg-emerald-600 hover:bg-emerald-700">
+                Browse Courses
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       )}

@@ -452,9 +452,11 @@ export default function TeacherCourseDetailPage() {
                           )}
                         </div>
                       </div>
-                      <Button variant="ghost" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
+                      <Link href={`/teacher/lessons/${lesson.documentId}/edit`}>
+                        <Button variant="ghost" size="sm">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </Link>
                     </div>
                   ))}
                 </div>

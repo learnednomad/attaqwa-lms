@@ -386,7 +386,7 @@ export default function AdminContentPage() {
 
                 {/* Actions */}
                 <div className="flex items-center gap-2">
-                  <Link href={`/education/content/${item.id}`}>
+                  <Link href={`/admin/education/content/${item.id}/edit`}>
                     <Button variant="ghost" size="sm" title="View Content">
                       <Eye className="h-4 w-4" />
                     </Button>

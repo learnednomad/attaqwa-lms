@@ -7,7 +7,7 @@ import {
   BookOpen, Clock, Calendar, Award, Bell,
   Users, MessageSquare, FileText,
   ChevronRight, ChevronDown, Home, User, LogOut,
-  GraduationCap, CreditCard, Building2, Heart, Search
+  GraduationCap, CreditCard, Building2, Heart, Search, Menu, X
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
@@ -35,6 +35,7 @@ export function StudentLayout({ children, title, subtitle }: StudentLayoutProps)
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>(generateMockNotifications());
 
@@ -55,6 +56,7 @@ export function StudentLayout({ children, title, subtitle }: StudentLayoutProps)
       isOpen: true,
       items: [
         { label: 'My Courses', href: '/student/courses', icon: BookOpen },
+        { label: 'My Lessons', href: '/student/lessons', icon: FileText },
         { label: 'Class Schedule', href: '/student/schedule', icon: Clock },
         { label: 'Grades & Transcript', href: '/student/grades', icon: Award },
         { label: 'Assignments', href: '/student/assignments', icon: FileText },
@@ -98,9 +100,9 @@ export function StudentLayout({ children, title, subtitle }: StudentLayoutProps)
     ));
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('studentToken');
-    localStorage.removeItem('studentData');
+  const handleLogout = async () => {
+    // Clear httpOnly cookie via API
+    await fetch('/api/student/auth/logout', { method: 'POST', credentials: 'include' });
     router.push('/student/login');
   };
 
@@ -108,11 +110,20 @@ export function StudentLayout({ children, title, subtitle }: StudentLayoutProps)
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
+      {/* Mobile Sidebar Overlay */}
+      {mobileSidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <aside className={cn(
         'fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transition-all duration-300',
         sidebarCollapsed ? 'w-16' : 'w-64',
-        'lg:relative'
+        'lg:relative',
+        mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       )}>
         {/* Logo Header */}
         <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
@@ -202,9 +213,17 @@ export function StudentLayout({ children, title, subtitle }: StudentLayoutProps)
         {/* Top Header */}
         <header className="bg-white border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
-              {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setMobileSidebarOpen(true)}
+                className="p-2 text-gray-500 hover:text-gray-700 lg:hidden"
+              >
+                <Menu className="h-5 w-5" />
+              </button>
+              <div>
+                <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
+                {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
+              </div>
             </div>
 
             <div className="flex items-center gap-4">

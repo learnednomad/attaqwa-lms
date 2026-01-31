@@ -220,7 +220,10 @@ export default function TeacherCoursesPage() {
           <Card
             key={course.id}
             className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-            onClick={() => router.push(`/teacher/courses/${course.documentId}`)}
+            onClick={() => {
+              const id = course.documentId || course.id;
+              router.push(`/teacher/courses/${id}`);
+            }}
           >
             {/* Course Header/Thumbnail */}
             <div className={`h-32 flex items-center justify-center ${
@@ -265,25 +268,25 @@ export default function TeacherCoursesPage() {
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={(e) => {
                         e.stopPropagation();
-                        router.push(`/teacher/courses/${course.documentId}`);
+                        router.push(`/teacher/courses/${course.documentId || course.id}`);
                       }}>
                         <Eye className="h-4 w-4 mr-2" /> View Course
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={(e) => {
                         e.stopPropagation();
-                        router.push(`/teacher/courses/${course.documentId}/edit`);
+                        router.push(`/teacher/courses/${course.documentId || course.id}/edit`);
                       }}>
                         <Edit className="h-4 w-4 mr-2" /> Edit Content
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={(e) => {
                         e.stopPropagation();
-                        router.push(`/teacher/courses/${course.documentId}/students`);
+                        router.push(`/teacher/courses/${course.documentId || course.id}/students`);
                       }}>
                         <Users className="h-4 w-4 mr-2" /> Manage Students
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={(e) => {
                         e.stopPropagation();
-                        router.push(`/teacher/courses/${course.documentId}/analytics`);
+                        router.push(`/teacher/courses/${course.documentId || course.id}/analytics`);
                       }}>
                         <BarChart3 className="h-4 w-4 mr-2" /> Analytics
                       </DropdownMenuItem>
@@ -293,7 +296,7 @@ export default function TeacherCoursesPage() {
                         onClick={(e) => {
                           e.stopPropagation();
                           // TODO: Add delete confirmation dialog
-                          console.log('Delete course:', course.documentId);
+                          console.log('Delete course:', course.documentId || course.id);
                         }}
                       >
                         <Trash2 className="h-4 w-4 mr-2" /> Delete Course
@@ -347,7 +350,7 @@ export default function TeacherCoursesPage() {
                     className="flex-1"
                     onClick={(e) => {
                       e.stopPropagation();
-                      router.push(`/teacher/courses/${course.documentId}/edit`);
+                      router.push(`/teacher/courses/${course.documentId || course.id}/edit`);
                     }}
                   >
                     <Edit className="h-4 w-4 mr-1" /> Edit
@@ -358,7 +361,7 @@ export default function TeacherCoursesPage() {
                     onClick={(e) => {
                       e.stopPropagation();
                       // TODO: Implement publish functionality
-                      console.log('Publish course:', course.documentId);
+                      console.log('Publish course:', course.documentId || course.id);
                     }}
                   >
                     <Play className="h-4 w-4 mr-1" /> Publish
