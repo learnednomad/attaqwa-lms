@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAnyAuthToken } from '@/lib/auth-cookies';
 
 const STRAPI_URL = process.env.STRAPI_URL || 'http://localhost:1337';
 
@@ -81,14 +82,16 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const authHeader = request.headers.get('authorization');
+    const authResult = await getAnyAuthToken();
+    const token = authResult?.token || null;
 
-    if (!authHeader) {
+    if (!authHeader && !token) {
       return NextResponse.json(
         {
           error: {
             status: 401,
             name: 'UnauthorizedError',
-            message: 'Missing authorization header',
+            message: 'Authentication required',
           },
         },
         { status: 401 }
@@ -99,9 +102,9 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: authHeader,
+        Authorization: authHeader || `Bearer ${token}`,
       },
-      body: JSON.stringify({ data: body }),
+      body: JSON.stringify({ data: body.data || body }),
     });
 
     if (!response.ok) {

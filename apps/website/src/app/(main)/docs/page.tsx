@@ -8,6 +8,10 @@ interface DocumentationData {
     title: string;
     version: string;
     lastUpdated: string;
+    mosque?: {
+      email: string;
+      phone: string;
+    };
   };
   api: any;
   userGuides: any;
@@ -162,13 +166,13 @@ export default function DocumentationPage() {
           <p className="mb-6">Contact our support team for assistance</p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
-              href={`mailto:${docs.meta.mosque.email}`}
+              href={`mailto:${docs.meta.mosque?.email || 'info@attaqwamasjid.org'}`}
               className="bg-white text-islamic-green-600 px-6 py-2 rounded-lg hover:bg-islamic-green-50 transition-colors"
             >
               Email Support
             </a>
             <a
-              href={`tel:${docs.meta.mosque.phone}`}
+              href={`tel:${docs.meta.mosque?.phone || ''}`}
               className="bg-islamic-green-700 text-white px-6 py-2 rounded-lg hover:bg-islamic-green-800 transition-colors"
             >
               Call Us

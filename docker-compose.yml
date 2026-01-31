@@ -1,5 +1,21 @@
 version: '3.8'
 
+# ============================================================================
+# SECURITY NOTICE:
+# This file no longer contains hardcoded secrets.
+# Create a .env file in the project root with the following variables:
+#
+# POSTGRES_PASSWORD=<strong-password>
+# APP_KEYS=<key1>,<key2>,<key3>,<key4>
+# API_TOKEN_SALT=<random-32-char-string>
+# ADMIN_JWT_SECRET=<random-32-char-string>
+# TRANSFER_TOKEN_SALT=<random-32-char-string>
+# ENCRYPTION_KEY=<random-32-char-string>
+# JWT_SECRET=<random-32-char-string>
+#
+# Generate secrets with: openssl rand -base64 32
+# ============================================================================
+
 services:
   # PostgreSQL Database
   postgres:
@@ -8,7 +24,8 @@ services:
     environment:
       POSTGRES_DB: attaqwa_lms
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      # SECURITY: Use environment variable, no default
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
     ports:
       - "5432:5432"
     volumes:
@@ -33,14 +50,16 @@ services:
       DATABASE_PORT: 5432
       DATABASE_NAME: attaqwa_lms
       DATABASE_USERNAME: postgres
-      DATABASE_PASSWORD: postgres
-      DATABASE_SSL: false
-      APP_KEYS: gKqShoiW6YDp/9ZjOogJTQ==,rq5NV3ZSr14Fp3FNxh8hcA==,Mc3QWBXxiQMw0uhxMqKf2w==,y7HKpVcvl46XPnHIIfeX2Q==
-      API_TOKEN_SALT: y8zX2Dpo7wwIyyWZCOX3vQ==
-      ADMIN_JWT_SECRET: 4DQHyJc+M07ibsYwNvWORg==
-      TRANSFER_TOKEN_SALT: TKMOrV1jJ1JPWTKDq44fBQ==
-      ENCRYPTION_KEY: bCuGCOln7gvbDl2WjXs1Kg==
-      NODE_ENV: production
+      # SECURITY: All secrets from environment variables
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      DATABASE_SSL: ${DATABASE_SSL:-false}
+      APP_KEYS: ${APP_KEYS:?APP_KEYS is required}
+      API_TOKEN_SALT: ${API_TOKEN_SALT:?API_TOKEN_SALT is required}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET:?ADMIN_JWT_SECRET is required}
+      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT:?TRANSFER_TOKEN_SALT is required}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:?ENCRYPTION_KEY is required}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      NODE_ENV: ${NODE_ENV:-production}
     ports:
       - "1337:1337"
     depends_on:
@@ -56,9 +75,10 @@ services:
       target: admin
     restart: unless-stopped
     environment:
-      NODE_ENV: production
+      NODE_ENV: ${NODE_ENV:-production}
       PORT: 3000
-      NEXT_PUBLIC_API_URL: http://localhost:1337
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:1337}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
     ports:
       - "3000:3000"
     depends_on:
@@ -71,9 +91,10 @@ services:
       target: website
     restart: unless-stopped
     environment:
-      NODE_ENV: production
+      NODE_ENV: ${NODE_ENV:-production}
       PORT: 3001
-      NEXT_PUBLIC_API_URL: http://localhost:1337
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:1337}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
     ports:
       - "3001:3001"
     depends_on:

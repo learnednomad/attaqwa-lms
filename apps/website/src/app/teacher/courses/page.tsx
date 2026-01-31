@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { TeacherLayout } from '@/components/layout/teacher-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,13 +12,14 @@ import { Input } from '@/components/ui/input';
 import {
   BookOpen, Users, Clock, Calendar, Search,
   Plus, MoreVertical, Play, Edit, Eye, Loader2,
-  AlertCircle, CheckCircle, FileText, BarChart3
+  AlertCircle, CheckCircle, FileText, BarChart3, Trash2
 } from 'lucide-react';
 import { teacherApi } from '@/lib/teacher-api';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
@@ -38,76 +41,11 @@ interface CourseData {
   thumbnail?: string;
 }
 
-const mockCourses: CourseData[] = [
-  {
-    id: 1,
-    documentId: 'fiqh-worship',
-    title: 'Fiqh of Worship',
-    slug: 'fiqh-of-worship',
-    description: 'Comprehensive study of Islamic worship including Salah, Zakat, Sawm, and Hajj.',
-    subject: 'Fiqh',
-    difficulty: 'Intermediate',
-    ageTier: 'Adults',
-    students: 24,
-    lessons: 30,
-    duration: '30 weeks',
-    progress: 65,
-    status: 'active',
-    nextClass: 'Today 6:30 PM',
-  },
-  {
-    id: 2,
-    documentId: 'hadith-nawawi',
-    title: 'Hadith Studies - 40 Nawawi',
-    slug: 'hadith-40-nawawi',
-    description: 'In-depth study of Imam Nawawi\'s famous collection of 40 hadiths.',
-    subject: 'Hadith',
-    difficulty: 'Intermediate',
-    ageTier: 'Adults',
-    students: 18,
-    lessons: 42,
-    duration: '20 weeks',
-    progress: 40,
-    status: 'active',
-    nextClass: 'Tomorrow 7:00 PM',
-  },
-  {
-    id: 3,
-    documentId: 'arabic-grammar-2',
-    title: 'Arabic Grammar Level 2',
-    slug: 'arabic-grammar-level-2',
-    description: 'Intermediate Arabic grammar focusing on Nahw and Sarf.',
-    subject: 'Arabic',
-    difficulty: 'Intermediate',
-    ageTier: 'Youth',
-    students: 15,
-    lessons: 24,
-    duration: '16 weeks',
-    progress: 75,
-    status: 'active',
-    nextClass: 'Wednesday 5:00 PM',
-  },
-  {
-    id: 4,
-    documentId: 'quran-tajweed',
-    title: 'Quran Tajweed Advanced',
-    slug: 'quran-tajweed-advanced',
-    description: 'Advanced Tajweed rules and practical recitation exercises.',
-    subject: 'Tajweed',
-    difficulty: 'Advanced',
-    ageTier: 'Adults',
-    students: 0,
-    lessons: 20,
-    duration: '12 weeks',
-    progress: 0,
-    status: 'draft',
-  },
-];
-
 export default function TeacherCoursesPage() {
+  const router = useRouter();
   const [courses, setCourses] = useState<CourseData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<'all' | 'active' | 'draft' | 'archived'>('all');
 
@@ -115,8 +53,9 @@ export default function TeacherCoursesPage() {
     const fetchCourses = async () => {
       try {
         setLoading(true);
+        setError(null);
         const result = await teacherApi.courses.getMyCourses();
-        const apiCourses = (result.data || []).map((course: any) => ({
+        const apiCourses: CourseData[] = (result.data || []).map((course: any) => ({
           id: course.id,
           documentId: course.documentId,
           title: course.title,
@@ -129,34 +68,19 @@ export default function TeacherCoursesPage() {
           lessons: course.lessons?.length || 0,
           duration: `${course.duration_weeks || 0} weeks`,
           progress: 0,
-          status: course.publishedAt ? 'active' : 'draft',
+          status: (course.publishedAt ? 'active' : 'draft') as 'active' | 'draft' | 'archived',
           thumbnail: course.thumbnail?.url,
         }));
-
-        if (apiCourses.length > 0) {
-          setCourses(apiCourses);
-          setDataSource('api');
-        } else {
-          setCourses(mockCourses);
-          setDataSource('mock');
-        }
-      } catch (error) {
-        console.error('Failed to fetch courses:', error);
-        setCourses(mockCourses);
-        setDataSource('mock');
+        setCourses(apiCourses);
+      } catch (err) {
+        console.error('Failed to fetch courses:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load courses');
       } finally {
         setLoading(false);
       }
     };
 
-    // Use mock data in development
-    const isDev = process.env.NODE_ENV === 'development';
-    if (isDev) {
-      setCourses(mockCourses);
-      setLoading(false);
-    } else {
-      fetchCourses();
-    }
+    fetchCourses();
   }, []);
 
   const filteredCourses = courses.filter(course => {
@@ -180,23 +104,23 @@ export default function TeacherCoursesPage() {
     );
   }
 
+  if (error) {
+    return (
+      <TeacherLayout title="My Courses" subtitle="Manage your course content and students">
+        <Card className="p-8 text-center">
+          <AlertCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Failed to load courses</h3>
+          <p className="text-gray-500 mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()} variant="outline">
+            Try Again
+          </Button>
+        </Card>
+      </TeacherLayout>
+    );
+  }
+
   return (
     <TeacherLayout title="My Courses" subtitle="Manage your course content and students">
-      {/* Data Source Badge */}
-      <div className="mb-4">
-        {dataSource === 'api' ? (
-          <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
-            <CheckCircle className="h-3 w-3 mr-1" />
-            Live Data from Strapi
-          </Badge>
-        ) : (
-          <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">
-            <AlertCircle className="h-3 w-3 mr-1" />
-            Demo Mode (Mock Data)
-          </Badge>
-        )}
-      </div>
-
       {/* Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Card>
@@ -282,22 +206,32 @@ export default function TeacherCoursesPage() {
             ))}
           </div>
         </div>
-        <Button className="bg-indigo-600 hover:bg-indigo-700">
-          <Plus className="h-4 w-4 mr-2" />
-          Create Course
-        </Button>
+        <Link href="/teacher/courses/new">
+          <Button className="bg-indigo-600 hover:bg-indigo-700">
+            <Plus className="h-4 w-4 mr-2" />
+            Create Course
+          </Button>
+        </Link>
       </div>
 
       {/* Courses Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {filteredCourses.map((course) => (
-          <Card key={course.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+          <Card
+            key={course.id}
+            className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={() => router.push(`/teacher/courses/${course.documentId}`)}
+          >
             {/* Course Header/Thumbnail */}
             <div className={`h-32 flex items-center justify-center ${
               course.subject === 'Fiqh' ? 'bg-gradient-to-br from-emerald-500 to-emerald-700' :
               course.subject === 'Hadith' ? 'bg-gradient-to-br from-amber-500 to-amber-700' :
               course.subject === 'Arabic' ? 'bg-gradient-to-br from-indigo-500 to-indigo-700' :
               course.subject === 'Tajweed' ? 'bg-gradient-to-br from-purple-500 to-purple-700' :
+              course.subject === 'Quran' ? 'bg-gradient-to-br from-teal-500 to-teal-700' :
+              course.subject === 'Seerah' ? 'bg-gradient-to-br from-rose-500 to-rose-700' :
+              course.subject === 'Aqeedah' ? 'bg-gradient-to-br from-blue-500 to-blue-700' :
+              course.subject === 'Akhlaq' ? 'bg-gradient-to-br from-cyan-500 to-cyan-700' :
               'bg-gradient-to-br from-gray-500 to-gray-700'
             }`}>
               <BookOpen className="h-12 w-12 text-white/80" />
@@ -319,22 +253,50 @@ export default function TeacherCoursesPage() {
                   </Badge>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <MoreVertical className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/teacher/courses/${course.documentId}`);
+                      }}>
                         <Eye className="h-4 w-4 mr-2" /> View Course
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/teacher/courses/${course.documentId}/edit`);
+                      }}>
                         <Edit className="h-4 w-4 mr-2" /> Edit Content
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/teacher/courses/${course.documentId}/students`);
+                      }}>
                         <Users className="h-4 w-4 mr-2" /> Manage Students
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/teacher/courses/${course.documentId}/analytics`);
+                      }}>
                         <BarChart3 className="h-4 w-4 mr-2" /> Analytics
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="text-red-600 focus:text-red-600"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // TODO: Add delete confirmation dialog
+                          console.log('Delete course:', course.documentId);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" /> Delete Course
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -379,10 +341,26 @@ export default function TeacherCoursesPage() {
               {/* Draft Actions */}
               {course.status === 'draft' && (
                 <div className="flex items-center gap-2 mt-4">
-                  <Button variant="outline" size="sm" className="flex-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/teacher/courses/${course.documentId}/edit`);
+                    }}
+                  >
                     <Edit className="h-4 w-4 mr-1" /> Edit
                   </Button>
-                  <Button size="sm" className="flex-1 bg-indigo-600 hover:bg-indigo-700">
+                  <Button
+                    size="sm"
+                    className="flex-1 bg-indigo-600 hover:bg-indigo-700"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // TODO: Implement publish functionality
+                      console.log('Publish course:', course.documentId);
+                    }}
+                  >
                     <Play className="h-4 w-4 mr-1" /> Publish
                   </Button>
                 </div>
@@ -400,10 +378,12 @@ export default function TeacherCoursesPage() {
           <p className="text-gray-500 mb-4">
             {searchQuery ? 'Try adjusting your search query' : 'Create your first course to get started'}
           </p>
-          <Button className="bg-indigo-600 hover:bg-indigo-700">
-            <Plus className="h-4 w-4 mr-2" />
-            Create Course
-          </Button>
+          <Link href="/teacher/courses/new">
+            <Button className="bg-indigo-600 hover:bg-indigo-700">
+              <Plus className="h-4 w-4 mr-2" />
+              Create Course
+            </Button>
+          </Link>
         </Card>
       )}
     </TeacherLayout>

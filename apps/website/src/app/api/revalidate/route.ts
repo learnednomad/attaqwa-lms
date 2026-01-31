@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath, revalidateTag } from 'next/cache';
 
+/**
+ * Revalidation API endpoint
+ *
+ * Next.js 16 Breaking Change:
+ * revalidateTag() now requires a second argument - a cacheLife profile.
+ * Using 'max' profile for SWR (stale-while-revalidate) behavior.
+ */
 export async function POST(req: NextRequest) {
   const secret = req.nextUrl.searchParams.get('secret');
   if (secret !== process.env.REVALIDATE_SECRET) {
@@ -16,7 +23,8 @@ export async function POST(req: NextRequest) {
   const paths: string[] | undefined = body?.paths;
 
   if (Array.isArray(tags)) {
-    for (const tag of tags) revalidateTag(tag);
+    // Next.js 16: revalidateTag requires cacheLife profile as second argument
+    for (const tag of tags) revalidateTag(tag, 'max');
   }
   if (Array.isArray(paths)) {
     for (const p of paths) revalidatePath(p);

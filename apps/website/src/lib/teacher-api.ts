@@ -13,6 +13,8 @@ export interface TeacherCourse extends Course {
   average_progress: number;
   completion_rate: number;
   pending_assignments: number;
+  publishedAt?: string | null;
+  prerequisites?: string;
 }
 
 export interface StudentEnrollment extends Enrollment {
@@ -23,6 +25,7 @@ export interface StudentEnrollment extends Enrollment {
     first_name?: string;
     last_name?: string;
   };
+  progress?: number; // Alias for overall_progress for convenience
 }
 
 export interface AssignmentSubmission {
@@ -69,28 +72,26 @@ export interface TeacherDashboardData {
   }[];
 }
 
-// Get auth token from localStorage
-function getAuthToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('teacherToken') || localStorage.getItem('auth_token');
-}
-
-// Generic fetch wrapper with auth
+/**
+ * Generic fetch wrapper with cookie-based auth
+ *
+ * SECURITY: Authentication is handled via httpOnly cookies instead of localStorage
+ * All requests include credentials: 'include' to send cookies
+ */
 async function fetchWithAuth<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = getAuthToken();
-
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...options.headers,
   };
 
   const response = await fetch(endpoint, {
     ...options,
     headers,
+    // SECURITY: Include cookies for httpOnly token authentication
+    credentials: 'include',
   });
 
   if (!response.ok) {
@@ -114,6 +115,25 @@ interface ApiResponse<T> {
   };
 }
 
+// Course creation/update data type
+export interface CourseFormData {
+  title: string;
+  slug?: string;
+  description: string;
+  age_tier: 'children' | 'youth' | 'adults' | 'seniors';
+  subject: 'quran' | 'arabic' | 'fiqh' | 'hadith' | 'seerah' | 'aqeedah' | 'akhlaq' | 'tajweed';
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  duration_weeks: number;
+  schedule?: string;
+  instructor?: string;
+  is_featured?: boolean;
+  learning_outcomes?: string[];
+  max_students?: number | null;
+  start_date?: string | null;
+  end_date?: string | null;
+  prerequisites?: string;
+}
+
 // ============================================================================
 // TEACHER COURSES API
 // ============================================================================
@@ -127,19 +147,71 @@ export const teacherCoursesApi = {
   },
 
   /**
+   * Get single course for editing (without enrollments)
+   */
+  getCourse: async (courseId: string): Promise<ApiResponse<Course>> => {
+    return fetchWithAuth(`${BFF_BASE_URL}/courses/${courseId}`);
+  },
+
+  /**
    * Get course details with enrollments
    */
   getCourseDetails: async (courseId: string): Promise<ApiResponse<TeacherCourse & { enrollments: StudentEnrollment[] }>> => {
-    return fetchWithAuth(`${BFF_BASE_URL}/courses/${courseId}?populate=enrollments`);
+    return fetchWithAuth(`${BFF_BASE_URL}/courses/${courseId}?populate=enrollments,lessons,thumbnail`);
+  },
+
+  /**
+   * Create a new course
+   */
+  createCourse: async (data: CourseFormData): Promise<ApiResponse<Course>> => {
+    // Auto-generate slug from title if not provided
+    const slug = data.slug || data.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+
+    return fetchWithAuth(`${BFF_BASE_URL}/courses`, {
+      method: 'POST',
+      body: JSON.stringify({ ...data, slug }),
+    });
   },
 
   /**
    * Update course details
    */
-  updateCourse: async (courseId: string, data: Partial<Course>): Promise<ApiResponse<Course>> => {
+  updateCourse: async (courseId: string, data: Partial<CourseFormData>): Promise<ApiResponse<Course>> => {
     return fetchWithAuth(`${BFF_BASE_URL}/courses/${courseId}`, {
       method: 'PUT',
       body: JSON.stringify({ data }),
+    });
+  },
+
+  /**
+   * Delete a course
+   */
+  deleteCourse: async (courseId: string): Promise<ApiResponse<{ id: string; deleted: boolean }>> => {
+    return fetchWithAuth(`${BFF_BASE_URL}/courses/${courseId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  /**
+   * Publish a draft course (updates publishedAt in Strapi)
+   */
+  publishCourse: async (courseId: string): Promise<ApiResponse<Course>> => {
+    return fetchWithAuth(`${BFF_BASE_URL}/courses/${courseId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ data: { publishedAt: new Date().toISOString() } }),
+    });
+  },
+
+  /**
+   * Unpublish a course (sets publishedAt to null)
+   */
+  unpublishCourse: async (courseId: string): Promise<ApiResponse<Course>> => {
+    return fetchWithAuth(`${BFF_BASE_URL}/courses/${courseId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ data: { publishedAt: null } }),
     });
   },
 };
@@ -210,10 +282,24 @@ export const teacherGradesApi = {
 // ============================================================================
 export const teacherLessonsApi = {
   /**
-   * Get lessons for a course
+   * Get all lessons across all courses
+   */
+  getAllLessons: async (): Promise<ApiResponse<Lesson[]>> => {
+    return fetchWithAuth(`${BFF_BASE_URL}/lessons?pageSize=100`);
+  },
+
+  /**
+   * Get a single lesson by documentId
+   */
+  getLesson: async (lessonId: string): Promise<ApiResponse<Lesson>> => {
+    return fetchWithAuth(`${BFF_BASE_URL}/lessons/${lessonId}`);
+  },
+
+  /**
+   * Get lessons for a specific course
    */
   getCourseLessons: async (courseId: string): Promise<ApiResponse<Lesson[]>> => {
-    return fetchWithAuth(`${BFF_BASE_URL}/lessons?course_id=${courseId}`);
+    return fetchWithAuth(`${BFF_BASE_URL}/lessons?course=${courseId}`);
   },
 
   /**
@@ -233,6 +319,15 @@ export const teacherLessonsApi = {
     return fetchWithAuth(`${BFF_BASE_URL}/lessons/${lessonId}`, {
       method: 'PUT',
       body: JSON.stringify({ data }),
+    });
+  },
+
+  /**
+   * Delete a lesson
+   */
+  deleteLesson: async (lessonId: string): Promise<ApiResponse<{ id: string; deleted: boolean }>> => {
+    return fetchWithAuth(`${BFF_BASE_URL}/lessons/${lessonId}`, {
+      method: 'DELETE',
     });
   },
 };
@@ -275,10 +370,9 @@ export const teacherDashboardApi = {
       const coursesRes = await teacherCoursesApi.getMyCourses();
       const courses = coursesRes.data || [];
 
-      // Get teacher data from localStorage
-      const teacherData = typeof window !== 'undefined'
-        ? JSON.parse(localStorage.getItem('teacherData') || '{}')
-        : {};
+      // SECURITY: Teacher info should come from the API, not localStorage
+      // The API endpoints use httpOnly cookies for authentication
+      const teacherData = { id: 0, username: 'Teacher', name: '', email: '', title: 'Instructor' };
 
       // Calculate totals
       const totalStudents = courses.reduce((sum, c) => sum + (c.current_enrollments || 0), 0);

@@ -10,7 +10,7 @@ import {
   GraduationCap, BarChart3, Settings, Search,
   PenTool, ClipboardList, BookMarked
 } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { NotificationPanel, NotificationItem, generateMockNotifications } from '@/components/notifications/notification-panel';
@@ -99,8 +99,9 @@ export function TeacherLayout({ children, title, subtitle }: TeacherLayoutProps)
     ));
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('teacherToken');
+  const handleLogout = async () => {
+    // Clear httpOnly cookie via API
+    await fetch('/api/teacher/auth/logout', { method: 'POST', credentials: 'include' });
     localStorage.removeItem('teacherData');
     router.push('/teacher/login');
   };
@@ -241,7 +242,6 @@ export function TeacherLayout({ children, title, subtitle }: TeacherLayoutProps)
 
               {/* Avatar */}
               <Avatar className="h-9 w-9">
-                <AvatarImage src="/placeholder-avatar.jpg" />
                 <AvatarFallback className="bg-indigo-100 text-indigo-700">
                   {teacherName.split(' ').map(n => n[0]).join('')}
                 </AvatarFallback>

@@ -18,10 +18,30 @@ build/
 .next/
 out/
 
-# Environment variables
+# Environment variables - CRITICAL: Never commit secrets
 .env
+.env.*
 .env.local
 .env.*.local
+*.env
+apps/*/.env
+apps/*/.env.*
+apps/*/.env.local
+packages/*/.env
+packages/*/.env.*
+
+# MCP configuration with tokens
+codex.mcp.json
+
+# Credentials and secrets
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+secrets.json
+**/secrets/
+**/.secrets/
 
 # Logs
 logs/

@@ -9,7 +9,7 @@ import {
   ChevronRight, ChevronDown, Home, User, LogOut,
   GraduationCap, CreditCard, Building2, Heart, Search
 } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { NotificationPanel, NotificationItem, generateMockNotifications } from '@/components/notifications/notification-panel';
@@ -233,7 +233,6 @@ export function StudentLayout({ children, title, subtitle }: StudentLayoutProps)
 
               {/* Avatar */}
               <Avatar className="h-9 w-9">
-                <AvatarImage src="/placeholder-avatar.jpg" />
                 <AvatarFallback className="bg-emerald-100 text-emerald-700">
                   {studentName.split(' ').map(n => n[0]).join('')}
                 </AvatarFallback>

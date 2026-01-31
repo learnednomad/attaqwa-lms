@@ -22,44 +22,21 @@ export default function TeacherLoginPage() {
     setError('');
 
     try {
-      // In development, bypass actual authentication
-      const isDev = process.env.NODE_ENV === 'development';
-
-      if (isDev) {
-        // Mock login for development
-        const mockTeacher = {
-          id: 1,
-          username: 'sheikh.abdullah',
-          email: email || 'abdullah.faqih@attaqwa.org',
-          name: 'Sheikh Abdullah Al-Faqih',
-          title: 'Instructor',
-        };
-
-        localStorage.setItem('teacherToken', 'mock-teacher-token');
-        localStorage.setItem('teacherData', JSON.stringify(mockTeacher));
-
-        router.push('/teacher/dashboard');
-        return;
-      }
-
-      // Production: Call auth API
-      const response = await fetch('/api/auth/local', {
+      const response = await fetch('/api/teacher/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          identifier: email,
-          password,
-        }),
+        credentials: 'include',
+        body: JSON.stringify({ email, password }),
       });
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error?.message || 'Invalid credentials');
+        throw new Error(data.error || 'Invalid credentials');
       }
 
       const data = await response.json();
 
-      localStorage.setItem('teacherToken', data.jwt);
+      // Store display info in localStorage (non-sensitive)
       localStorage.setItem('teacherData', JSON.stringify(data.user));
 
       router.push('/teacher/dashboard');

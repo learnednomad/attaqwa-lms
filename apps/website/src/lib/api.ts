@@ -1,3 +1,12 @@
+/**
+ * API Client
+ *
+ * SECURITY IMPROVEMENTS:
+ * - Removed localStorage token storage (XSS vulnerability)
+ * - Authentication is handled via httpOnly cookies
+ * - All requests include credentials for cookie-based auth
+ */
+
 import {
   API_V1_ENDPOINTS,
   API_ENDPOINTS,
@@ -39,21 +48,15 @@ async function makeRequest<T>(
     'Content-Type': 'application/json',
   };
 
-  // Add auth token if available
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-      defaultHeaders['Authorization'] = `Bearer ${token}`;
-    }
-  }
-
+  // SECURITY: No localStorage token - authentication via httpOnly cookies
   const response = await fetch(url, {
     ...options,
     headers: {
       ...defaultHeaders,
       ...options.headers,
     },
-    credentials: 'include', // Include cookies for server-side auth
+    // SECURITY: Include cookies for httpOnly token authentication
+    credentials: 'include',
   });
 
   if (!response.ok) {
@@ -75,8 +78,9 @@ async function makeRequest<T>(
 
 // Auth API (using v1 endpoints)
 export const authApi = {
-  login: async (credentials: LoginInput): Promise<{ user: AuthUser; token: string }> => {
-    const response = await makeRequest<{ user: AuthUser; token: string }>(
+  login: async (credentials: LoginInput): Promise<{ user: AuthUser }> => {
+    // SECURITY: Server sets httpOnly cookie, we only receive user data
+    const response = await makeRequest<{ user: AuthUser; token?: string }>(
       API_V1_ENDPOINTS.LOGIN,
       {
         method: 'POST',
@@ -84,16 +88,13 @@ export const authApi = {
       }
     );
 
-    // Store token in localStorage for client-side usage
-    if (typeof window !== 'undefined' && response.token) {
-      localStorage.setItem('auth_token', response.token);
-    }
-
-    return response;
+    // SECURITY: Don't expose token to client code
+    return { user: response.user };
   },
 
-  register: async (userData: RegisterInput): Promise<{ user: AuthUser; token: string }> => {
-    const response = await makeRequest<{ user: AuthUser; token: string }>(
+  register: async (userData: RegisterInput): Promise<{ user: AuthUser }> => {
+    // SECURITY: Server sets httpOnly cookie, we only receive user data
+    const response = await makeRequest<{ user: AuthUser; token?: string }>(
       API_V1_ENDPOINTS.REGISTER,
       {
         method: 'POST',
@@ -101,21 +102,15 @@ export const authApi = {
       }
     );
 
-    if (typeof window !== 'undefined' && response.token) {
-      localStorage.setItem('auth_token', response.token);
-    }
-
-    return response;
+    // SECURITY: Don't expose token to client code
+    return { user: response.user };
   },
 
   logout: async (): Promise<void> => {
+    // SECURITY: Server clears httpOnly cookie
     await makeRequest(API_V1_ENDPOINTS.LOGOUT, {
       method: 'POST',
     });
-
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth_token');
-    }
   },
 
   getMe: async (): Promise<{ user: AuthUser }> => {

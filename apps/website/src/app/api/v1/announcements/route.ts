@@ -1,12 +1,22 @@
-import { NextRequest, NextResponse } from 'next/server';
-
 /**
  * Announcements API v1
  * GET /api/v1/announcements
  * POST /api/v1/announcements
  *
- * Versioned announcements endpoint with Strapi v5 response format.
+ * SECURITY IMPROVEMENTS:
+ * - Added Zod input validation
+ * - Sanitized error responses (no stack traces)
+ * - Added authentication check for POST
  */
+
+import { NextRequest, NextResponse } from 'next/server';
+import {
+  createAnnouncementSchema,
+  announcementQuerySchema,
+  validateBody,
+  validateQuery,
+} from '@/lib/schemas';
+import { verifyAuth } from '@/middleware/auth';
 
 const mockAnnouncements = [
   {
@@ -58,11 +68,9 @@ const mockAnnouncements = [
 
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const limit = parseInt(searchParams.get('limit') || '10');
-    const offset = parseInt(searchParams.get('offset') || '0');
-    const type = searchParams.get('type');
-    const active = searchParams.get('active') !== 'false';
+    // Validate query parameters
+    const query = validateQuery(announcementQuerySchema, request.nextUrl.searchParams);
+    const { limit, offset, type, active } = query;
 
     // Filter announcements
     let filtered = mockAnnouncements.filter((a) => a.isActive === active);
@@ -88,14 +96,14 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching announcements:', error);
+    // SECURITY: Log full error server-side, return generic message to client
+    console.error('[API] Announcements GET error:', error);
+
     return NextResponse.json(
       {
         error: {
           status: 500,
-          name: 'ServerError',
-          message: 'Failed to fetch announcements',
-          details: error instanceof Error ? error.message : 'Unknown error',
+          message: 'Failed to fetch announcements. Please try again later.',
         },
       },
       { status: 500 }
@@ -105,19 +113,52 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // SECURITY: Verify authentication
+    const user = await verifyAuth(request);
+    if (!user) {
+      return NextResponse.json(
+        {
+          error: {
+            status: 401,
+            message: 'Authentication required',
+          },
+        },
+        { status: 401 }
+      );
+    }
+
+    // SECURITY: Check authorization (only admins and moderators can create)
+    if (!['ADMIN', 'MODERATOR', 'admin', 'moderator'].includes(user.role)) {
+      return NextResponse.json(
+        {
+          error: {
+            status: 403,
+            message: 'Insufficient permissions',
+          },
+        },
+        { status: 403 }
+      );
+    }
+
+    // Parse and validate request body
     const body = await request.json();
+    const validation = validateBody(createAnnouncementSchema, body);
 
-    // In production, validate admin authentication here
-    // Then save to database
+    if (!validation.success) {
+      return validation.response;
+    }
 
+    const validatedData = validation.data;
+
+    // Create the announcement (in production, save to database)
     const newAnnouncement = {
       documentId: `ann-${Date.now()}`,
-      ...body,
+      ...validatedData,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       author: {
-        name: 'Admin',
-        role: 'ADMIN',
+        name: user.name,
+        role: user.role,
       },
     };
 
@@ -133,12 +174,27 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
+    // SECURITY: Log full error server-side, return generic message to client
+    console.error('[API] Announcements POST error:', error);
+
+    // Handle JSON parse errors specifically
+    if (error instanceof SyntaxError) {
+      return NextResponse.json(
+        {
+          error: {
+            status: 400,
+            message: 'Invalid JSON in request body',
+          },
+        },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
       {
         error: {
           status: 500,
-          name: 'ServerError',
-          message: 'Failed to create announcement',
+          message: 'Failed to create announcement. Please try again later.',
         },
       },
       { status: 500 }

@@ -144,28 +144,26 @@ interface ApiResponse<T> {
   };
 }
 
-// Get auth token from localStorage
-function getAuthToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('studentToken') || localStorage.getItem('auth_token');
-}
-
-// Generic fetch wrapper with auth
+/**
+ * Generic fetch wrapper with cookie-based auth
+ *
+ * SECURITY: Authentication is handled via httpOnly cookies instead of localStorage
+ * All requests include credentials: 'include' to send cookies
+ */
 async function fetchWithAuth<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = getAuthToken();
-
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...options.headers,
   };
 
   const response = await fetch(endpoint, {
     ...options,
     headers,
+    // SECURITY: Include cookies for httpOnly token authentication
+    credentials: 'include',
   });
 
   if (!response.ok) {
@@ -446,10 +444,9 @@ export const dashboardApi = {
         : 0;
       const totalTime = progress.reduce((sum, p) => sum + (p.time_spent_minutes || 0), 0);
 
-      // Get student info from localStorage (set during login)
-      const studentData = typeof window !== 'undefined'
-        ? JSON.parse(localStorage.getItem('studentData') || '{}')
-        : {};
+      // SECURITY: Student info should come from the API, not localStorage
+      // The API endpoints use httpOnly cookies for authentication
+      const studentData = { id: 0, name: 'Student', email: '', username: '' };
 
       return {
         student: {

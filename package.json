@@ -22,8 +22,14 @@
     "mcp:coolify": "node scripts/coolify-mcp.mjs"
   },
   "engines": {
-    "node": ">=18.0.0 <=22.x.x",
+    "node": ">=20.9.0",
     "pnpm": ">=10.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "^19.0.0",
+      "@types/react-dom": "^19.0.0"
+    }
   },
   "keywords": [
     "lms",

@@ -80,9 +80,13 @@ global.sessionStorage = sessionStorageMock
 global.fetch = jest.fn()
 
 // Setup for React Query tests
-import { QueryClient } from '@tanstack/react-query'
+import React from 'react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
-// Create a wrapper for React Query tests
+/**
+ * Create a wrapper for React Query tests
+ * @returns {React.FC<{children: React.ReactNode}>} A wrapper component
+ */
 export const createQueryClientWrapper = () => {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -92,12 +96,13 @@ export const createQueryClientWrapper = () => {
       },
     },
   })
-  
-  return ({ children }) => (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
+
+  /** @type {React.FC<{children: React.ReactNode}>} */
+  const Wrapper = ({ children }) => (
+    React.createElement(QueryClientProvider, { client: queryClient }, children)
   )
+
+  return Wrapper
 }
 
 // Islamic calendar mocks for testing

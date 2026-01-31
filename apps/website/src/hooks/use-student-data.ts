@@ -166,14 +166,15 @@ export function useEnrollments(params?: {
       setLoading(true);
       setError(null);
       const result = await studentApi.enrollments.getMine(params);
+      const defaultSummary = {
+        totalEnrollments: result.data.length,
+        active: result.data.filter(e => e.enrollment_status === 'active').length,
+        completed: result.data.filter(e => e.enrollment_status === 'completed').length,
+        certificatesEarned: result.data.filter(e => e.certificate_issued).length,
+      };
       setData({
         enrollments: result.data,
-        summary: result.meta?.summary || {
-          totalEnrollments: result.data.length,
-          active: result.data.filter(e => e.enrollment_status === 'active').length,
-          completed: result.data.filter(e => e.enrollment_status === 'completed').length,
-          certificatesEarned: result.data.filter(e => e.certificate_issued).length,
-        },
+        summary: (result.meta?.summary as EnrollmentsData['summary']) || defaultSummary,
       });
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to fetch enrollments'));
