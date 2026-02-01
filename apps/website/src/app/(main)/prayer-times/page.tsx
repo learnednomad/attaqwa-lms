@@ -1,17 +1,13 @@
 /**
  * Prayer Times Page - SEO Optimized for Local Mosque Discovery
- * Comprehensive prayer time information with Islamic content optimization
  */
 
 import { PrayerTimesWidget } from '@/components/features/prayer-times/prayer-times-widget';
-import { QiblaCompass } from '@/components/features/prayer-times/QiblaCompass';
-import { Card } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { generateSEOMetadata } from '@/lib/seo';
 import { PrayerTimesStructuredData, BreadcrumbStructuredData, MosqueStructuredData } from '@/components/seo/StructuredData';
 import type { Metadata } from 'next';
 import { MOSQUE_INFO } from '@attaqwa/shared';
-import { Clock, Compass, Calendar, MapPin } from 'lucide-react';
+import { Clock, Compass, Calendar, MapPin, Phone, Mail, BookOpen, Check } from 'lucide-react';
 
 export const metadata: Metadata = generateSEOMetadata({
   title: "Daily Prayer Times & Schedule - Masjid At-Taqwa",
@@ -20,7 +16,7 @@ export const metadata: Metadata = generateSEOMetadata({
     'prayer times today',
     'salah times',
     'fajr time',
-    'dhuhr time', 
+    'dhuhr time',
     'asr time',
     'maghrib time',
     'isha time',
@@ -38,50 +34,76 @@ export const metadata: Metadata = generateSEOMetadata({
   type: 'article',
 });
 
-// Mock prayer times data - replace with actual API call
 const mockPrayerTimes = {
   date: new Date().toISOString().split('T')[0],
   fajr: '4:32 AM',
-  sunrise: '6:15 AM', 
+  sunrise: '6:15 AM',
   dhuhr: '1:15 PM',
   asr: '5:45 PM',
   maghrib: '8:20 PM',
   isha: '9:45 PM',
   qibla: 58.5,
+  iqama: {
+    fajr: '5:00 AM',
+    dhuhr: '1:30 PM',
+    asr: '6:00 PM',
+    maghrib: '8:25 PM',
+    isha: '10:00 PM',
+  },
+  jummah: ['12:30 PM', '1:15 PM'],
 };
 
-// Prayer time descriptions for SEO and user education
-const prayerDescriptions = {
-  fajr: {
+const prayerDescriptions = [
+  {
+    key: 'fajr',
     name: 'Fajr (Dawn Prayer)',
-    description: 'The first prayer of the day, performed before sunrise. A time for spiritual reflection and beginning the day with remembrance of Allah.',
     time: mockPrayerTimes.fajr,
+    description: 'The first prayer of the day, performed before sunrise. A time for spiritual reflection and beginning the day with remembrance of Allah.',
   },
-  dhuhr: {
-    name: 'Dhuhr (Midday Prayer)', 
-    description: 'The second prayer performed after the sun passes its zenith. A midday break for spiritual connection.',
+  {
+    key: 'dhuhr',
+    name: 'Dhuhr (Midday Prayer)',
     time: mockPrayerTimes.dhuhr,
+    description: 'The second prayer performed after the sun passes its zenith. A midday break for spiritual connection.',
   },
-  asr: {
+  {
+    key: 'asr',
     name: 'Asr (Afternoon Prayer)',
-    description: 'The third prayer of the day, performed in the afternoon. A time to pause and reconnect with faith.',
     time: mockPrayerTimes.asr,
+    description: 'The third prayer of the day, performed in the afternoon. A time to pause and reconnect with faith.',
   },
-  maghrib: {
+  {
+    key: 'maghrib',
     name: 'Maghrib (Sunset Prayer)',
-    description: 'The fourth prayer performed just after sunset. A time to be grateful for the day and reflect on Allah\'s blessings.',
     time: mockPrayerTimes.maghrib,
+    description: 'The fourth prayer performed just after sunset. A time to be grateful for the day and reflect on Allah\'s blessings.',
   },
-  isha: {
+  {
+    key: 'isha',
     name: 'Isha (Night Prayer)',
-    description: 'The fifth and final prayer of the day, performed after twilight. A peaceful end to the day with prayer and reflection.',
     time: mockPrayerTimes.isha,
+    description: 'The fifth and final prayer of the day, performed after twilight. A peaceful end to the day with prayer and reflection.',
   },
-};
+];
+
+const etiquetteItems = [
+  'Arrive early for community prayers',
+  'Remove shoes before entering prayer hall',
+  'Maintain silence during prayers',
+  'Dress modestly and appropriately',
+  'Turn off mobile devices',
+];
 
 const breadcrumbs = [
   { name: 'Home', url: '/' },
   { name: 'Prayer Times', url: '/prayer-times' }
+];
+
+const stats = [
+  { label: 'Daily Prayers', value: '5', icon: Clock },
+  { label: 'Qibla Direction', value: `${mockPrayerTimes.qibla}°`, icon: Compass },
+  { label: 'Jummah Services', value: '2', icon: Calendar },
+  { label: 'Location', value: 'Doraville, GA', icon: MapPin },
 ];
 
 export default function PrayerTimesPage() {
@@ -97,214 +119,244 @@ export default function PrayerTimesPage() {
 
   return (
     <>
-      {/* Structured Data for SEO */}
-      <PrayerTimesStructuredData 
-        prayerTimes={mockPrayerTimes} 
+      <PrayerTimesStructuredData
+        prayerTimes={mockPrayerTimes}
         date={mockPrayerTimes.date}
       />
       <BreadcrumbStructuredData items={breadcrumbs} />
       <MosqueStructuredData />
 
-      <div className="container mx-auto px-4 py-8">
-        {/* Page Header */}
-        <header className="mb-8 text-center">
-          <h1 className="mb-4 text-4xl font-bold text-islamic-navy-800 md:text-5xl">
-            Daily Prayer Times
-          </h1>
-          <p className="mx-auto max-w-3xl text-lg text-islamic-navy-600 md:text-xl">
-            Find accurate Islamic prayer times for {MOSQUE_INFO.name}. 
-            Join our community for daily prayers including Fajr, Dhuhr, Asr, Maghrib, and Isha.
-          </p>
-          <div className="mt-4 flex items-center justify-center gap-2 text-sm text-islamic-navy-500">
-            <Calendar className="h-4 w-4" aria-hidden="true" />
-            <time dateTime={currentDate.toISOString()}>
-              {formatDate(currentDate)}
-            </time>
+      <div className="min-h-screen bg-white">
+        {/* Header */}
+        <section className="border-b border-neutral-100">
+          <div className="max-w-5xl mx-auto px-6 py-16 text-center">
+            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-emerald-700 mb-3">
+              Masjid At-Taqwa
+            </p>
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-neutral-900 mb-4">
+              Daily Prayer Times
+            </h1>
+            <p className="text-base text-neutral-500 max-w-2xl mx-auto leading-relaxed">
+              Find accurate Islamic prayer times for {MOSQUE_INFO.name}.
+              Join our community for daily prayers including Fajr, Dhuhr, Asr, Maghrib, and Isha.
+            </p>
+            <div className="mt-4 flex items-center justify-center gap-2 text-xs text-neutral-400">
+              <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
+              <time dateTime={currentDate.toISOString()}>
+                {formatDate(currentDate)}
+              </time>
+            </div>
           </div>
-        </header>
+        </section>
 
-        <div className="grid gap-8 lg:grid-cols-3">
-          {/* Main Prayer Times Widget */}
-          <div className="lg:col-span-2">
-            <section aria-labelledby="prayer-times-today">
-              <h2 id="prayer-times-today" className="mb-6 text-2xl font-bold text-islamic-navy-800">
-                Today's Prayer Schedule
-              </h2>
-              <PrayerTimesWidget
-                prayerTimes={mockPrayerTimes}
-              />
-            </section>
-
-            <Separator className="my-8" />
-
-            {/* Prayer Descriptions for SEO and Education */}
-            <section aria-labelledby="prayer-information">
-              <h2 id="prayer-information" className="mb-6 text-2xl font-bold text-islamic-navy-800">
-                Islamic Prayer Information
-              </h2>
-              <div className="grid gap-6 md:grid-cols-2">
-                {Object.entries(prayerDescriptions).map(([key, prayer]) => (
-                  <Card key={key} className="p-6">
-                    <header className="mb-3 flex items-center gap-3">
-                      <Clock className="h-5 w-5 text-islamic-green-600" aria-hidden="true" />
-                      <div>
-                        <h3 className="font-semibold text-islamic-navy-800">
-                          {prayer.name}
-                        </h3>
-                        <time 
-                          className="text-lg font-bold text-islamic-green-600"
-                          dateTime={prayer.time}
-                        >
-                          {prayer.time}
-                        </time>
+        <div className="max-w-5xl mx-auto px-6">
+          {/* Stats */}
+          <section className="py-10">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {stats.map((stat) => {
+                const IconComponent = stat.icon;
+                return (
+                  <div key={stat.label} className="rounded-xl border border-neutral-200 bg-white p-5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center">
+                        <IconComponent className="h-4 w-4 text-emerald-600" />
                       </div>
-                    </header>
-                    <p className="text-sm text-islamic-navy-600">
-                      {prayer.description}
-                    </p>
-                  </Card>
-                ))}
-              </div>
-            </section>
-
-            <Separator className="my-8" />
-
-            {/* Jummah Prayer Information */}
-            <section aria-labelledby="jummah-prayer">
-              <h2 id="jummah-prayer" className="mb-4 text-2xl font-bold text-islamic-navy-800">
-                Jummah (Friday Prayer)
-              </h2>
-              <Card className="p-6">
-                <div className="flex items-start gap-4">
-                  <Calendar className="mt-1 h-6 w-6 text-islamic-green-600" aria-hidden="true" />
-                  <div>
-                    <h3 className="mb-2 text-lg font-semibold text-islamic-navy-800">
-                      Friday Congregational Prayer
-                    </h3>
-                    <p className="mb-3 text-islamic-navy-600">
-                      Join us every Friday for Jummah prayers, an essential weekly gathering 
-                      for the Muslim community featuring khutbah (sermon) and congregational prayer.
-                    </p>
-                    <div className="mb-3">
-                      <strong className="text-islamic-green-600">First Jummah:</strong> 12:30 PM<br />
-                      <strong className="text-islamic-green-600">Second Jummah:</strong> 1:15 PM
+                      <div>
+                        <p className="text-lg font-bold text-neutral-900 leading-tight">{stat.value}</p>
+                        <p className="text-xs text-neutral-500">{stat.label}</p>
+                      </div>
                     </div>
-                    <p className="text-sm text-islamic-navy-500">
-                      Please arrive 15 minutes early. Parking available on-site and nearby locations.
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          <div className="grid gap-8 lg:grid-cols-3 pb-16">
+            {/* Main Content */}
+            <div className="lg:col-span-2 space-y-10">
+              {/* Prayer Times Widget */}
+              <section aria-labelledby="prayer-times-today">
+                <div className="flex items-center gap-3 mb-6">
+                  <h2 id="prayer-times-today" className="text-xl font-semibold text-neutral-900">
+                    Today&apos;s Prayer Schedule
+                  </h2>
+                  <div className="flex-1 h-px bg-neutral-100" />
+                </div>
+                <PrayerTimesWidget prayerTimes={mockPrayerTimes} />
+              </section>
+
+              {/* Prayer Descriptions */}
+              <section aria-labelledby="prayer-information">
+                <div className="flex items-center gap-3 mb-6">
+                  <h2 id="prayer-information" className="text-xl font-semibold text-neutral-900">
+                    Islamic Prayer Information
+                  </h2>
+                  <div className="flex-1 h-px bg-neutral-100" />
+                </div>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {prayerDescriptions.map((prayer) => (
+                    <div key={prayer.key} className="rounded-xl border border-neutral-200 bg-white p-5">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-9 h-9 rounded-lg bg-neutral-50 border border-neutral-100 flex items-center justify-center">
+                          <Clock className="h-4 w-4 text-neutral-600" aria-hidden="true" />
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-semibold text-neutral-900">
+                            {prayer.name}
+                          </h3>
+                          <time
+                            className="text-sm font-bold text-emerald-600"
+                            dateTime={prayer.time}
+                          >
+                            {prayer.time}
+                          </time>
+                        </div>
+                      </div>
+                      <p className="text-xs text-neutral-500 leading-relaxed">
+                        {prayer.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Jummah Prayer Information */}
+              <section aria-labelledby="jummah-prayer">
+                <div className="flex items-center gap-3 mb-6">
+                  <h2 id="jummah-prayer" className="text-xl font-semibold text-neutral-900">
+                    Jummah (Friday Prayer)
+                  </h2>
+                  <div className="flex-1 h-px bg-neutral-100" />
+                </div>
+                <div className="rounded-xl border border-neutral-200 bg-white p-6">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+                      <Calendar className="h-5 w-5 text-emerald-600" aria-hidden="true" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-neutral-900 mb-2">
+                        Friday Congregational Prayer
+                      </h3>
+                      <p className="text-sm text-neutral-500 leading-relaxed mb-3">
+                        Join us every Friday for Jummah prayers, an essential weekly gathering
+                        for the Muslim community featuring khutbah (sermon) and congregational prayer.
+                      </p>
+                      <div className="flex gap-4 mb-3">
+                        <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-2 text-center">
+                          <p className="text-[10px] text-neutral-500 uppercase tracking-wide">First Jummah</p>
+                          <p className="text-sm font-bold text-neutral-900 font-mono">12:30 PM</p>
+                        </div>
+                        <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-2 text-center">
+                          <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Second Jummah</p>
+                          <p className="text-sm font-bold text-neutral-900 font-mono">1:15 PM</p>
+                        </div>
+                      </div>
+                      <p className="text-xs text-neutral-400">
+                        Please arrive 15 minutes early. Parking available on-site and nearby locations.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            {/* Sidebar */}
+            <aside className="space-y-5" role="complementary">
+              {/* Qibla Direction */}
+              <section aria-labelledby="qibla-direction">
+                <div className="rounded-xl border border-neutral-200 bg-white p-5">
+                  <h3 id="qibla-direction" className="text-sm font-semibold text-neutral-900 mb-4">
+                    Qibla Direction
+                  </h3>
+                  <div className="text-center">
+                    <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center mx-auto mb-3">
+                      <Compass className="h-8 w-8 text-emerald-600" aria-hidden="true" />
+                    </div>
+                    <p className="text-2xl font-bold text-neutral-900">
+                      {mockPrayerTimes.qibla}&deg;
+                    </p>
+                    <p className="text-xs text-neutral-500 mt-1">
+                      Northeast direction toward Mecca
                     </p>
                   </div>
                 </div>
-              </Card>
-            </section>
-          </div>
+              </section>
 
-          {/* Sidebar */}
-          <aside className="space-y-8" role="complementary">
-            {/* Qibla Direction */}
-            <section aria-labelledby="qibla-direction">
-              <h3 id="qibla-direction" className="mb-4 text-lg font-semibold text-islamic-navy-800">
-                Qibla Direction
-              </h3>
-              <Card className="p-6">
-                <div className="text-center">
-                  <Compass className="mx-auto mb-3 h-12 w-12 text-islamic-green-600" aria-hidden="true" />
-                  <div className="mb-2">
-                    <span className="text-2xl font-bold text-islamic-green-600">
-                      {mockPrayerTimes.qibla}°
-                    </span>
-                  </div>
-                  <p className="text-sm text-islamic-navy-600">
-                    Northeast direction toward Mecca
-                  </p>
-                </div>
-              </Card>
-            </section>
-
-            {/* Mosque Location */}
-            <section aria-labelledby="mosque-location">
-              <h3 id="mosque-location" className="mb-4 text-lg font-semibold text-islamic-navy-800">
-                Mosque Location
-              </h3>
-              <Card className="p-6">
-                <div className="space-y-3">
+              {/* Mosque Location */}
+              <section aria-labelledby="mosque-location">
+                <div className="rounded-xl border border-neutral-200 bg-white p-5">
+                  <h3 id="mosque-location" className="text-sm font-semibold text-neutral-900 mb-4">
+                    Mosque Location
+                  </h3>
                   <div className="flex items-start gap-3">
-                    <MapPin className="mt-1 h-5 w-5 text-islamic-green-600" aria-hidden="true" />
+                    <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
+                      <MapPin className="h-3.5 w-3.5 text-emerald-600" aria-hidden="true" />
+                    </div>
                     <div>
-                      <h4 className="font-semibold text-islamic-navy-800">
+                      <h4 className="text-xs font-medium text-neutral-900">
                         {MOSQUE_INFO.name}
                       </h4>
-                      <address className="not-italic text-sm text-islamic-navy-600">
+                      <address className="not-italic text-xs text-neutral-500 mt-0.5">
                         {MOSQUE_INFO.address}<br />
-                        <a href={`tel:${MOSQUE_INFO.phone}`} className="text-islamic-green-600 hover:underline">
+                        <a href={`tel:${MOSQUE_INFO.phone}`} className="text-emerald-600">
                           {MOSQUE_INFO.phone}
                         </a>
                       </address>
                     </div>
                   </div>
-                  <p className="text-xs text-islamic-navy-500">
+                  <p className="text-xs text-neutral-400 mt-3">
                     Easy parking available. Wheelchair accessible entrance.
                   </p>
                 </div>
-              </Card>
-            </section>
+              </section>
 
-            {/* Prayer Etiquette */}
-            <section aria-labelledby="prayer-etiquette">
-              <h3 id="prayer-etiquette" className="mb-4 text-lg font-semibold text-islamic-navy-800">
-                Prayer Etiquette
-              </h3>
-              <Card className="p-6">
-                <ul className="space-y-2 text-sm text-islamic-navy-600">
-                  <li className="flex gap-2">
-                    <span className="text-islamic-green-600">•</span>
-                    Arrive early for community prayers
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-islamic-green-600">•</span>
-                    Remove shoes before entering prayer hall
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-islamic-green-600">•</span>
-                    Maintain silence during prayers
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-islamic-green-600">•</span>
-                    Dress modestly and appropriately
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-islamic-green-600">•</span>
-                    Turn off mobile devices
-                  </li>
-                </ul>
-              </Card>
-            </section>
-
-            {/* Contact Information */}
-            <section aria-labelledby="contact-info">
-              <h3 id="contact-info" className="mb-4 text-lg font-semibold text-islamic-navy-800">
-                Need Help?
-              </h3>
-              <Card className="p-6">
-                <p className="mb-3 text-sm text-islamic-navy-600">
-                  Questions about prayer times or community events?
-                </p>
-                <div className="space-y-2 text-sm">
-                  <a 
-                    href={`mailto:${MOSQUE_INFO.email}`} 
-                    className="block text-islamic-green-600 hover:underline"
-                  >
-                    {MOSQUE_INFO.email}
-                  </a>
-                  <a 
-                    href={`tel:${MOSQUE_INFO.phone}`} 
-                    className="block text-islamic-green-600 hover:underline"
-                  >
-                    {MOSQUE_INFO.phone}
-                  </a>
+              {/* Prayer Etiquette */}
+              <section aria-labelledby="prayer-etiquette">
+                <div className="rounded-xl border border-neutral-200 bg-white p-5">
+                  <h3 id="prayer-etiquette" className="text-sm font-semibold text-neutral-900 mb-4">
+                    Prayer Etiquette
+                  </h3>
+                  <ul className="space-y-2">
+                    {etiquetteItems.map((item) => (
+                      <li key={item} className="flex items-start gap-2 text-xs text-neutral-600">
+                        <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              </Card>
-            </section>
-          </aside>
+              </section>
+
+              {/* Need Help */}
+              <section aria-labelledby="contact-info">
+                <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-5">
+                  <h3 id="contact-info" className="text-sm font-semibold text-neutral-900 mb-3">
+                    Need Help?
+                  </h3>
+                  <p className="text-xs text-neutral-500 mb-3">
+                    Questions about prayer times or community events?
+                  </p>
+                  <div className="space-y-2">
+                    <a
+                      href={`mailto:${MOSQUE_INFO.email}`}
+                      className="flex items-center gap-2 text-xs text-emerald-600"
+                    >
+                      <Mail className="h-3.5 w-3.5" />
+                      {MOSQUE_INFO.email}
+                    </a>
+                    <a
+                      href={`tel:${MOSQUE_INFO.phone}`}
+                      className="flex items-center gap-2 text-xs text-emerald-600"
+                    >
+                      <Phone className="h-3.5 w-3.5" />
+                      {MOSQUE_INFO.phone}
+                    </a>
+                  </div>
+                </div>
+              </section>
+            </aside>
+          </div>
         </div>
       </div>
     </>

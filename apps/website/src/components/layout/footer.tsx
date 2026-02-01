@@ -4,21 +4,8 @@ import Link from 'next/link';
 import { Mail, Phone, MapPin, Facebook, Youtube, Building } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { MOSQUE_INFO } from '@/constants';
+import { footerQuickLinks, footerResources, footerAbout } from '@/lib/navigation';
 import { useState, useEffect } from 'react';
-
-const quickLinks = [
-  { name: 'Prayer Times', href: '/prayer-times' },
-  { name: 'Events', href: '/events' },
-  { name: 'Donations', href: '/donate' },
-  { name: 'Contact Us', href: '/contact' },
-];
-
-const resources = [
-  { name: 'Islamic Calendar', href: '/calendar' },
-  { name: 'Announcements', href: '/announcements' },
-  { name: 'About Us', href: '/about' },
-  { name: 'Services', href: '/services' },
-];
 
 const socialLinks = [
   { name: 'Facebook', href: MOSQUE_INFO.social.facebook, icon: Facebook },
@@ -70,7 +57,7 @@ export function Footer() {
           <div className="space-y-4">
             <h3 className="font-semibold text-islamic-navy-800">Quick Links</h3>
             <ul className="space-y-2">
-              {quickLinks.map((link) => (
+              {footerQuickLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
@@ -87,7 +74,7 @@ export function Footer() {
           <div className="space-y-4">
             <h3 className="font-semibold text-islamic-navy-800">Resources</h3>
             <ul className="space-y-2">
-              {resources.map((link) => (
+              {footerResources.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
@@ -100,10 +87,22 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Social Media & Newsletter */}
+          {/* About & Education */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-islamic-navy-800">Stay Connected</h3>
-            <div className="flex gap-2">
+            <h3 className="font-semibold text-islamic-navy-800">About & Education</h3>
+            <ul className="space-y-2">
+              {footerAbout.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-gray-600 transition-colors hover:text-islamic-green-600"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <div className="flex gap-2 pt-2">
               {socialLinks.map((social) => {
                 const Icon = social.icon;
                 return (
@@ -117,14 +116,6 @@ export function Footer() {
                   </Link>
                 );
               })}
-            </div>
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-islamic-navy-800">
-                Prayer Time Notifications
-              </p>
-              <p className="text-xs text-gray-600">
-                Subscribe to receive daily prayer time reminders and mosque updates.
-              </p>
             </div>
           </div>
         </div>

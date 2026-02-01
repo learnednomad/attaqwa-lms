@@ -1,9 +1,6 @@
 'use client';
 
 import { Download, FileText, Calendar as CalendarIcon } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -41,42 +38,39 @@ export function CalendarDownload({
     document.body.removeChild(link);
   };
 
-  // Featured card mode
+  // Featured card
   if (featured) {
     return (
-      <div className={cn('card-premium p-6', className)}>
+      <div className={cn('rounded-xl border border-neutral-200 bg-white p-6', className)}>
         <div className="flex flex-col gap-4">
           <div className="flex items-start gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-islamic-green-500 to-islamic-green-700 shadow-lg">
-              <CalendarIcon className="h-6 w-6 text-white" />
+            <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+              <CalendarIcon className="h-5 w-5 text-emerald-600" />
             </div>
-            <div className="space-y-1">
-              <h3
-                className="text-lg font-semibold text-islamic-navy-800"
-                style={{ fontFamily: "'Cormorant Garamond', serif" }}
-              >
+            <div>
+              <h3 className="text-sm font-semibold text-neutral-900">
                 {calendar.title}
               </h3>
-              <div className="flex items-center gap-3">
-                <Badge variant="outline" className="text-xs">
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-[10px] font-medium text-neutral-500 border border-neutral-200 rounded px-1.5 py-0.5">
                   {calendar.year}
-                </Badge>
-                <span className="text-xs text-muted-foreground">
+                </span>
+                <span className="text-xs text-neutral-400">
                   {formatFileSize(calendar.fileSize)} &middot; PDF
                 </span>
               </div>
             </div>
           </div>
           {calendar.description && (
-            <p className="text-sm leading-relaxed text-islamic-navy-600 line-clamp-3">
+            <p className="text-sm text-neutral-500 leading-relaxed line-clamp-3">
               {calendar.description}
             </p>
           )}
           <button
             onClick={handleDownload}
-            className="btn-islamic-primary flex w-full items-center justify-center gap-2"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white"
           >
-            <Download className="h-4 w-4" />
+            <Download className="h-3.5 w-3.5" />
             Download Calendar
           </button>
         </div>
@@ -84,94 +78,76 @@ export function CalendarDownload({
     );
   }
 
-  // Compact row mode (for "All Available" and "Archived" lists)
+  // Compact row
   if (compact) {
-    const isArchived = archived;
-    const borderColor = isArchived ? 'border-l-islamic-navy-300' : 'border-l-islamic-green-500';
-    const iconBg = isArchived ? 'bg-islamic-navy-100' : 'bg-islamic-green-100';
-    const iconColor = isArchived ? 'text-islamic-navy-600' : 'text-islamic-green-600';
-    const rowBg = index % 2 === 1 ? (isArchived ? 'bg-islamic-navy-50/30' : 'bg-islamic-green-50/30') : 'bg-white';
-
     return (
       <div
         className={cn(
-          'flex items-center justify-between rounded-lg border-l-4 px-5 py-4',
-          borderColor,
-          rowBg,
-          isArchived ? 'hover:bg-islamic-navy-50/50' : 'hover:bg-islamic-green-50/50',
+          'flex items-center justify-between px-4 py-3.5',
+          index > 0 && 'border-t border-neutral-100',
+          archived && 'opacity-70',
           className
         )}
       >
         <div className="flex items-center gap-3">
-          <div className={cn('rounded-md p-2', iconBg)}>
-            <FileText className={cn('h-4 w-4', iconColor)} />
+          <div className="w-8 h-8 rounded-lg bg-neutral-50 border border-neutral-100 flex items-center justify-center">
+            <FileText className="h-4 w-4 text-neutral-400" />
           </div>
           <div>
-            <h4 className="text-sm font-medium text-islamic-navy-800">{calendar.title}</h4>
-            <p className="text-xs text-muted-foreground">
+            <h4 className="text-sm font-medium text-neutral-900">{calendar.title}</h4>
+            <p className="text-xs text-neutral-400">
               {formatFileSize(calendar.fileSize)} &middot; PDF
             </p>
           </div>
         </div>
-        <Button
-          size="sm"
+        <button
           onClick={handleDownload}
-          className="gap-1.5"
+          className="flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700"
         >
           <Download className="h-3 w-3" />
           Download
-        </Button>
+        </button>
       </div>
     );
   }
 
-  // Regular card mode
+  // Regular card
   return (
-    <Card
-      className={cn(
-        'hover:shadow-[var(--shadow-islamic)]',
-        className
-      )}
-    >
-      <CardHeader className="pb-2">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-2">
-            <div className="rounded-md bg-islamic-green-100 p-2">
-              <CalendarIcon className="h-5 w-5 text-islamic-green-600" />
-            </div>
-            <div>
-              <CardTitle className="text-lg text-islamic-navy-800">
-                {calendar.title}
-              </CardTitle>
-              <div className="mt-1 flex items-center gap-2">
-                <Badge variant="outline" className="text-xs">
-                  {calendar.year}
-                </Badge>
-                <span className="text-xs text-muted-foreground">
-                  {formatFileSize(calendar.fileSize)}
-                </span>
-              </div>
+    <div className={cn('rounded-xl border border-neutral-200 bg-white p-5', className)}>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+            <CalendarIcon className="h-4 w-4 text-emerald-600" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-neutral-900">{calendar.title}</h3>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-[10px] font-medium text-neutral-500 border border-neutral-200 rounded px-1.5 py-0.5">
+                {calendar.year}
+              </span>
+              <span className="text-xs text-neutral-400">{formatFileSize(calendar.fileSize)}</span>
             </div>
           </div>
-          {!calendar.isActive && <Badge variant="secondary">Archived</Badge>}
         </div>
-      </CardHeader>
-
-      <CardContent className="space-y-4">
-        {calendar.description && (
-          <p className="text-sm text-gray-600">{calendar.description}</p>
+        {!calendar.isActive && (
+          <span className="text-[10px] font-medium text-neutral-400 uppercase tracking-wide">Archived</span>
         )}
+      </div>
 
-        <div className="flex items-center justify-between">
-          <div className="text-xs text-muted-foreground">
-            PDF Document &middot; Available for download
-          </div>
-          <Button onClick={handleDownload} className="gap-2">
-            <Download className="h-4 w-4" />
-            Download Calendar
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+      {calendar.description && (
+        <p className="text-sm text-neutral-500 mt-3 leading-relaxed">{calendar.description}</p>
+      )}
+
+      <div className="flex items-center justify-between mt-4">
+        <span className="text-xs text-neutral-400">PDF Document</span>
+        <button
+          onClick={handleDownload}
+          className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white"
+        >
+          <Download className="h-3.5 w-3.5" />
+          Download
+        </button>
+      </div>
+    </div>
   );
 }

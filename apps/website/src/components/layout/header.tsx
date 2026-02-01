@@ -4,50 +4,14 @@ import Link from 'next/link';
 import { Menu, X, Building, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
-import { cn } from '@/lib/utils';
 import { MOSQUE_INFO } from '@/constants';
+import { navigation } from '@/lib/navigation';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
-type NavItem = {
-  name: string;
-  href?: string;
-  submenu?: { name: string; href: string }[];
-};
-
-const navigation: NavItem[] = [
-  { name: 'Home', href: '/' },
-  {
-    name: 'Education',
-    submenu: [
-      { name: 'Programs', href: '/education' },
-      { name: 'Student Portal', href: '/student/dashboard' },
-      { name: 'Quran Study', href: '/resources/quran-study' },
-    ]
-  },
-  { name: 'Services', href: '/services' },
-  {
-    name: 'Community',
-    submenu: [
-      { name: 'Events', href: '/events' },
-      { name: 'Announcements', href: '/announcements' },
-      { name: 'Calendar', href: '/calendar' },
-    ]
-  },
-  { name: 'Prayer Times', href: '/prayer-times' },
-  {
-    name: 'More',
-    submenu: [
-      { name: 'Resources', href: '/resources' },
-      { name: 'Documentation', href: '/docs' },
-      { name: 'Contact', href: '/contact' },
-    ]
-  },
-];
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -98,6 +62,13 @@ export function Header() {
                 </Link>
               )
             )}
+            {/* Donate CTA */}
+            <Link
+              href="/donate"
+              className="ml-2 rounded-md bg-islamic-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-islamic-green-500"
+            >
+              Donate
+            </Link>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -147,6 +118,16 @@ export function Header() {
                   </Link>
                 )
               )}
+              {/* Mobile Donate CTA */}
+              <div className="mt-3 border-t pt-3">
+                <Link
+                  href="/donate"
+                  className="block rounded-md bg-islamic-green-600 px-3 py-2 text-center text-sm font-medium text-white transition-colors hover:bg-islamic-green-500"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Donate
+                </Link>
+              </div>
             </nav>
           </div>
         )}

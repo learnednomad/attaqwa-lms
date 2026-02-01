@@ -1,7 +1,4 @@
-import { Clock, Users, BookOpen, Calendar, GraduationCap, Star } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { Clock, Users, BookOpen, Calendar, GraduationCap, Star, Check, Phone, Mail, MapPin } from 'lucide-react';
 
 export const metadata = {
   title: 'Educational Programs | Masjid At-Taqwa',
@@ -165,241 +162,322 @@ const weeklySchedule: ClassSchedule[] = [
   { day: 'Sunday', time: '11:00 AM-12:30 PM', program: 'Sisters\' Study Circle', instructor: 'Female Instructors', ageGroup: 'Adult Women' },
 ];
 
-export default function EducationPage() {
-  return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-islamic-green-700 mb-4">Educational Programs</h1>
-        <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-          Comprehensive Islamic education programs for all ages, from Quran memorization to adult studies, 
-          fostering spiritual growth and Islamic knowledge in our community.
-        </p>
-      </div>
+const stats = [
+  { label: 'Programs', value: '6', icon: BookOpen },
+  { label: 'Students', value: '200+', icon: Users },
+  { label: 'Weekly Classes', value: '9', icon: Calendar },
+  { label: 'Instructors', value: '10+', icon: GraduationCap },
+];
 
-      {/* Featured Program - Tahfeedh */}
-      <Card className="mb-8 border-islamic-green-200 bg-gradient-to-r from-islamic-green-50 to-white">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <Star className="h-6 w-6 text-islamic-gold-600" />
-            <div>
-              <CardTitle className="text-2xl text-islamic-green-700">Featured Program</CardTitle>
-              <p className="text-islamic-green-600">Tahfeedhul Qur'an - Quran Memorization</p>
-            </div>
-            <Badge className="ml-auto bg-islamic-gold-600">Premium Program</Badge>
+export default function EducationPage() {
+  const tahfeedh = educationalPrograms.find(p => p.id === 'tahfeedh')!;
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <section className="border-b border-neutral-100">
+        <div className="max-w-5xl mx-auto px-6 py-16 text-center">
+          <p className="text-xs font-semibold tracking-[0.2em] uppercase text-emerald-700 mb-3">
+            Masjid At-Taqwa
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-neutral-900 mb-4">
+            Educational Programs
+          </h1>
+          <p className="text-base text-neutral-500 max-w-2xl mx-auto leading-relaxed">
+            Comprehensive Islamic education programs for all ages, from Quran memorization
+            to adult studies, fostering spiritual growth and Islamic knowledge in our community.
+          </p>
+        </div>
+      </section>
+
+      <div className="max-w-5xl mx-auto px-6">
+        {/* Stats */}
+        <section className="py-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {stats.map((stat) => {
+              const IconComponent = stat.icon;
+              return (
+                <div key={stat.label} className="rounded-xl border border-neutral-200 bg-white p-5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center">
+                      <IconComponent className="h-4 w-4 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-neutral-900 leading-tight">{stat.value}</p>
+                      <p className="text-xs text-neutral-500">{stat.label}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <p className="text-muted-foreground mb-4">
-                Our flagship Quran memorization program with certified instructors and proven methodology. 
-                Students receive individual attention and progress through structured levels.
-              </p>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-islamic-green-600" />
-                  <span>Ages 6-18</span>
+        </section>
+
+        {/* Featured Program */}
+        <section className="pb-12">
+          <div className="flex items-center gap-3 mb-6">
+            <h2 className="text-xl font-semibold text-neutral-900">Featured Program</h2>
+            <div className="flex-1 h-px bg-neutral-100" />
+          </div>
+
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50/30 p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0">
+                  <Star className="h-5 w-5 text-amber-600" />
                 </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-islamic-green-600" />
-                  <span>Mon-Fri, 4:00-6:00 PM</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <GraduationCap className="h-4 w-4 text-islamic-green-600" />
-                  <span>Certified Instructors</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <BookOpen className="h-4 w-4 text-islamic-green-600" />
-                  <span>Individual Assessment</span>
+                <div>
+                  <h3 className="text-base font-semibold text-neutral-900">
+                    Tahfeedhul Qur&apos;an - Quran Memorization
+                  </h3>
+                  <span className="text-[10px] font-medium text-amber-700 border border-amber-200 bg-amber-50 rounded-full px-2 py-0.5">
+                    Premium Program
+                  </span>
                 </div>
               </div>
             </div>
-            <div className="space-y-3">
-              <h4 className="font-semibold text-islamic-green-700">Program Highlights:</h4>
-              <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• Proper Tajweed instruction with certified teachers</li>
-                <li>• Regular progress evaluations and parent meetings</li>
-                <li>• Annual Hifz graduation ceremony</li>
-                <li>• Small class sizes for individual attention</li>
-                <li>• Flexible scheduling for different learning paces</li>
-              </ul>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <p className="text-sm text-neutral-500 leading-relaxed mb-4">
+                  Our flagship Quran memorization program with certified instructors and proven methodology.
+                  Students receive individual attention and progress through structured levels.
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex items-center gap-2 text-xs text-neutral-600">
+                    <Users className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                    <span>Ages 6-18</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-neutral-600">
+                    <Clock className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                    <span>Mon-Fri, 4:00-6:00 PM</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-neutral-600">
+                    <GraduationCap className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                    <span>Certified Instructors</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-neutral-600">
+                    <BookOpen className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                    <span>Individual Assessment</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h4 className="text-xs font-semibold text-neutral-900 mb-3">Program Highlights</h4>
+                <ul className="space-y-1.5">
+                  {[
+                    'Proper Tajweed instruction with certified teachers',
+                    'Regular progress evaluations and parent meetings',
+                    'Annual Hifz graduation ceremony',
+                    'Small class sizes for individual attention',
+                    'Flexible scheduling for different learning paces',
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-xs text-neutral-600">
+                      <div className="w-1 h-1 bg-emerald-400 rounded-full shrink-0 mt-1.5" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </section>
 
-      {/* All Programs Grid */}
-      <div className="grid gap-8 mb-12">
-        <h2 className="text-3xl font-bold text-islamic-green-700 text-center mb-8">All Educational Programs</h2>
-        <div className="grid md:grid-cols-2 gap-6">
-          {educationalPrograms.map((program) => (
-            <Card key={program.id} className="islamic-pattern border-islamic-green-100">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-xl text-islamic-green-700 mb-2">{program.name}</CardTitle>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Users className="h-4 w-4" />
-                        <span>{program.ageGroup}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        <span>{program.schedule.split(',')[0]}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <Badge variant="outline" className="border-islamic-green-300 text-islamic-green-700">
+        {/* All Programs */}
+        <section className="pb-16">
+          <div className="flex items-center gap-3 mb-6">
+            <h2 className="text-xl font-semibold text-neutral-900">All Educational Programs</h2>
+            <div className="flex-1 h-px bg-neutral-100" />
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-5">
+            {educationalPrograms.map((program) => (
+              <div key={program.id} className="rounded-xl border border-neutral-200 bg-white p-5">
+                {/* Header */}
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-neutral-900 pr-3">{program.name}</h3>
+                  <span className="text-[10px] font-medium text-emerald-700 border border-emerald-200 bg-emerald-50 rounded-full px-2 py-0.5 whitespace-nowrap shrink-0">
                     {program.level}
-                  </Badge>
+                  </span>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-muted-foreground">{program.description}</p>
-                
-                <div className="grid grid-cols-2 gap-4 text-sm">
+
+                {/* Meta */}
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="flex items-center gap-1.5 text-xs text-neutral-500">
+                    <Users className="h-3 w-3" />
+                    <span>{program.ageGroup}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs text-neutral-500">
+                    <Clock className="h-3 w-3" />
+                    <span>{program.schedule.split(',')[0]}</span>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <p className="text-xs text-neutral-500 leading-relaxed mb-4">{program.description}</p>
+
+                {/* Details Grid */}
+                <div className="grid grid-cols-2 gap-3 mb-4">
                   <div>
-                    <span className="font-medium text-islamic-green-700">Schedule:</span>
-                    <p className="text-muted-foreground">{program.schedule}</p>
+                    <p className="text-[10px] font-medium text-neutral-400 uppercase tracking-wide">Schedule</p>
+                    <p className="text-xs text-neutral-700">{program.schedule}</p>
                   </div>
                   <div>
-                    <span className="font-medium text-islamic-green-700">Instructor:</span>
-                    <p className="text-muted-foreground">{program.instructor}</p>
+                    <p className="text-[10px] font-medium text-neutral-400 uppercase tracking-wide">Instructor</p>
+                    <p className="text-xs text-neutral-700">{program.instructor}</p>
                   </div>
                   {program.capacity && (
                     <div>
-                      <span className="font-medium text-islamic-green-700">Capacity:</span>
-                      <p className="text-muted-foreground">{program.capacity} students</p>
+                      <p className="text-[10px] font-medium text-neutral-400 uppercase tracking-wide">Capacity</p>
+                      <p className="text-xs text-neutral-700">{program.capacity} students</p>
                     </div>
                   )}
                   {program.duration && (
                     <div>
-                      <span className="font-medium text-islamic-green-700">Duration:</span>
-                      <p className="text-muted-foreground">{program.duration}</p>
+                      <p className="text-[10px] font-medium text-neutral-400 uppercase tracking-wide">Duration</p>
+                      <p className="text-xs text-neutral-700">{program.duration}</p>
                     </div>
                   )}
                 </div>
 
-                <Separator />
-                
-                <div>
-                  <h4 className="font-semibold text-islamic-green-700 mb-2">Program Features:</h4>
-                  <div className="grid grid-cols-1 gap-1 text-sm">
-                    {program.features.slice(0, 4).map((feature, index) => (
-                      <div key={index} className="flex items-start gap-2">
-                        <span className="text-islamic-green-600 mt-0.5">•</span>
-                        <span className="text-muted-foreground">{feature}</span>
-                      </div>
+                {/* Divider */}
+                <div className="h-px bg-neutral-100 mb-4" />
+
+                {/* Features */}
+                <div className="mb-4">
+                  <h4 className="text-[10px] font-semibold text-neutral-900 uppercase tracking-wide mb-2">Program Features</h4>
+                  <ul className="space-y-1">
+                    {program.features.slice(0, 4).map((feature) => (
+                      <li key={feature} className="flex items-start gap-2 text-xs text-neutral-600">
+                        <div className="w-1 h-1 bg-emerald-400 rounded-full shrink-0 mt-1.5" />
+                        {feature}
+                      </li>
                     ))}
                     {program.features.length > 4 && (
-                      <div className="flex items-start gap-2">
-                        <span className="text-islamic-green-600 mt-0.5">•</span>
-                        <span className="text-muted-foreground">And {program.features.length - 4} more features...</span>
-                      </div>
+                      <li className="text-xs text-neutral-400">
+                        +{program.features.length - 4} more features
+                      </li>
                     )}
-                  </div>
+                  </ul>
                 </div>
 
+                {/* Requirements */}
                 {program.requirements && (
                   <div>
-                    <h4 className="font-semibold text-islamic-green-700 mb-2">Requirements:</h4>
-                    <div className="text-sm space-y-1">
-                      {program.requirements.map((req, index) => (
-                        <div key={index} className="flex items-start gap-2">
-                          <span className="text-islamic-gold-600 mt-0.5">✓</span>
-                          <span className="text-muted-foreground">{req}</span>
-                        </div>
+                    <h4 className="text-[10px] font-semibold text-neutral-900 uppercase tracking-wide mb-2">Requirements</h4>
+                    <ul className="space-y-1">
+                      {program.requirements.map((req) => (
+                        <li key={req} className="flex items-start gap-2 text-xs text-neutral-600">
+                          <Check className="h-3 w-3 text-emerald-500 shrink-0 mt-0.5" />
+                          {req}
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      {/* Weekly Schedule */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-islamic-green-700">
-            <Calendar className="h-5 w-5" />
-            Weekly Class Schedule
-          </CardTitle>
-          <p className="text-muted-foreground">
-            Complete schedule of all educational programs throughout the week
-          </p>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-islamic-green-200">
-                  <th className="text-left font-semibold text-islamic-green-700 py-3">Day</th>
-                  <th className="text-left font-semibold text-islamic-green-700 py-3">Time</th>
-                  <th className="text-left font-semibold text-islamic-green-700 py-3">Program</th>
-                  <th className="text-left font-semibold text-islamic-green-700 py-3">Instructor</th>
-                  <th className="text-left font-semibold text-islamic-green-700 py-3">Age Group</th>
-                </tr>
-              </thead>
-              <tbody>
-                {weeklySchedule.map((schedule, index) => (
-                  <tr key={index} className="border-b border-gray-100 hover:bg-islamic-green-50 transition-colors">
-                    <td className="py-3 font-medium text-islamic-green-700">{schedule.day}</td>
-                    <td className="py-3 text-muted-foreground">{schedule.time}</td>
-                    <td className="py-3">{schedule.program}</td>
-                    <td className="py-3 text-muted-foreground">{schedule.instructor}</td>
-                    <td className="py-3">
-                      <Badge variant="outline" className="border-islamic-green-300 text-islamic-green-700">
-                        {schedule.ageGroup}
-                      </Badge>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+              </div>
+            ))}
           </div>
-        </CardContent>
-      </Card>
+        </section>
 
-      {/* Registration Information */}
-      <Card className="bg-islamic-gold-50 border-islamic-gold-200">
-        <CardHeader>
-          <CardTitle className="text-islamic-gold-800">Registration Information</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-semibold text-islamic-gold-800 mb-2">How to Register:</h4>
-              <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• Contact the masjid office during office hours</li>
-                <li>• Speak with instructors after prayers</li>
-                <li>• Register online through our website (coming soon)</li>
-                <li>• Visit during program times to observe classes</li>
-              </ul>
+        {/* Weekly Schedule */}
+        <section className="pb-16">
+          <div className="flex items-center gap-3 mb-6">
+            <h2 className="text-xl font-semibold text-neutral-900">Weekly Class Schedule</h2>
+            <div className="flex-1 h-px bg-neutral-100" />
+          </div>
+
+          <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-neutral-200 bg-neutral-50/50">
+                    <th className="text-left text-[10px] font-semibold text-neutral-500 uppercase tracking-wide px-4 py-3">Day</th>
+                    <th className="text-left text-[10px] font-semibold text-neutral-500 uppercase tracking-wide px-4 py-3">Time</th>
+                    <th className="text-left text-[10px] font-semibold text-neutral-500 uppercase tracking-wide px-4 py-3">Program</th>
+                    <th className="text-left text-[10px] font-semibold text-neutral-500 uppercase tracking-wide px-4 py-3">Instructor</th>
+                    <th className="text-left text-[10px] font-semibold text-neutral-500 uppercase tracking-wide px-4 py-3">Age Group</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {weeklySchedule.map((schedule, index) => (
+                    <tr key={index} className="border-b border-neutral-100 last:border-0">
+                      <td className="px-4 py-3 text-xs font-medium text-neutral-900">{schedule.day}</td>
+                      <td className="px-4 py-3 text-xs text-neutral-500 font-mono">{schedule.time}</td>
+                      <td className="px-4 py-3 text-xs text-neutral-700">{schedule.program}</td>
+                      <td className="px-4 py-3 text-xs text-neutral-500">{schedule.instructor}</td>
+                      <td className="px-4 py-3">
+                        <span className="text-[10px] font-medium text-emerald-700 border border-emerald-200 bg-emerald-50 rounded-full px-2 py-0.5">
+                          {schedule.ageGroup}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            <div>
-              <h4 className="font-semibold text-islamic-gold-800 mb-2">Contact Information:</h4>
-              <div className="text-sm text-muted-foreground space-y-1">
-                <p><strong>Phone:</strong> (404) 244-9577</p>
-                <p><strong>Email:</strong> info@masjidattaqwaatlanta.org</p>
-                <p><strong>Address:</strong> 1584 Rogers Lake Rd, Lithonia, GA 30058</p>
-                <p><strong>Office Hours:</strong> Daily after prayers or by appointment</p>
+          </div>
+        </section>
+
+        {/* Registration CTA */}
+        <section className="pb-20">
+          <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-6 sm:p-8">
+            <h3 className="text-base font-semibold text-neutral-900 mb-1">
+              Registration Information
+            </h3>
+            <p className="text-sm text-neutral-500 mb-6">
+              Enroll in any of our programs — new students are welcome throughout the year.
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              <div>
+                <h4 className="text-xs font-semibold text-neutral-900 uppercase tracking-wide mb-3">How to Register</h4>
+                <ul className="space-y-2">
+                  {[
+                    'Contact the masjid office during office hours',
+                    'Speak with instructors after prayers',
+                    'Register online through our website (coming soon)',
+                    'Visit during program times to observe classes',
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-xs text-neutral-600">
+                      <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-xs font-semibold text-neutral-900 uppercase tracking-wide mb-3">Contact Information</h4>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-xs text-neutral-600">
+                    <Phone className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                    <a href="tel:4042449577" className="text-emerald-600">(404) 244-9577</a>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-neutral-600">
+                    <Mail className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                    <a href="mailto:info@masjidattaqwaatlanta.org" className="text-emerald-600">info@masjidattaqwaatlanta.org</a>
+                  </div>
+                  <div className="flex items-start gap-2 text-xs text-neutral-600">
+                    <MapPin className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>2674 Woodwin Rd, Doraville, GA 30360</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-neutral-600">
+                    <Clock className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                    <span>Daily after prayers or by appointment</span>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-          
-          <Separator />
-          
-          <div className="text-center">
-            <p className="text-islamic-gold-800 font-medium">
-              "And whoever fears Allah - He will make for him a way out and provide for him from where he does not expect."
+
+            <div className="h-px bg-neutral-200 my-6" />
+
+            <p className="text-center text-sm text-neutral-600 italic">
+              &ldquo;And whoever fears Allah - He will make for him a way out and provide for him from where he does not expect.&rdquo;
             </p>
-            <p className="text-sm text-muted-foreground mt-1">- Quran 65:2-3</p>
+            <p className="text-center text-xs text-neutral-400 mt-1">Quran 65:2-3</p>
           </div>
-        </CardContent>
-      </Card>
+        </section>
+      </div>
     </div>
   );
 }

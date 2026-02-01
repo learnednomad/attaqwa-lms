@@ -1,7 +1,5 @@
 import { EventCard } from '@/components/features/events/event-card';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, Clock, MapPin, Users } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, BookOpen, Heart } from 'lucide-react';
 import { Event } from '@/types';
 import { generateSEOMetadata } from '@/lib/seo';
 import type { Metadata } from 'next';
@@ -97,200 +95,176 @@ const mockEvents: Event[] = [
 const upcomingEvents = mockEvents.filter(event => event.date >= new Date()).sort((a, b) => a.date.getTime() - b.date.getTime());
 const pastEvents = mockEvents.filter(event => event.date < new Date()).sort((a, b) => b.date.getTime() - a.date.getTime());
 
+const stats = [
+  { label: 'Upcoming Events', value: String(upcomingEvents.length), icon: Calendar },
+  { label: 'Regular Programs', value: 'Weekly', icon: Clock },
+  { label: 'Community Members', value: '200+', icon: Users },
+  { label: 'Event Venues', value: '5', icon: MapPin },
+];
+
+const categories = [
+  {
+    title: 'Religious Observances',
+    description: 'Eid prayers, Ramadan programs, and special Islamic holidays',
+    icon: Calendar,
+  },
+  {
+    title: 'Educational Programs',
+    description: 'Islamic studies, Quran classes, and knowledge workshops',
+    icon: BookOpen,
+  },
+  {
+    title: 'Family Events',
+    description: 'Community gatherings, youth programs, and family activities',
+    icon: Heart,
+  },
+];
+
 export default function EventsPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Page Header */}
-      <header className="mb-8">
-        <h1 className="mb-4 text-3xl font-bold text-islamic-navy-800 md:text-4xl">
-          Islamic Events & Activities
-        </h1>
-        <p className="text-lg text-islamic-navy-600 max-w-3xl">
-          Join our vibrant Islamic community for spiritual gatherings, educational programs, 
-          and celebrations throughout the year. From Eid prayers to weekly workshops, 
-          there's always something meaningful happening at Masjid At-Taqwa.
-        </p>
-      </header>
-
-      {/* Event Statistics */}
-      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardContent className="flex items-center gap-3 p-4">
-            <Calendar className="h-8 w-8 text-islamic-green-600" />
-            <div>
-              <p className="text-2xl font-bold text-islamic-navy-800">{upcomingEvents.length}</p>
-              <p className="text-sm text-islamic-navy-600">Upcoming Events</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-3 p-4">
-            <Clock className="h-8 w-8 text-islamic-green-600" />
-            <div>
-              <p className="text-2xl font-bold text-islamic-navy-800">Weekly</p>
-              <p className="text-sm text-islamic-navy-600">Regular Programs</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-3 p-4">
-            <Users className="h-8 w-8 text-islamic-green-600" />
-            <div>
-              <p className="text-2xl font-bold text-islamic-navy-800">200+</p>
-              <p className="text-sm text-islamic-navy-600">Community Members</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-3 p-4">
-            <MapPin className="h-8 w-8 text-islamic-green-600" />
-            <div>
-              <p className="text-2xl font-bold text-islamic-navy-800">5</p>
-              <p className="text-sm text-islamic-navy-600">Event Venues</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Upcoming Events */}
-      <section className="mb-12">
-        <header className="mb-6">
-          <h2 className="mb-2 text-2xl font-bold text-islamic-navy-800">
-            Upcoming Events
-          </h2>
-          <p className="text-islamic-navy-600">
-            Don't miss these upcoming Islamic community events and programs.
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <section className="border-b border-neutral-100">
+        <div className="max-w-5xl mx-auto px-6 py-16">
+          <p className="text-xs font-semibold tracking-[0.2em] uppercase text-emerald-700 mb-3">
+            Masjid At-Taqwa
           </p>
-        </header>
-        
-        {upcomingEvents.length > 0 ? (
-          <div className="grid gap-6">
-            {upcomingEvents.map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
-          </div>
-        ) : (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <Calendar className="mx-auto mb-4 h-12 w-12 text-islamic-navy-400" />
-              <h3 className="mb-2 text-lg font-semibold text-islamic-navy-800">
-                No Upcoming Events
-              </h3>
-              <p className="text-islamic-navy-600">
-                Check back soon for new events and programs.
-              </p>
-            </CardContent>
-          </Card>
-        )}
-      </section>
-
-      {/* Event Categories */}
-      <section className="mb-12">
-        <header className="mb-6">
-          <h2 className="mb-2 text-2xl font-bold text-islamic-navy-800">
-            Event Categories
-          </h2>
-          <p className="text-islamic-navy-600">
-            Explore different types of events and programs we offer.
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-neutral-900 mb-4 max-w-2xl">
+            Events & Activities
+          </h1>
+          <p className="text-base text-neutral-500 max-w-2xl leading-relaxed">
+            Join our vibrant Islamic community for spiritual gatherings, educational programs,
+            and celebrations throughout the year. From Eid prayers to weekly workshops,
+            there&apos;s always something meaningful happening.
           </p>
-        </header>
-        
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">🕌</span>
-                Religious Observances
-              </CardTitle>
-              <CardDescription>
-                Eid prayers, Ramadan programs, and special Islamic holidays
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full">
-                View Religious Events
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">📚</span>
-                Educational Programs
-              </CardTitle>
-              <CardDescription>
-                Islamic studies, Quran classes, and knowledge workshops
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full">
-                View Educational Events
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">👨‍👩‍👧‍👦</span>
-                Family Events
-              </CardTitle>
-              <CardDescription>
-                Community gatherings, youth programs, and family activities
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full">
-                View Family Events
-              </Button>
-            </CardContent>
-          </Card>
         </div>
       </section>
 
-      {/* Recent Past Events */}
-      {pastEvents.length > 0 && (
-        <section>
-          <header className="mb-6">
-            <h2 className="mb-2 text-2xl font-bold text-islamic-navy-800">
-              Recent Past Events
-            </h2>
-            <p className="text-islamic-navy-600">
-              Take a look at our recent community events and programs.
-            </p>
-          </header>
-          
-          <div className="grid gap-6">
-            {pastEvents.slice(0, 3).map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
+      <div className="max-w-5xl mx-auto px-6">
+        {/* Stats */}
+        <section className="py-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {stats.map((stat) => {
+              const IconComponent = stat.icon;
+              return (
+                <div
+                  key={stat.label}
+                  className="rounded-xl border border-neutral-200 bg-white p-5"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center">
+                      <IconComponent className="h-4 w-4 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-neutral-900 leading-tight">{stat.value}</p>
+                      <p className="text-xs text-neutral-500">{stat.label}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </section>
-      )}
 
-      {/* Call to Action */}
-      <section className="mt-12">
-        <Card className="bg-islamic-green-50 border-islamic-green-200">
-          <CardContent className="p-8 text-center">
-            <h3 className="mb-4 text-2xl font-bold text-islamic-green-800">
+        {/* Upcoming Events */}
+        <section className="pb-16">
+          <div className="flex items-center gap-3 mb-6">
+            <h2 className="text-xl font-semibold text-neutral-900">Upcoming Events</h2>
+            <div className="flex-1 h-px bg-neutral-100" />
+          </div>
+
+          {upcomingEvents.length > 0 ? (
+            <div className="space-y-4">
+              {upcomingEvents.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-12 text-center">
+              <Calendar className="mx-auto mb-3 h-8 w-8 text-neutral-300" />
+              <h3 className="text-sm font-semibold text-neutral-900 mb-1">
+                No Upcoming Events
+              </h3>
+              <p className="text-xs text-neutral-500">
+                Check back soon for new events and programs.
+              </p>
+            </div>
+          )}
+        </section>
+
+        {/* Event Categories */}
+        <section className="pb-16">
+          <div className="flex items-center gap-3 mb-6">
+            <h2 className="text-xl font-semibold text-neutral-900">Event Categories</h2>
+            <div className="flex-1 h-px bg-neutral-100" />
+          </div>
+
+          <div className="grid sm:grid-cols-3 gap-4">
+            {categories.map((cat) => {
+              const IconComponent = cat.icon;
+              return (
+                <div
+                  key={cat.title}
+                  className="rounded-xl border border-neutral-200 bg-white p-5"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-neutral-50 border border-neutral-100 flex items-center justify-center mb-4">
+                    <IconComponent className="h-4 w-4 text-neutral-600" />
+                  </div>
+                  <h3 className="text-sm font-semibold text-neutral-900 mb-1">
+                    {cat.title}
+                  </h3>
+                  <p className="text-xs text-neutral-500 leading-relaxed">
+                    {cat.description}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Past Events */}
+        {pastEvents.length > 0 && (
+          <section className="pb-16">
+            <div className="flex items-center gap-3 mb-6">
+              <h2 className="text-xl font-semibold text-neutral-900">Recent Past Events</h2>
+              <div className="flex-1 h-px bg-neutral-100" />
+            </div>
+
+            <div className="space-y-4">
+              {pastEvents.slice(0, 3).map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* CTA */}
+        <section className="pb-20">
+          <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-8 sm:p-10 text-center">
+            <h3 className="text-lg font-semibold text-neutral-900 mb-2">
               Stay Connected with Our Community
             </h3>
-            <p className="mb-6 text-islamic-green-700">
-              Subscribe to our newsletter to receive updates about upcoming events, 
+            <p className="text-sm text-neutral-500 max-w-xl mx-auto mb-6 leading-relaxed">
+              Subscribe to our newsletter to receive updates about upcoming events,
               special programs, and important community announcements.
             </p>
-            <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-              <Button size="lg" className="bg-islamic-green-600 hover:bg-islamic-green-700">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <a
+                href="/contact"
+                className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white"
+              >
                 Subscribe to Updates
-              </Button>
-              <Button size="lg" variant="outline" className="border-islamic-green-600 text-islamic-green-600 hover:bg-islamic-green-600 hover:text-white">
+              </a>
+              <a
+                href="/contact"
+                className="inline-flex items-center justify-center rounded-lg border border-neutral-300 bg-white px-5 py-2.5 text-sm font-medium text-neutral-700"
+              >
                 Contact Event Coordinator
-              </Button>
+              </a>
             </div>
-          </CardContent>
-        </Card>
-      </section>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

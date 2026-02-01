@@ -23,37 +23,37 @@ export function AnnouncementCard({
   return (
     <div
       className={cn(
-        'flex bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden',
+        'flex rounded-xl border border-neutral-200 bg-white overflow-hidden',
+        announcement.isArchived && 'opacity-70',
         className
       )}
     >
-      {/* Left accent border */}
-      <div className="w-1 bg-emerald-500 flex-shrink-0" />
-
       {/* Date block */}
-      <div className="flex flex-col items-center justify-center px-4 py-4 border-r border-gray-100 min-w-[70px]">
-        <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wide">
+      <div className="flex flex-col items-center justify-center px-5 py-5 border-r border-neutral-100 min-w-[72px] bg-neutral-50">
+        <span className="text-[10px] font-semibold text-emerald-600 uppercase tracking-widest">
           {monthAbbrev}
         </span>
-        <span className="text-2xl font-bold text-gray-900">{dayNumber}</span>
+        <span className="text-2xl font-bold text-neutral-900 tabular-nums leading-tight">
+          {dayNumber}
+        </span>
       </div>
 
       {/* Content */}
-      <div className="flex-1 p-4">
-        <h3 className="font-semibold text-gray-900 leading-tight">
+      <div className="flex-1 p-5">
+        <h3 className="text-sm font-semibold text-neutral-900 leading-snug">
           {announcement.title}
         </h3>
 
         {announcement.time && (
-          <div className="flex items-center gap-1.5 text-sm text-gray-500 mt-1.5">
-            <Clock className="w-4 h-4" />
-            <span className="font-medium">{announcement.time}</span>
+          <div className="flex items-center gap-1.5 text-xs text-neutral-500 mt-1.5">
+            <Clock className="w-3 h-3 text-neutral-400" />
+            <span className="font-medium text-neutral-600">{announcement.time}</span>
           </div>
         )}
 
         <p
           className={cn(
-            'text-gray-600 mt-2 text-sm leading-relaxed',
+            'text-sm text-neutral-500 mt-2 leading-relaxed',
             compact ? 'line-clamp-2' : 'line-clamp-3'
           )}
         >
