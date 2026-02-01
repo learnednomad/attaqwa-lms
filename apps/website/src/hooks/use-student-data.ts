@@ -1,11 +1,6 @@
 'use client';
 
-/**
- * React hooks for student portal data fetching
- * Uses SWR for caching and revalidation
- */
-
-import { useState, useEffect, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   studentApi,
   Course,
@@ -14,136 +9,46 @@ import {
   UserProgress,
   StudentDashboardData,
 } from '@/lib/student-api';
-
-// Simple state hook for data fetching with loading/error states
-interface UseDataState<T> {
-  data: T | null;
-  loading: boolean;
-  error: Error | null;
-  refetch: () => Promise<void>;
-}
+import { CACHE_TTL } from '@attaqwa/shared';
 
 // ============================================================================
-// DASHBOARD HOOK
+// QUERY KEY FACTORY
 // ============================================================================
-export function useStudentDashboard(): UseDataState<StudentDashboardData> {
-  const [data, setData] = useState<StudentDashboardData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
 
-  const fetchData = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const result = await studentApi.dashboard.getData();
-      setData(result);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch dashboard data'));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  return { data, loading, error, refetch: fetchData };
-}
-
-// ============================================================================
-// COURSES HOOKS
-// ============================================================================
-export function useCourses(params?: {
-  age_tier?: string;
-  subject?: string;
-  difficulty?: string;
-  featured?: boolean;
-}): UseDataState<Course[]> {
-  const [data, setData] = useState<Course[] | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  const fetchData = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const result = await studentApi.courses.getAll(params);
-      setData(result.data);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch courses'));
-    } finally {
-      setLoading(false);
-    }
-  }, [params?.age_tier, params?.subject, params?.difficulty, params?.featured]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  return { data, loading, error, refetch: fetchData };
-}
-
-export function useCourse(id: string): UseDataState<Course> {
-  const [data, setData] = useState<Course | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  const fetchData = useCallback(async () => {
-    if (!id) return;
-    try {
-      setLoading(true);
-      setError(null);
-      const result = await studentApi.courses.getById(id);
-      setData(result.data);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch course'));
-    } finally {
-      setLoading(false);
-    }
-  }, [id]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  return { data, loading, error, refetch: fetchData };
-}
+export const studentKeys = {
+  progress: {
+    all: ['student', 'progress'] as const,
+    list: (params?: { course_id?: string; status?: string }) =>
+      [...studentKeys.progress.all, 'list', params] as const,
+  },
+  enrollments: {
+    all: ['student', 'enrollments'] as const,
+    list: (params?: { status?: string }) =>
+      [...studentKeys.enrollments.all, 'list', params] as const,
+  },
+  courses: {
+    all: ['student', 'courses'] as const,
+    list: (params?: { age_tier?: string; subject?: string; difficulty?: string; featured?: boolean }) =>
+      [...studentKeys.courses.all, 'list', params] as const,
+    detail: (id: string) =>
+      [...studentKeys.courses.all, 'detail', id] as const,
+  },
+  lessons: {
+    all: ['student', 'lessons'] as const,
+    list: (params?: { course_id?: string; is_free?: boolean }) =>
+      [...studentKeys.lessons.all, 'list', params] as const,
+    detail: (id: string) =>
+      [...studentKeys.lessons.all, 'detail', id] as const,
+  },
+  dashboard: {
+    all: ['student', 'dashboard'] as const,
+  },
+};
 
 // ============================================================================
-// LESSONS HOOK
+// ENROLLMENTS DATA TYPE
 // ============================================================================
-export function useLessons(params?: {
-  course_id?: string;
-  is_free?: boolean;
-}): UseDataState<Lesson[]> {
-  const [data, setData] = useState<Lesson[] | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
 
-  const fetchData = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const result = await studentApi.lessons.getAll(params);
-      setData(result.data);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch lessons'));
-    } finally {
-      setLoading(false);
-    }
-  }, [params?.course_id, params?.is_free]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  return { data, loading, error, refetch: fetchData };
-}
-
-// ============================================================================
-// ENROLLMENTS HOOKS
-// ============================================================================
 interface EnrollmentsData {
   enrollments: Enrollment[];
   summary: {
@@ -154,171 +59,206 @@ interface EnrollmentsData {
   };
 }
 
-export function useEnrollments(params?: {
-  status?: 'active' | 'completed' | 'dropped';
-}): UseDataState<EnrollmentsData> {
-  const [data, setData] = useState<EnrollmentsData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  const fetchData = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const result = await studentApi.enrollments.getMine(params);
-      const defaultSummary = {
-        totalEnrollments: result.data.length,
-        active: result.data.filter(e => e.enrollment_status === 'active').length,
-        completed: result.data.filter(e => e.enrollment_status === 'completed').length,
-        certificatesEarned: result.data.filter(e => e.certificate_issued).length,
-      };
-      setData({
-        enrollments: result.data,
-        summary: (result.meta?.summary as EnrollmentsData['summary']) || defaultSummary,
-      });
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch enrollments'));
-    } finally {
-      setLoading(false);
-    }
-  }, [params?.status]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  return { data, loading, error, refetch: fetchData };
-}
-
 // ============================================================================
-// PROGRESS HOOKS
+// QUERY HOOKS
 // ============================================================================
+
 export function useProgress(params?: {
   course_id?: string;
   status?: 'not_started' | 'in_progress' | 'completed';
-}): UseDataState<UserProgress[]> {
-  const [data, setData] = useState<UserProgress[] | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+}) {
+  return useQuery({
+    queryKey: studentKeys.progress.list(params),
+    queryFn: () => studentApi.progress.getMine(params),
+    select: (res) => res.data,
+    staleTime: CACHE_TTL.SHORT,
+  });
+}
 
-  const fetchData = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const result = await studentApi.progress.getMine(params);
-      setData(result.data);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch progress'));
-    } finally {
-      setLoading(false);
-    }
-  }, [params?.course_id, params?.status]);
+export function useCourses(params?: {
+  age_tier?: string;
+  subject?: string;
+  difficulty?: string;
+  featured?: boolean;
+}) {
+  return useQuery({
+    queryKey: studentKeys.courses.list(params),
+    queryFn: () => studentApi.courses.getAll(params),
+    select: (res) => res.data,
+    staleTime: CACHE_TTL.SHORT,
+  });
+}
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+export function useCourse(id: string) {
+  return useQuery({
+    queryKey: studentKeys.courses.detail(id),
+    queryFn: () => studentApi.courses.getById(id),
+    select: (res) => res.data,
+    staleTime: CACHE_TTL.SHORT,
+    enabled: !!id,
+  });
+}
 
-  return { data, loading, error, refetch: fetchData };
+export function useLessons(params?: {
+  course_id?: string;
+  is_free?: boolean;
+}) {
+  return useQuery({
+    queryKey: studentKeys.lessons.list(params),
+    queryFn: () => studentApi.lessons.getAll(params),
+    select: (res) => res.data,
+    staleTime: CACHE_TTL.SHORT,
+  });
+}
+
+export function useLesson(id: string) {
+  return useQuery({
+    queryKey: studentKeys.lessons.detail(id),
+    queryFn: () => studentApi.lessons.getById(id),
+    select: (res) => res.data,
+    staleTime: CACHE_TTL.SHORT,
+    enabled: !!id,
+  });
+}
+
+export function useEnrollments(params?: {
+  status?: 'active' | 'completed' | 'dropped';
+}) {
+  return useQuery({
+    queryKey: studentKeys.enrollments.list(params),
+    queryFn: () => studentApi.enrollments.getMine(params),
+    select: (res): EnrollmentsData => {
+      const enrollments = res.data;
+      const defaultSummary = {
+        totalEnrollments: enrollments.length,
+        active: enrollments.filter(e => e.enrollment_status === 'active').length,
+        completed: enrollments.filter(e => e.enrollment_status === 'completed').length,
+        certificatesEarned: enrollments.filter(e => e.certificate_issued).length,
+      };
+      return {
+        enrollments,
+        summary: (res.meta?.summary as EnrollmentsData['summary']) || defaultSummary,
+      };
+    },
+    staleTime: CACHE_TTL.SHORT,
+  });
+}
+
+export function useStudentDashboard() {
+  return useQuery({
+    queryKey: studentKeys.dashboard.all,
+    queryFn: () => studentApi.dashboard.getData(),
+    staleTime: CACHE_TTL.SHORT,
+  });
 }
 
 // ============================================================================
-// ENROLLMENT ACTIONS HOOK
+// MUTATIONS
 // ============================================================================
-interface EnrollmentActions {
-  enrollInCourse: (courseId: number) => Promise<void>;
-  dropCourse: (enrollmentId: number) => Promise<void>;
-  loading: boolean;
-  error: Error | null;
+
+export function useUpdateLessonProgress() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      lessonId,
+      data,
+    }: {
+      lessonId: number;
+      data: { status?: 'not_started' | 'in_progress' | 'completed'; progress_percentage?: number };
+    }) => studentApi.progress.updateLesson(lessonId, data),
+
+    onMutate: async ({ lessonId, data }) => {
+      // Cancel any outgoing refetches so they don't overwrite our optimistic update
+      await queryClient.cancelQueries({ queryKey: studentKeys.progress.all });
+
+      // Snapshot the previous progress data across all cached queries
+      const previousQueries = queryClient.getQueriesData<{ data: UserProgress[] }>({
+        queryKey: studentKeys.progress.all,
+      });
+
+      // Optimistically update all cached progress lists
+      queryClient.setQueriesData<{ data: UserProgress[] }>(
+        { queryKey: studentKeys.progress.all },
+        (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            data: old.data.map((p) =>
+              p.lesson?.id === lessonId
+                ? { ...p, ...data }
+                : p
+            ),
+          };
+        }
+      );
+
+      return { previousQueries };
+    },
+
+    onError: (_err, _vars, context) => {
+      // Rollback from snapshot on error
+      if (context?.previousQueries) {
+        for (const [queryKey, data] of context.previousQueries) {
+          queryClient.setQueryData(queryKey, data);
+        }
+      }
+    },
+
+    onSettled: () => {
+      // Invalidate all related queries to refetch fresh data
+      queryClient.invalidateQueries({ queryKey: studentKeys.progress.all });
+      queryClient.invalidateQueries({ queryKey: studentKeys.enrollments.all });
+      queryClient.invalidateQueries({ queryKey: studentKeys.dashboard.all });
+    },
+  });
 }
 
-export function useEnrollmentActions(onSuccess?: () => void): EnrollmentActions {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+export function useSubmitQuiz() {
+  const queryClient = useQueryClient();
 
-  const enrollInCourse = async (courseId: number) => {
-    try {
-      setLoading(true);
-      setError(null);
-      await studentApi.enrollments.enroll(courseId);
-      onSuccess?.();
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to enroll'));
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
+  return useMutation({
+    mutationFn: ({
+      quizId,
+      answers,
+    }: {
+      quizId: number;
+      answers: Record<string, number | boolean>;
+    }) => studentApi.progress.submitQuiz(quizId, answers),
 
-  const dropCourse = async (enrollmentId: number) => {
-    try {
-      setLoading(true);
-      setError(null);
-      await studentApi.enrollments.updateStatus(enrollmentId, 'dropped');
-      onSuccess?.();
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to drop course'));
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { enrollInCourse, dropCourse, loading, error };
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: studentKeys.progress.all });
+      queryClient.invalidateQueries({ queryKey: studentKeys.enrollments.all });
+      queryClient.invalidateQueries({ queryKey: studentKeys.dashboard.all });
+    },
+  });
 }
 
-// ============================================================================
-// PROGRESS ACTIONS HOOK
-// ============================================================================
-interface ProgressActions {
-  updateLessonProgress: (
-    lessonId: number,
-    data: { status?: 'not_started' | 'in_progress' | 'completed'; progress_percentage?: number }
-  ) => Promise<void>;
-  submitQuiz: (
-    quizId: number,
-    answers: Record<string, number | boolean>
-  ) => Promise<{ score: number; passed: boolean }>;
-  loading: boolean;
-  error: Error | null;
+export function useEnrollInCourse() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (courseId: number) => studentApi.enrollments.enroll(courseId),
+
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: studentKeys.enrollments.all });
+      queryClient.invalidateQueries({ queryKey: studentKeys.dashboard.all });
+    },
+  });
 }
 
-export function useProgressActions(onSuccess?: () => void): ProgressActions {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+export function useDropCourse() {
+  const queryClient = useQueryClient();
 
-  const updateLessonProgress = async (
-    lessonId: number,
-    data: { status?: 'not_started' | 'in_progress' | 'completed'; progress_percentage?: number }
-  ) => {
-    try {
-      setLoading(true);
-      setError(null);
-      await studentApi.progress.updateLesson(lessonId, data);
-      onSuccess?.();
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to update progress'));
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
+  return useMutation({
+    mutationFn: (enrollmentId: number) =>
+      studentApi.enrollments.updateStatus(enrollmentId, 'dropped'),
 
-  const submitQuiz = async (quizId: number, answers: Record<string, number | boolean>) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const result = await studentApi.progress.submitQuiz(quizId, answers);
-      onSuccess?.();
-      return { score: result.data.score, passed: result.data.passed };
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to submit quiz'));
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { updateLessonProgress, submitQuiz, loading, error };
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: studentKeys.enrollments.all });
+      queryClient.invalidateQueries({ queryKey: studentKeys.dashboard.all });
+    },
+  });
 }
 
 // ============================================================================

@@ -3,13 +3,10 @@
 import { generatePrayerTimesStructuredData, generateEventStructuredData, generateBreadcrumbStructuredData } from '@/lib/seo';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { Suspense, useState, useEffect } from 'react';
-
-// Core UI components
-import { Button } from '@/components/ui/button';
+import { Suspense } from 'react';
 
 // Essential icons
-import { Clock, Calendar, BookOpen, ArrowRight, Moon, Sparkles, Star, Activity, CheckCircle, Zap, Users, Download, Megaphone } from 'lucide-react';
+import { Calendar, Megaphone } from 'lucide-react';
 
 // Section Header component
 import { SectionHeader } from '@/components/ui/section-header';
@@ -32,21 +29,22 @@ const EventCard = dynamic(() => import('@/components/features/events/event-card'
   ssr: true
 });
 
-const CalendarDownload = dynamic(() => import('@/components/features/calendar/calendar-download').then(mod => ({ default: mod.CalendarDownload })), {
-  loading: () => <div className="animate-pulse h-24 bg-islamic-navy/10 rounded-xl border border-islamic-navy/20 flex items-center justify-center"><div className="text-islamic-navy-600 text-sm">Loading calendar...</div></div>,
-  ssr: true
-});
-
-const PrayerTimesWidget = dynamic(() => import('@/components/features/prayer-times/prayer-times-widget').then(mod => ({ default: mod.PrayerTimesWidget })), {
-  loading: () => (
-    <div className="animate-pulse h-96 bg-gradient-to-br from-islamic-green-50 to-islamic-gold-50 rounded-xl border border-islamic-green/20 flex items-center justify-center p-6">
-      <div className="text-center space-y-2">
-        <div className="text-islamic-green-600 font-medium">Loading Prayer Times...</div>
-        <div className="text-xs text-islamic-navy-500">Please wait while we fetch today&apos;s prayer schedule</div>
-      </div>
-    </div>
-  )
-});
+// Commented out: redundant prayer times widgets removed from homepage
+// const CalendarDownload = dynamic(() => import('@/components/features/calendar/calendar-download').then(mod => ({ default: mod.CalendarDownload })), {
+//   loading: () => <div className="animate-pulse h-24 bg-islamic-navy/10 rounded-xl border border-islamic-navy/20 flex items-center justify-center"><div className="text-islamic-navy-600 text-sm">Loading calendar...</div></div>,
+//   ssr: true
+// });
+//
+// const PrayerTimesWidget = dynamic(() => import('@/components/features/prayer-times/prayer-times-widget').then(mod => ({ default: mod.PrayerTimesWidget })), {
+//   loading: () => (
+//     <div className="animate-pulse h-96 bg-gradient-to-br from-islamic-green-50 to-islamic-gold-50 rounded-xl border border-islamic-green/20 flex items-center justify-center p-6">
+//       <div className="text-center space-y-2">
+//         <div className="text-islamic-green-600 font-medium">Loading Prayer Times...</div>
+//         <div className="text-xs text-islamic-navy-500">Please wait while we fetch today&apos;s prayer schedule</div>
+//       </div>
+//     </div>
+//   )
+// });
 
 import { IslamicServicesGrid } from '@/components/features/islamic-services/islamic-services-grid';
 import { MosquePrayerTimesSection } from '@/components/features/prayer-times/mosque-prayer-times-section';
@@ -146,8 +144,13 @@ const mockEvents: Event[] = [
   },
 ];
 
+function getTodayDateStr(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 const mockPrayerTimes: DailyPrayerTimes = {
-  date: '2025-08-26',
+  date: getTodayDateStr(),
   fajr: '5:41 AM',
   sunrise: '7:07 AM',
   dhuhr: '1:40 PM',
@@ -224,74 +227,77 @@ export default function Home() {
       <FloatingHeader />
 
       {/* Immersive Hero Section */}
+      {/* Hero floating prayer card commented out — redundant with MosquePrayerTimesSection below
+      <ImmersiveHero
+        floatingContent={
+          <PrayerTimesWidget prayerTimes={mockPrayerTimes} variant="glass" className="w-64 lg:w-72" />
+        }
+      />
+      */}
       <ImmersiveHero />
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        {/* Prayer Times Section */}
-        <section className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+        {/* Prayer Times Section - Image+Hadith with prayer strip */}
+        <section>
           <MosquePrayerTimesSection location="Doraville, Georgia" prayerTimes={mockPrayerTimes} />
+          {/* Aside prayer widget commented out — redundant with MosquePrayerTimesSection
+          <aside className="lg:col-span-4 lg:sticky lg:top-24 flex justify-end">
+            <div className="w-80 lg:w-96 rounded-xl overflow-hidden bg-gradient-to-br from-islamic-green-50 via-white to-islamic-gold-50/30 p-1 shadow-xl shadow-islamic-green/10">
+              <div className="bg-white rounded-lg">
+                <Suspense fallback={<div className="animate-pulse h-96 bg-islamic-green/10" />}>
+                  <PrayerTimesWidget prayerTimes={mockPrayerTimes} />
+                </Suspense>
+              </div>
+            </div>
+          </aside>
+          */}
         </section>
 
         {/* Islamic Services Grid */}
-        <section className="mt-12 md:mt-16 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+        <section className="mt-12 md:mt-16">
           <IslamicServicesGrid />
         </section>
 
-        {/* Main content grid - balanced 7:5 ratio */}
-        <div className="mt-12 md:mt-16 grid gap-6 lg:gap-8 lg:grid-cols-12">
-          {/* Main Content Column */}
-          <article className="lg:col-span-7 space-y-8">
-            {/* Announcements Section */}
-            <section aria-labelledby="announcements-heading">
-              <SectionHeader
-                icon={<Megaphone className="w-5 h-5" />}
-                title="Community Announcements"
-                subtitle="Latest updates from Masjid At-Taqwa"
-                viewAllHref="/announcements"
-                accentColor="emerald"
-              />
+        {/* Announcements & Events */}
+        <div className="mt-12 md:mt-16 grid gap-6 lg:gap-8 lg:grid-cols-2">
+          {/* Announcements Section */}
+          <section aria-labelledby="announcements-heading">
+            <SectionHeader
+              icon={<Megaphone className="w-5 h-5" />}
+              title="Community Announcements"
+              subtitle="Latest updates from Masjid At-Taqwa"
+              viewAllHref="/announcements"
+              accentColor="emerald"
+            />
 
-              <div className="space-y-4">
-                {mockAnnouncements.slice(0, 1).map((announcement) => (
-                  <Suspense key={announcement.id} fallback={<div className="animate-pulse h-24 bg-gray-100 rounded-lg" />}>
-                    <AnnouncementCard announcement={announcement} />
-                  </Suspense>
-                ))}
-              </div>
-            </section>
-
-            {/* Events Section */}
-            <section aria-labelledby="events-heading">
-              <SectionHeader
-                icon={<Calendar className="w-5 h-5" />}
-                title="Upcoming Events"
-                subtitle="Join our vibrant community gatherings"
-                viewAllHref="/events"
-                accentColor="amber"
-              />
-
-              <div className="space-y-4">
-                {mockEvents.slice(0, 1).map((event) => (
-                  <Suspense key={event.id} fallback={<div className="animate-pulse h-32 bg-gray-100 rounded-lg" />}>
-                    <EventCard event={event} />
-                  </Suspense>
-                ))}
-              </div>
-            </section>
-          </article>
-
-          {/* Sidebar */}
-          <aside className="lg:col-span-5 space-y-6 animate-fade-in-up" style={{ animationDelay: '600ms' }}>
-            {/* Prayer Times Widget */}
-            <section className="rounded-xl overflow-hidden bg-gradient-to-br from-islamic-green-50 via-white to-islamic-gold-50/30 p-1 shadow-xl shadow-islamic-green/10">
-              <div className="bg-white rounded-lg">
-                <Suspense fallback={<div className="animate-pulse h-96 bg-islamic-green/10" />}>
-                  <PrayerTimesWidget prayerTimes={mockPrayerTimes} currentPrayer="dhuhr" />
+            <div className="space-y-4">
+              {mockAnnouncements.slice(0, 1).map((announcement) => (
+                <Suspense key={announcement.id} fallback={<div className="animate-pulse h-24 bg-gray-100 rounded-lg" />}>
+                  <AnnouncementCard announcement={announcement} />
                 </Suspense>
-              </div>
-            </section>
-          </aside>
+              ))}
+            </div>
+          </section>
+
+          {/* Events Section */}
+          <section aria-labelledby="events-heading">
+            <SectionHeader
+              icon={<Calendar className="w-5 h-5" />}
+              title="Upcoming Events"
+              subtitle="Join our vibrant community gatherings"
+              viewAllHref="/events"
+              accentColor="amber"
+            />
+
+            <div className="space-y-4">
+              {mockEvents.slice(0, 1).map((event) => (
+                <Suspense key={event.id} fallback={<div className="animate-pulse h-32 bg-gray-100 rounded-lg" />}>
+                  <EventCard event={event} />
+                </Suspense>
+              ))}
+            </div>
+          </section>
         </div>
       </div>
     </>

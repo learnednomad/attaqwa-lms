@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -10,7 +10,7 @@ import {
   GraduationCap, CreditCard, Building2, Heart, Search,
   Settings, ExternalLink, MoreHorizontal, AlertCircle
 } from 'lucide-react';
-import { studentApi } from '@/lib/student-api';
+import { useCourses, useEnrollments, useProgress } from '@/hooks/use-student-data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -79,11 +79,6 @@ interface SidebarSection {
 export default function StudentDashboard() {
   const router = useRouter();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [student, setStudent] = useState<StudentData | null>(null);
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [payments, setPayments] = useState<PaymentRecord[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
   const [scheduleView, setScheduleView] = useState<'daily' | 'weekly'>('daily');
   const [semesterFilter, setSemesterFilter] = useState('all');
 
@@ -151,208 +146,111 @@ export default function StudentDashboard() {
     ));
   };
 
-  // Load mock data as fallback
-  const loadMockData = () => {
-    setDataSource('mock');
-    setStudent({
-      id: '1',
-      name: 'Ahmed Hassan',
-      email: 'student@attaqwa.org',
-      studentId: 'STU2024001',
-      ageTier: 'HIGH_SCHOOL',
-      enrolledCourses: 6,
-      completedCourses: 120,
-      totalCourses: 144,
-      averageGrade: 3.75,
-      maxGrade: 4.00,
-      activeClasses: 15,
-      totalClasses: 18,
-      attendanceRate: 92,
-    });
+  // TanStack Query hooks
+  const { data: apiCourses = [], isLoading: coursesLoading, isError: coursesError } = useCourses();
+  const { data: enrollmentsData } = useEnrollments();
+  const { data: allProgress = [] } = useProgress();
 
-    setCourses([
-      {
-        id: '1',
-        title: 'Quran Memorization - Juz 30',
-        instructor: 'Imam Mohammad',
-        instructorTitle: 'Hafiz',
-        progress: 75,
-        nextClass: 'Today',
-        classTime: '08:30 AM - 09:30 AM',
-        room: 'QUR-201',
-        credits: 4,
-        assignments: 2,
-        grade: 88,
-      },
-      {
-        id: '2',
-        title: 'Islamic Studies - Fiqh',
-        instructor: 'Sheikh Abdullah',
-        instructorTitle: 'Ph.D',
-        progress: 60,
-        nextClass: 'Today',
-        classTime: '09:30 AM - 01:30 PM',
-        room: 'ISL-303',
-        credits: 4,
-        assignments: 1,
-        grade: 82,
-      },
-      {
-        id: '3',
-        title: 'Arabic Language - Level 2',
-        instructor: 'Ustadh Omar',
-        instructorTitle: 'Ph.D',
-        progress: 45,
-        nextClass: 'Today',
-        classTime: '01:30 PM - 03:30 PM',
-        room: 'ARB-401',
-        credits: 4,
-        assignments: 3,
-        grade: 90,
-      },
-      {
-        id: '4',
-        title: 'Hadith Studies',
-        instructor: 'Dr. Fatima Ali',
-        instructorTitle: 'Ph.D',
-        progress: 80,
-        nextClass: 'Tomorrow',
-        classTime: '04:30 PM - 06:00 PM',
-        room: 'HAD-102',
-        credits: 3,
-        assignments: 0,
-        grade: 86,
-      },
-    ]);
+  const enrollments = enrollmentsData?.enrollments || [];
+  const loading = coursesLoading;
 
-    setPayments([
-      {
-        id: '1',
-        paymentId: 'PID-331829',
-        category: '6th Semester Tuition',
-        date: '23 October 2024',
-        status: 'on-verification',
-      },
-      {
-        id: '2',
-        paymentId: 'PID-331828',
-        category: 'Quran Program 2025',
-        date: '24 August 2024',
-        status: 'completed',
-      },
-      {
-        id: '3',
-        paymentId: 'PID-331827',
-        category: '5th Semester Tuition',
-        date: '20 May 2024',
-        status: 'completed',
-      },
-      {
-        id: '4',
-        paymentId: 'PID-331826',
-        category: '4th Semester Tuition',
-        date: '22 October 2023',
-        status: 'completed',
-      },
-    ]);
+  // Mock data constants
+  const mockStudent: StudentData = {
+    id: '1',
+    name: 'Ahmed Hassan',
+    email: 'student@attaqwa.org',
+    studentId: 'STU2024001',
+    ageTier: 'HIGH_SCHOOL',
+    enrolledCourses: 6,
+    completedCourses: 120,
+    totalCourses: 144,
+    averageGrade: 3.75,
+    maxGrade: 4.00,
+    activeClasses: 15,
+    totalClasses: 18,
+    attendanceRate: 92,
   };
 
-  // Fetch data from API, fallback to mock
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      // In development mode, allow access without authentication for testing
-      const isDev = process.env.NODE_ENV === 'development';
+  const mockCourses: Course[] = [
+    { id: '1', title: 'Quran Memorization - Juz 30', instructor: 'Imam Mohammad', instructorTitle: 'Hafiz', progress: 75, nextClass: 'Today', classTime: '08:30 AM - 09:30 AM', room: 'QUR-201', credits: 4, assignments: 2, grade: 88 },
+    { id: '2', title: 'Islamic Studies - Fiqh', instructor: 'Sheikh Abdullah', instructorTitle: 'Ph.D', progress: 60, nextClass: 'Today', classTime: '09:30 AM - 01:30 PM', room: 'ISL-303', credits: 4, assignments: 1, grade: 82 },
+    { id: '3', title: 'Arabic Language - Level 2', instructor: 'Ustadh Omar', instructorTitle: 'Ph.D', progress: 45, nextClass: 'Today', classTime: '01:30 PM - 03:30 PM', room: 'ARB-401', credits: 4, assignments: 3, grade: 90 },
+    { id: '4', title: 'Hadith Studies', instructor: 'Dr. Fatima Ali', instructorTitle: 'Ph.D', progress: 80, nextClass: 'Tomorrow', classTime: '04:30 PM - 06:00 PM', room: 'HAD-102', credits: 3, assignments: 0, grade: 86 },
+  ];
 
-      if (!isDev && typeof window !== 'undefined') {
-        const studentData = localStorage.getItem('studentData');
-        if (!studentData) {
-          router.push('/student/login');
-          return;
-        }
-      }
+  const mockPayments: PaymentRecord[] = [
+    { id: '1', paymentId: 'PID-331829', category: '6th Semester Tuition', date: '23 October 2024', status: 'on-verification' },
+    { id: '2', paymentId: 'PID-331828', category: 'Quran Program 2025', date: '24 August 2024', status: 'completed' },
+    { id: '3', paymentId: 'PID-331827', category: '5th Semester Tuition', date: '20 May 2024', status: 'completed' },
+    { id: '4', paymentId: 'PID-331826', category: '4th Semester Tuition', date: '22 October 2023', status: 'completed' },
+  ];
 
-      try {
-        // Try to fetch real data from Strapi via BFF
-        const [coursesRes, enrollmentsRes] = await Promise.all([
-          studentApi.courses.getAll(),
-          studentApi.enrollments.getMine().catch(() => null), // May fail if not authenticated
-        ]);
+  // Derive dashboard data from TQ results
+  const { student, courses, payments, dataSource } = useMemo(() => {
+    if (coursesError || apiCourses.length === 0) {
+      return {
+        student: mockStudent,
+        courses: mockCourses,
+        payments: mockPayments,
+        dataSource: 'mock' as const,
+      };
+    }
 
-        const apiCourses = coursesRes.data || [];
-        const enrollments = enrollmentsRes?.data || [];
+    // Get student data from localStorage if available
+    const storedStudent = typeof window !== 'undefined'
+      ? JSON.parse(localStorage.getItem('studentData') || '{}')
+      : {};
 
-        // If we got courses from the API, transform and use them
-        if (apiCourses.length > 0) {
-          setDataSource('api');
+    // Calculate real lesson progress stats
+    const lessonsCompleted = allProgress.filter(p => p.status === 'completed').length;
 
-          // Get student data from localStorage if available
-          const storedStudent = typeof window !== 'undefined'
-            ? JSON.parse(localStorage.getItem('studentData') || '{}')
-            : {};
+    // Transform API courses to match UI interface
+    const transformedCourses: Course[] = apiCourses.slice(0, 4).map((course, index) => {
+      const enrollment = enrollments.find(e => e.course?.id === course.id);
+      return {
+        id: String(course.id),
+        title: course.title,
+        instructor: course.instructor,
+        instructorTitle: course.subject === 'quran' ? 'Hafiz' : 'Ph.D',
+        progress: enrollment?.overall_progress || 0,
+        nextClass: index < 3 ? 'Today' : 'Tomorrow',
+        classTime: ['08:30 AM - 09:30 AM', '09:30 AM - 01:30 PM', '01:30 PM - 03:30 PM', '04:30 PM - 06:00 PM'][index] || '08:00 AM',
+        room: `${course.subject.substring(0, 3).toUpperCase()}-${201 + index}`,
+        credits: course.duration_weeks > 20 ? 4 : 3,
+        assignments: 0,
+        grade: enrollment?.average_quiz_score || 0,
+      };
+    });
 
-          // Transform API courses to match our UI interface
-          const transformedCourses: Course[] = apiCourses.slice(0, 4).map((course, index) => {
-            const enrollment = enrollments.find(e => e.course?.id === course.id);
-            return {
-              id: String(course.id),
-              title: course.title,
-              instructor: course.instructor,
-              instructorTitle: course.subject === 'quran' ? 'Hafiz' : 'Ph.D',
-              progress: enrollment?.overall_progress || Math.floor(Math.random() * 80) + 20,
-              nextClass: index < 3 ? 'Today' : 'Tomorrow',
-              classTime: ['08:30 AM - 09:30 AM', '09:30 AM - 01:30 PM', '01:30 PM - 03:30 PM', '04:30 PM - 06:00 PM'][index] || '08:00 AM',
-              room: `${course.subject.substring(0, 3).toUpperCase()}-${201 + index}`,
-              credits: course.duration_weeks > 20 ? 4 : 3,
-              assignments: Math.floor(Math.random() * 4),
-              grade: enrollment?.average_quiz_score || Math.floor(Math.random() * 20) + 75,
-            };
-          });
+    // Calculate stats from enrollments
+    const activeEnrollments = enrollments.filter(e => e.enrollment_status === 'active');
+    const completedEnrollments = enrollments.filter(e => e.enrollment_status === 'completed');
 
-          setCourses(transformedCourses);
-
-          // Calculate stats from enrollments
-          const activeEnrollments = enrollments.filter(e => e.enrollment_status === 'active');
-          const completedEnrollments = enrollments.filter(e => e.enrollment_status === 'completed');
-
-          setStudent({
-            id: storedStudent.id?.toString() || '1',
-            name: storedStudent.username || storedStudent.name || 'Student',
-            email: storedStudent.email || 'student@attaqwa.org',
-            studentId: `STU${new Date().getFullYear()}${String(storedStudent.id || 1).padStart(3, '0')}`,
-            ageTier: 'HIGH_SCHOOL',
-            enrolledCourses: apiCourses.length,
-            completedCourses: completedEnrollments.length,
-            totalCourses: apiCourses.length,
-            averageGrade: enrollments.length > 0
-              ? enrollments.reduce((sum, e) => sum + (e.average_quiz_score || 0), 0) / enrollments.length / 25
-              : 3.5,
-            maxGrade: 4.00,
-            activeClasses: activeEnrollments.length || apiCourses.length,
-            totalClasses: apiCourses.length + 2,
-            attendanceRate: 92,
-          });
-
-          // Payments remain mock for now (not in Strapi yet)
-          setPayments([
-            { id: '1', paymentId: 'PID-331829', category: '6th Semester Tuition', date: '23 October 2024', status: 'on-verification' },
-            { id: '2', paymentId: 'PID-331828', category: 'Quran Program 2025', date: '24 August 2024', status: 'completed' },
-            { id: '3', paymentId: 'PID-331827', category: '5th Semester Tuition', date: '20 May 2024', status: 'completed' },
-            { id: '4', paymentId: 'PID-331826', category: '4th Semester Tuition', date: '22 October 2023', status: 'completed' },
-          ]);
-        } else {
-          // No API data, use mock
-          loadMockData();
-        }
-      } catch (error) {
-        console.warn('Failed to fetch from API, using mock data:', error);
-        loadMockData();
-      } finally {
-        setLoading(false);
-      }
+    const derivedStudent: StudentData = {
+      id: storedStudent.id?.toString() || '1',
+      name: storedStudent.username || storedStudent.name || 'Student',
+      email: storedStudent.email || 'student@attaqwa.org',
+      studentId: `STU${new Date().getFullYear()}${String(storedStudent.id || 1).padStart(3, '0')}`,
+      ageTier: 'HIGH_SCHOOL',
+      enrolledCourses: apiCourses.length,
+      completedCourses: lessonsCompleted,
+      totalCourses: allProgress.length || apiCourses.length,
+      averageGrade: enrollments.length > 0
+        ? enrollments.reduce((sum, e) => sum + (e.average_quiz_score || 0), 0) / enrollments.length / 25
+        : 3.5,
+      maxGrade: 4.00,
+      activeClasses: activeEnrollments.length || apiCourses.length,
+      totalClasses: apiCourses.length + 2,
+      attendanceRate: 92,
     };
 
-    fetchDashboardData();
-  }, [router]);
+    return {
+      student: derivedStudent,
+      courses: transformedCourses,
+      payments: mockPayments,
+      dataSource: 'api' as const,
+    };
+  }, [apiCourses, enrollments, allProgress, coursesError]);
 
   const handleLogout = () => {
     localStorage.removeItem('studentToken');

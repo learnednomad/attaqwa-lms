@@ -1,7 +1,28 @@
+'use client';
+
+import { useMemo } from 'react';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+
+/**
+ * Check if current date falls within Sha'ban or Ramadan
+ * using the browser's Intl API with islamic-umalqura calendar.
+ */
+function isRamadanSeason(): boolean {
+  try {
+    const now = new Date();
+    const month = new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura', {
+      month: 'numeric',
+    }).format(now);
+    const monthNum = parseInt(month, 10);
+    // Sha'ban = 8, Ramadan = 9 in the Islamic calendar
+    return monthNum === 8 || monthNum === 9;
+  } catch {
+    return true; // Show by default if Intl not supported
+  }
+}
 
 // Islamic Services from mosque theme analysis
 const islamicServices = [
@@ -18,18 +39,32 @@ const islamicServices = [
     textColor: 'text-islamic-green-700',
     hoverShadow: 'hover:shadow-islamic-green/20',
   },
+  // {
+  //   id: 'hajj-umrah',
+  //   name: 'Hajj & Umrah',
+  //   description: 'Pilgrimage guidance, travel assistance, and spiritual preparation',
+  //   href: '/services/hajj-umrah',
+  //   icon: '🕋',
+  //   iconAlt: 'Kaaba icon representing pilgrimage services',
+  //   gradient: 'from-islamic-navy-500 to-islamic-navy-600',
+  //   bgColor: 'bg-islamic-navy-50',
+  //   borderColor: 'border-islamic-navy-200',
+  //   textColor: 'text-islamic-navy-700',
+  //   hoverShadow: 'hover:shadow-islamic-navy/20',
+  // },
   {
-    id: 'hajj-umrah',
-    name: 'Hajj & Umrah',
-    description: 'Pilgrimage guidance, travel assistance, and spiritual preparation',
-    href: '/services/hajj-umrah',
-    icon: '🕋',
-    iconAlt: 'Kaaba icon representing pilgrimage services',
-    gradient: 'from-islamic-navy-500 to-islamic-navy-600',
+    id: 'ramadan-services',
+    name: 'Ramadan Services',
+    description: 'Tarawee, Iftar, Tahajjud, and community Ramadan programs',
+    href: '/services/ramadan-services',
+    icon: '🌙',
+    iconAlt: 'Crescent moon representing Ramadan services',
+    gradient: 'from-islamic-navy-500 to-islamic-gold-500',
     bgColor: 'bg-islamic-navy-50',
     borderColor: 'border-islamic-navy-200',
     textColor: 'text-islamic-navy-700',
     hoverShadow: 'hover:shadow-islamic-navy/20',
+    seasonal: 'ramadan' as const,
   },
   {
     id: 'zakat',
@@ -83,32 +118,32 @@ const islamicServices = [
     textColor: 'text-islamic-gold-700',
     hoverShadow: 'hover:shadow-islamic-gold/20',
   },
-  {
-    id: 'scholarship',
-    name: 'Scholarship Program',
-    description: 'Educational scholarships, Islamic studies funding, and student support',
-    href: '/services/scholarship-program',
-    icon: '🎓',
-    iconAlt: 'Graduation cap representing scholarship programs',
-    gradient: 'from-islamic-green-500 to-islamic-gold-500',
-    bgColor: 'bg-islamic-green-50',
-    borderColor: 'border-islamic-green-200',
-    textColor: 'text-islamic-green-700',
-    hoverShadow: 'hover:shadow-islamic-green/20',
-  },
-  {
-    id: 'halal-food',
-    name: 'Halal Food Program',
-    description: 'Community meals, food pantry, and halal certification guidance',
-    href: '/services/halal-food-program',
-    icon: '🍽️',
-    iconAlt: 'Plate icon representing halal food services',
-    gradient: 'from-islamic-navy-500 to-islamic-gold-500',
-    bgColor: 'bg-islamic-navy-50',
-    borderColor: 'border-islamic-navy-200',
-    textColor: 'text-islamic-navy-700',
-    hoverShadow: 'hover:shadow-islamic-navy/20',
-  },
+  // {
+  //   id: 'scholarship',
+  //   name: 'Scholarship Program',
+  //   description: 'Educational scholarships, Islamic studies funding, and student support',
+  //   href: '/services/scholarship-program',
+  //   icon: '🎓',
+  //   iconAlt: 'Graduation cap representing scholarship programs',
+  //   gradient: 'from-islamic-green-500 to-islamic-gold-500',
+  //   bgColor: 'bg-islamic-green-50',
+  //   borderColor: 'border-islamic-green-200',
+  //   textColor: 'text-islamic-green-700',
+  //   hoverShadow: 'hover:shadow-islamic-green/20',
+  // },
+  // {
+  //   id: 'halal-food',
+  //   name: 'Halal Food Program',
+  //   description: 'Community meals, food pantry, and halal certification guidance',
+  //   href: '/services/halal-food-program',
+  //   icon: '🍽️',
+  //   iconAlt: 'Plate icon representing halal food services',
+  //   gradient: 'from-islamic-navy-500 to-islamic-gold-500',
+  //   bgColor: 'bg-islamic-navy-50',
+  //   borderColor: 'border-islamic-navy-200',
+  //   textColor: 'text-islamic-navy-700',
+  //   hoverShadow: 'hover:shadow-islamic-navy/20',
+  // },
   // Quick Actions & Resources
   {
     id: 'donate',
@@ -123,19 +158,19 @@ const islamicServices = [
     textColor: 'text-islamic-green-700',
     hoverShadow: 'hover:shadow-islamic-green/20',
   },
-  {
-    id: 'contact',
-    name: 'Contact Us',
-    description: 'Get in touch with the masjid administration',
-    href: '/contact',
-    icon: '📧',
-    iconAlt: 'Email icon representing contact',
-    gradient: 'from-islamic-navy-500 to-islamic-navy-600',
-    bgColor: 'bg-islamic-navy-50',
-    borderColor: 'border-islamic-navy-200',
-    textColor: 'text-islamic-navy-700',
-    hoverShadow: 'hover:shadow-islamic-navy/20',
-  },
+  // {
+  //   id: 'contact',
+  //   name: 'Contact Us',
+  //   description: 'Get in touch with the masjid administration',
+  //   href: '/contact',
+  //   icon: '📧',
+  //   iconAlt: 'Email icon representing contact',
+  //   gradient: 'from-islamic-navy-500 to-islamic-navy-600',
+  //   bgColor: 'bg-islamic-navy-50',
+  //   borderColor: 'border-islamic-navy-200',
+  //   textColor: 'text-islamic-navy-700',
+  //   hoverShadow: 'hover:shadow-islamic-navy/20',
+  // },
   {
     id: 'education',
     name: 'Islamic Education',
@@ -149,45 +184,45 @@ const islamicServices = [
     textColor: 'text-islamic-gold-700',
     hoverShadow: 'hover:shadow-islamic-gold/20',
   },
-  {
-    id: 'quran-study',
-    name: 'Quran Study',
-    description: 'Tafsir, recitation guides, and Quranic resources',
-    href: '/resources/quran-study',
-    icon: '📖',
-    iconAlt: 'Open book icon representing Quran study',
-    gradient: 'from-islamic-green-600 to-islamic-navy-500',
-    bgColor: 'bg-islamic-green-50',
-    borderColor: 'border-islamic-green-200',
-    textColor: 'text-islamic-green-700',
-    hoverShadow: 'hover:shadow-islamic-green/20',
-  },
-  {
-    id: 'hadith',
-    name: 'Hadith Collections',
-    description: 'Prophetic traditions and authentic narrations',
-    href: '/resources/hadith-collections',
-    icon: '📜',
-    iconAlt: 'Scroll icon representing hadith collections',
-    gradient: 'from-islamic-navy-600 to-islamic-green-500',
-    bgColor: 'bg-islamic-navy-50',
-    borderColor: 'border-islamic-navy-200',
-    textColor: 'text-islamic-navy-700',
-    hoverShadow: 'hover:shadow-islamic-navy/20',
-  },
-  {
-    id: 'qibla',
-    name: 'Qibla Direction',
-    description: 'Find the direction to Mecca for prayer',
-    href: '/resources/qibla-direction',
-    icon: '🧭',
-    iconAlt: 'Compass icon representing Qibla direction',
-    gradient: 'from-islamic-gold-600 to-islamic-green-500',
-    bgColor: 'bg-islamic-gold-50',
-    borderColor: 'border-islamic-gold-200',
-    textColor: 'text-islamic-gold-700',
-    hoverShadow: 'hover:shadow-islamic-gold/20',
-  },
+  // {
+  //   id: 'quran-study',
+  //   name: 'Quran Study',
+  //   description: 'Tafsir, recitation guides, and Quranic resources',
+  //   href: '/resources/quran-study',
+  //   icon: '📖',
+  //   iconAlt: 'Open book icon representing Quran study',
+  //   gradient: 'from-islamic-green-600 to-islamic-navy-500',
+  //   bgColor: 'bg-islamic-green-50',
+  //   borderColor: 'border-islamic-green-200',
+  //   textColor: 'text-islamic-green-700',
+  //   hoverShadow: 'hover:shadow-islamic-green/20',
+  // },
+  // {
+  //   id: 'hadith',
+  //   name: 'Hadith Collections',
+  //   description: 'Prophetic traditions and authentic narrations',
+  //   href: '/resources/hadith-collections',
+  //   icon: '📜',
+  //   iconAlt: 'Scroll icon representing hadith collections',
+  //   gradient: 'from-islamic-navy-600 to-islamic-green-500',
+  //   bgColor: 'bg-islamic-navy-50',
+  //   borderColor: 'border-islamic-navy-200',
+  //   textColor: 'text-islamic-navy-700',
+  //   hoverShadow: 'hover:shadow-islamic-navy/20',
+  // },
+  // {
+  //   id: 'qibla',
+  //   name: 'Qibla Direction',
+  //   description: 'Find the direction to Mecca for prayer',
+  //   href: '/resources/qibla-direction',
+  //   icon: '🧭',
+  //   iconAlt: 'Compass icon representing Qibla direction',
+  //   gradient: 'from-islamic-gold-600 to-islamic-green-500',
+  //   bgColor: 'bg-islamic-gold-50',
+  //   borderColor: 'border-islamic-gold-200',
+  //   textColor: 'text-islamic-gold-700',
+  //   hoverShadow: 'hover:shadow-islamic-gold/20',
+  // },
 ];
 
 interface IslamicServicesGridProps {
@@ -196,11 +231,19 @@ interface IslamicServicesGridProps {
   compact?: boolean;
 }
 
-export function IslamicServicesGrid({ 
-  className, 
-  showTitle = true, 
-  compact = false 
+export function IslamicServicesGrid({
+  className,
+  showTitle = true,
+  compact = false
 }: IslamicServicesGridProps) {
+  const visibleServices = useMemo(() => {
+    const ramadanVisible = isRamadanSeason();
+    return islamicServices.filter((s) => {
+      if ('seasonal' in s && s.seasonal === 'ramadan') return ramadanVisible;
+      return true;
+    });
+  }, []);
+
   return (
     <section 
       className={cn('relative py-16 px-4 sm:px-6 lg:px-8', className)}
@@ -228,31 +271,31 @@ export function IslamicServicesGrid({
 
         {/* Services Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {islamicServices.map((service, index) => (
+          {visibleServices.map((service, index) => (
             <Link
               key={service.id}
               href={service.href}
               className="group block"
             >
-              <Card className="relative overflow-hidden bg-white border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-islamic-green-400 group-hover:bg-islamic-green-500 h-64">
+              <Card className="relative overflow-hidden bg-white border border-gray-200 shadow-sm hover:shadow-lg hover:border-islamic-green-400 group-hover:bg-islamic-green-500 transition-[box-shadow,border-color,background-color] duration-200 h-64">
                 <CardContent className="p-8 h-full flex flex-col items-center justify-center text-center">
                   {/* Service Icon */}
                   <div className="mb-6">
-                    <div className="w-16 h-16 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform duration-300">
-                      <span role="img" aria-label={service.iconAlt} className="filter grayscale group-hover:grayscale-0 group-hover:brightness-0 group-hover:invert transition-all duration-300">
+                    <div className="w-16 h-16 flex items-center justify-center text-3xl">
+                      <span role="img" aria-label={service.iconAlt} className="filter grayscale group-hover:grayscale-0 group-hover:brightness-0 group-hover:invert transition-[filter] duration-200">
                         {service.icon}
                       </span>
                     </div>
                   </div>
 
                   {/* Service Title */}
-                  <h3 className="text-xl font-bold text-gray-900 group-hover:text-white transition-colors duration-300 mb-2">
+                  <h3 className="text-xl font-bold text-gray-900 group-hover:text-white transition-colors duration-200 mb-2">
                     {service.name}
                   </h3>
 
                   {/* Service Description */}
                   {!compact && (
-                    <p className="text-sm text-gray-600 group-hover:text-white/90 transition-colors duration-300 leading-relaxed">
+                    <p className="text-sm text-gray-600 group-hover:text-white/90 transition-colors duration-200 leading-relaxed">
                       {service.description}
                     </p>
                   )}

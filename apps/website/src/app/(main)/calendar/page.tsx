@@ -1,8 +1,21 @@
 import { CalendarDownload } from '@/components/features/calendar/calendar-download';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Calendar as CalendarIcon, Download, FileText, Clock, Star } from 'lucide-react';
+
+import {
+  Calendar as CalendarIcon,
+  Download,
+  FileText,
+  Clock,
+  Star,
+  Moon,
+  Sparkles,
+  MapPin,
+  Users,
+  Archive,
+  Smartphone,
+  Printer,
+  ArrowRight,
+  Check,
+} from 'lucide-react';
 import { Calendar } from '@/types';
 import { generateSEOMetadata } from '@/lib/seo';
 import type { Metadata } from 'next';
@@ -36,7 +49,7 @@ const mockCalendars: Calendar[] = [
     description: 'Complete Ramadan schedule with daily Suhur and Iftar times, prayer times, and special programs. Includes community Iftar dates and Taraweh prayer schedules.',
     fileUrl: '/calendars/ramadan-2025.pdf',
     fileName: 'ramadan-calendar-2025.pdf',
-    fileSize: 2048576, // 2MB
+    fileSize: 2048576,
     year: 2025,
     isActive: true,
     createdAt: new Date('2025-02-01'),
@@ -48,7 +61,7 @@ const mockCalendars: Calendar[] = [
     description: 'Complete year-round prayer times for all five daily prayers including Fajr, Dhuhr, Asr, Maghrib, and Isha. Updated monthly for daylight saving adjustments.',
     fileUrl: '/calendars/prayer-times-2025.pdf',
     fileName: 'prayer-times-2025.pdf',
-    fileSize: 1536000, // 1.5MB
+    fileSize: 1536000,
     year: 2025,
     isActive: true,
     createdAt: new Date('2025-01-01'),
@@ -60,7 +73,7 @@ const mockCalendars: Calendar[] = [
     description: 'Important Islamic dates including Eid ul-Fitr, Eid ul-Adha, Mawlid an-Nabi, Ashura, and other significant occasions with community event details.',
     fileUrl: '/calendars/islamic-holidays-2025.pdf',
     fileName: 'islamic-holidays-2025.pdf',
-    fileSize: 1024000, // 1MB
+    fileSize: 1024000,
     year: 2025,
     isActive: true,
     createdAt: new Date('2025-01-01'),
@@ -72,7 +85,7 @@ const mockCalendars: Calendar[] = [
     description: 'Comprehensive Hajj calendar with important dates, pilgrimage schedule, and preparation guide for community members planning to perform Hajj.',
     fileUrl: '/calendars/hajj-guide-2025.pdf',
     fileName: 'hajj-guide-2025.pdf',
-    fileSize: 3072000, // 3MB
+    fileSize: 3072000,
     year: 2025,
     isActive: true,
     createdAt: new Date('2025-03-01'),
@@ -84,7 +97,7 @@ const mockCalendars: Calendar[] = [
     description: 'Quarterly calendar featuring educational workshops, youth programs, family events, and special community gatherings from April to June 2025.',
     fileUrl: '/calendars/community-events-q2-2025.pdf',
     fileName: 'community-events-q2-2025.pdf',
-    fileSize: 1792000, // 1.75MB
+    fileSize: 1792000,
     year: 2025,
     isActive: true,
     createdAt: new Date('2025-03-15'),
@@ -96,7 +109,7 @@ const mockCalendars: Calendar[] = [
     description: 'Previous year Ramadan calendar for reference. Includes actual Iftar times and community program records from Ramadan 1445.',
     fileUrl: '/calendars/ramadan-2024.pdf',
     fileName: 'ramadan-calendar-2024.pdf',
-    fileSize: 1920000, // 1.9MB
+    fileSize: 1920000,
     year: 2024,
     isActive: false,
     createdAt: new Date('2024-02-01'),
@@ -112,318 +125,330 @@ const formatFileSize = (bytes: number): string => {
   return `${mb.toFixed(1)} MB`;
 };
 
-const getTotalDownloads = (calendars: Calendar[]): number => {
+const getTotalSize = (calendars: Calendar[]): number => {
   return calendars.reduce((total, cal) => total + cal.fileSize, 0);
 };
 
+const categories = [
+  {
+    icon: Moon,
+    title: 'Ramadan Calendars',
+    description: 'Comprehensive Ramadan schedules with Suhur, Iftar, and prayer times',
+    detail: 'Daily Ramadan schedules including community Iftar programs and Taraweh prayers.',
+    iconBg: 'bg-islamic-green-100',
+    iconColor: 'text-islamic-green-600',
+    buttonLabel: 'View Ramadan Calendars',
+  },
+  {
+    icon: Clock,
+    title: 'Prayer Time Schedules',
+    description: 'Annual and monthly prayer time tables for daily prayers',
+    detail: 'Accurate prayer times for Fajr, Dhuhr, Asr, Maghrib, and Isha throughout the year.',
+    iconBg: 'bg-blue-100',
+    iconColor: 'text-blue-600',
+    buttonLabel: 'View Prayer Schedules',
+  },
+  {
+    icon: Sparkles,
+    title: 'Islamic Holidays',
+    description: 'Important Islamic dates and religious observances',
+    detail: 'Eid dates, Ashura, Mawlid, and other significant Islamic calendar events.',
+    iconBg: 'bg-islamic-gold-100',
+    iconColor: 'text-islamic-gold-600',
+    buttonLabel: 'View Holiday Calendars',
+  },
+  {
+    icon: MapPin,
+    title: 'Hajj & Umrah',
+    description: 'Pilgrimage calendars and preparation guides',
+    detail: 'Hajj schedules, preparation timelines, and important pilgrimage dates.',
+    iconBg: 'bg-amber-100',
+    iconColor: 'text-amber-600',
+    buttonLabel: 'View Pilgrimage Calendars',
+  },
+  {
+    icon: Users,
+    title: 'Community Events',
+    description: 'Local mosque events and community programs',
+    detail: 'Educational workshops, youth programs, and community gatherings schedule.',
+    iconBg: 'bg-purple-100',
+    iconColor: 'text-purple-600',
+    buttonLabel: 'View Event Calendars',
+  },
+  {
+    icon: CalendarIcon,
+    title: 'Hijri Calendar',
+    description: 'Islamic lunar calendar with Gregorian equivalents',
+    detail: 'Full Hijri calendar with important Islamic months and date conversions.',
+    iconBg: 'bg-teal-100',
+    iconColor: 'text-teal-600',
+    buttonLabel: 'View Hijri Calendars',
+  },
+];
+
 export default function CalendarPage() {
+  const ramadanCalendar = currentCalendars.find(c => c.title.includes('Ramadan'));
+  const secondaryFeatured = currentCalendars.filter(c => !c.title.includes('Ramadan')).slice(0, 3);
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Page Header */}
-      <header className="mb-8">
-        <h1 className="mb-4 text-3xl font-bold text-islamic-navy-800 md:text-4xl">
-          Islamic Calendar Downloads
-        </h1>
-        <p className="text-lg text-islamic-navy-600 max-w-3xl">
-          Access comprehensive Islamic calendars including Ramadan schedules, prayer times, 
-          Hijri dates, and important Islamic holidays. All calendars are available as 
-          free PDF downloads for our community members.
-        </p>
-      </header>
+    <div className="min-h-screen">
+      {/* ─── Section 1: Hero Banner ─── */}
+      <section className="relative bg-immersive-dark overflow-hidden">
+        <div className="islamic-pattern-overlay absolute inset-0 pointer-events-none" />
 
-      {/* Calendar Statistics */}
-      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardContent className="flex items-center gap-3 p-4">
-            <CalendarIcon className="h-8 w-8 text-islamic-green-600" />
-            <div>
-              <p className="text-2xl font-bold text-islamic-navy-800">{currentCalendars.length}</p>
-              <p className="text-sm text-islamic-navy-600">Available Calendars</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-3 p-4">
-            <Download className="h-8 w-8 text-islamic-green-600" />
-            <div>
-              <p className="text-2xl font-bold text-islamic-navy-800">{formatFileSize(getTotalDownloads(currentCalendars))}</p>
-              <p className="text-sm text-islamic-navy-600">Total Download Size</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-3 p-4">
-            <FileText className="h-8 w-8 text-islamic-green-600" />
-            <div>
-              <p className="text-2xl font-bold text-islamic-navy-800">PDF</p>
-              <p className="text-sm text-islamic-navy-600">File Format</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-3 p-4">
-            <Clock className="h-8 w-8 text-islamic-green-600" />
-            <div>
-              <p className="text-2xl font-bold text-islamic-navy-800">2025</p>
-              <p className="text-sm text-islamic-navy-600">Current Year</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+        <div className="relative mx-auto max-w-6xl px-4 pb-24 pt-20 md:pb-28 md:pt-28 lg:pb-32 lg:pt-32">
+          <div className="flex flex-col items-center text-center">
+            {/* Arabic bismillah */}
+            <p className="mb-4 text-lg text-white/60 md:text-xl" style={{ fontFamily: "'Amiri', serif" }}>
+              بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ
+            </p>
 
-      {/* Featured Calendars */}
-      <section className="mb-12">
-        <header className="mb-6">
-          <h2 className="mb-2 text-2xl font-bold text-islamic-navy-800 flex items-center gap-2">
-            <Star className="h-6 w-6 text-islamic-gold-600" />
-            Featured Calendars
-          </h2>
-          <p className="text-islamic-navy-600">
-            Most popular and essential Islamic calendars for the community.
-          </p>
-        </header>
-        
-        <div className="grid gap-6 md:grid-cols-2">
-          {currentCalendars.slice(0, 4).map((calendar) => (
-            <div key={calendar.id} className="relative">
-              {calendar.title.includes('Ramadan') && (
-                <Badge className="absolute -top-2 -right-2 z-10 bg-islamic-green-600">
-                  Featured
-                </Badge>
-              )}
-              <CalendarDownload calendar={calendar} />
+            {/* Headline */}
+            <h1
+              className="mb-4 text-4xl font-semibold text-white md:text-5xl lg:text-6xl"
+              style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: '-0.03em', lineHeight: 1.1 }}
+            >
+              Islamic Calendar Downloads
+            </h1>
+
+            {/* Subtitle */}
+            <p className="mb-10 max-w-2xl text-base text-white/70 md:text-lg">
+              Access comprehensive Islamic calendars including Ramadan schedules, prayer times,
+              Hijri dates, and important Islamic holidays — free for our community.
+            </p>
+
+            {/* Glass stat pills */}
+            <div className="flex flex-wrap justify-center gap-3">
+              {[
+                { label: 'Calendars', value: String(currentCalendars.length) },
+                { label: 'Total Size', value: formatFileSize(getTotalSize(currentCalendars)) },
+                { label: 'Format', value: 'PDF' },
+                { label: 'Year', value: '2025' },
+              ].map(stat => (
+                <div
+                  key={stat.label}
+                  className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2 backdrop-blur-xl"
+                >
+                  <span className="text-sm font-semibold text-white">{stat.value}</span>
+                  <span className="text-xs text-white/60">{stat.label}</span>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
+
+        {/* Bottom fade to white */}
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent" />
       </section>
 
-      {/* Calendar Categories */}
-      <section className="mb-12">
-        <header className="mb-6">
-          <h2 className="mb-2 text-2xl font-bold text-islamic-navy-800">
-            Calendar Categories
-          </h2>
-          <p className="text-islamic-navy-600">
-            Browse calendars by type to find exactly what you need.
-          </p>
-        </header>
-        
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">🌙</span>
-                Ramadan Calendars
-              </CardTitle>
-              <CardDescription>
-                Comprehensive Ramadan schedules with Suhur, Iftar, and prayer times
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="mb-4 text-sm text-islamic-navy-600">
-                Daily Ramadan schedules including community Iftar programs and Taraweh prayers.
-              </p>
-              <Button variant="outline" className="w-full">
-                View Ramadan Calendars
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">🕐</span>
-                Prayer Time Schedules
-              </CardTitle>
-              <CardDescription>
-                Annual and monthly prayer time tables for daily prayers
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="mb-4 text-sm text-islamic-navy-600">
-                Accurate prayer times for Fajr, Dhuhr, Asr, Maghrib, and Isha throughout the year.
-              </p>
-              <Button variant="outline" className="w-full">
-                View Prayer Schedules
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">🎉</span>
-                Islamic Holidays
-              </CardTitle>
-              <CardDescription>
-                Important Islamic dates and religious observances
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="mb-4 text-sm text-islamic-navy-600">
-                Eid dates, Ashura, Mawlid, and other significant Islamic calendar events.
-              </p>
-              <Button variant="outline" className="w-full">
-                View Holiday Calendars
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">🕋</span>
-                Hajj & Umrah
-              </CardTitle>
-              <CardDescription>
-                Pilgrimage calendars and preparation guides
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="mb-4 text-sm text-islamic-navy-600">
-                Hajj schedules, preparation timelines, and important pilgrimage dates.
-              </p>
-              <Button variant="outline" className="w-full">
-                View Pilgrimage Calendars
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">👥</span>
-                Community Events
-              </CardTitle>
-              <CardDescription>
-                Local mosque events and community programs
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="mb-4 text-sm text-islamic-navy-600">
-                Educational workshops, youth programs, and community gatherings schedule.
-              </p>
-              <Button variant="outline" className="w-full">
-                View Event Calendars
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">📅</span>
-                Hijri Calendar
-              </CardTitle>
-              <CardDescription>
-                Islamic lunar calendar with Gregorian equivalents
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="mb-4 text-sm text-islamic-navy-600">
-                Full Hijri calendar with important Islamic months and date conversions.
-              </p>
-              <Button variant="outline" className="w-full">
-                View Hijri Calendars
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* All Current Calendars */}
-      <section className="mb-12">
-        <header className="mb-6">
-          <h2 className="mb-2 text-2xl font-bold text-islamic-navy-800">
-            All Available Calendars (2025)
-          </h2>
-          <p className="text-islamic-navy-600">
-            Complete collection of current Islamic calendars available for download.
-          </p>
-        </header>
-        
-        <div className="grid gap-4">
-          {currentCalendars.map((calendar) => (
-            <CalendarDownload key={calendar.id} calendar={calendar} compact />
-          ))}
-        </div>
-      </section>
-
-      {/* How to Use */}
-      <section className="mb-12">
-        <Card className="bg-islamic-gold-50 border-islamic-gold-200">
-          <CardContent className="p-8">
-            <h3 className="mb-4 text-2xl font-bold text-islamic-gold-800">
-              How to Use Islamic Calendars
-            </h3>
-            <div className="grid gap-6 md:grid-cols-2">
-              <div>
-                <h4 className="mb-3 font-semibold text-islamic-gold-800">📱 On Mobile Devices</h4>
-                <ul className="space-y-2 text-sm text-islamic-gold-700">
-                  <li>• Download PDF files to your device</li>
-                  <li>• Save to your preferred calendar app</li>
-                  <li>• Set prayer time reminders</li>
-                  <li>• Share with family and friends</li>
-                </ul>
+      <div className="mx-auto max-w-6xl px-4">
+        {/* ─── Section 2: Featured Calendars ─── */}
+        <div className="py-12 md:py-16">
+          <header className="mb-8">
+            <div className="mb-3 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-islamic-gold-100">
+                <Star className="h-5 w-5 text-islamic-gold-600" />
               </div>
-              <div>
-                <h4 className="mb-3 font-semibold text-islamic-gold-800">🖨️ For Print Use</h4>
-                <ul className="space-y-2 text-sm text-islamic-gold-700">
-                  <li>• Print at home or local print shop</li>
-                  <li>• High-quality PDF format for clear printing</li>
-                  <li>• Display in your home or office</li>
-                  <li>• Great for community bulletin boards</li>
-                </ul>
-              </div>
+              <h2 className="section-heading-gradient">Featured Calendars</h2>
             </div>
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* Archived Calendars */}
-      {archivedCalendars.length > 0 && (
-        <section>
-          <header className="mb-6">
-            <h2 className="mb-2 text-2xl font-bold text-islamic-navy-800">
-              Archived Calendars
-            </h2>
             <p className="text-islamic-navy-600">
-              Previous years' calendars available for reference and historical purposes.
+              Most popular and essential Islamic calendars for the community.
             </p>
           </header>
-          
-          <div className="grid gap-4">
-            {archivedCalendars.map((calendar) => (
-              <div key={calendar.id} className="opacity-75">
-                <CalendarDownload calendar={calendar} compact />
+
+          {/* Hero card — Ramadan (full-width horizontal) */}
+          {ramadanCalendar && (
+            <div className="relative mb-6">
+              <div className="pointer-events-none absolute -right-2 -top-3 z-10 rounded-full bg-islamic-green-600 px-4 py-1 text-xs font-semibold text-white shadow-lg">
+                Featured
               </div>
+              <CalendarDownload
+                calendar={ramadanCalendar}
+                featured
+                className="[&>div]:md:flex-row [&>div]:md:items-center [&>div]:md:justify-between [&_button]:md:w-auto [&_p.line-clamp-3]:md:max-w-lg"
+              />
+            </div>
+          )}
+
+          {/* Secondary featured grid */}
+          <div className="grid gap-5 md:grid-cols-3">
+            {secondaryFeatured.map(calendar => (
+              <CalendarDownload key={calendar.id} calendar={calendar} featured />
             ))}
           </div>
-        </section>
-      )}
+        </div>
 
-      {/* Newsletter Subscription */}
-      <section className="mt-12">
-        <Card className="bg-islamic-green-50 border-islamic-green-200">
-          <CardContent className="p-8 text-center">
-            <h3 className="mb-4 text-2xl font-bold text-islamic-green-800">
+        {/* ─── Section 3: Calendar Categories ─── */}
+        <div className="pb-12 md:pb-16">
+          <header className="mb-8">
+            <h2 className="section-heading-gradient mb-2">Calendar Categories</h2>
+            <p className="text-islamic-navy-600">
+              Browse calendars by type to find exactly what you need.
+            </p>
+          </header>
+
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {categories.map(cat => {
+              const Icon = cat.icon;
+              return (
+                <div key={cat.title} className="card-event overflow-hidden">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${cat.iconBg}`}>
+                      <Icon className={`h-6 w-6 ${cat.iconColor}`} />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-islamic-navy-800">{cat.title}</h3>
+                      <p className="text-xs text-islamic-navy-500">{cat.description}</p>
+                    </div>
+                  </div>
+                  <p className="mb-4 text-sm text-islamic-navy-600">{cat.detail}</p>
+                  <button className="btn-islamic-secondary w-full text-sm">
+                    {cat.buttonLabel}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ─── Section 4: All Available Calendars ─── */}
+        <div className="pb-12 md:pb-16">
+          <header className="mb-8">
+            <h2 className="section-heading-gradient mb-2">All Available Calendars (2025)</h2>
+            <p className="text-islamic-navy-600">
+              Complete collection of current Islamic calendars available for download.
+            </p>
+          </header>
+
+          <div className="card-announcement space-y-1 overflow-hidden">
+            {currentCalendars.map((calendar, i) => (
+              <CalendarDownload key={calendar.id} calendar={calendar} compact index={i} />
+            ))}
+          </div>
+        </div>
+
+        {/* ─── Section 5: How to Use ─── */}
+        <div className="pb-12 md:pb-16">
+          <div className="card-event relative overflow-hidden">
+            {/* Subtle geometric overlay */}
+            <div className="islamic-geometric-pattern pointer-events-none absolute inset-0 opacity-30" />
+
+            <div className="relative">
+              <h3
+                className="mb-6 text-2xl font-semibold text-islamic-gold-800"
+                style={{ fontFamily: "'Cormorant Garamond', serif" }}
+              >
+                How to Use Islamic Calendars
+              </h3>
+
+              <div className="grid gap-8 md:grid-cols-2">
+                {/* Mobile */}
+                <div>
+                  <div className="mb-3 flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-islamic-gold-200">
+                      <Smartphone className="h-5 w-5 text-islamic-gold-800" />
+                    </div>
+                    <h4 className="font-semibold text-islamic-gold-800">On Mobile Devices</h4>
+                  </div>
+                  <ul className="space-y-2 text-sm text-islamic-gold-700">
+                    {[
+                      'Download PDF files to your device',
+                      'Save to your preferred calendar app',
+                      'Set prayer time reminders',
+                      'Share with family and friends',
+                    ].map(item => (
+                      <li key={item} className="flex items-start gap-2">
+                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-islamic-gold-500" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Print */}
+                <div>
+                  <div className="mb-3 flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-islamic-gold-200">
+                      <Printer className="h-5 w-5 text-islamic-gold-800" />
+                    </div>
+                    <h4 className="font-semibold text-islamic-gold-800">For Print Use</h4>
+                  </div>
+                  <ul className="space-y-2 text-sm text-islamic-gold-700">
+                    {[
+                      'Print at home or local print shop',
+                      'High-quality PDF format for clear printing',
+                      'Display in your home or office',
+                      'Great for community bulletin boards',
+                    ].map(item => (
+                      <li key={item} className="flex items-start gap-2">
+                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-islamic-gold-500" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ─── Section 6: Archived Calendars ─── */}
+        {archivedCalendars.length > 0 && (
+          <div className="pb-12 md:pb-16">
+            <header className="mb-6">
+              <div className="mb-3 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-islamic-navy-100">
+                  <Archive className="h-5 w-5 text-islamic-navy-600" />
+                </div>
+                <h2 className="text-2xl font-bold text-islamic-navy-800">Archived Calendars</h2>
+              </div>
+              <p className="text-islamic-navy-600">
+                Previous years&apos; calendars available for reference and historical purposes.
+              </p>
+            </header>
+
+            <div className="space-y-1 rounded-2xl border-2 border-dashed border-islamic-navy-200 bg-islamic-navy-50/50 p-4 opacity-80">
+              {archivedCalendars.map((calendar, i) => (
+                <CalendarDownload key={calendar.id} calendar={calendar} compact archived index={i} />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ─── Section 7: Newsletter CTA ─── */}
+      <div className="px-4 pb-16 md:pb-20">
+        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-2xl bg-immersive-dark">
+          <div className="islamic-pattern-overlay pointer-events-none absolute inset-0" />
+
+          <div className="relative px-6 py-14 text-center md:px-12 md:py-20">
+            {/* Arabic line */}
+            <p className="mb-3 text-base text-white/60" style={{ fontFamily: "'Amiri', serif" }}>
+              وَتَعَاوَنُوا عَلَى الْبِرِّ وَالتَّقْوَىٰ
+            </p>
+
+            <h3
+              className="mb-4 text-3xl font-semibold text-white md:text-4xl"
+              style={{ fontFamily: "'Cormorant Garamond', serif", letterSpacing: '-0.02em' }}
+            >
               Get Calendar Updates
             </h3>
-            <p className="mb-6 text-islamic-green-700">
-              Subscribe to receive notifications when new Islamic calendars are available. 
+
+            <p className="mx-auto mb-8 max-w-xl text-white/70">
+              Subscribe to receive notifications when new Islamic calendars are available.
               Be the first to know about Ramadan schedules, prayer time updates, and special event calendars.
             </p>
-            <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-              <Button size="lg" className="bg-islamic-green-600 hover:bg-islamic-green-700">
+
+            <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <button className="btn-cta-primary flex items-center gap-2">
                 Subscribe for Updates
-              </Button>
-              <Button size="lg" variant="outline" className="border-islamic-green-600 text-islamic-green-600 hover:bg-islamic-green-600 hover:text-white">
-                Request Custom Calendar
-              </Button>
+                <ArrowRight className="h-4 w-4" />
+              </button>
+              <button className="btn-cta-outline">Request Custom Calendar</button>
             </div>
-          </CardContent>
-        </Card>
-      </section>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

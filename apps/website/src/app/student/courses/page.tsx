@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { StudentLayout } from '@/components/layout/student-layout';
@@ -11,7 +11,7 @@ import {
   BookOpen, Clock, Users, Play, CheckCircle, AlertCircle, Loader2,
   BarChart3, ChevronDown, ChevronUp, ArrowRight, Search, Award
 } from 'lucide-react';
-import { studentApi, Course as ApiCourse } from '@/lib/student-api';
+import { useCourses, useEnrollments, useProgress } from '@/hooks/use-student-data';
 
 interface CourseData {
   id: string;
@@ -243,69 +243,73 @@ const mockCourses: CourseData[] = [
 
 export default function CoursesPage() {
   const router = useRouter();
-  const [courses, setCourses] = useState<CourseData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
-  const [totalHours, setTotalHours] = useState(127);
 
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const [coursesRes, enrollmentsRes] = await Promise.all([
-          studentApi.courses.getAll(),
-          studentApi.enrollments.getMine().catch(() => null),
-        ]);
+  // TanStack Query hooks
+  const { data: apiCourses = [], isLoading: coursesLoading, isError: coursesError } = useCourses();
+  const { data: enrollmentsData } = useEnrollments();
+  const { data: allProgress = [] } = useProgress();
 
-        const apiCourses = coursesRes.data || [];
-        const enrollments = enrollmentsRes?.data || [];
+  const enrollments = enrollmentsData?.enrollments || [];
 
-        if (apiCourses.length > 0) {
-          setDataSource('api');
+  // Derive CourseData[] from TQ results
+  const { courses, dataSource, totalHours } = useMemo(() => {
+    if (apiCourses.length > 0) {
+      const transformedCourses: CourseData[] = apiCourses.map((course) => {
+        const enrollment = enrollments.find(e => e.course?.id === course.id);
+        const isCompleted = enrollment?.enrollment_status === 'completed';
+        const lessonsCount = course.lessons?.length || Math.ceil(course.duration_weeks * 2);
 
-          const transformedCourses: CourseData[] = apiCourses.map((course) => {
-            const enrollment = enrollments.find(e => e.course?.id === course.id);
-            const isCompleted = enrollment?.enrollment_status === 'completed';
-            const progress = enrollment?.overall_progress || (isCompleted ? 100 : Math.floor(Math.random() * 80) + 10);
-            const lessonsCount = course.lessons?.length || Math.ceil(course.duration_weeks * 2);
-            const completedLessons = Math.round((progress / 100) * lessonsCount);
+        // Use actual progress records instead of estimated percentage
+        const courseLessonIds = new Set(
+          (course.lessons || []).map(l => l.id)
+        );
+        const actualCompleted = allProgress.filter(
+          p => p.lesson && courseLessonIds.has(p.lesson.id) && p.status === 'completed'
+        ).length;
 
-            return {
-              id: String(course.id),
-              documentId: course.documentId,
-              title: course.title,
-              subject: course.subject || getSubjectFromTitle(course.title),
-              instructor: course.instructor,
-              instructorTitle: course.subject === 'quran' || course.subject === 'tajweed' ? 'Hafiz' : 'Ph.D',
-              progress,
-              lessons: lessonsCount,
-              completedLessons,
-              students: course.current_enrollments || Math.floor(Math.random() * 30) + 10,
-              nextLesson: isCompleted ? 'Course Completed' : `Lesson ${completedLessons + 1}: ${course.title.split(' - ')[0]}`,
-              schedule: isCompleted ? 'Completed' : course.schedule,
-              status: isCompleted ? 'completed' : 'in_progress',
-            };
-          });
+        // Use actual completed count if we have lesson data, otherwise fall back to enrollment progress
+        const completedLessons = courseLessonIds.size > 0
+          ? actualCompleted
+          : (enrollment ? Math.round((enrollment.overall_progress / 100) * lessonsCount) : 0);
+        const progress = isCompleted ? 100 : (
+          lessonsCount > 0 ? Math.round((completedLessons / lessonsCount) * 100) : (enrollment?.overall_progress || 0)
+        );
 
-          setCourses(transformedCourses);
+        return {
+          id: String(course.id),
+          documentId: course.documentId,
+          title: course.title,
+          subject: course.subject || getSubjectFromTitle(course.title),
+          instructor: course.instructor,
+          instructorTitle: course.subject === 'quran' || course.subject === 'tajweed' ? 'Hafiz' : 'Ph.D',
+          progress,
+          lessons: lessonsCount,
+          completedLessons,
+          students: course.current_enrollments || 0,
+          nextLesson: isCompleted ? 'Course Completed' : `Lesson ${completedLessons + 1}: ${course.title.split(' - ')[0]}`,
+          schedule: isCompleted ? 'Completed' : course.schedule,
+          status: isCompleted ? 'completed' as const : 'in_progress' as const,
+        };
+      });
 
-          const hours = enrollments.reduce((sum, e) => sum + Math.round((e.total_time_spent_minutes || 0) / 60), 0);
-          setTotalHours(hours || 127);
-        } else {
-          setCourses(mockCourses);
-        }
-      } catch (error) {
-        console.warn('Failed to fetch courses from API, using mock data:', error);
-        setCourses(mockCourses);
-      } finally {
-        setLoading(false);
-      }
-    };
+      const hours = enrollments.reduce((sum, e) => sum + Math.round((e.total_time_spent_minutes || 0) / 60), 0);
 
-    fetchCourses();
-  }, []);
+      return {
+        courses: transformedCourses,
+        dataSource: 'api' as const,
+        totalHours: hours || 0,
+      };
+    }
+    return { courses: mockCourses, dataSource: 'mock' as const, totalHours: 127 };
+  }, [apiCourses, enrollments, allProgress]);
 
-  const activeCourses = courses.filter(c => c.status === 'in_progress');
-  const completedCourses = courses.filter(c => c.status === 'completed');
+  // Use mock on error
+  const effectiveCourses = coursesError ? mockCourses : courses;
+  const effectiveDataSource = coursesError ? 'mock' : dataSource;
+  const loading = coursesLoading;
+
+  const activeCourses = effectiveCourses.filter(c => c.status === 'in_progress');
+  const completedCourses = effectiveCourses.filter(c => c.status === 'completed');
 
   if (loading) {
     return (
@@ -322,7 +326,7 @@ export default function CoursesPage() {
       {/* Top Bar: Data Source + Browse Link */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          {dataSource === 'api' ? (
+          {effectiveDataSource === 'api' ? (
             <Badge className="bg-emerald-100 text-emerald-700 border-0">
               <CheckCircle className="h-3 w-3 mr-1" />
               Live Data from Strapi
@@ -349,7 +353,7 @@ export default function CoursesPage() {
               <BookOpen className="h-5 w-5 text-blue-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">{courses.length}</p>
+              <p className="text-2xl font-bold text-gray-900">{effectiveCourses.length}</p>
               <p className="text-xs text-gray-500">Total Courses</p>
             </div>
           </div>
@@ -428,7 +432,7 @@ export default function CoursesPage() {
       )}
 
       {/* Empty State */}
-      {courses.length === 0 && (
+      {effectiveCourses.length === 0 && (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
           <BookOpen className="h-12 w-12 mx-auto text-gray-300 mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No Courses Yet</h3>

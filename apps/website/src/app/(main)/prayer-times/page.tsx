@@ -132,7 +132,6 @@ export default function PrayerTimesPage() {
               </h2>
               <PrayerTimesWidget
                 prayerTimes={mockPrayerTimes}
-                currentPrayer="dhuhr"
               />
             </section>
 
