@@ -5,41 +5,13 @@ import Link from 'next/link';
 import { Building, Menu, X, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MOSQUE_INFO } from '@/constants';
+import { navigation } from '@/lib/navigation';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
-type NavItem = {
-  name: string;
-  href?: string;
-  submenu?: { name: string; href: string }[];
-};
-
-const navigation: NavItem[] = [
-  { name: 'Home', href: '/' },
-  {
-    name: 'Education',
-    submenu: [
-      { name: 'Programs', href: '/education' },
-      { name: 'Student Portal', href: '/student/dashboard' },
-      { name: 'Teacher Portal', href: '/teacher/dashboard' },
-      { name: 'Quran Study', href: '/resources/quran-study' },
-    ],
-  },
-  { name: 'Services', href: '/services' },
-  {
-    name: 'Community',
-    submenu: [
-      { name: 'Events', href: '/events' },
-      { name: 'Announcements', href: '/announcements' },
-      { name: 'Calendar', href: '/calendar' },
-    ],
-  },
-  { name: 'Prayer Times', href: '/prayer-times' },
-];
 
 export function FloatingHeader() {
   const [scrolled, setScrolled] = useState(false);
