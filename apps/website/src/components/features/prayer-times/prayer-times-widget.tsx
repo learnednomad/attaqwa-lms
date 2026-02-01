@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Clock, MapPin } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { DailyPrayerTimes } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -12,7 +10,6 @@ interface PrayerTimesWidgetProps {
   className?: string;
   compact?: boolean;
   currentPrayer?: string;
-  variant?: 'default' | 'glass';
 }
 
 function parseTimeToMinutes(timeStr: string): number {
@@ -50,11 +47,9 @@ export function PrayerTimesWidget({
   className,
   compact = false,
   currentPrayer: currentPrayerProp,
-  variant = 'default'
 }: PrayerTimesWidgetProps) {
   const [detectedPrayer, setDetectedPrayer] = useState('');
   const [hijriDate, setHijriDate] = useState({ en: '', ar: '' });
-  const g = variant === 'glass';
 
   useEffect(() => {
     const update = () => setDetectedPrayer(detectCurrentPrayer(prayerTimes));
@@ -80,42 +75,12 @@ export function PrayerTimesWidget({
 
   const currentPrayer = currentPrayerProp || detectedPrayer;
   const prayers = [
-    {
-      name: 'Fajr',
-      time: prayerTimes.fajr,
-      iqama: prayerTimes.iqama?.fajr,
-      key: 'fajr'
-    },
-    {
-      name: 'Sunrise',
-      time: prayerTimes.sunrise,
-      key: 'sunrise',
-      isShurooq: true
-    },
-    {
-      name: 'Dhuhr',
-      time: prayerTimes.dhuhr,
-      iqama: prayerTimes.iqama?.dhuhr,
-      key: 'dhuhr'
-    },
-    {
-      name: 'Asr',
-      time: prayerTimes.asr,
-      iqama: prayerTimes.iqama?.asr,
-      key: 'asr'
-    },
-    {
-      name: 'Maghrib',
-      time: prayerTimes.maghrib,
-      iqama: prayerTimes.iqama?.maghrib,
-      key: 'maghrib'
-    },
-    {
-      name: 'Isha',
-      time: prayerTimes.isha,
-      iqama: prayerTimes.iqama?.isha,
-      key: 'isha'
-    },
+    { name: 'Fajr', time: prayerTimes.fajr, iqama: prayerTimes.iqama?.fajr, key: 'fajr' },
+    { name: 'Sunrise', time: prayerTimes.sunrise, key: 'sunrise', isShurooq: true },
+    { name: 'Dhuhr', time: prayerTimes.dhuhr, iqama: prayerTimes.iqama?.dhuhr, key: 'dhuhr' },
+    { name: 'Asr', time: prayerTimes.asr, iqama: prayerTimes.iqama?.asr, key: 'asr' },
+    { name: 'Maghrib', time: prayerTimes.maghrib, iqama: prayerTimes.iqama?.maghrib, key: 'maghrib' },
+    { name: 'Isha', time: prayerTimes.isha, iqama: prayerTimes.iqama?.isha, key: 'isha' },
   ];
 
   const formatDate = (dateString: string) => {
@@ -131,227 +96,143 @@ export function PrayerTimesWidget({
 
   if (compact) {
     return (
-      <Card className={cn('', className)}>
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base font-semibold text-islamic-green-700">
-              Today&apos;s Prayer Times
-            </CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            {prayers.filter(prayer => !prayer.isShurooq).map((prayer) => (
-              <div
-                key={prayer.key}
-                className={cn(
-                  'flex justify-between rounded-md p-2',
-                  currentPrayer === prayer.key
-                    ? 'bg-islamic-green-100 text-islamic-green-800'
-                    : 'bg-gray-50'
-                )}
-              >
-                <span className="font-medium">{prayer.name}</span>
-                <span className="prayer-time font-bold">{prayer.time}</span>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <div className={cn('rounded-xl border border-neutral-200 bg-white p-5', className)}>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-neutral-900">Today&apos;s Prayer Times</h3>
+          <Clock className="h-4 w-4 text-neutral-400" />
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {prayers.filter(prayer => !prayer.isShurooq).map((prayer) => (
+            <div
+              key={prayer.key}
+              className={cn(
+                'flex justify-between rounded-lg px-3 py-2 text-xs',
+                currentPrayer === prayer.key
+                  ? 'bg-emerald-50 border border-emerald-200'
+                  : 'bg-neutral-50 border border-neutral-100'
+              )}
+            >
+              <span className={cn(
+                'font-medium',
+                currentPrayer === prayer.key ? 'text-emerald-700' : 'text-neutral-700'
+              )}>{prayer.name}</span>
+              <span className={cn(
+                'font-bold font-mono',
+                currentPrayer === prayer.key ? 'text-emerald-700' : 'text-neutral-900'
+              )}>{prayer.time}</span>
+            </div>
+          ))}
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card className={cn(
-      g
-        ? 'bg-white/10 backdrop-blur-xl border-white/30 shadow-2xl'
-        : 'bg-gradient-to-br from-white via-islamic-green-50/30 to-islamic-gold-50/20 shadow-lg border border-islamic-green/10',
-      className
-    )}>
-      <CardHeader className="px-3 pt-3 pb-2">
-        <CardTitle className={cn(
-          'flex items-center justify-between text-sm font-bold',
-          g ? 'text-white' : 'text-islamic-green-700'
-        )}>
-          <span>Today&apos;s Prayer Times</span>
-          <Badge className={cn(
-            'text-[10px] px-1.5 py-0',
-            g
-              ? 'bg-white/15 text-white/90 border-white/25 hover:bg-white/20'
-              : 'bg-islamic-green-100 text-islamic-green-700 border-islamic-green-200 hover:bg-islamic-green-200'
-          )}>
+    <div className={cn('rounded-xl border border-neutral-200 bg-white', className)}>
+      {/* Header */}
+      <div className="px-4 pt-3 pb-2">
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-bold text-neutral-900">Today&apos;s Prayer Times</h3>
+          <span className="text-[10px] font-medium text-emerald-600 border border-emerald-200 bg-emerald-50 rounded-full px-2 py-0.5">
             Live
-          </Badge>
-        </CardTitle>
-        {!g && (
-          <div className="flex flex-col gap-0.5 text-xs mt-1 text-islamic-navy-600">
-            <div className="flex items-center gap-1.5">
-              <MapPin className="h-3 w-3" />
-              <span className="font-medium">{formatDate(prayerTimes.date)}</span>
-            </div>
-            {hijriDate.en && (
-              <div className="flex items-center gap-1.5 ml-[18px]">
-                <span className="text-[10px] font-medium text-islamic-green-600">{hijriDate.en}</span>
-                <div className="w-1 h-1 rounded-full bg-islamic-gold-400"></div>
-                <span className="text-[10px] opacity-75" dir="rtl">{hijriDate.ar}</span>
-              </div>
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5 mt-1 text-xs text-neutral-400">
+          <MapPin className="h-3 w-3" />
+          <span>{formatDate(prayerTimes.date)}</span>
+          {hijriDate.en && (
+            <>
+              <span>&middot;</span>
+              <span className="text-emerald-600">{hijriDate.en}</span>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Prayer rows */}
+      <div className="px-3 pb-3 space-y-1">
+        {prayers.map((prayer) => (
+          <div
+            key={prayer.key}
+            className={cn(
+              'flex items-center justify-between rounded-lg px-3 py-2 border',
+              prayer.isShurooq
+                ? 'bg-amber-50/50 border-amber-200'
+                : currentPrayer === prayer.key
+                ? 'bg-emerald-50 border-emerald-200'
+                : 'bg-neutral-50/30 border-neutral-100'
             )}
-          </div>
-        )}
-      </CardHeader>
-
-      <CardContent className="space-y-1 px-3 pt-0 pb-3">
-        {/* Prayer times grid */}
-        <div className="space-y-0.5">
-          {prayers.map((prayer, index) => (
-            <div key={prayer.key}>
-              <div
-                className={cn(
-                  'flex items-center justify-between rounded-lg px-2 py-1.5 border',
-                  prayer.isShurooq
-                    ? g
-                      ? 'bg-amber-500/15 border-amber-400/25'
-                      : 'bg-gradient-to-r from-orange-50 to-orange-100/50 border-orange-200'
-                    : currentPrayer === prayer.key
-                    ? g
-                      ? 'bg-white/15 border-white/30'
-                      : 'bg-gradient-to-r from-islamic-green-100 to-islamic-green-200/50 border-islamic-green-300 shadow-sm shadow-islamic-green/10'
-                    : g
-                      ? 'bg-white/5 border-white/10'
-                      : 'bg-gradient-to-r from-white to-islamic-navy-50/30 border-gray-200'
-                )}
-              >
-                {/* Prayer name and status */}
-                <div className="flex items-center gap-2">
-                  <div className={cn(
-                    'w-1.5 h-5 rounded-full',
-                    prayer.isShurooq
-                      ? 'bg-orange-400'
-                      : currentPrayer === prayer.key
-                      ? g ? 'bg-emerald-400' : 'bg-islamic-green-500'
-                      : g ? 'bg-white/30' : 'bg-islamic-navy-300'
-                  )}></div>
-                  <div>
-                    <span
-                      className={cn(
-                        'font-bold text-xs',
-                        prayer.isShurooq
-                          ? g ? 'text-amber-300' : 'text-orange-700'
-                          : currentPrayer === prayer.key
-                          ? g ? 'text-white' : 'text-islamic-green-800'
-                          : g ? 'text-white/90' : 'text-islamic-navy-700'
-                      )}
-                    >
-                      {prayer.name}
-                    </span>
-                    {prayer.isShurooq && (
-                      <Badge variant="outline" className={cn(
-                        'ml-1.5 text-[9px] px-1 py-0',
-                        g
-                          ? 'border-amber-400/40 text-amber-300 bg-amber-500/10'
-                          : 'border-orange-300 text-orange-700 bg-orange-50'
-                      )}>
-                        Shurooq
-                      </Badge>
-                    )}
-                    {currentPrayer === prayer.key && !prayer.isShurooq && (
-                      <Badge className={cn(
-                        'ml-1.5 text-[9px] px-1 py-0',
-                        g ? 'bg-emerald-500/80' : 'bg-islamic-green-600'
-                      )}>
-                        Current
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-
-                {/* Prayer times */}
-                <div className="text-right space-y-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className={cn('text-[10px]', g ? 'text-white/40' : 'text-gray-400')}>Adhan</span>
-                    <span
-                      className={cn(
-                        'prayer-time text-sm font-bold font-mono',
-                        prayer.isShurooq
-                          ? g ? 'text-amber-300' : 'text-orange-700'
-                          : currentPrayer === prayer.key
-                          ? g ? 'text-white' : 'text-islamic-green-700'
-                          : g ? 'text-white/90' : 'text-islamic-navy-700'
-                      )}
-                    >
-                      {prayer.time}
-                    </span>
-                  </div>
-                  {prayer.iqama && (
-                    <div className="flex items-center gap-1.5">
-                      <span className={cn('text-[10px]', g ? 'text-emerald-400/70' : 'text-islamic-green-600')}>Iqama</span>
-                      <span
-                        className={cn(
-                          'prayer-time text-xs font-bold font-mono',
-                          g ? 'text-emerald-300' : currentPrayer === prayer.key
-                            ? 'text-islamic-green-600'
-                            : 'text-islamic-green-700'
-                        )}
-                      >
-                        {prayer.iqama}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {index < prayers.length - 1 && (
-                <div className={cn(
-                  'h-px bg-gradient-to-r from-transparent to-transparent',
-                  g ? 'via-white/10' : 'via-islamic-navy-200/30'
-                )}></div>
+          >
+            {/* Name */}
+            <div className="flex items-center gap-2">
+              <div className={cn(
+                'w-1.5 h-5 rounded-full',
+                prayer.isShurooq
+                  ? 'bg-amber-400'
+                  : currentPrayer === prayer.key
+                  ? 'bg-emerald-500'
+                  : 'bg-neutral-300'
+              )} />
+              <span className={cn(
+                'text-[15px] font-bold',
+                prayer.isShurooq ? 'text-amber-700' : currentPrayer === prayer.key ? 'text-emerald-700' : 'text-neutral-800'
+              )}>
+                {prayer.name}
+              </span>
+              {prayer.isShurooq && (
+                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded border border-amber-200 text-amber-500 bg-amber-50">Shurooq</span>
+              )}
+              {currentPrayer === prayer.key && !prayer.isShurooq && (
+                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-emerald-600 text-white">Current</span>
               )}
             </div>
-          ))}
-        </div>
 
-        {/* Jummah Prayer Times */}
-        {prayerTimes.jummah && prayerTimes.jummah.length > 0 && (
-          <>
-            <div className={cn(
-              'h-px bg-gradient-to-r from-transparent to-transparent',
-              g ? 'via-white/20' : 'via-islamic-gold-300/50'
-            )}></div>
-            <div className={cn(
-              'rounded-lg px-2 py-2 border',
-              g
-                ? 'bg-amber-500/10 border-amber-400/20'
-                : 'bg-gradient-to-r from-islamic-gold-50 via-islamic-gold-100/50 to-islamic-gold-50 border-islamic-gold-300'
-            )}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-4 rounded-full bg-islamic-gold-500"></div>
-                  <div>
-                    <span className={cn('font-bold text-xs', g ? 'text-amber-200' : 'text-islamic-gold-800')}>
-                      Jumu&apos;ah Prayer
-                    </span>
-                    <div className={cn('text-[9px] opacity-75', g ? 'text-amber-300/60' : 'text-islamic-gold-600')}>صلاة الجمعة</div>
-                  </div>
+            {/* Times */}
+            <div className="text-right">
+              <div className="flex items-baseline gap-1.5 justify-end">
+                <span className="text-[11px] text-neutral-400">Adhan</span>
+                <span className={cn(
+                  'text-[15px] font-bold font-mono',
+                  prayer.isShurooq ? 'text-amber-700' : currentPrayer === prayer.key ? 'text-emerald-700' : 'text-neutral-900'
+                )}>
+                  {prayer.time}
+                </span>
+              </div>
+              {prayer.iqama && (
+                <div className="flex items-baseline gap-1.5 justify-end -mt-0.5">
+                  <span className="text-[11px] text-emerald-500">Iqama</span>
+                  <span className="text-[15px] font-bold font-mono text-emerald-600">
+                    {prayer.iqama}
+                  </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  {prayerTimes.jummah.map((time, index) => (
-                    <div key={index} className="text-center">
-                      <div className={cn('text-[9px]', g ? 'text-amber-300/60' : 'text-islamic-gold-600')}>
-                        {index === 0 ? '1st' : '2nd'} Khutbah
-                      </div>
-                      <span className={cn('prayer-time text-sm font-bold font-mono block', g ? 'text-amber-200' : 'text-islamic-gold-700')}>
-                        {time}
-                      </span>
-                    </div>
-                  ))}
+              )}
+            </div>
+          </div>
+        ))}
+
+        {/* Jummah */}
+        {prayerTimes.jummah && prayerTimes.jummah.length > 0 && (
+          <div className="rounded-lg px-3 py-2 border border-amber-200 bg-amber-50/50">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-5 rounded-full bg-amber-500" />
+                <div>
+                  <span className="text-[15px] font-bold text-amber-800">Jumu&apos;ah Prayer</span>
+                  <div className="text-[10px] text-amber-500 -mt-0.5">&#1589;&#1604;&#1575;&#1577; &#1575;&#1604;&#1580;&#1605;&#1593;&#1577;</div>
                 </div>
               </div>
+              <div className="flex items-center gap-4">
+                {prayerTimes.jummah.map((time, index) => (
+                  <div key={index} className="text-center">
+                    <div className="text-[10px] text-amber-500">{index === 0 ? '1st' : '2nd'} Khutbah</div>
+                    <span className="text-[15px] font-bold font-mono text-amber-700 block -mt-0.5">{time}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </>
+          </div>
         )}
-
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

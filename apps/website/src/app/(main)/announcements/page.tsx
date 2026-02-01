@@ -1,11 +1,8 @@
 import { AnnouncementCard } from '@/components/features/announcements/announcement-card';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Megaphone, Calendar, Clock, Archive, Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Megaphone, Calendar, Clock, Archive, Search, BookOpen, Heart, Building2, Moon } from 'lucide-react';
 import { Announcement } from '@/types';
 import { generateSEOMetadata } from '@/lib/seo';
+import { cn } from '@/lib/utils';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = generateSEOMetadata({
@@ -96,306 +93,199 @@ const mockAnnouncements: Announcement[] = [
 const activeAnnouncements = mockAnnouncements.filter(ann => ann.isActive && !ann.isArchived);
 const archivedAnnouncements = mockAnnouncements.filter(ann => ann.isArchived);
 
+const stats = [
+  { label: 'Active Announcements', value: String(activeAnnouncements.length), icon: Megaphone },
+  { label: 'Update Frequency', value: 'Weekly', icon: Calendar },
+  { label: 'Last Updated', value: 'Today', icon: Clock },
+  { label: 'Archived Items', value: String(archivedAnnouncements.length), icon: Archive },
+];
+
+const filterTags = ['All', 'Prayer Schedule', 'Events', 'Ramadan', 'Education', 'Community'];
+
+const categories = [
+  { title: 'Prayer & Worship', description: 'Prayer time changes, special services, and worship announcements', icon: Calendar },
+  { title: 'Events & Programs', description: 'Upcoming events, programs, and community activities', icon: Megaphone },
+  { title: 'Education & Learning', description: 'Islamic education programs, classes, and learning opportunities', icon: BookOpen },
+  { title: 'Facility Updates', description: 'Construction, renovation, and facility improvement announcements', icon: Building2 },
+  { title: 'Community Support', description: 'Volunteer opportunities, fundraising, and community initiatives', icon: Heart },
+  { title: 'Islamic Calendar', description: 'Ramadan, Eid, Hajj, and other Islamic calendar announcements', icon: Moon },
+];
+
 export default function AnnouncementsPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Page Header */}
-      <header className="mb-8">
-        <h1 className="mb-4 text-3xl font-bold text-islamic-navy-800 md:text-4xl">
-          Community Announcements
-        </h1>
-        <p className="text-lg text-islamic-navy-600 max-w-3xl">
-          Stay informed with the latest news, updates, and important information 
-          from Masjid At-Taqwa. From prayer schedule changes to community events, 
-          find everything you need to know here.
-        </p>
-      </header>
-
-      {/* Announcement Statistics */}
-      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardContent className="flex items-center gap-3 p-4">
-            <Megaphone className="h-8 w-8 text-islamic-green-600" />
-            <div>
-              <p className="text-2xl font-bold text-islamic-navy-800">{activeAnnouncements.length}</p>
-              <p className="text-sm text-islamic-navy-600">Active Announcements</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-3 p-4">
-            <Calendar className="h-8 w-8 text-islamic-green-600" />
-            <div>
-              <p className="text-2xl font-bold text-islamic-navy-800">Weekly</p>
-              <p className="text-sm text-islamic-navy-600">Update Frequency</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-3 p-4">
-            <Clock className="h-8 w-8 text-islamic-green-600" />
-            <div>
-              <p className="text-2xl font-bold text-islamic-navy-800">Today</p>
-              <p className="text-sm text-islamic-navy-600">Last Updated</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-3 p-4">
-            <Archive className="h-8 w-8 text-islamic-green-600" />
-            <div>
-              <p className="text-2xl font-bold text-islamic-navy-800">{archivedAnnouncements.length}</p>
-              <p className="text-sm text-islamic-navy-600">Archived Items</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Search and Filter */}
-      <div className="mb-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Search Announcements</CardTitle>
-            <CardDescription>
-              Find specific announcements by title or content
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-islamic-navy-400" />
-                  <Input 
-                    placeholder="Search announcements..." 
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-              <Button variant="outline">
-                Filter
-              </Button>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Badge variant="secondary">All</Badge>
-              <Badge variant="outline">Prayer Schedule</Badge>
-              <Badge variant="outline">Events</Badge>
-              <Badge variant="outline">Ramadan</Badge>
-              <Badge variant="outline">Education</Badge>
-              <Badge variant="outline">Community</Badge>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Active Announcements */}
-      <section className="mb-12">
-        <header className="mb-6">
-          <h2 className="mb-2 text-2xl font-bold text-islamic-navy-800 flex items-center gap-2">
-            <Megaphone className="h-6 w-6 text-islamic-green-600" />
-            Current Announcements
-          </h2>
-          <p className="text-islamic-navy-600">
-            Important and recent updates from our Islamic community.
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <section className="border-b border-neutral-100">
+        <div className="max-w-5xl mx-auto px-6 py-16">
+          <p className="text-xs font-semibold tracking-[0.2em] uppercase text-emerald-700 mb-3">
+            Masjid At-Taqwa
           </p>
-        </header>
-        
-        {activeAnnouncements.length > 0 ? (
-          <div className="space-y-6">
-            {activeAnnouncements.map((announcement) => (
-              <AnnouncementCard key={announcement.id} announcement={announcement} />
-            ))}
-          </div>
-        ) : (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <Megaphone className="mx-auto mb-4 h-12 w-12 text-islamic-navy-400" />
-              <h3 className="mb-2 text-lg font-semibold text-islamic-navy-800">
-                No Current Announcements
-              </h3>
-              <p className="text-islamic-navy-600">
-                Check back soon for community updates and important information.
-              </p>
-            </CardContent>
-          </Card>
-        )}
-      </section>
-
-      {/* Announcement Categories */}
-      <section className="mb-12">
-        <header className="mb-6">
-          <h2 className="mb-2 text-2xl font-bold text-islamic-navy-800">
-            Announcement Categories
-          </h2>
-          <p className="text-islamic-navy-600">
-            Browse announcements by category to find what interests you most.
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-neutral-900 mb-4 max-w-2xl">
+            Community Announcements
+          </h1>
+          <p className="text-base text-neutral-500 max-w-2xl leading-relaxed">
+            Stay informed with the latest news, updates, and important information
+            from Masjid At-Taqwa. From prayer schedule changes to community events,
+            find everything you need to know here.
           </p>
-        </header>
-        
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">🕌</span>
-                Prayer & Worship
-              </CardTitle>
-              <CardDescription>
-                Prayer time changes, special services, and worship announcements
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full">
-                View Prayer Announcements
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">📅</span>
-                Events & Programs
-              </CardTitle>
-              <CardDescription>
-                Upcoming events, programs, and community activities
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full">
-                View Event Announcements
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">📚</span>
-                Education & Learning
-              </CardTitle>
-              <CardDescription>
-                Islamic education programs, classes, and learning opportunities
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full">
-                View Education Announcements
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">🏗️</span>
-                Facility Updates
-              </CardTitle>
-              <CardDescription>
-                Construction, renovation, and facility improvement announcements
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full">
-                View Facility Updates
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">🤝</span>
-                Community Support
-              </CardTitle>
-              <CardDescription>
-                Volunteer opportunities, fundraising, and community initiatives
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full">
-                View Community Updates
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">🌙</span>
-                Islamic Calendar
-              </CardTitle>
-              <CardDescription>
-                Ramadan, Eid, Hajj, and other Islamic calendar announcements
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full">
-                View Calendar Updates
-              </Button>
-            </CardContent>
-          </Card>
         </div>
       </section>
 
-      {/* Newsletter Subscription */}
-      <section className="mb-12">
-        <Card className="bg-islamic-green-50 border-islamic-green-200">
-          <CardContent className="p-8">
-            <h3 className="mb-4 text-2xl font-bold text-islamic-green-800">
-              Stay Updated with Email Notifications
-            </h3>
-            <p className="mb-6 text-islamic-green-700">
-              Subscribe to receive important announcements directly in your email. 
-              Never miss critical updates about prayer times, events, or community news.
-            </p>
-            <div className="flex flex-col gap-4 sm:flex-row">
-              <div className="flex-1">
-                <Input 
-                  type="email" 
-                  placeholder="Enter your email address" 
-                  className="border-islamic-green-300 focus:border-islamic-green-500"
+      <div className="max-w-5xl mx-auto px-6">
+        {/* Stats */}
+        <section className="py-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {stats.map((stat) => {
+              const IconComponent = stat.icon;
+              return (
+                <div
+                  key={stat.label}
+                  className="rounded-xl border border-neutral-200 bg-white p-5"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center">
+                      <IconComponent className="h-4 w-4 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-neutral-900 leading-tight">{stat.value}</p>
+                      <p className="text-xs text-neutral-500">{stat.label}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Search & Filter */}
+        <section className="pb-10">
+          <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-5">
+            <div className="flex gap-3">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                <input
+                  type="text"
+                  placeholder="Search announcements..."
+                  className="w-full rounded-lg border border-neutral-200 bg-white pl-10 pr-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300"
                 />
               </div>
-              <Button className="bg-islamic-green-600 hover:bg-islamic-green-700">
-                Subscribe to Updates
-              </Button>
             </div>
-            <p className="mt-3 text-sm text-islamic-green-600">
-              We respect your privacy. Unsubscribe at any time.
-            </p>
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* Archived Announcements */}
-      {archivedAnnouncements.length > 0 && (
-        <section>
-          <header className="mb-6">
-            <h2 className="mb-2 text-2xl font-bold text-islamic-navy-800 flex items-center gap-2">
-              <Archive className="h-6 w-6 text-islamic-navy-400" />
-              Archived Announcements
-            </h2>
-            <p className="text-islamic-navy-600">
-              Previous announcements for reference and historical purposes.
-            </p>
-          </header>
-          
-          <div className="space-y-4">
-            {archivedAnnouncements.slice(0, 3).map((announcement) => (
-              <div key={announcement.id} className="opacity-75">
-                <AnnouncementCard announcement={announcement} />
-              </div>
-            ))}
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {filterTags.map((tag, i) => (
+                <span
+                  key={tag}
+                  className={cn(
+                    'px-3 py-1 rounded-md text-xs font-medium cursor-pointer',
+                    i === 0
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-white border border-neutral-200 text-neutral-600'
+                  )}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
           </div>
-          
-          {archivedAnnouncements.length > 3 && (
-            <div className="mt-6 text-center">
-              <Button variant="outline">
-                View More Archived Announcements
-              </Button>
+        </section>
+
+        {/* Current Announcements */}
+        <section className="pb-16">
+          <div className="flex items-center gap-3 mb-6">
+            <h2 className="text-xl font-semibold text-neutral-900">Current Announcements</h2>
+            <div className="flex-1 h-px bg-neutral-100" />
+          </div>
+
+          {activeAnnouncements.length > 0 ? (
+            <div className="space-y-4">
+              {activeAnnouncements.map((announcement) => (
+                <AnnouncementCard key={announcement.id} announcement={announcement} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-12 text-center">
+              <Megaphone className="mx-auto mb-3 h-8 w-8 text-neutral-300" />
+              <h3 className="text-sm font-semibold text-neutral-900 mb-1">
+                No Current Announcements
+              </h3>
+              <p className="text-xs text-neutral-500">
+                Check back soon for community updates and important information.
+              </p>
             </div>
           )}
         </section>
-      )}
+
+        {/* Categories */}
+        <section className="pb-16">
+          <div className="flex items-center gap-3 mb-6">
+            <h2 className="text-xl font-semibold text-neutral-900">Browse by Category</h2>
+            <div className="flex-1 h-px bg-neutral-100" />
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {categories.map((cat) => {
+              const IconComponent = cat.icon;
+              return (
+                <div
+                  key={cat.title}
+                  className="rounded-xl border border-neutral-200 bg-white p-5"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-neutral-50 border border-neutral-100 flex items-center justify-center mb-4">
+                    <IconComponent className="h-4 w-4 text-neutral-600" />
+                  </div>
+                  <h3 className="text-sm font-semibold text-neutral-900 mb-1">
+                    {cat.title}
+                  </h3>
+                  <p className="text-xs text-neutral-500 leading-relaxed">
+                    {cat.description}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Newsletter */}
+        <section className="pb-16">
+          <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-8 sm:p-10">
+            <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+              Stay Updated with Email Notifications
+            </h3>
+            <p className="text-sm text-neutral-500 max-w-xl mb-6 leading-relaxed">
+              Subscribe to receive important announcements directly in your email.
+              Never miss critical updates about prayer times, events, or community news.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="email"
+                placeholder="Enter your email address"
+                className="flex-1 rounded-lg border border-neutral-200 bg-white px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300"
+              />
+              <button className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white shrink-0">
+                Subscribe to Updates
+              </button>
+            </div>
+            <p className="mt-3 text-xs text-neutral-400">
+              We respect your privacy. Unsubscribe at any time.
+            </p>
+          </div>
+        </section>
+
+        {/* Archived */}
+        {archivedAnnouncements.length > 0 && (
+          <section className="pb-20">
+            <div className="flex items-center gap-3 mb-6">
+              <h2 className="text-xl font-semibold text-neutral-900">Archived Announcements</h2>
+              <div className="flex-1 h-px bg-neutral-100" />
+            </div>
+
+            <div className="space-y-4">
+              {archivedAnnouncements.slice(0, 3).map((announcement) => (
+                <AnnouncementCard key={announcement.id} announcement={announcement} />
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
     </div>
   );
 }
