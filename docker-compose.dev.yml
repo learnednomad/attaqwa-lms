@@ -1,3 +1,9 @@
+# ============================================================================
+# Development Docker Compose
+# ============================================================================
+# SECURITY: No hardcoded secrets. Uses environment variables.
+# For development, you can use the provided defaults or set your own in .env
+# ============================================================================
 
 services:
   # PostgreSQL Database (same as production)
@@ -8,7 +14,8 @@ services:
     environment:
       POSTGRES_DB: attaqwa_lms
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      # Development default, override with .env for security
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev-password-change-me}
     ports:
       - "5432:5432"
     volumes:
@@ -34,13 +41,15 @@ services:
       DATABASE_PORT: 5432
       DATABASE_NAME: attaqwa_lms
       DATABASE_USERNAME: postgres
-      DATABASE_PASSWORD: postgres
+      # SECURITY: All secrets from environment variables
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dev-password-change-me}
       DATABASE_SSL: false
-      APP_KEYS: gKqShoiW6YDp/9ZjOogJTQ==,rq5NV3ZSr14Fp3FNxh8hcA==,Mc3QWBXxiQMw0uhxMqKf2w==,y7HKpVcvl46XPnHIIfeX2Q==
-      API_TOKEN_SALT: y8zX2Dpo7wwIyyWZCOX3vQ==
-      ADMIN_JWT_SECRET: 4DQHyJc+M07ibsYwNvWORg==
-      TRANSFER_TOKEN_SALT: TKMOrV1jJ1JPWTKDq44fBQ==
-      ENCRYPTION_KEY: bCuGCOln7gvbDl2WjXs1Kg==
+      APP_KEYS: ${APP_KEYS:-dev-key1,dev-key2,dev-key3,dev-key4}
+      API_TOKEN_SALT: ${API_TOKEN_SALT:-dev-api-token-salt}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET:-dev-admin-jwt-secret}
+      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT:-dev-transfer-token-salt}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-dev-encryption-key}
+      JWT_SECRET: ${JWT_SECRET:-dev-jwt-secret-change-me}
       NODE_ENV: development
     ports:
       - "1337:1337"
@@ -63,6 +72,7 @@ services:
       NODE_ENV: development
       PORT: 3000
       NEXT_PUBLIC_API_URL: http://localhost:1337
+      JWT_SECRET: ${JWT_SECRET:-dev-jwt-secret-change-me}
     ports:
       - "3000:3000"
     depends_on:
@@ -83,6 +93,7 @@ services:
       NODE_ENV: development
       PORT: 3001
       NEXT_PUBLIC_API_URL: http://localhost:1337
+      JWT_SECRET: ${JWT_SECRET:-dev-jwt-secret-change-me}
     ports:
       - "3001:3001"
     depends_on:

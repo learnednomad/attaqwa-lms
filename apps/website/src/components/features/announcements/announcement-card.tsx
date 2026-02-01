@@ -1,9 +1,5 @@
 import { format } from 'date-fns';
-import Image from 'next/image';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Calendar, Clock, MapPin } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { Announcement } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -13,80 +9,57 @@ interface AnnouncementCardProps {
   compact?: boolean;
 }
 
-export function AnnouncementCard({ 
-  announcement, 
-  className, 
-  compact = false 
+export function AnnouncementCard({
+  announcement,
+  className,
+  compact = false,
 }: AnnouncementCardProps) {
-  const formattedDate = format(announcement.date, 'MMMM dd, yyyy');
+  const monthAbbrev = format(announcement.date, 'MMM').toUpperCase();
+  const dayNumber = format(announcement.date, 'd');
+
+  // Strip HTML tags for plain text preview
+  const plainTextContent = announcement.content.replace(/<[^>]*>/g, '');
 
   return (
-    <Card className={cn('overflow-hidden transition-shadow hover:shadow-md', className)}>
-      {announcement.imageUrl && !compact && (
-        <div className="relative h-48 w-full overflow-hidden">
-          <Image
-            src={announcement.imageUrl}
-            alt={announcement.imageAlt || announcement.title}
-            fill
-            className="object-cover transition-transform hover:scale-105"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        </div>
+    <div
+      className={cn(
+        'flex bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden',
+        className
       )}
-      
-      <CardHeader className={cn('pb-2', compact && 'pb-1')}>
-        <div className="flex items-start justify-between gap-2">
-          <CardTitle className={cn(
-            'text-lg font-semibold leading-tight text-islamic-navy-800',
-            compact && 'text-base'
-          )}>
-            {announcement.title}
-          </CardTitle>
-          {!announcement.isActive && (
-            <Badge variant="secondary" className="text-xs">
-              Archived
-            </Badge>
-          )}
-        </div>
-        
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <Calendar className="h-4 w-4" />
-            <span>{formattedDate}</span>
-          </div>
-          {announcement.time && (
-            <div className="flex items-center gap-1">
-              <Clock className="h-4 w-4" />
-              <span className="prayer-time">{announcement.time}</span>
-            </div>
-          )}
-        </div>
-      </CardHeader>
+    >
+      {/* Left accent border */}
+      <div className="w-1 bg-emerald-500 flex-shrink-0" />
 
-      <CardContent className={cn('pt-0', compact && 'pb-3')}>
-        <div 
-          className={cn(
-            'prose prose-sm max-w-none text-gray-700',
-            compact && 'line-clamp-2'
-          )}
-          dangerouslySetInnerHTML={{ __html: announcement.content }}
-        />
-        
-        {announcement.imageUrl && compact && (
-          <>
-            <Separator className="my-3" />
-            <div className="relative h-24 w-full overflow-hidden rounded-md">
-              <Image
-                src={announcement.imageUrl}
-                alt={announcement.imageAlt || announcement.title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              />
-            </div>
-          </>
+      {/* Date block */}
+      <div className="flex flex-col items-center justify-center px-4 py-4 border-r border-gray-100 min-w-[70px]">
+        <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wide">
+          {monthAbbrev}
+        </span>
+        <span className="text-2xl font-bold text-gray-900">{dayNumber}</span>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 p-4">
+        <h3 className="font-semibold text-gray-900 leading-tight">
+          {announcement.title}
+        </h3>
+
+        {announcement.time && (
+          <div className="flex items-center gap-1.5 text-sm text-gray-500 mt-1.5">
+            <Clock className="w-4 h-4" />
+            <span className="font-medium">{announcement.time}</span>
+          </div>
         )}
-      </CardContent>
-    </Card>
+
+        <p
+          className={cn(
+            'text-gray-600 mt-2 text-sm leading-relaxed',
+            compact ? 'line-clamp-2' : 'line-clamp-3'
+          )}
+        >
+          {plainTextContent}
+        </p>
+      </div>
+    </div>
   );
 }

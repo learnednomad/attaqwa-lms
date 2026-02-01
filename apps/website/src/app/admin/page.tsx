@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { formatTime } from '@attaqwa/shared';
+import type { Announcement, Event } from '@/types';
 
 export default function AdminDashboard() {
   const { data: announcements } = useAnnouncements({ limit: 5, isActive: true });
@@ -91,9 +92,9 @@ export default function AdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {prayerTimes?.data ? (
+            {prayerTimes ? (
               <div className="space-y-3">
-                {Object.entries(prayerTimes.data)
+                {Object.entries(prayerTimes)
                   .filter(([key]) => key !== 'date' && key !== 'qibla')
                   .map(([prayer, time]) => (
                     <div key={prayer} className="flex justify-between items-center">
@@ -109,7 +110,7 @@ export default function AdminDashboard() {
                   <div className="flex justify-between items-center">
                     <span className="font-medium text-gray-700">Qibla Direction</span>
                     <span className="font-mono text-islamic-green-600">
-                      {prayerTimes.data.qibla}°
+                      {prayerTimes.qibla}°
                     </span>
                   </div>
                 </div>

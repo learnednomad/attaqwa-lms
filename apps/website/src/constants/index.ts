@@ -1,6 +1,9 @@
 export const MOSQUE_INFO = {
   name: 'Masjid At-Taqwa',
-  address: '2674 Woodwin Rd, Doraville, GA 30360',
+  address: '2674 Woodwin Rd',
+  city: 'Doraville',
+  province: 'GA',
+  postalCode: '30360',
   phone: '(678) 896-9257',
   email: 'Mohammad30360@hotmail.com',
   schoolEmail: 'Attaqwa.du@gmail.com',

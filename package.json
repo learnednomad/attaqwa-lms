@@ -15,11 +15,21 @@
     "build:api": "pnpm --filter api build",
     "clean": "pnpm --parallel --filter './apps/*' clean && rm -rf node_modules",
     "lint": "pnpm --parallel --filter './apps/*' lint",
-    "type-check": "pnpm --parallel --filter './apps/*' type-check"
+    "type-check": "pnpm --parallel --filter './apps/*' type-check",
+    "bmad:refresh": "bmad-method install -f -i codex",
+    "bmad:list": "bmad-method list:agents",
+    "bmad:validate": "bmad-method validate",
+    "mcp:coolify": "node scripts/coolify-mcp.mjs"
   },
   "engines": {
-    "node": ">=18.0.0 <=22.x.x",
+    "node": ">=20.9.0",
     "pnpm": ">=10.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "^19.0.0",
+      "@types/react-dom": "^19.0.0"
+    }
   },
   "keywords": [
     "lms",

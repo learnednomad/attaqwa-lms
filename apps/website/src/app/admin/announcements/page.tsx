@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, Calendar, FileText, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { formatDate, truncateText } from '@attaqwa/shared';
+import type { Announcement } from '@/types';
 
 export default function AnnouncementsPage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -62,7 +63,7 @@ export default function AnnouncementsPage() {
     );
   }
 
-  const announcements = data?.data || [];
+  const announcements: Announcement[] = data?.data || [];
   const pagination = data?.pagination;
 
   return (

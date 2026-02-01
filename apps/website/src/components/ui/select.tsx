@@ -23,16 +23,29 @@ function useSelectContext() {
 
 interface SelectProps {
   value?: string;
+  defaultValue?: string;
   onValueChange?: (value: string) => void;
   children: React.ReactNode;
 }
 
-const Select = ({ value, onValueChange, children }: SelectProps) => {
+const Select = ({ value: controlledValue, defaultValue, onValueChange, children }: SelectProps) => {
   const [open, setOpen] = React.useState(false);
+  const [internalValue, setInternalValue] = React.useState(defaultValue);
+
+  // Use controlled value if provided, otherwise use internal state
+  const value = controlledValue !== undefined ? controlledValue : internalValue;
+
+  const handleValueChange = React.useCallback(
+    (newValue: string) => {
+      setInternalValue(newValue);
+      onValueChange?.(newValue);
+    },
+    [onValueChange]
+  );
 
   const contextValue = React.useMemo(
-    () => ({ value, onValueChange, open, setOpen }),
-    [value, onValueChange, open]
+    () => ({ value, onValueChange: handleValueChange, open, setOpen }),
+    [value, handleValueChange, open]
   );
 
   return (

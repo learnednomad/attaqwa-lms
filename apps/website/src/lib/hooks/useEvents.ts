@@ -2,7 +2,8 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { eventsApi } from '@/lib/api';
-import { CACHE_KEYS, CACHE_TTL, type Event } from '@attaqwa/shared';
+import { CACHE_KEYS, CACHE_TTL } from '@attaqwa/shared';
+import type { Event, PaginatedResponse } from '@/types';
 
 interface UseEventsParams {
   page?: number;
@@ -12,10 +13,10 @@ interface UseEventsParams {
 }
 
 export function useEvents(params: UseEventsParams = {}) {
-  return useQuery({
+  return useQuery<PaginatedResponse<Event>>({
     queryKey: [CACHE_KEYS.EVENTS, params],
     queryFn: () => eventsApi.getAll(params),
-    staleTime: CACHE_TTL.EVENTS,
+    staleTime: CACHE_TTL.SHORT,
   });
 }
 
@@ -23,7 +24,7 @@ export function useUpcomingEvents(limit: number = 5) {
   return useQuery({
     queryKey: [CACHE_KEYS.EVENTS, 'upcoming', { limit }],
     queryFn: () => eventsApi.getAll({ upcoming: true, isActive: true, limit }),
-    staleTime: CACHE_TTL.EVENTS,
+    staleTime: CACHE_TTL.SHORT,
   });
 }
 
@@ -31,7 +32,7 @@ export function useEvent(id: string) {
   return useQuery({
     queryKey: [CACHE_KEYS.EVENTS, id],
     queryFn: () => eventsApi.getById(id),
-    staleTime: CACHE_TTL.EVENTS,
+    staleTime: CACHE_TTL.SHORT,
     enabled: !!id,
   });
 }

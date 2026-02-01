@@ -1,22 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { studentAuth } from '@/lib/auth-cookies';
 
-export async function POST(request: NextRequest) {
-  // Create response
-  const response = NextResponse.json({
-    success: true,
-    message: 'Logged out successfully'
-  });
+/**
+ * POST /api/student/auth/logout
+ * Clears the student authentication httpOnly cookie.
+ */
+export async function POST() {
+  try {
+    await studentAuth.clearToken();
 
-  // Clear the auth cookie
-  response.cookies.set({
-    name: 'student-auth-token',
-    value: '',
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 0, // Expire immediately
-    path: '/'
-  });
-
-  return response;
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('[API] Student auth/logout error:', error);
+    return NextResponse.json(
+      { error: 'Logout failed' },
+      { status: 500 }
+    );
+  }
 }

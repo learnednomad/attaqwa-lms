@@ -43,14 +43,14 @@ export function CourseForm({
     category: initialData?.category || 'general',
     difficulty: initialData?.difficulty || 'beginner',
     ageTier: initialData?.ageTier || 'all',
-    coverImage: initialData?.coverImage || undefined,
-    duration: initialData?.duration || 0,
+    coverImage: initialData?.coverImage?.url || undefined,
+    duration: initialData?.estimatedDuration || 0,
     isPublished: initialData?.isPublished || false,
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof CourseFormData, string>>>({});
   const [coverImagePreview, setCoverImagePreview] = useState<string | null>(
-    typeof initialData?.coverImage === 'string' ? initialData.coverImage : null
+    initialData?.coverImage?.url || null
   );
 
   const categories: { value: CourseCategory; label: string }[] = [

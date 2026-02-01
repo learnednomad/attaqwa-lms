@@ -1,5 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+/**
+ * @deprecated This endpoint is deprecated. Use /api/v1/announcements instead.
+ * This endpoint will be removed on 2025-12-01.
+ * See: docs/api-migration-plan.md
+ */
+
+// Helper to add deprecation headers
+function addDeprecationHeaders(response: NextResponse): NextResponse {
+  response.headers.set('Deprecation', 'true');
+  response.headers.set('Sunset', 'Mon, 01 Dec 2025 00:00:00 GMT');
+  response.headers.set('Link', '</api/v1/announcements>; rel="successor-version"');
+  return response;
+}
+
 // Mock announcements data - in production, this would come from a database
 const mockAnnouncements = [
   {
@@ -63,7 +77,7 @@ export async function GET(request: NextRequest) {
     // Apply pagination
     const paginatedAnnouncements = filtered.slice(offset, offset + limit);
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: paginatedAnnouncements,
       pagination: {
@@ -73,6 +87,7 @@ export async function GET(request: NextRequest) {
         hasMore: offset + limit < filtered.length
       }
     });
+    return addDeprecationHeaders(response);
   } catch (error) {
     console.error('Error fetching announcements:', error);
     return NextResponse.json(
@@ -105,11 +120,12 @@ export async function POST(request: NextRequest) {
       }
     };
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: 'Announcement created successfully',
       data: newAnnouncement
     });
+    return addDeprecationHeaders(response);
   } catch (error) {
     return NextResponse.json(
       {

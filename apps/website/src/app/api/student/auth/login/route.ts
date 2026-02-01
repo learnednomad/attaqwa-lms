@@ -1,106 +1,103 @@
 import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { prisma } from '@attaqwa/db';
+import { createAuthToken } from '@/middleware/auth';
+import { studentAuth } from '@/lib/auth-cookies';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const STRAPI_URL = process.env.STRAPI_URL || 'http://localhost:1337';
 
+/**
+ * POST /api/student/auth/login
+ * Validates credentials against Strapi and sets an httpOnly cookie with the JWT.
+ */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, studentId, password } = body;
+    const { email, password, studentId } = body;
 
-    // Validate input
-    if (!password || (!email && !studentId)) {
+    if ((!email && !studentId) || !password) {
       return NextResponse.json(
         { error: 'Email/Student ID and password are required' },
         { status: 400 }
       );
     }
 
-    // Find user by email or studentId
-    const user = await prisma.user.findFirst({
-      where: email 
-        ? { email }
-        : { studentId },
-      include: {
-        enrollments: {
-          include: {
-            course: true
+    // Attempt to authenticate against Strapi
+    try {
+      const strapiResponse = await fetch(`${STRAPI_URL}/api/auth/local`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          identifier: email || studentId,
+          password,
+        }),
+      });
+
+      if (strapiResponse.ok) {
+        const strapiData = await strapiResponse.json();
+        const strapiUser = strapiData.user;
+
+        // Create our own JWT for cookie storage
+        const token = createAuthToken({
+          userId: String(strapiUser.id),
+          email: strapiUser.email,
+          studentId: strapiUser.studentId || studentId,
+          name: strapiUser.username || strapiUser.name || 'Student',
+          role: strapiUser.role?.name || 'student',
+        });
+
+        // Set httpOnly cookie
+        await studentAuth.setToken(token);
+
+        return NextResponse.json({
+          user: {
+            id: String(strapiUser.id),
+            email: strapiUser.email,
+            studentId: strapiUser.studentId || studentId,
+            name: strapiUser.username || strapiUser.name || 'Student',
+            role: strapiUser.role?.name || 'student',
           },
-          where: {
-            status: 'ACTIVE'
-          }
-        }
+        });
       }
-    });
 
-    if (!user) {
+      // Strapi returned an error
       return NextResponse.json(
         { error: 'Invalid credentials' },
         { status: 401 }
       );
-    }
+    } catch {
+      // Strapi is not available - use dev fallback in development only
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[AUTH] Strapi unavailable, using development fallback');
 
-    // Verify password
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) {
+        const token = createAuthToken({
+          userId: 'dev-student-001',
+          email: email || `${studentId}@attaqwa.edu`,
+          studentId: studentId || 'STU-001',
+          name: 'Development Student',
+          role: 'student',
+        });
+
+        await studentAuth.setToken(token);
+
+        return NextResponse.json({
+          user: {
+            id: 'dev-student-001',
+            email: email || `${studentId}@attaqwa.edu`,
+            studentId: studentId || 'STU-001',
+            name: 'Development Student',
+            role: 'student',
+          },
+        });
+      }
+
       return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
+        { error: 'Authentication service unavailable' },
+        { status: 503 }
       );
     }
-
-    // Generate JWT token
-    const token = jwt.sign(
-      { 
-        userId: user.id, 
-        email: user.email,
-        studentId: user.studentId,
-        name: user.name,
-        role: user.role 
-      },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
-    // Prepare user data (exclude password)
-    const userData = {
-      id: user.id,
-      email: user.email,
-      studentId: user.studentId,
-      name: user.name,
-      role: user.role,
-      enrolledCourses: user.enrollments.map(e => ({
-        courseId: e.courseId,
-        courseName: e.course.name,
-        enrolledAt: e.enrolledAt
-      }))
-    };
-
-    // Create response with cookie
-    const response = NextResponse.json({
-      success: true,
-      token,
-      user: userData
-    });
-
-    // Set HTTP-only cookie for security
-    response.cookies.set({
-      name: 'student-auth-token',
-      value: token,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: '/'
-    });
-
-    return response;
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('[API] Student auth/login error:', error);
     return NextResponse.json(
-      { error: 'An error occurred during login' },
+      { error: 'Login failed' },
       { status: 500 }
     );
   }

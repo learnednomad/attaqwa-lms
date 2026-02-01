@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -138,7 +138,7 @@ export function SeerahModuleContent({ moduleId }: ModuleContentProps) {
       if (paragraph.startsWith('#')) {
         const level = paragraph.match(/^#+/)?.[0].length || 1;
         const text = paragraph.replace(/^#+\s/, '');
-        const HeadingTag = `h${Math.min(level, 6)}` as keyof JSX.IntrinsicElements;
+        const HeadingTag = `h${Math.min(level, 6)}` as keyof React.JSX.IntrinsicElements;
         return (
           <HeadingTag key={index} className={`font-bold mb-3 mt-6 ${
             level === 1 ? 'text-2xl' : 

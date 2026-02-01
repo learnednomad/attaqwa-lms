@@ -25,8 +25,10 @@ const navigation = [
   { name: 'Courses', href: '/courses', icon: BookOpen, roles: ['teacher', 'admin'] },
   { name: 'Students', href: '/students', icon: Users, roles: ['teacher', 'admin'] },
   { name: 'Analytics', href: '/analytics', icon: BarChart3, roles: ['teacher', 'admin'] },
-  { name: 'Achievements', href: '/achievements', icon: Trophy, roles: ['admin'] },
-  { name: 'Settings', href: '/settings', icon: Settings, roles: ['admin'] },
+  // TODO: Implement achievements page
+  // { name: 'Achievements', href: '/achievements', icon: Trophy, roles: ['admin'] },
+  // TODO: Implement settings page
+  // { name: 'Settings', href: '/settings', icon: Settings, roles: ['admin'] },
 ];
 
 export function Sidebar() {

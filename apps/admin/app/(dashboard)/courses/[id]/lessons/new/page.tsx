@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 
 import { LessonForm, type LessonFormData } from '@/components/lessons/lesson-form';
 import { strapiClient } from '@attaqwa/api-client';
-import type { Course } from '@attaqwa/shared-types';
+import type { Course, StrapiResponse } from '@attaqwa/shared-types';
 
 export default function CreateLessonPage() {
   const params = useParams();
@@ -29,7 +29,7 @@ export default function CreateLessonPage() {
     const fetchCourse = async () => {
       try {
         setIsLoading(true);
-        const response = await strapiClient.get(`/courses/${courseId}`);
+        const response = await strapiClient.get<StrapiResponse<Course>>(`/courses/${courseId}`);
         setCourse(response.data.data);
       } catch (err) {
         console.error('Failed to fetch course:', err);

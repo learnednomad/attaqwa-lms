@@ -1,5 +1,15 @@
 'use client';
 
+/**
+ * Student Authentication Context
+ *
+ * SECURITY IMPROVEMENTS:
+ * - Removed localStorage token storage (XSS vulnerability)
+ * - Token is now stored in httpOnly cookies by the server
+ * - Client only receives user data, never the raw token
+ * - All auth state is managed via API calls with credentials: 'include'
+ */
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -51,7 +61,8 @@ export function StudentAuthProvider({ children }: { children: React.ReactNode })
   const checkAuth = async () => {
     try {
       const response = await fetch('/api/student/auth/me', {
-        credentials: 'include'
+        // SECURITY: Include cookies for httpOnly token
+        credentials: 'include',
       });
 
       if (response.ok) {
@@ -75,6 +86,7 @@ export function StudentAuthProvider({ children }: { children: React.ReactNode })
         headers: {
           'Content-Type': 'application/json',
         },
+        // SECURITY: Include cookies - server will set httpOnly cookie
         credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
@@ -85,13 +97,10 @@ export function StudentAuthProvider({ children }: { children: React.ReactNode })
         throw new Error(data.error || 'Login failed');
       }
 
+      // SECURITY: Only store user data, NOT the token
+      // Token is stored in httpOnly cookie by the server
       setUser(data.user);
-      
-      // Store token in localStorage as backup
-      if (data.token) {
-        localStorage.setItem('studentToken', data.token);
-      }
-      
+
       router.push('/student/dashboard');
     } catch (error) {
       throw error;
@@ -105,6 +114,7 @@ export function StudentAuthProvider({ children }: { children: React.ReactNode })
         headers: {
           'Content-Type': 'application/json',
         },
+        // SECURITY: Include cookies - server will set httpOnly cookie
         credentials: 'include',
         body: JSON.stringify({ studentId, password }),
       });
@@ -115,13 +125,9 @@ export function StudentAuthProvider({ children }: { children: React.ReactNode })
         throw new Error(data.error || 'Login failed');
       }
 
+      // SECURITY: Only store user data, NOT the token
       setUser(data.user);
-      
-      // Store token in localStorage as backup
-      if (data.token) {
-        localStorage.setItem('studentToken', data.token);
-      }
-      
+
       router.push('/student/dashboard');
     } catch (error) {
       throw error;
@@ -132,19 +138,15 @@ export function StudentAuthProvider({ children }: { children: React.ReactNode })
     try {
       await fetch('/api/student/auth/logout', {
         method: 'POST',
+        // SECURITY: Include cookies for server to clear httpOnly cookie
         credentials: 'include',
       });
-
-      setUser(null);
-      localStorage.removeItem('studentToken');
-      localStorage.removeItem('studentData');
-      router.push('/student/login');
     } catch (error) {
-      console.error('Logout failed:', error);
-      // Force logout even if API call fails
+      console.error('Logout API call failed:', error);
+      // Continue with logout even if API call fails
+    } finally {
+      // Clear local state
       setUser(null);
-      localStorage.removeItem('studentToken');
-      localStorage.removeItem('studentData');
       router.push('/student/login');
     }
   };

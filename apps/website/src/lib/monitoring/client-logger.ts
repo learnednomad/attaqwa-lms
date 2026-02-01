@@ -359,7 +359,7 @@ class ClientLogger {
         const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
         this.log('info', 'page_load_performance', {
           loadTime: navigation.loadEventEnd - navigation.loadEventStart,
-          domContentLoaded: navigation.domContentLoadedEventEnd - navigation.navigationStart,
+          domContentLoaded: navigation.domContentLoadedEventEnd - navigation.fetchStart,
           firstPaint: this.getFirstPaint(),
           largestContentfulPaint: this.getLargestContentfulPaint(),
         });

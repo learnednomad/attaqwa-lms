@@ -6,11 +6,11 @@
       "@/*": [
         "./src/*"
       ],
-      "@attaqwa/shared/*": [
-        "../shared/src/*"
+      "@attaqwa/shared": [
+        "../../packages/shared/src"
       ],
-      "@attaqwa/db": [
-        "../db/src"
+      "@attaqwa/shared-types": [
+        "../../packages/shared-types/src"
       ]
     },
     "allowJs": true,

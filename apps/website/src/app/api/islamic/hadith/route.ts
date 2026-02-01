@@ -1,5 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+/**
+ * @deprecated This endpoint is deprecated. Use /api/v1/hadiths instead.
+ * This endpoint will be removed on 2025-12-01.
+ * See: docs/api-migration-plan.md
+ */
+
+// Helper to add deprecation headers
+function addDeprecationHeaders(response: NextResponse): NextResponse {
+  response.headers.set('Deprecation', 'true');
+  response.headers.set('Sunset', 'Mon, 01 Dec 2025 00:00:00 GMT');
+  response.headers.set('Link', '</api/v1/hadiths>; rel="successor-version"');
+  return response;
+}
+
 // Mock hadith data - in production, this would come from a proper Islamic API
 const mockHadithData = [
   {
@@ -52,10 +66,11 @@ export async function GET(request: NextRequest) {
       (!bookNumber || h.bookNumber === bookNumber.toString())
     );
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: filtered
     });
+    return addDeprecationHeaders(response);
   } catch (error) {
     console.error('Error fetching hadith:', error);
     return NextResponse.json(

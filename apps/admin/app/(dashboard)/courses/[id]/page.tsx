@@ -14,7 +14,7 @@ import { CourseForm, type CourseFormData } from '@/components/courses/course-for
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { strapiClient } from '@attaqwa/api-client';
-import type { Course } from '@attaqwa/shared-types';
+import type { Course, StrapiResponse } from '@attaqwa/shared-types';
 
 export default function EditCoursePage() {
   const params = useParams();
@@ -31,7 +31,7 @@ export default function EditCoursePage() {
     const fetchCourse = async () => {
       try {
         setIsLoading(true);
-        const response = await strapiClient.get(`/courses/${courseId}?populate=*`);
+        const response = await strapiClient.get<StrapiResponse<Course>>(`/courses/${courseId}?populate=*`);
         setCourse(response.data.data);
       } catch (err) {
         console.error('Failed to fetch course:', err);

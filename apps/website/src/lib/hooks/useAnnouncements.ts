@@ -2,7 +2,8 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { announcementsApi } from '@/lib/api';
-import { CACHE_KEYS, CACHE_TTL, type Announcement } from '@attaqwa/shared';
+import { CACHE_KEYS, CACHE_TTL } from '@attaqwa/shared';
+import type { Announcement, PaginatedResponse } from '@/types';
 
 interface UseAnnouncementsParams {
   page?: number;
@@ -12,10 +13,10 @@ interface UseAnnouncementsParams {
 }
 
 export function useAnnouncements(params: UseAnnouncementsParams = {}) {
-  return useQuery({
+  return useQuery<PaginatedResponse<Announcement>>({
     queryKey: [CACHE_KEYS.ANNOUNCEMENTS, params],
     queryFn: () => announcementsApi.getAll(params),
-    staleTime: CACHE_TTL.ANNOUNCEMENTS,
+    staleTime: CACHE_TTL.SHORT,
   });
 }
 
@@ -23,7 +24,7 @@ export function useAnnouncement(id: string) {
   return useQuery({
     queryKey: [CACHE_KEYS.ANNOUNCEMENTS, id],
     queryFn: () => announcementsApi.getById(id),
-    staleTime: CACHE_TTL.ANNOUNCEMENTS,
+    staleTime: CACHE_TTL.SHORT,
     enabled: !!id,
   });
 }

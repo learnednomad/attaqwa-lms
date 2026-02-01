@@ -13,8 +13,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function StudentLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('student1@attaqwa.test');
+  const [password, setPassword] = useState('Student123!');
   const [studentId, setStudentId] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -27,14 +27,14 @@ export default function StudentLoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/student/auth/login', {
+      // Authenticate against Strapi backend
+      const response = await fetch('http://localhost:1337/api/auth/local', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
         body: JSON.stringify({
-          ...(loginMethod === 'email' ? { email } : { studentId }),
+          identifier: loginMethod === 'email' ? email : studentId,
           password,
         }),
       });
@@ -42,12 +42,12 @@ export default function StudentLoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to login');
+        throw new Error(data.error?.message || 'Failed to login');
       }
 
-      // Store token and redirect to student dashboard
-      if (data.token) {
-        localStorage.setItem('studentToken', data.token);
+      // Store token and user data from Strapi response
+      if (data.jwt) {
+        localStorage.setItem('studentToken', data.jwt);
         localStorage.setItem('studentData', JSON.stringify(data.user));
       }
 
@@ -203,20 +203,20 @@ export default function StudentLoginPage() {
                   variant="outline"
                   size="sm"
                   className="w-full justify-start"
-                  onClick={() => handleDemoLogin('student@attaqwa.org', 'student123')}
+                  onClick={() => handleDemoLogin('student1@attaqwa.test', 'Student123!')}
                 >
                   <User className="mr-2 h-4 w-4" />
-                  Regular Student (student@attaqwa.org)
+                  Ahmed Abdullah (student1@attaqwa.test)
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   className="w-full justify-start"
-                  onClick={() => handleDemoLogin('parent@attaqwa.org', 'parent123')}
+                  onClick={() => handleDemoLogin('student2@attaqwa.test', 'Student123!')}
                 >
                   <User className="mr-2 h-4 w-4" />
-                  Parent Account (parent@attaqwa.org)
+                  Fatima Hassan (student2@attaqwa.test)
                 </Button>
               </div>
             </div>

@@ -1,20 +1,30 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  BookOpen, Clock, Calendar, Award, Bell, TrendingUp, 
-  CheckCircle, AlertCircle, Users, MessageSquare, FileText,
-  ChevronRight, Home, User, LogOut, Menu, X, Zap,
-  GraduationCap, Target, Brain, Star
+import {
+  BookOpen, Clock, Calendar, Award, Bell, TrendingUp,
+  CheckCircle, Users, MessageSquare, FileText,
+  ChevronRight, ChevronDown, Home, User, LogOut, Menu, X,
+  GraduationCap, CreditCard, Building2, Heart, Search,
+  Settings, ExternalLink, MoreHorizontal, AlertCircle
 } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useCourses, useEnrollments, useProgress } from '@/hooks/use-student-data';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { NotificationPanel, NotificationItem, generateMockNotifications } from '@/components/notifications/notification-panel';
 
 interface StudentData {
   id: string;
@@ -24,7 +34,11 @@ interface StudentData {
   ageTier: string;
   enrolledCourses: number;
   completedCourses: number;
+  totalCourses: number;
   averageGrade: number;
+  maxGrade: number;
+  activeClasses: number;
+  totalClasses: number;
   attendanceRate: number;
 }
 
@@ -32,156 +46,211 @@ interface Course {
   id: string;
   title: string;
   instructor: string;
+  instructorTitle: string;
   progress: number;
   nextClass: string;
+  classTime: string;
+  room: string;
+  credits: number;
   assignments: number;
   grade?: number;
+  avatarUrl?: string;
 }
 
-interface Assignment {
+interface PaymentRecord {
   id: string;
-  courseTitle: string;
-  title: string;
-  dueDate: string;
-  status: 'pending' | 'submitted' | 'graded';
-  grade?: number;
+  paymentId: string;
+  category: string;
+  date: string;
+  status: 'completed' | 'on-verification' | 'pending';
 }
 
-interface Notification {
-  id: string;
+interface SidebarSection {
   title: string;
-  message: string;
-  type: 'assignment' | 'grade' | 'announcement' | 'message';
-  timestamp: string;
-  read: boolean;
+  icon: React.ElementType;
+  items: {
+    label: string;
+    href: string;
+    icon: React.ElementType;
+  }[];
+  isOpen: boolean;
 }
 
 export default function StudentDashboard() {
   const router = useRouter();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [student, setStudent] = useState<StudentData | null>(null);
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [assignments, setAssignments] = useState<Assignment[]>([]);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [scheduleView, setScheduleView] = useState<'daily' | 'weekly'>('daily');
+  const [semesterFilter, setSemesterFilter] = useState('all');
 
-  // Mock data for demonstration
-  useEffect(() => {
-    // Check authentication - only access localStorage in useEffect to avoid hydration issues
-    if (typeof window !== 'undefined') {
-      const studentData = localStorage.getItem('studentData');
-      if (!studentData) {
-        router.push('/student/login');
-        return;
-      }
+  // Notification state
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<NotificationItem[]>(generateMockNotifications());
+  const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  const handleMarkAllRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+  };
+
+  const handleMarkAsRead = (id: string) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+  };
+
+  // Sidebar sections state
+  const [sidebarSections, setSidebarSections] = useState<SidebarSection[]>([
+    {
+      title: 'Academic',
+      icon: GraduationCap,
+      isOpen: true,
+      items: [
+        { label: 'My Courses', href: '/student/courses', icon: BookOpen },
+        { label: 'Class Schedule', href: '/student/schedule', icon: Clock },
+        { label: 'Grades & Transcript', href: '/student/grades', icon: Award },
+        { label: 'Assignments', href: '/student/assignments', icon: FileText },
+        { label: 'Islamic Calendar', href: '/student/calendar', icon: Calendar },
+      ]
+    },
+    {
+      title: 'Documents',
+      icon: FileText,
+      isOpen: false,
+      items: [
+        { label: 'Official Transcript', href: '/student/transcript', icon: FileText },
+        { label: 'Certificates', href: '/student/certificates', icon: Award },
+      ]
+    },
+    {
+      title: 'Financial',
+      icon: CreditCard,
+      isOpen: false,
+      items: [
+        { label: 'Tuition & Fees', href: '/student/tuition', icon: CreditCard },
+        { label: 'Payment History', href: '/student/payments', icon: Clock },
+        { label: 'Zakat Aid', href: '/student/financial-aid', icon: Heart },
+      ]
+    },
+    {
+      title: 'Student Life',
+      icon: Users,
+      isOpen: false,
+      items: [
+        { label: 'Study Groups', href: '/student/groups', icon: Users },
+        { label: 'Masjid Events', href: '/student/events', icon: Calendar },
+        { label: 'Community', href: '/student/community', icon: Building2 },
+      ]
+    },
+  ]);
+
+  const toggleSection = (index: number) => {
+    setSidebarSections(prev => prev.map((section, i) =>
+      i === index ? { ...section, isOpen: !section.isOpen } : section
+    ));
+  };
+
+  // TanStack Query hooks
+  const { data: apiCourses = [], isLoading: coursesLoading, isError: coursesError } = useCourses();
+  const { data: enrollmentsData } = useEnrollments();
+  const { data: allProgress = [] } = useProgress();
+
+  const enrollments = enrollmentsData?.enrollments || [];
+  const loading = coursesLoading;
+
+  // Mock data constants
+  const mockStudent: StudentData = {
+    id: '1',
+    name: 'Ahmed Hassan',
+    email: 'student@attaqwa.org',
+    studentId: 'STU2024001',
+    ageTier: 'HIGH_SCHOOL',
+    enrolledCourses: 6,
+    completedCourses: 120,
+    totalCourses: 144,
+    averageGrade: 3.75,
+    maxGrade: 4.00,
+    activeClasses: 15,
+    totalClasses: 18,
+    attendanceRate: 92,
+  };
+
+  const mockCourses: Course[] = [
+    { id: '1', title: 'Quran Memorization - Juz 30', instructor: 'Imam Mohammad', instructorTitle: 'Hafiz', progress: 75, nextClass: 'Today', classTime: '08:30 AM - 09:30 AM', room: 'QUR-201', credits: 4, assignments: 2, grade: 88 },
+    { id: '2', title: 'Islamic Studies - Fiqh', instructor: 'Sheikh Abdullah', instructorTitle: 'Ph.D', progress: 60, nextClass: 'Today', classTime: '09:30 AM - 01:30 PM', room: 'ISL-303', credits: 4, assignments: 1, grade: 82 },
+    { id: '3', title: 'Arabic Language - Level 2', instructor: 'Ustadh Omar', instructorTitle: 'Ph.D', progress: 45, nextClass: 'Today', classTime: '01:30 PM - 03:30 PM', room: 'ARB-401', credits: 4, assignments: 3, grade: 90 },
+    { id: '4', title: 'Hadith Studies', instructor: 'Dr. Fatima Ali', instructorTitle: 'Ph.D', progress: 80, nextClass: 'Tomorrow', classTime: '04:30 PM - 06:00 PM', room: 'HAD-102', credits: 3, assignments: 0, grade: 86 },
+  ];
+
+  const mockPayments: PaymentRecord[] = [
+    { id: '1', paymentId: 'PID-331829', category: '6th Semester Tuition', date: '23 October 2024', status: 'on-verification' },
+    { id: '2', paymentId: 'PID-331828', category: 'Quran Program 2025', date: '24 August 2024', status: 'completed' },
+    { id: '3', paymentId: 'PID-331827', category: '5th Semester Tuition', date: '20 May 2024', status: 'completed' },
+    { id: '4', paymentId: 'PID-331826', category: '4th Semester Tuition', date: '22 October 2023', status: 'completed' },
+  ];
+
+  // Derive dashboard data from TQ results
+  const { student, courses, payments, dataSource } = useMemo(() => {
+    if (coursesError || apiCourses.length === 0) {
+      return {
+        student: mockStudent,
+        courses: mockCourses,
+        payments: mockPayments,
+        dataSource: 'mock' as const,
+      };
     }
 
-    // Load mock data
-    setStudent({
-      id: '1',
-      name: 'Ahmed Hassan',
-      email: 'student@attaqwa.org',
-      studentId: 'STU2024001',
-      ageTier: 'HIGH_SCHOOL',
-      enrolledCourses: 6,
-      completedCourses: 12,
-      averageGrade: 85,
-      attendanceRate: 92,
+    // Get student data from localStorage if available
+    const storedStudent = typeof window !== 'undefined'
+      ? JSON.parse(localStorage.getItem('studentData') || '{}')
+      : {};
+
+    // Calculate real lesson progress stats
+    const lessonsCompleted = allProgress.filter(p => p.status === 'completed').length;
+
+    // Transform API courses to match UI interface
+    const transformedCourses: Course[] = apiCourses.slice(0, 4).map((course, index) => {
+      const enrollment = enrollments.find(e => e.course?.id === course.id);
+      return {
+        id: String(course.id),
+        title: course.title,
+        instructor: course.instructor,
+        instructorTitle: course.subject === 'quran' ? 'Hafiz' : 'Ph.D',
+        progress: enrollment?.overall_progress || 0,
+        nextClass: index < 3 ? 'Today' : 'Tomorrow',
+        classTime: ['08:30 AM - 09:30 AM', '09:30 AM - 01:30 PM', '01:30 PM - 03:30 PM', '04:30 PM - 06:00 PM'][index] || '08:00 AM',
+        room: `${course.subject.substring(0, 3).toUpperCase()}-${201 + index}`,
+        credits: course.duration_weeks > 20 ? 4 : 3,
+        assignments: 0,
+        grade: enrollment?.average_quiz_score || 0,
+      };
     });
 
-    setCourses([
-      {
-        id: '1',
-        title: 'Quran Memorization - Juz 30',
-        instructor: 'Imam Mohammad',
-        progress: 75,
-        nextClass: 'Today, 4:00 PM',
-        assignments: 2,
-        grade: 88,
-      },
-      {
-        id: '2',
-        title: 'Islamic Studies - Fiqh',
-        instructor: 'Sheikh Abdullah',
-        progress: 60,
-        nextClass: 'Tomorrow, 3:00 PM',
-        assignments: 1,
-        grade: 82,
-      },
-      {
-        id: '3',
-        title: 'Arabic Language - Level 2',
-        instructor: 'Ustadh Omar',
-        progress: 45,
-        nextClass: 'Wed, 5:00 PM',
-        assignments: 3,
-        grade: 90,
-      },
-      {
-        id: '4',
-        title: 'Hadith Studies',
-        instructor: 'Dr. Fatima Ali',
-        progress: 80,
-        nextClass: 'Thu, 4:30 PM',
-        assignments: 0,
-        grade: 86,
-      },
-    ]);
+    // Calculate stats from enrollments
+    const activeEnrollments = enrollments.filter(e => e.enrollment_status === 'active');
+    const completedEnrollments = enrollments.filter(e => e.enrollment_status === 'completed');
 
-    setAssignments([
-      {
-        id: '1',
-        courseTitle: 'Quran Memorization',
-        title: 'Memorize Surah An-Naba',
-        dueDate: '2024-03-25',
-        status: 'pending',
-      },
-      {
-        id: '2',
-        courseTitle: 'Islamic Studies',
-        title: 'Essay on Prayer Importance',
-        dueDate: '2024-03-26',
-        status: 'submitted',
-      },
-      {
-        id: '3',
-        courseTitle: 'Arabic Language',
-        title: 'Vocabulary Quiz Chapter 5',
-        dueDate: '2024-03-24',
-        status: 'graded',
-        grade: 92,
-      },
-    ]);
+    const derivedStudent: StudentData = {
+      id: storedStudent.id?.toString() || '1',
+      name: storedStudent.username || storedStudent.name || 'Student',
+      email: storedStudent.email || 'student@attaqwa.org',
+      studentId: `STU${new Date().getFullYear()}${String(storedStudent.id || 1).padStart(3, '0')}`,
+      ageTier: 'HIGH_SCHOOL',
+      enrolledCourses: apiCourses.length,
+      completedCourses: lessonsCompleted,
+      totalCourses: allProgress.length || apiCourses.length,
+      averageGrade: enrollments.length > 0
+        ? enrollments.reduce((sum, e) => sum + (e.average_quiz_score || 0), 0) / enrollments.length / 25
+        : 3.5,
+      maxGrade: 4.00,
+      activeClasses: activeEnrollments.length || apiCourses.length,
+      totalClasses: apiCourses.length + 2,
+      attendanceRate: 92,
+    };
 
-    setNotifications([
-      {
-        id: '1',
-        title: 'New Assignment Posted',
-        message: 'Quran Memorization: New surah assignment available',
-        type: 'assignment',
-        timestamp: '2 hours ago',
-        read: false,
-      },
-      {
-        id: '2',
-        title: 'Grade Posted',
-        message: 'Your Arabic Language quiz has been graded',
-        type: 'grade',
-        timestamp: '5 hours ago',
-        read: false,
-      },
-      {
-        id: '3',
-        title: 'Upcoming Event',
-        message: 'Youth Islamic Conference this Saturday',
-        type: 'announcement',
-        timestamp: '1 day ago',
-        read: true,
-      },
-    ]);
-
-    setLoading(false);
-  }, [router]);
+    return {
+      student: derivedStudent,
+      courses: transformedCourses,
+      payments: mockPayments,
+      dataSource: 'api' as const,
+    };
+  }, [apiCourses, enrollments, allProgress, coursesError]);
 
   const handleLogout = () => {
     localStorage.removeItem('studentToken');
@@ -189,30 +258,24 @@ export default function StudentDashboard() {
     router.push('/student/login');
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'submitted': return 'bg-blue-100 text-blue-800';
-      case 'graded': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case 'assignment': return FileText;
-      case 'grade': return Award;
-      case 'announcement': return Bell;
-      case 'message': return MessageSquare;
-      default: return Bell;
+      case 'on-verification':
+        return <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">On-Verification</Badge>;
+      case 'completed':
+        return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Completed</Badge>;
+      case 'pending':
+        return <Badge className="bg-gray-100 text-gray-700 hover:bg-gray-100">Pending</Badge>;
+      default:
+        return <Badge>{status}</Badge>;
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-islamic-green-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading dashboard...</p>
         </div>
       </div>
@@ -220,98 +283,134 @@ export default function StudentDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-islamic-navy-800 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
-        <div className="flex items-center justify-between h-16 px-4 bg-islamic-navy-900">
-          <div className="flex items-center">
-            <GraduationCap className="h-8 w-8 text-white mr-2" />
-            <span className="text-white font-semibold text-lg">Student Portal</span>
+    <div className="min-h-screen bg-gray-100 flex">
+      {/* Sidebar - Enlight Style */}
+      <aside className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'} lg:relative`}>
+        {/* Logo Header */}
+        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
+              <GraduationCap className="h-5 w-5 text-white" />
+            </div>
+            {!sidebarCollapsed && <span className="font-semibold text-gray-900">At-Taqwa</span>}
           </div>
           <button
-            onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-white"
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="text-gray-400 hover:text-gray-600"
           >
-            <X className="h-6 w-6" />
+            <ChevronRight className={`h-5 w-5 transition-transform ${sidebarCollapsed ? '' : 'rotate-180'}`} />
           </button>
         </div>
-        
-        <nav className="mt-8">
-          <Link href="/student/dashboard" className="flex items-center px-4 py-3 text-white bg-islamic-green-600">
-            <Home className="h-5 w-5 mr-3" />
-            Dashboard
-          </Link>
-          <Link href="/student/courses" className="flex items-center px-4 py-3 text-gray-300 hover:bg-islamic-navy-700">
-            <BookOpen className="h-5 w-5 mr-3" />
-            My Courses
-          </Link>
-          <Link href="/student/assignments" className="flex items-center px-4 py-3 text-gray-300 hover:bg-islamic-navy-700">
-            <FileText className="h-5 w-5 mr-3" />
-            Assignments
-          </Link>
-          <Link href="/student/grades" className="flex items-center px-4 py-3 text-gray-300 hover:bg-islamic-navy-700">
-            <Award className="h-5 w-5 mr-3" />
-            Grades
-          </Link>
-          <Link href="/student/calendar" className="flex items-center px-4 py-3 text-gray-300 hover:bg-islamic-navy-700">
-            <Calendar className="h-5 w-5 mr-3" />
-            Calendar
-          </Link>
-          <Link href="/student/messages" className="flex items-center px-4 py-3 text-gray-300 hover:bg-islamic-navy-700">
-            <MessageSquare className="h-5 w-5 mr-3" />
-            Messages
-          </Link>
-          <Link href="/student/profile" className="flex items-center px-4 py-3 text-gray-300 hover:bg-islamic-navy-700">
-            <User className="h-5 w-5 mr-3" />
-            Profile
-          </Link>
-        </nav>
-        
-        <div className="absolute bottom-0 w-full p-4">
-          <button
-            onClick={handleLogout}
-            className="flex items-center w-full px-4 py-3 text-gray-300 hover:bg-islamic-navy-700 rounded"
-          >
-            <LogOut className="h-5 w-5 mr-3" />
-            Logout
-          </button>
-        </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="lg:ml-64 flex-1">
-        {/* Top Bar */}
-        <header className="bg-white shadow-sm">
-          <div className="flex items-center justify-between px-4 py-3">
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden"
-            >
-              <Menu className="h-6 w-6" />
-            </button>
-            
-            <div className="flex-1 px-4">
-              <h1 className="text-2xl font-semibold text-islamic-navy-800">
-                Assalamu Alaikum, {student?.name}!
-              </h1>
-              <p className="text-sm text-gray-600">Student ID: {student?.studentId}</p>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              {/* Notifications */}
-              <button className="relative">
-                <Bell className="h-6 w-6 text-gray-600" />
-                {notifications.filter(n => !n.read).length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {notifications.filter(n => !n.read).length}
-                  </span>
+        {/* Navigation */}
+        <nav className="p-2 space-y-1 overflow-y-auto h-[calc(100vh-8rem)]">
+          {/* Dashboard Link */}
+          <Link
+            href="/student/dashboard"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-emerald-50 text-emerald-700 font-medium"
+          >
+            <Home className="h-5 w-5" />
+            {!sidebarCollapsed && <span>Dashboard</span>}
+          </Link>
+
+          {/* Collapsible Sections */}
+          {sidebarSections.map((section, index) => (
+            <div key={section.title} className="mt-4">
+              <button
+                onClick={() => toggleSection(index)}
+                className="flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-700"
+              >
+                <div className="flex items-center gap-2">
+                  <section.icon className="h-4 w-4" />
+                  {!sidebarCollapsed && <span>{section.title}</span>}
+                </div>
+                {!sidebarCollapsed && (
+                  <ChevronDown className={`h-4 w-4 transition-transform ${section.isOpen ? 'rotate-180' : ''}`} />
                 )}
               </button>
-              
-              {/* Profile */}
-              <Avatar>
+
+              {section.isOpen && !sidebarCollapsed && (
+                <div className="mt-1 ml-4 space-y-1">
+                  {section.items.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg"
+                    >
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.label}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </nav>
+
+        {/* Logout */}
+        <div className="absolute bottom-0 w-full p-2 border-t border-gray-200 bg-white">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 w-full px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg"
+          >
+            <LogOut className="h-5 w-5" />
+            {!sidebarCollapsed && <span>Logout</span>}
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <div className="flex-1 min-w-0">
+        {/* Top Header */}
+        <header className="bg-white border-b border-gray-200 px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-semibold text-gray-900">
+                Welcome Back, {student?.name}
+              </h1>
+              {dataSource === 'api' ? (
+                <Badge className="mt-1 bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  Live Data from Strapi
+                </Badge>
+              ) : (
+                <Badge className="mt-1 bg-amber-100 text-amber-700 hover:bg-amber-100">
+                  <AlertCircle className="h-3 w-3 mr-1" />
+                  Demo Mode (Mock Data)
+                </Badge>
+              )}
+            </div>
+
+            <div className="flex items-center gap-4">
+              {/* Search */}
+              <div className="relative hidden md:block">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Search Here"
+                  className="pl-9 w-64 bg-gray-50 border-gray-200"
+                />
+              </div>
+
+              {/* Icons */}
+              <button className="p-2 text-gray-500 hover:text-gray-700">
+                <MessageSquare className="h-5 w-5" />
+              </button>
+              <button
+                onClick={() => setNotificationsOpen(true)}
+                className="relative p-2 text-gray-500 hover:text-gray-700"
+              >
+                <Bell className="h-5 w-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                )}
+              </button>
+
+              {/* Avatar */}
+              <Avatar className="h-9 w-9">
                 <AvatarImage src="/placeholder-avatar.jpg" />
-                <AvatarFallback>{student?.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                <AvatarFallback className="bg-emerald-100 text-emerald-700">
+                  {student?.name.split(' ').map(n => n[0]).join('')}
+                </AvatarFallback>
               </Avatar>
             </div>
           </div>
@@ -319,220 +418,312 @@ export default function StudentDashboard() {
 
         {/* Dashboard Content */}
         <main className="p-6">
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <Card>
+          {/* Top Stats - 3 Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            {/* Courses Completed */}
+            <Card className="bg-white shadow-sm">
               <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Enrolled Courses</p>
-                    <p className="text-3xl font-bold text-islamic-navy-800">{student?.enrolledCourses}</p>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+                      <Award className="h-4 w-4 text-amber-600" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-600">Courses Completed</span>
                   </div>
-                  <BookOpen className="h-8 w-8 text-islamic-green-500" />
+                  <button className="text-gray-400 hover:text-gray-600">
+                    <MoreHorizontal className="h-5 w-5" />
+                  </button>
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-bold text-gray-900">{student?.completedCourses}</span>
+                  <span className="text-lg text-gray-400">/{student?.totalCourses}</span>
+                </div>
+                <div className="flex items-center justify-between mt-3">
+                  <span className="text-sm text-gray-500">Compared To Last Semester</span>
+                  <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">+24 Courses</Badge>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            {/* Grade Point Average */}
+            <Card className="bg-white shadow-sm">
               <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Average Grade</p>
-                    <p className="text-3xl font-bold text-islamic-navy-800">{student?.averageGrade}%</p>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <TrendingUp className="h-4 w-4 text-purple-600" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-600">Grade Point Average</span>
                   </div>
-                  <TrendingUp className="h-8 w-8 text-blue-500" />
+                  <button className="text-gray-400 hover:text-gray-600">
+                    <MoreHorizontal className="h-5 w-5" />
+                  </button>
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-bold text-gray-900">{student?.averageGrade.toFixed(2)}</span>
+                  <span className="text-lg text-gray-400">/{student?.maxGrade.toFixed(2)}</span>
+                </div>
+                <div className="flex items-center justify-between mt-3">
+                  <span className="text-sm text-gray-500">Compared To Last Semester</span>
+                  <Badge className="bg-rose-100 text-rose-700 hover:bg-rose-100">-0.25 Points</Badge>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            {/* Active Classes */}
+            <Card className="bg-white shadow-sm">
               <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Attendance</p>
-                    <p className="text-3xl font-bold text-islamic-navy-800">{student?.attendanceRate}%</p>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <BookOpen className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-600">Active Classes</span>
                   </div>
-                  <CheckCircle className="h-8 w-8 text-green-500" />
+                  <button className="text-gray-400 hover:text-gray-600">
+                    <MoreHorizontal className="h-5 w-5" />
+                  </button>
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Completed</p>
-                    <p className="text-3xl font-bold text-islamic-navy-800">{student?.completedCourses}</p>
-                  </div>
-                  <Award className="h-8 w-8 text-purple-500" />
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-bold text-gray-900">{student?.activeClasses}</span>
+                  <span className="text-lg text-gray-400">/{student?.totalClasses}</span>
+                </div>
+                <div className="flex items-center justify-between mt-3">
+                  <span className="text-sm text-gray-500">Active Course This Semester</span>
+                  <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">+3 Active Course</Badge>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Current Courses */}
-            <div className="lg:col-span-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <span>Current Courses</span>
-                    <Link href="/student/courses">
-                      <Button variant="ghost" size="sm">
-                        View All
-                        <ChevronRight className="h-4 w-4 ml-1" />
-                      </Button>
-                    </Link>
-                  </CardTitle>
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Left Column - Grade Chart + Payment Table */}
+            <div className="lg:col-span-7 space-y-6">
+              {/* Grade Point Average Chart */}
+              <Card className="bg-white shadow-sm">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-lg font-semibold">Grade Point Average</CardTitle>
+                      <p className="text-sm text-gray-500 mt-1">Comparison between your GPA and Average Student GPA</p>
+                    </div>
+                    <Select value={semesterFilter} onValueChange={setSemesterFilter}>
+                      <SelectTrigger className="w-[140px]">
+                        <SelectValue placeholder="All Semesters" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Semesters</SelectItem>
+                        <SelectItem value="current">Current</SelectItem>
+                        <SelectItem value="previous">Previous</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    {courses.map((course) => (
-                      <div key={course.id} className="border rounded-lg p-4 hover:bg-gray-50">
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <h4 className="font-semibold text-islamic-navy-800">{course.title}</h4>
-                            <p className="text-sm text-gray-600">Instructor: {course.instructor}</p>
-                            <p className="text-sm text-gray-500">Next class: {course.nextClass}</p>
-                          </div>
-                          {course.grade && (
-                            <Badge variant="outline">Grade: {course.grade}%</Badge>
-                          )}
-                        </div>
-                        <div className="mt-3">
-                          <div className="flex justify-between text-sm mb-1">
-                            <span>Progress</span>
-                            <span>{course.progress}%</span>
-                          </div>
-                          <Progress value={course.progress} className="h-2" />
-                        </div>
-                        {course.assignments > 0 && (
-                          <div className="mt-2">
-                            <Badge className="bg-yellow-100 text-yellow-800">
-                              {course.assignments} pending assignment{course.assignments > 1 ? 's' : ''}
-                            </Badge>
-                          </div>
-                        )}
+                  {/* Simple Chart Placeholder - You can integrate a real chart library */}
+                  <div className="h-64 relative">
+                    {/* Y-axis labels */}
+                    <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-gray-400 py-4">
+                      <span>4.0</span>
+                      <span>3.5</span>
+                      <span>3.0</span>
+                      <span>2.5</span>
+                      <span>2.0</span>
+                      <span>1.5</span>
+                      <span>1.0</span>
+                    </div>
+
+                    {/* Chart Area */}
+                    <div className="ml-8 h-full border-l border-b border-gray-200 relative">
+                      {/* Grid lines */}
+                      <div className="absolute inset-0 flex flex-col justify-between">
+                        {[...Array(6)].map((_, i) => (
+                          <div key={i} className="border-t border-gray-100 w-full"></div>
+                        ))}
                       </div>
-                    ))}
+
+                      {/* Chart visualization - placeholder SVG */}
+                      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 600 200" preserveAspectRatio="none">
+                        {/* Your GPA line - purple dashed */}
+                        <path
+                          d="M 50 100 Q 150 90, 200 95 T 350 80 T 500 70"
+                          fill="none"
+                          stroke="#a855f7"
+                          strokeWidth="2"
+                          strokeDasharray="5,5"
+                        />
+                        {/* Average GPA line - emerald solid */}
+                        <path
+                          d="M 50 120 Q 150 115, 200 110 T 350 100 T 500 85"
+                          fill="none"
+                          stroke="#10b981"
+                          strokeWidth="2"
+                        />
+                        {/* Data points */}
+                        <circle cx="350" cy="80" r="4" fill="#a855f7" />
+                        <circle cx="350" cy="100" r="4" fill="#10b981" />
+                      </svg>
+
+                      {/* Legend tooltip */}
+                      <div className="absolute top-1/4 left-1/2 bg-white shadow-lg rounded-lg p-3 text-xs border">
+                        <p className="font-medium text-gray-700 mb-2">2nd Semester 2025</p>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+                          <span className="text-gray-600">Your GPA</span>
+                          <span className="font-semibold ml-auto">2.33</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                          <span className="text-gray-600">Average GPA</span>
+                          <span className="font-semibold ml-auto">2.49</span>
+                        </div>
+                      </div>
+
+                      {/* X-axis labels */}
+                      <div className="absolute bottom-0 left-0 right-0 translate-y-6 flex justify-between text-xs text-gray-400 px-4">
+                        <span>1st Sem</span>
+                        <span>2nd Sem</span>
+                        <span>3rd Sem</span>
+                        <span>4th Sem</span>
+                        <span>5th Sem</span>
+                        <span>6th Sem</span>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Upcoming Assignments */}
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <span>Upcoming Assignments</span>
-                    <Link href="/student/assignments">
-                      <Button variant="ghost" size="sm">
-                        View All
-                        <ChevronRight className="h-4 w-4 ml-1" />
-                      </Button>
-                    </Link>
-                  </CardTitle>
+              {/* Payment & Tuition History */}
+              <Card className="bg-white shadow-sm">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-lg font-semibold">Payment & Tuition History</CardTitle>
+                      <p className="text-sm text-gray-500 mt-1">Complete data about your payment and tuition history</p>
+                    </div>
+                    <Button variant="outline" size="sm">
+                      View All Payment
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    {assignments.map((assignment) => (
-                      <div key={assignment.id} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div className="flex-1">
-                          <h4 className="font-medium">{assignment.title}</h4>
-                          <p className="text-sm text-gray-600">{assignment.courseTitle}</p>
-                          <p className="text-sm text-gray-500">Due: {assignment.dueDate}</p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          {assignment.grade && (
-                            <span className="text-sm font-medium">{assignment.grade}%</span>
-                          )}
-                          <Badge className={getStatusColor(assignment.status)}>
-                            {assignment.status}
-                          </Badge>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-gray-200">
+                          <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Payment ID</th>
+                          <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Payment Category</th>
+                          <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Date</th>
+                          <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Payment Status</th>
+                          <th className="py-3 px-4 text-sm font-medium text-gray-500">...</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {payments.map((payment) => (
+                          <tr key={payment.id} className="border-b border-gray-100 hover:bg-gray-50">
+                            <td className="py-3 px-4 text-sm text-gray-900">{payment.paymentId}</td>
+                            <td className="py-3 px-4 text-sm text-gray-900">{payment.category}</td>
+                            <td className="py-3 px-4 text-sm text-gray-600">{payment.date}</td>
+                            <td className="py-3 px-4">{getStatusBadge(payment.status)}</td>
+                            <td className="py-3 px-4">
+                              <button className="text-gray-400 hover:text-gray-600">
+                                <ExternalLink className="h-4 w-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Notifications */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Recent Notifications</CardTitle>
+            {/* Right Column - Daily Class Schedule */}
+            <div className="lg:col-span-5">
+              <Card className="bg-white shadow-sm h-full">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-lg font-semibold">Daily Class Schedule</CardTitle>
+                      <p className="text-sm text-gray-500 mt-1">Schedule for your class in weekly & daily</p>
+                    </div>
+                    <Select value={scheduleView} onValueChange={(v) => setScheduleView(v as 'daily' | 'weekly')}>
+                      <SelectTrigger className="w-[100px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="daily">Daily</SelectItem>
+                        <SelectItem value="weekly">Weekly</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {notifications.map((notification) => {
-                      const Icon = getNotificationIcon(notification.type);
-                      return (
-                        <div 
-                          key={notification.id} 
-                          className={`p-3 rounded-lg border ${notification.read ? 'bg-white' : 'bg-blue-50 border-blue-200'}`}
-                        >
-                          <div className="flex items-start space-x-3">
-                            <Icon className="h-5 w-5 text-gray-600 mt-0.5" />
-                            <div className="flex-1">
-                              <h4 className="font-medium text-sm">{notification.title}</h4>
-                              <p className="text-xs text-gray-600 mt-1">{notification.message}</p>
-                              <p className="text-xs text-gray-500 mt-2">{notification.timestamp}</p>
+                <CardContent className="space-y-4">
+                  {courses.map((course) => {
+                    // Generate course code from title (e.g., "Stories of Prophets" -> "SFR")
+                    const getCourseCode = (title: string) => {
+                      const words = title.split(' ').filter(w => w.length > 2);
+                      if (words.length >= 2) {
+                        return words.slice(0, 3).map(w => w[0]).join('').toUpperCase();
+                      }
+                      return title.substring(0, 3).toUpperCase();
+                    };
+                    const courseCode = getCourseCode(course.title);
+
+                    return (
+                      <div key={course.id} className="border border-gray-200 rounded-xl p-4 hover:border-gray-300 transition-colors">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-start gap-3">
+                            <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                              <span className="text-emerald-700 font-bold text-xs">{courseCode}</span>
+                            </div>
+                            <div>
+                              <h4 className="font-semibold text-gray-900">{course.title}</h4>
+                              <p className="text-sm text-gray-500">{course.classTime}</p>
                             </div>
                           </div>
+                          <button className="text-gray-400 hover:text-gray-600">
+                            <ExternalLink className="h-4 w-4" />
+                          </button>
                         </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
 
-              {/* Quick Actions */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Quick Actions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <Button variant="outline" className="w-full justify-start">
-                      <Brain className="h-4 w-4 mr-2" />
-                      Start Quiz Practice
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start">
-                      <Target className="h-4 w-4 mr-2" />
-                      View Study Plan
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start">
-                      <Star className="h-4 w-4 mr-2" />
-                      Check Achievements
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start">
-                      <Zap className="h-4 w-4 mr-2" />
-                      Join Live Session
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Study Streak */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Study Streak</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center">
-                    <div className="text-4xl font-bold text-orange-600 mb-2">
-                      🔥 7
-                    </div>
-                    <p className="text-sm text-gray-600">Days in a row!</p>
-                    <p className="text-xs text-gray-500 mt-2">Keep it up!</p>
-                  </div>
+                        <div className="mt-4 space-y-2 text-sm">
+                          <div className="flex items-center gap-2">
+                            <User className="h-4 w-4 text-gray-400" />
+                            <span className="text-gray-500">Instructor</span>
+                            <span className="ml-auto text-gray-900">{course.instructor}, {course.instructorTitle}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Building2 className="h-4 w-4 text-gray-400" />
+                            <span className="text-gray-500">Room</span>
+                            <span className="ml-auto text-gray-900">{course.room}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Award className="h-4 w-4 text-gray-400" />
+                            <span className="text-gray-500">Course Credits</span>
+                            <span className="ml-auto text-emerald-600 font-medium">{course.credits} Credits</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </CardContent>
               </Card>
             </div>
           </div>
         </main>
       </div>
+
+      {/* Notification Panel */}
+      <NotificationPanel
+        isOpen={notificationsOpen}
+        onClose={() => setNotificationsOpen(false)}
+        notifications={notifications}
+        onMarkAllRead={handleMarkAllRead}
+        onMarkAsRead={handleMarkAsRead}
+      />
     </div>
   );
 }

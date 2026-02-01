@@ -11,8 +11,8 @@ import { ApiError } from '@/lib/api';
 import { MOSQUE_INFO } from '@attaqwa/shared';
 
 export default function AdminLoginPage() {
-  const [email, setEmail] = useState('admin@attaqwa.org');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('admin@attaqwa.test');
+  const [password, setPassword] = useState('Admin123!');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
@@ -104,8 +104,8 @@ export default function AdminLoginPage() {
           <div className="mt-6 p-4 bg-islamic-gold-50 border border-islamic-gold-200 rounded-lg">
             <p className="text-sm text-islamic-gold-700 font-medium mb-2">Demo Credentials:</p>
             <p className="text-xs text-islamic-gold-600">
-              Email: admin@attaqwa.org<br />
-              Password: admin123
+              Email: admin@attaqwa.test<br />
+              Password: Admin123!
             </p>
           </div>
         </CardContent>

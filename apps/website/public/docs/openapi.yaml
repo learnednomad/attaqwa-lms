@@ -1,0 +1,974 @@
+openapi: 3.1.0
+info:
+  title: At-Taqwa LMS API
+  description: |
+    RESTful API for Masjid At-Taqwa's Learning Management System and Islamic Services.
+
+    ## API Versioning
+    All endpoints are versioned with the `/api/v1/` prefix. Legacy endpoints without versioning
+    are deprecated and will be removed on 2025-12-01.
+
+    ## Authentication
+    Most endpoints require JWT authentication. Include the token in the Authorization header:
+    ```
+    Authorization: Bearer <your-token>
+    ```
+
+    ## Rate Limiting
+    - Anonymous users: 100 requests/minute
+    - Authenticated users: 500 requests/minute
+    - Admin users: 1000 requests/minute
+
+    Rate limit headers are included in all responses:
+    - `X-RateLimit-Limit`: Maximum requests allowed
+    - `X-RateLimit-Remaining`: Requests remaining in current window
+    - `X-RateLimit-Reset`: Seconds until rate limit resets
+
+    ## Response Format
+    All responses follow the Strapi v5 flat format:
+    ```json
+    {
+      "data": { ... },
+      "meta": { "pagination": { ... } }
+    }
+    ```
+  version: 1.0.0
+  contact:
+    name: At-Taqwa Development Team
+    email: Attaqwa.du@gmail.com
+    url: https://masjidattaqwaatlanta.org
+  license:
+    name: Proprietary
+    url: https://masjidattaqwaatlanta.org/terms
+
+servers:
+  - url: http://localhost:3003
+    description: Local Development (Next.js BFF)
+  - url: http://localhost:1337
+    description: Local Development (Strapi API)
+  - url: https://api.masjidattaqwaatlanta.org
+    description: Production Server
+
+tags:
+  - name: Authentication
+    description: User authentication and session management
+  - name: Courses
+    description: LMS course management
+  - name: Lessons
+    description: Course lesson content
+  - name: Quizzes
+    description: Assessment and quiz management
+  - name: Progress
+    description: User learning progress tracking
+  - name: Islamic Services
+    description: Prayer times, Quran, and Hadith services
+  - name: Community
+    description: Announcements and events
+
+paths:
+  # ============================================================================
+  # AUTHENTICATION
+  # ============================================================================
+  /api/auth/local:
+    post:
+      summary: User Login
+      description: Authenticate user with email/username and password
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [identifier, password]
+              properties:
+                identifier:
+                  type: string
+                  description: Email or username
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  example: password123
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/auth/local/register:
+    post:
+      summary: User Registration
+      description: Create a new user account
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, email, password]
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                  example: newuser
+                email:
+                  type: string
+                  format: email
+                  example: newuser@example.com
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                  example: securePassword123
+      responses:
+        '200':
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /api/users/me:
+    get:
+      summary: Get Current User
+      description: Retrieve the authenticated user's profile
+      tags: [Authentication]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ============================================================================
+  # COURSES (v1)
+  # ============================================================================
+  /api/v1/courses:
+    get:
+      summary: List Courses
+      description: Retrieve a paginated list of courses with optional filtering
+      tags: [Courses]
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+        - name: filters[age_tier][$eq]
+          in: query
+          description: Filter by age tier
+          schema:
+            $ref: '#/components/schemas/AgeTier'
+        - name: filters[subject][$eq]
+          in: query
+          description: Filter by subject
+          schema:
+            $ref: '#/components/schemas/CourseSubject'
+        - name: filters[difficulty][$eq]
+          in: query
+          description: Filter by difficulty level
+          schema:
+            $ref: '#/components/schemas/DifficultyLevel'
+        - name: sort
+          in: query
+          description: Sort field and direction
+          schema:
+            type: string
+            example: createdAt:desc
+      responses:
+        '200':
+          description: Courses retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoursesResponse'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+    post:
+      summary: Create Course
+      description: Create a new course (admin only)
+      tags: [Courses]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseInput'
+      responses:
+        '201':
+          description: Course created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/courses/{documentId}:
+    get:
+      summary: Get Course by ID
+      description: Retrieve a single course by its document ID
+      tags: [Courses]
+      parameters:
+        - $ref: '#/components/parameters/DocumentId'
+        - name: populate
+          in: query
+          description: Relations to populate
+          schema:
+            type: string
+            example: lessons,enrollments
+      responses:
+        '200':
+          description: Course retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      summary: Update Course
+      description: Update an existing course (admin only)
+      tags: [Courses]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DocumentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseInput'
+      responses:
+        '200':
+          description: Course updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: Delete Course
+      description: Delete a course (admin only)
+      tags: [Courses]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DocumentId'
+      responses:
+        '204':
+          description: Course deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ============================================================================
+  # ISLAMIC SERVICES (v1)
+  # ============================================================================
+  /api/v1/prayer-times:
+    get:
+      summary: Get Prayer Times
+      description: |
+        Retrieve prayer times for a given location and date.
+        Uses 5-layer fallback system for 99.9% uptime.
+      tags: [Islamic Services]
+      parameters:
+        - name: latitude
+          in: query
+          description: Location latitude (default: 33.9114 - At-Taqwa Masjid)
+          schema:
+            type: number
+            format: double
+            example: 33.9114
+        - name: longitude
+          in: query
+          description: Location longitude (default: -84.2614 - At-Taqwa Masjid)
+          schema:
+            type: number
+            format: double
+            example: -84.2614
+        - name: method
+          in: query
+          description: Calculation method (1-7)
+          schema:
+            type: integer
+            enum: [1, 2, 3, 4, 5, 6, 7]
+            default: 2
+        - name: school
+          in: query
+          description: Juristic school for Asr calculation
+          schema:
+            type: integer
+            enum: [0, 1]
+            default: 0
+        - name: date
+          in: query
+          description: Date for prayer times (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+            example: '2025-01-15'
+      responses:
+        '200':
+          description: Prayer times retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrayerTimesResponse'
+
+  /api/v1/ayahs:
+    get:
+      summary: Get Quran Ayah
+      description: Retrieve a Quran ayah by surah and ayah number
+      tags: [Islamic Services]
+      parameters:
+        - name: surah
+          in: query
+          description: Surah number (1-114)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 114
+            example: 2
+        - name: ayah
+          in: query
+          description: Ayah number
+          schema:
+            type: integer
+            minimum: 1
+            example: 255
+        - name: edition
+          in: query
+          description: Translation/tafsir edition
+          schema:
+            type: string
+            default: en.sahih
+      responses:
+        '200':
+          description: Ayah retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AyahResponse'
+
+  /api/v1/ayahs/daily:
+    get:
+      summary: Get Daily Ayah
+      description: Retrieve the featured ayah of the day
+      tags: [Islamic Services]
+      responses:
+        '200':
+          description: Daily ayah retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AyahResponse'
+
+  /api/v1/hadiths:
+    get:
+      summary: Get Hadiths
+      description: Retrieve hadiths from various collections
+      tags: [Islamic Services]
+      parameters:
+        - name: collection
+          in: query
+          description: Hadith collection name
+          schema:
+            type: string
+            enum: [bukhari, muslim, tirmidhi, abudawud, nasai, ibnmajah]
+            default: bukhari
+        - name: book
+          in: query
+          description: Book number within collection
+          schema:
+            type: string
+            example: '1'
+        - name: limit
+          in: query
+          description: Number of hadiths to return
+          schema:
+            type: integer
+            default: 10
+            maximum: 50
+        - name: offset
+          in: query
+          description: Offset for pagination
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Hadiths retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HadithsResponse'
+
+  # ============================================================================
+  # COMMUNITY (v1)
+  # ============================================================================
+  /api/v1/announcements:
+    get:
+      summary: List Announcements
+      description: Retrieve community announcements with optional filtering
+      tags: [Community]
+      parameters:
+        - name: type
+          in: query
+          description: Filter by announcement type
+          schema:
+            type: string
+            enum: [prayer, event, education, general]
+        - name: active
+          in: query
+          description: Filter by active status
+          schema:
+            type: boolean
+            default: true
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
+      responses:
+        '200':
+          description: Announcements retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnnouncementsResponse'
+
+    post:
+      summary: Create Announcement
+      description: Create a new announcement (admin only)
+      tags: [Community]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnnouncementInput'
+      responses:
+        '201':
+          description: Announcement created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnnouncementResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    DocumentId:
+      name: documentId
+      in: path
+      required: true
+      description: Strapi v5 document ID
+      schema:
+        type: string
+        example: abc123xyz
+
+    PageParam:
+      name: pagination[page]
+      in: query
+      description: Page number (1-indexed)
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+
+    PageSizeParam:
+      name: pagination[pageSize]
+      in: query
+      description: Items per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+
+    LimitParam:
+      name: limit
+      in: query
+      description: Maximum number of items to return
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 10
+
+    OffsetParam:
+      name: offset
+      in: query
+      description: Number of items to skip
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+
+  schemas:
+    # Enums
+    AgeTier:
+      type: string
+      enum: [PRESCHOOL, ELEMENTARY, MIDDLE_SCHOOL, HIGH_SCHOOL, COLLEGE, ADULTS, SENIORS]
+      description: Age tier for content filtering
+
+    CourseSubject:
+      type: string
+      enum: [QURAN, ARABIC, FIQH, SEERAH, AQEEDAH, ISLAMIC_HISTORY, HADEETH, TAFSEER]
+      description: Course subject category
+
+    DifficultyLevel:
+      type: string
+      enum: [BEGINNER, INTERMEDIATE, ADVANCED]
+      description: Course difficulty level
+
+    # Auth Schemas
+    AuthResponse:
+      type: object
+      properties:
+        jwt:
+          type: string
+          description: JWT authentication token
+        user:
+          $ref: '#/components/schemas/User'
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        documentId:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        provider:
+          type: string
+        confirmed:
+          type: boolean
+        blocked:
+          type: boolean
+        role:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            type:
+              type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    # Course Schemas
+    Course:
+      type: object
+      properties:
+        documentId:
+          type: string
+        title:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        age_tier:
+          $ref: '#/components/schemas/AgeTier'
+        subject:
+          $ref: '#/components/schemas/CourseSubject'
+        difficulty:
+          $ref: '#/components/schemas/DifficultyLevel'
+        duration_minutes:
+          type: integer
+        is_published:
+          type: boolean
+        thumbnail:
+          type: object
+          nullable: true
+        lessons:
+          type: array
+          items:
+            $ref: '#/components/schemas/Lesson'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CourseInput:
+      type: object
+      required: [title, slug, age_tier, subject, difficulty]
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 200
+        slug:
+          type: string
+          pattern: '^[a-z0-9-]+$'
+        description:
+          type: string
+        age_tier:
+          $ref: '#/components/schemas/AgeTier'
+        subject:
+          $ref: '#/components/schemas/CourseSubject'
+        difficulty:
+          $ref: '#/components/schemas/DifficultyLevel'
+        duration_minutes:
+          type: integer
+          minimum: 1
+        is_published:
+          type: boolean
+          default: false
+
+    CourseResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Course'
+        meta:
+          type: object
+
+    CoursesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Course'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+
+    Lesson:
+      type: object
+      properties:
+        documentId:
+          type: string
+        title:
+          type: string
+        order:
+          type: integer
+        duration_minutes:
+          type: integer
+        content_type:
+          type: string
+          enum: [VIDEO, TEXT, QUIZ, INTERACTIVE]
+        is_published:
+          type: boolean
+
+    # Islamic Services Schemas
+    PrayerTimesResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            timings:
+              type: object
+              properties:
+                Fajr:
+                  type: string
+                  example: '05:30'
+                Sunrise:
+                  type: string
+                  example: '07:00'
+                Dhuhr:
+                  type: string
+                  example: '12:30'
+                Asr:
+                  type: string
+                  example: '15:45'
+                Maghrib:
+                  type: string
+                  example: '18:00'
+                Isha:
+                  type: string
+                  example: '19:30'
+            coordinates:
+              type: object
+              properties:
+                latitude:
+                  type: number
+                longitude:
+                  type: number
+            meta:
+              type: object
+              properties:
+                timezone:
+                  type: string
+                method:
+                  type: string
+        meta:
+          type: object
+          properties:
+            version:
+              type: string
+              example: v1
+            timestamp:
+              type: string
+              format: date-time
+
+    AyahResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            number:
+              type: integer
+            text:
+              type: string
+              description: Arabic text
+            translation:
+              type: string
+            tafsir:
+              type: string
+            surah:
+              type: object
+              properties:
+                number:
+                  type: integer
+                name:
+                  type: string
+                englishName:
+                  type: string
+            audio:
+              type: string
+              format: uri
+        meta:
+          type: object
+          properties:
+            version:
+              type: string
+            timestamp:
+              type: string
+              format: date-time
+
+    HadithsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              collection:
+                type: string
+              bookNumber:
+                type: string
+              hadithNumber:
+                type: string
+              hadith:
+                type: object
+                properties:
+                  arab:
+                    type: string
+                  english:
+                    type: string
+                  narrator:
+                    type: string
+              grade:
+                type: string
+              reference:
+                type: string
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+
+    # Community Schemas
+    Announcement:
+      type: object
+      properties:
+        documentId:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        type:
+          type: string
+          enum: [prayer, event, education, general]
+        priority:
+          type: string
+          enum: [low, normal, medium, high]
+        isActive:
+          type: boolean
+        author:
+          type: object
+          properties:
+            name:
+              type: string
+            role:
+              type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AnnouncementInput:
+      type: object
+      required: [title, content, type]
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 200
+        content:
+          type: string
+        type:
+          type: string
+          enum: [prayer, event, education, general]
+        priority:
+          type: string
+          enum: [low, normal, medium, high]
+          default: normal
+        isActive:
+          type: boolean
+          default: true
+
+    AnnouncementResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Announcement'
+        meta:
+          type: object
+
+    AnnouncementsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Announcement'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+
+    # Common Schemas
+    PaginationMeta:
+      type: object
+      properties:
+        pagination:
+          type: object
+          properties:
+            page:
+              type: integer
+            pageSize:
+              type: integer
+            pageCount:
+              type: integer
+            total:
+              type: integer
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            status:
+              type: integer
+            name:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
+
+  responses:
+    BadRequest:
+      description: Bad request - Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Unauthorized - Missing or invalid authentication
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Forbidden:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Not found - Resource does not exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    RateLimitExceeded:
+      description: Rate limit exceeded
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+          description: Maximum requests allowed per window
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+          description: Requests remaining in current window
+        X-RateLimit-Reset:
+          schema:
+            type: integer
+          description: Seconds until rate limit resets
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds to wait before retrying
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

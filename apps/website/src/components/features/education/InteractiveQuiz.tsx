@@ -237,7 +237,7 @@ export function InteractiveQuiz({
             </div>
           </div>
 
-          {timeLimit > 0 && (
+          {timeLimit && timeLimit > 0 && (
             <div className={cn(
               'text-right',
               timeLeft < 60 && 'text-red-600 animate-pulse'

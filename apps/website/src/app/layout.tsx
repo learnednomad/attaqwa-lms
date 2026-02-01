@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import { Inter, Amiri } from "next/font/google";
+import { Inter, Amiri, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
 import { Providers } from "@/lib/providers";
 import { MOSQUE_INFO } from "@attaqwa/shared";
 import { SEO_KEYWORDS, generateSEOMetadata, generateMosqueStructuredData } from "@/lib/seo";
@@ -18,6 +16,13 @@ const amiri = Amiri({
   weight: ["400", "700"],
   variable: "--font-amiri",
   display: "swap", // Optimize font loading for Core Web Vitals
+});
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-cormorant",
+  display: "swap",
 });
 
 export const metadata: Metadata = generateSEOMetadata({
@@ -47,7 +52,7 @@ export default function RootLayout({
   const mosqueStructuredData = generateMosqueStructuredData();
 
   return (
-    <html lang="en" dir="ltr" className={`${inter.variable} ${amiri.variable}`}>
+    <html lang="en" dir="ltr" className={`${inter.variable} ${amiri.variable} ${cormorant.variable}`}>
       <head>
         {/* Structured Data for SEO */}
         <script
@@ -89,14 +94,9 @@ export default function RootLayout({
           >
             Skip to main content
           </a>
-          
-          <div className="relative flex min-h-screen flex-col">
-            <Header />
-            <main id="main-content" className="flex-1" role="main">
-              {children}
-            </main>
-            <Footer />
-          </div>
+
+          {/* Children layouts handle their own header/footer */}
+          {children}
         </Providers>
 
         {/* Initialize performance monitoring and Arabic SEO */}

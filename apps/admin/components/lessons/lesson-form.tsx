@@ -69,7 +69,7 @@ export function LessonForm({
     duration: initialData?.duration || 10,
     order: initialData?.order || 1,
     isRequired: initialData?.isRequired || false,
-    content: initialData?.content || {},
+    content: (typeof initialData?.content === 'string' ? {} : initialData?.content) || {},
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof LessonFormData, string>>>({});
@@ -628,14 +628,15 @@ function QuizContentEditor({
                 />
 
                 <div className="grid gap-3 md:grid-cols-2">
-                  {question.options?.map((option, optIndex) => (
+                  {(Array.isArray(question.options) ? question.options : []).map((option, optIndex) => (
                     <Input
                       key={optIndex}
                       label={`Option ${optIndex + 1}`}
                       placeholder={`Answer option ${optIndex + 1}`}
                       value={option}
                       onChange={(e) => {
-                        const newOptions = [...(question.options || [])];
+                        const currentOptions = Array.isArray(question.options) ? question.options : [];
+                        const newOptions = [...currentOptions];
                         newOptions[optIndex] = e.target.value;
                         updateQuestion(index, 'options', newOptions);
                       }}

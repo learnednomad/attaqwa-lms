@@ -1,12 +1,18 @@
 /**
  * Strapi API Client for Next.js Web Admin
  * Handles authentication, requests, and error handling
+ *
+ * Updated: 2025-12-10 - Now uses v1 versioned endpoints
  */
 
 import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios';
+import { API_V1_ENDPOINTS, API_CONFIG } from '@attaqwa/shared';
 
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337/api';
+
+// API Version configuration
+const API_VERSION = API_CONFIG.CURRENT_VERSION; // 'v1'
 
 class StrapiClient {
   private client: AxiosInstance;
@@ -222,3 +228,32 @@ export const buildStrapiQuery = {
     return queryParts.filter(Boolean).join('&');
   },
 };
+
+// v1 Versioned API endpoints for admin operations
+export const adminApiEndpoints = {
+  // LMS Core (v1 versioned)
+  courses: `/${API_VERSION}/courses`,
+  lessons: `/${API_VERSION}/lessons`,
+  quizzes: `/${API_VERSION}/quizzes`,
+
+  // User Management (v1 versioned)
+  userProgress: `/${API_VERSION}/user-progresses`,
+  courseEnrollments: `/${API_VERSION}/course-enrollments`,
+  achievements: `/${API_VERSION}/achievements`,
+  userAchievements: `/${API_VERSION}/user-achievements`,
+
+  // Gamification (v1 versioned)
+  leaderboards: `/${API_VERSION}/leaderboards`,
+  streaks: `/${API_VERSION}/streaks`,
+
+  // Auth (standard Strapi - no version prefix)
+  login: '/auth/local',
+  register: '/auth/local/register',
+  me: '/users/me',
+
+  // File upload (standard Strapi)
+  upload: '/upload',
+} as const;
+
+// Export shared endpoints for consistency
+export { API_V1_ENDPOINTS, API_CONFIG };

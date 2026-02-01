@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FeatureFlagService } from '@attaqwa/shared/feature-flags';
+import { FeatureFlagService } from '@attaqwa/shared';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,7 +24,11 @@ import {
   TrendingUp,
   Clock
 } from 'lucide-react';
-import type { IslamicSubject, DifficultyLevel, EducationContentType, AgeTier } from '@attaqwa/shared';
+// Local types for this page
+type IslamicSubject = 'QURAN' | 'HADITH' | 'FIQH' | 'AQIDAH' | 'SEERAH' | 'WORSHIP' | 'ARABIC_LANGUAGE' | 'ISLAMIC_HISTORY';
+type EducationContentType = 'LESSON' | 'QUIZ' | 'VIDEO' | 'AUDIO' | 'READING' | 'INTERACTIVE';
+type DifficultyLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+type AgeTier = 'CHILDREN' | 'YOUTH' | 'ADULTS' | 'ALL_AGES';
 
 interface ContentItem {
   id: string;
@@ -382,7 +386,7 @@ export default function AdminContentPage() {
 
                 {/* Actions */}
                 <div className="flex items-center gap-2">
-                  <Link href={`/education/content/${item.id}`}>
+                  <Link href={`/admin/education/content/${item.id}/edit`}>
                     <Button variant="ghost" size="sm" title="View Content">
                       <Eye className="h-4 w-4" />
                     </Button>

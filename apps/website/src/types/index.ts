@@ -4,10 +4,13 @@ export interface Announcement {
   content: string;
   date: Date;
   time?: string;
+  eventDate?: Date;
   imageUrl?: string;
   imageAlt?: string;
+  pdfUrl?: string;
   isActive: boolean;
   isArchived: boolean;
+  isEvent?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
