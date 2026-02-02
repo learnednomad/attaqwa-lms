@@ -99,19 +99,9 @@ jobs:
 
       - name: Build admin app
         run: pnpm run build:admin
-        continue-on-error: true # Allow failure until type errors fixed (Priority #0)
 
       - name: Build website app
         run: pnpm run build:website
-        continue-on-error: true # Allow failure until module exports fixed (Priority #0)
-
-      - name: Check build status
-        if: always()
-        run: |
-          echo "⚠️ Build validation complete"
-          echo "Note: Builds currently failing - see BASELINES.md Priority #0"
-          echo "Admin build: TypeScript errors in Strapi client"
-          echo "Website build: Missing exports from @attaqwa/shared"
 
   e2e-tests:
     name: E2E Tests
@@ -143,7 +133,6 @@ jobs:
         run: |
           cd apps/website
           pnpm exec playwright test --project=chromium
-        continue-on-error: true # Allow failure until apps fully working
 
       - name: Upload Playwright report
         if: always()

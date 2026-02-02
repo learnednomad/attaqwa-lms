@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { sanitizeHtml } from '@/lib/sanitize';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -189,7 +190,7 @@ export default function LessonViewerPage() {
                 <div
                   className="prose prose-lg max-w-none"
                   dangerouslySetInnerHTML={{
-                    __html: lesson.content || '<p className="text-gray-600">Content coming soon...</p>'
+                    __html: sanitizeHtml(lesson.content || '<p class="text-gray-600">Content coming soon...</p>')
                   }}
                 />
               </CardContent>

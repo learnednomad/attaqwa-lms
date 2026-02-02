@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyAuth } from '@/middleware/auth';
 
 // Mock events data - in production, this would come from Strapi
 const mockEvents = [
@@ -129,23 +130,22 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const authHeader = request.headers.get('authorization');
-
-    if (!authHeader) {
+    // SECURITY: Verify authentication and role
+    const user = await verifyAuth(request);
+    if (!user) {
       return NextResponse.json(
-        {
-          error: {
-            status: 401,
-            name: 'UnauthorizedError',
-            message: 'Missing authorization header',
-          },
-        },
+        { error: { status: 401, message: 'Authentication required' } },
         { status: 401 }
       );
     }
+    if (!['ADMIN', 'MODERATOR', 'admin', 'moderator'].includes(user.role)) {
+      return NextResponse.json(
+        { error: { status: 403, message: 'Insufficient permissions' } },
+        { status: 403 }
+      );
+    }
 
-    // In production, validate admin role and save to database
+    const body = await request.json();
     const newEvent = {
       documentId: `evt-${Date.now()}`,
       ...body,

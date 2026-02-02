@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAnyAuthToken } from '@/lib/auth-cookies';
+import { verifyAuth } from '@/middleware/auth';
 
 const STRAPI_URL = process.env.STRAPI_URL || 'http://localhost:1337';
 
@@ -80,23 +81,25 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    // SECURITY: Verify authentication and role
+    const user = await verifyAuth(request);
+    if (!user) {
+      return NextResponse.json(
+        { error: { status: 401, message: 'Authentication required' } },
+        { status: 401 }
+      );
+    }
+    if (!['ADMIN', 'TEACHER', 'admin', 'teacher'].includes(user.role)) {
+      return NextResponse.json(
+        { error: { status: 403, message: 'Insufficient permissions' } },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const authHeader = request.headers.get('authorization');
     const authResult = await getAnyAuthToken();
     const token = authResult?.token || null;
-
-    if (!authHeader && !token) {
-      return NextResponse.json(
-        {
-          error: {
-            status: 401,
-            name: 'UnauthorizedError',
-            message: 'Authentication required',
-          },
-        },
-        { status: 401 }
-      );
-    }
 
     const response = await fetch(`${STRAPI_URL}/api/v1/lessons`, {
       method: 'POST',

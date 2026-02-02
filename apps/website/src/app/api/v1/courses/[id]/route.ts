@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAnyAuthToken } from '@/lib/auth-cookies';
+import { verifyAuth } from '@/middleware/auth';
 
 const STRAPI_URL = process.env.STRAPI_URL || 'http://localhost:1337';
 
@@ -100,25 +101,27 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
-    const body = await request.json();
-
-    // Get auth token from cookies
-    const token = await getAuthToken();
-    const authHeader = request.headers.get('authorization');
-
-    if (!token && !authHeader) {
+    // SECURITY: Verify authentication and role
+    const user = await verifyAuth(request);
+    if (!user) {
       return NextResponse.json(
-        {
-          error: {
-            status: 401,
-            name: 'UnauthorizedError',
-            message: 'Authentication required',
-          },
-        },
+        { error: { status: 401, message: 'Authentication required' } },
         { status: 401 }
       );
     }
+    if (!['ADMIN', 'TEACHER', 'admin', 'teacher'].includes(user.role)) {
+      return NextResponse.json(
+        { error: { status: 403, message: 'Insufficient permissions' } },
+        { status: 403 }
+      );
+    }
+
+    const { id } = await params;
+    const body = await request.json();
+
+    // Get auth token for Strapi forwarding
+    const token = await getAuthToken();
+    const authHeader = request.headers.get('authorization');
 
     // Try v1 API first, fall back to standard Strapi API
     let response = await fetch(`${STRAPI_URL}/api/v1/courses/${id}`, {
@@ -189,24 +192,26 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
-
-    // Get auth token from cookies
-    const token = await getAuthToken();
-    const authHeader = request.headers.get('authorization');
-
-    if (!token && !authHeader) {
+    // SECURITY: Verify authentication and role
+    const user = await verifyAuth(request);
+    if (!user) {
       return NextResponse.json(
-        {
-          error: {
-            status: 401,
-            name: 'UnauthorizedError',
-            message: 'Authentication required',
-          },
-        },
+        { error: { status: 401, message: 'Authentication required' } },
         { status: 401 }
       );
     }
+    if (!['ADMIN', 'TEACHER', 'admin', 'teacher'].includes(user.role)) {
+      return NextResponse.json(
+        { error: { status: 403, message: 'Insufficient permissions' } },
+        { status: 403 }
+      );
+    }
+
+    const { id } = await params;
+
+    // Get auth token for Strapi forwarding
+    const token = await getAuthToken();
+    const authHeader = request.headers.get('authorization');
 
     // Try v1 API first, fall back to standard Strapi API
     let response = await fetch(`${STRAPI_URL}/api/v1/courses/${id}`, {

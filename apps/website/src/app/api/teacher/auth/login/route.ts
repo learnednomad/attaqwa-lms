@@ -56,38 +56,18 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // Strapi returned an auth error — fall through to dev fallback below
+      // Strapi returned an auth error — return 401
+      return NextResponse.json(
+        { error: 'Invalid credentials' },
+        { status: 401 }
+      );
     } catch {
-      // Strapi is not available — fall through to dev fallback below
+      // Strapi is not available — return 503
+      return NextResponse.json(
+        { error: 'Authentication service unavailable' },
+        { status: 503 }
+      );
     }
-
-    // Development fallback: allow login without valid Strapi credentials
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('[AUTH] Using development fallback for teacher login');
-
-      const token = createAuthToken({
-        userId: 'dev-teacher-001',
-        email: email || 'teacher@attaqwa.org',
-        name: 'Development Teacher',
-        role: 'teacher',
-      });
-
-      await teacherAuth.setToken(token);
-
-      return NextResponse.json({
-        user: {
-          id: 'dev-teacher-001',
-          email: email || 'teacher@attaqwa.org',
-          name: 'Development Teacher',
-          role: 'teacher',
-        },
-      });
-    }
-
-    return NextResponse.json(
-      { error: 'Invalid credentials' },
-      { status: 401 }
-    );
   } catch (error) {
     console.error('[API] Teacher auth/login error:', error);
     return NextResponse.json(

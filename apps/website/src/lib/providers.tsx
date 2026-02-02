@@ -5,7 +5,16 @@ import { AuthProvider } from '@/lib/hooks/useAuth';
 import { useState, Suspense } from 'react';
 import dynamic from 'next/dynamic';
 
-// Dynamically import DevTools with no SSR and error boundary
+// Dynamically import ErrorBoundary with no SSR (client-logger.ts accesses window at module scope)
+const ErrorBoundary = dynamic(
+  () =>
+    import('@/components/monitoring/ErrorBoundary').then((m) => ({
+      default: m.ErrorBoundary,
+    })),
+  { ssr: false }
+);
+
+// Dynamically import DevTools with no SSR
 const ReactQueryDevtools = dynamic(
   () =>
     import('@tanstack/react-query-devtools').then((d) => ({
@@ -42,7 +51,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
         {process.env.NODE_ENV === 'development' && (
           <Suspense fallback={null}>
             <ReactQueryDevtools initialIsOpen={false} />
