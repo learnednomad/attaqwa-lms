@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { sanitizeHtml } from '@/lib/sanitize';
 import { FeatureFlagService } from '@attaqwa/shared';
 import { Button } from '@/components/ui/button';
 import { useParams } from 'next/navigation';
@@ -413,8 +414,8 @@ export default function EducationContentPage() {
           <CardContent>
             <div 
               className="prose prose-lg max-w-none prose-headings:text-islamic-navy-800 prose-a:text-islamic-green-600"
-              dangerouslySetInnerHTML={{ 
-                __html: content.content.replace(/\n/g, '<br>').replace(/##\s/g, '<h2>').replace(/###\s/g, '<h3>') 
+              dangerouslySetInnerHTML={{
+                __html: sanitizeHtml(content.content.replace(/\n/g, '<br>').replace(/##\s/g, '<h2>').replace(/###\s/g, '<h3>'))
               }}
             />
           </CardContent>

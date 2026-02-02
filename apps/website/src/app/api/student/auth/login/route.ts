@@ -64,31 +64,7 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     } catch {
-      // Strapi is not available - use dev fallback in development only
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('[AUTH] Strapi unavailable, using development fallback');
-
-        const token = createAuthToken({
-          userId: 'dev-student-001',
-          email: email || `${studentId}@attaqwa.edu`,
-          studentId: studentId || 'STU-001',
-          name: 'Development Student',
-          role: 'student',
-        });
-
-        await studentAuth.setToken(token);
-
-        return NextResponse.json({
-          user: {
-            id: 'dev-student-001',
-            email: email || `${studentId}@attaqwa.edu`,
-            studentId: studentId || 'STU-001',
-            name: 'Development Student',
-            role: 'student',
-          },
-        });
-      }
-
+      // Strapi is not available — return 503
       return NextResponse.json(
         { error: 'Authentication service unavailable' },
         { status: 503 }

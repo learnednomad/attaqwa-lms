@@ -34,7 +34,7 @@ const securityHeaders = [
       // Images: self, data URIs, blob, CDN
       "img-src 'self' data: https: blob:",
       // API connections
-      "connect-src 'self' https://api.aladhan.com https://cms.learnednomad.com wss:" + (process.env.NODE_ENV === 'development' ? " http://localhost:1337" : ''),
+      "connect-src 'self' https://api.aladhan.com https://cms.learnednomad.com https://hadithapi.com wss:" + (process.env.NODE_ENV === 'development' ? " http://localhost:1337" : ''),
       // Frames: prevent clickjacking
       "frame-ancestors 'none'",
       // Forms: self only

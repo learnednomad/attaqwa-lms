@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { sanitizeHtml } from '@/lib/sanitize';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { StudentLayout } from '@/components/layout/student-layout';
@@ -683,7 +684,7 @@ export default function StudentLessonDetailPage() {
               <CardContent>
                 <div
                   className="prose prose-gray max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-600 prose-p:leading-relaxed prose-li:text-gray-600 prose-strong:text-gray-900 prose-a:text-emerald-600"
-                  dangerouslySetInnerHTML={{ __html: lesson.content }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(lesson.content) }}
                 />
               </CardContent>
             </Card>

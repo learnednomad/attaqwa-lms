@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { sanitizeHtml } from '@/lib/sanitize';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { TeacherLayout } from '@/components/layout/teacher-layout';
@@ -179,7 +180,7 @@ export default function LessonDetailPage() {
               {lesson.content ? (
                 <div
                   className="prose prose-sm max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-li:text-gray-700 prose-strong:text-gray-900"
-                  dangerouslySetInnerHTML={{ __html: lesson.content }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(lesson.content) }}
                 />
               ) : (
                 <div className="text-center py-8">
