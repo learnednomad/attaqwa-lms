@@ -597,6 +597,67 @@ export const lessonProgressApi = {
 };
 
 // ============================================================================
+// AI API
+// ============================================================================
+
+export const aiApi = {
+  /**
+   * Health check for AI service
+   */
+  getHealth: async () => {
+    const response = await fetch(`${API_BASE}/v1/ai/health`);
+    if (!response.ok) return null;
+    const json = await response.json();
+    return json.data;
+  },
+
+  /**
+   * Semantic search across all content
+   */
+  search: async (query: string, contentType?: string, limit?: number) => {
+    const response = await fetch(`${API_BASE}/v1/ai/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, contentType, limit: limit || 10 }),
+    });
+    if (!response.ok) return [];
+    const json = await response.json();
+    return json.data || [];
+  },
+
+  /**
+   * Get AI summary for content
+   */
+  summarize: async (content: string) => {
+    const response = await fetch(`${API_BASE}/v1/ai/summarize`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content }),
+    });
+    if (!response.ok) return null;
+    const json = await response.json();
+    return json.data?.summary || null;
+  },
+
+  /**
+   * Get personalized recommendations for authenticated user
+   */
+  getRecommendations: async (token: string, limit?: number) => {
+    const response = await fetch(
+      `${API_BASE}/v1/ai/recommend?limit=${limit || 5}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (!response.ok) return [];
+    const json = await response.json();
+    return json.data || [];
+  },
+};
+
+// ============================================================================
 // Utility Functions
 // ============================================================================
 

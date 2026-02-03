@@ -11,6 +11,7 @@ import {
   GraduationCap,
   Home,
   Settings,
+  Shield,
   Trophy,
   Users,
 } from 'lucide-react';
@@ -25,6 +26,7 @@ const navigation = [
   { name: 'Courses', href: '/courses', icon: BookOpen, roles: ['teacher', 'admin'] },
   { name: 'Students', href: '/students', icon: Users, roles: ['teacher', 'admin'] },
   { name: 'Analytics', href: '/analytics', icon: BarChart3, roles: ['teacher', 'admin'] },
+  { name: 'Moderation', href: '/moderation', icon: Shield, roles: ['admin'] },
   // TODO: Implement achievements page
   // { name: 'Achievements', href: '/achievements', icon: Trophy, roles: ['admin'] },
   // TODO: Implement settings page

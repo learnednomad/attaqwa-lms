@@ -43,6 +43,19 @@ export const API_V1_ENDPOINTS = {
   ANNOUNCEMENTS: '/api/v1/announcements',
   EVENTS: '/api/v1/events',
   EDUCATION_CONTENT: '/api/v1/education-contents',
+
+  // AI Endpoints
+  AI_HEALTH: '/api/v1/ai/health',
+  AI_MODERATE: '/api/v1/ai/moderate',
+  AI_SUMMARIZE: '/api/v1/ai/summarize',
+  AI_GENERATE_TAGS: '/api/v1/ai/generate-tags',
+  AI_GENERATE_QUIZ: '/api/v1/ai/generate-quiz',
+  AI_JOB: '/api/v1/ai/jobs', // Append /:jobId
+  AI_SEARCH: '/api/v1/ai/search',
+  AI_RECOMMEND: '/api/v1/ai/recommend',
+
+  // Moderation Queue
+  MODERATION_QUEUE: '/api/v1/moderation-queues',
 } as const;
 
 // ============================================================================
@@ -126,6 +139,11 @@ export const CACHE_KEYS = {
   PRAYER_TIMES: 'prayer-times',
   EDUCATION_CONTENT: 'education-content',
   USER_PROGRESS: 'user-progress',
+  AI_SUMMARY: 'ai-summary',
+  AI_TAGS: 'ai-tags',
+  AI_SEARCH: 'ai-search',
+  AI_RECOMMENDATIONS: 'ai-recommendations',
+  AI_MODERATION: 'ai-moderation',
 } as const;
 
 export const CACHE_TTL = {
@@ -214,6 +232,17 @@ export type {
   // Filter types
   CourseFilters,
   LessonFilters,
+
+  // AI types
+  ModerationResult,
+  ModerationFlag,
+  TagSuggestion,
+  AIJobStatus,
+  AIJob,
+  SemanticSearchResult,
+  ContentRecommendation,
+  ModerationQueueItem,
+  OllamaHealthStatus,
 } from '@attaqwa/shared-types';
 
 // Export runtime const objects for enum-like usage

@@ -459,3 +459,83 @@ export interface CourseAnalytics {
     completionRate: number;
   }[];
 }
+
+// ============================================================================
+// AI / Ollama Types
+// ============================================================================
+
+export interface ModerationResult {
+  score: number;
+  flags: ModerationFlag[];
+  reasoning: string;
+  recommendation: 'approve' | 'needs_review' | 'reject';
+}
+
+export interface ModerationFlag {
+  type: 'ACCURACY' | 'AGE_APPROPRIATENESS' | 'CULTURAL_SENSITIVITY' | 'QUALITY' | 'SAFETY';
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  description: string;
+}
+
+export interface TagSuggestion {
+  subject: string;
+  difficulty: string;
+  ageTier: string;
+  keywords: string[];
+}
+
+export type AIJobStatus = 'pending' | 'processing' | 'completed' | 'failed';
+
+export interface AIJob<T = any> {
+  id: string;
+  type: string;
+  status: AIJobStatus;
+  result?: T;
+  error?: string;
+  createdAt: number;
+  startedAt?: number;
+  completedAt?: number;
+}
+
+export interface SemanticSearchResult {
+  contentType: string;
+  contentId: string;
+  title: string;
+  snippet: string;
+  score: number;
+  metadata?: Record<string, any>;
+}
+
+export interface ContentRecommendation {
+  courseId: string;
+  title: string;
+  description: string;
+  score: number;
+  reason: string;
+  difficulty: CourseDifficulty;
+  category: CourseCategory;
+}
+
+export interface ModerationQueueItem {
+  id: string;
+  contentType: string;
+  contentId: string;
+  contentTitle: string;
+  status: 'pending' | 'approved' | 'rejected' | 'needs_review';
+  aiScore: number;
+  aiFlags: ModerationFlag[];
+  aiReasoning: string;
+  reviewer?: Pick<User, 'id' | 'username'>;
+  reviewerNotes?: string;
+  reviewedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OllamaHealthStatus {
+  available: boolean;
+  enabled: boolean;
+  baseUrl: string;
+  model: string;
+  models: string[];
+}
