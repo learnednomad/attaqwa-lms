@@ -1,0 +1,88 @@
+{
+  "kind": "collectionType",
+  "collectionName": "course_enrollments",
+  "info": {
+    "singularName": "course-enrollment",
+    "pluralName": "course-enrollments",
+    "displayName": "Course Enrollment",
+    "description": "Track student enrollments in courses"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "course": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::course.course",
+      "inversedBy": "enrollments"
+    },
+    "enrollment_status": {
+      "type": "enumeration",
+      "enum": ["pending", "active", "completed", "dropped", "suspended"],
+      "required": true,
+      "default": "pending"
+    },
+    "enrollment_date": {
+      "type": "datetime",
+      "required": true
+    },
+    "completion_date": {
+      "type": "datetime",
+      "required": false
+    },
+    "overall_progress": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0,
+      "max": 100
+    },
+    "lessons_completed": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "quizzes_completed": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "average_quiz_score": {
+      "type": "decimal",
+      "required": false,
+      "min": 0,
+      "max": 100
+    },
+    "total_time_spent_minutes": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "last_activity_date": {
+      "type": "datetime",
+      "required": false
+    },
+    "certificate_issued": {
+      "type": "boolean",
+      "default": false
+    },
+    "certificate_url": {
+      "type": "string",
+      "required": false
+    },
+    "notes": {
+      "type": "text",
+      "required": false
+    }
+  }
+}

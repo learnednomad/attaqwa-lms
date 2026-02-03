@@ -1,0 +1,1140 @@
+{
+  "courses": [
+    {
+      "title": "My First Quran - Short Surahs for Kids",
+      "description": "An engaging introduction to the Quran for young children, focusing on memorizing and understanding short surahs from Juz Amma with age-appropriate explanations and fun activities.",
+      "target_audience": "ELEMENTARY",
+      "difficulty_level": "BEGINNER",
+      "estimated_duration_weeks": 12,
+      "category": "QURAN_STUDIES",
+      "lessons": [
+        {
+          "title": "Introduction to the Quran - Allah's Special Book",
+          "content": "Welcome to your first Quran lesson! The Quran is Allah's special message to all people. It was revealed to Prophet Muhammad (peace be upon him) over 1,400 years ago, and it teaches us how to live good lives and be close to Allah.\n\nThe Quran is not like other books. Every word in it comes from Allah, and it has never been changed. Muslims all over the world read the same Quran in Arabic, the language it was revealed in. When we read or listen to the Quran, we are hearing Allah's words directly!\n\nThe Quran has 114 chapters called 'surahs.' Some surahs are long, and some are short. In this course, we will learn the short surahs together. These surahs are perfect for children because they are easy to memorize and have beautiful meanings.\n\nWhen we read the Quran, we should be clean and respectful. We say 'Bismillah' (In the name of Allah) before we start, and we read carefully and beautifully. The Quran teaches us about Allah, how to be kind to others, and how to be good Muslims.\n\nThroughout this course, you'll learn to recite surahs, understand their meanings, and discover how they can help you in your daily life. Learning the Quran is one of the best things you can do, and Allah loves children who learn His words!\n\nRemember: Every letter you read from the Quran gives you rewards from Allah. Even if you make mistakes while learning, Allah appreciates your effort. So let's begin this exciting journey together with happy hearts and the intention to please Allah!",
+          "duration_minutes": 20,
+          "order_index": 1,
+          "learning_objectives": [
+            "Understand that the Quran is Allah's word revealed to Prophet Muhammad (PBUH)",
+            "Learn that the Quran has 114 chapters called surahs",
+            "Recognize the importance of treating the Quran with respect",
+            "Understand the rewards of reading and learning the Quran",
+            "Learn proper etiquette when handling and reading the Quran"
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "Who revealed the Quran?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Prophet Muhammad", "Allah (God)", "The angels", "The companions"],
+                "correct_answer": "Allah (God)",
+                "explanation": "Allah revealed the Quran to Prophet Muhammad (peace be upon him) through the angel Jibril (Gabriel). The Quran is Allah's direct word to humanity."
+              },
+              {
+                "question": "How many chapters (surahs) does the Quran have?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["100", "114", "120", "99"],
+                "correct_answer": "114",
+                "explanation": "The Quran has exactly 114 chapters called surahs. They range from very long surahs to very short ones."
+              },
+              {
+                "question": "What language was the Quran revealed in?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["English", "Urdu", "Arabic", "Persian"],
+                "correct_answer": "Arabic",
+                "explanation": "The Quran was revealed in Arabic, and Muslims around the world read it in this original language."
+              },
+              {
+                "question": "What should we say before reading the Quran?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Alhamdulillah", "Bismillah", "Allahu Akbar", "SubhanAllah"],
+                "correct_answer": "Bismillah",
+                "explanation": "We say 'Bismillah' (In the name of Allah) before reading the Quran. This shows we are starting with Allah's name."
+              },
+              {
+                "question": "True or False: The Quran has been changed many times over the years.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "False",
+                "explanation": "The Quran has never been changed since it was revealed. Allah has protected it, and Muslims everywhere read the exact same Quran."
+              },
+              {
+                "question": "What do we call the chapters in the Quran?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Verses", "Surahs", "Pages", "Juz"],
+                "correct_answer": "Surahs",
+                "explanation": "The chapters of the Quran are called 'surahs.' Each surah has a name and contains verses called 'ayat.'"
+              },
+              {
+                "question": "Why should we treat the Quran with respect?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Because it's old", "Because it's Allah's word", "Because it's expensive", "Because teachers say so"],
+                "correct_answer": "Because it's Allah's word",
+                "explanation": "We treat the Quran with great respect because it contains Allah's words. It is the most important book for Muslims."
+              },
+              {
+                "question": "True or False: You get rewards from Allah for every letter you read from the Quran.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "True",
+                "explanation": "Prophet Muhammad (PBUH) taught us that we get rewards for every letter we read from the Quran. Allah loves when we read His words!"
+              },
+              {
+                "question": "What should we be when reading the Quran?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Loud and fast", "Clean and respectful", "Standing up", "Outside only"],
+                "correct_answer": "Clean and respectful",
+                "explanation": "We should be clean and respectful when reading the Quran. We should be in wudu (ablution) if possible and give the Quran our full attention."
+              },
+              {
+                "question": "Who did Allah send the Quran to?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Prophet Ibrahim", "Prophet Musa", "Prophet Muhammad", "Prophet Isa"],
+                "correct_answer": "Prophet Muhammad",
+                "explanation": "Allah revealed the Quran to Prophet Muhammad (peace be upon him). He is the last prophet and messenger of Allah."
+              }
+            ]
+          }
+        },
+        {
+          "title": "Surah Al-Fatihah - The Opening",
+          "content": "Surah Al-Fatihah is the very first surah in the Quran, and it's also the most important! Every Muslim recites this beautiful surah at least 17 times a day during their five daily prayers. That's how special it is!\n\nAl-Fatihah means 'The Opening.' It's like a key that opens the door to understanding the Quran. This surah has seven verses, and each verse teaches us something wonderful about Allah and how to ask for His guidance.\n\nLet's break down what Al-Fatihah teaches us:\n\nWhen we say 'Bismillah ir-Rahman ir-Raheem' (In the name of Allah, the Most Gracious, the Most Merciful), we remember that Allah is kind and loving. We start everything with His name.\n\n'Alhamdulillahi Rabbil 'alamin' means 'All praise is for Allah, Lord of all the worlds.' We thank Allah for everything - our families, our food, our homes, and all the good things in our lives.\n\n'Ar-Rahman ir-Raheem' reminds us again that Allah is the Most Gracious and Most Merciful. He loves us and forgives us when we make mistakes.\n\n'Maliki Yawmid-Deen' means 'Master of the Day of Judgment.' This tells us that Allah is the only one who will judge us on the Day of Judgment.\n\n'Iyyaka na'budu wa iyyaka nasta'een' is where we make a promise: 'You alone we worship, and You alone we ask for help.' We tell Allah that we worship only Him and need His help in everything we do.\n\nFinally, 'Ihdinas-siratal-mustaqeem, Siratal-lazeena an'amta 'alayhim, ghayril-maghdubi 'alayhim wa lad-dalleen' means 'Guide us to the straight path - the path of those You have blessed, not of those who have earned Your anger or who have gone astray.' We ask Allah to guide us to the right way of living.\n\nWhen you memorize Al-Fatihah and understand its meaning, you'll know exactly what you're saying to Allah during your prayers. You'll be asking Him to guide you and help you be a good Muslim every single day!",
+          "duration_minutes": 25,
+          "order_index": 2,
+          "learning_objectives": [
+            "Memorize Surah Al-Fatihah completely with correct pronunciation",
+            "Understand the meaning of each verse in simple language",
+            "Recognize why Al-Fatihah is recited in every prayer",
+            "Learn that Al-Fatihah is a conversation with Allah",
+            "Apply the lessons of seeking guidance in daily life"
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "How many verses does Surah Al-Fatihah have?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["5", "6", "7", "8"],
+                "correct_answer": "7",
+                "explanation": "Surah Al-Fatihah has seven verses. It is often called 'The Seven Oft-Repeated Verses' because we recite it many times each day."
+              },
+              {
+                "question": "What does 'Al-Fatihah' mean?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["The Closing", "The Opening", "The Middle", "The Beginning"],
+                "correct_answer": "The Opening",
+                "explanation": "Al-Fatihah means 'The Opening.' It is the opening chapter of the Quran and opens our prayers."
+              },
+              {
+                "question": "How many times do Muslims recite Al-Fatihah in their daily prayers?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["5 times", "10 times", "17 times", "20 times"],
+                "correct_answer": "17 times",
+                "explanation": "Muslims recite Al-Fatihah at least 17 times during the five daily prayers - it's recited in every rak'ah (unit) of prayer."
+              },
+              {
+                "question": "What does 'Bismillah ir-Rahman ir-Raheem' mean?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Allah is Great", "In the name of Allah, the Most Gracious, the Most Merciful", "All praise is for Allah", "Guide us to the straight path"],
+                "correct_answer": "In the name of Allah, the Most Gracious, the Most Merciful",
+                "explanation": "Bismillah means 'In the name of Allah,' and Rahman and Raheem both describe Allah's mercy and kindness to us."
+              },
+              {
+                "question": "True or False: In Al-Fatihah, we only praise Allah but don't ask Him for anything.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "False",
+                "explanation": "Al-Fatihah contains both praise for Allah and a request - we ask Him to guide us to the straight path."
+              },
+              {
+                "question": "What does 'Alhamdulillahi Rabbil 'alamin' mean?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Allah is One", "All praise is for Allah, Lord of all the worlds", "In the name of Allah", "You alone we worship"],
+                "correct_answer": "All praise is for Allah, Lord of all the worlds",
+                "explanation": "This phrase means we give all thanks and praise to Allah, who created and takes care of everything in all the worlds."
+              },
+              {
+                "question": "In Al-Fatihah, what do we ask Allah to guide us to?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["The difficult path", "The straight path", "The wide path", "The long path"],
+                "correct_answer": "The straight path",
+                "explanation": "We ask Allah to guide us to 'the straight path' - the right way of living that leads to Paradise and pleases Allah."
+              },
+              {
+                "question": "True or False: Al-Fatihah is only recited once a day.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "False",
+                "explanation": "Al-Fatihah is recited multiple times every day - at least 17 times in the five daily prayers, and Muslims often recite it at other times too."
+              },
+              {
+                "question": "What does 'Iyyaka na'budu wa iyyaka nasta'een' mean?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Guide us to the straight path", "You alone we worship and You alone we ask for help", "All praise is for Allah", "Master of the Day of Judgment"],
+                "correct_answer": "You alone we worship and You alone we ask for help",
+                "explanation": "In this verse, we promise Allah that we worship only Him and that we turn to Him alone when we need help."
+              },
+              {
+                "question": "Why is Surah Al-Fatihah so important?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Because it's the longest surah", "Because it's recited in every prayer", "Because it's the last surah", "Because it's in English"],
+                "correct_answer": "Because it's recited in every prayer",
+                "explanation": "Al-Fatihah is essential because we recite it in every rak'ah of prayer. Without it, our prayer is not complete. It's also a complete conversation with Allah."
+              }
+            ]
+          }
+        },
+        {
+          "title": "Surah Al-Ikhlas - The Sincerity",
+          "content": "Surah Al-Ikhlas is one of the shortest surahs in the Quran, but it's incredibly powerful! Prophet Muhammad (peace be upon him) said that this surah is equal to one-third of the entire Quran. Imagine - just four short verses that carry such immense reward!\n\n'Al-Ikhlas' means 'The Sincerity' or 'The Purity.' This surah teaches us the most important belief in Islam: Tawheed, which means believing that Allah is One and there is no one like Him.\n\nLet's understand what each verse means:\n\n'Qul Huwa Allahu Ahad' - Say: He is Allah, the One. This tells us that Allah is One and Only. There is no other god besides Him. He is unique and complete in Himself.\n\n'Allahu Samad' - Allah is Eternal and Absolute. 'Samad' means that Allah doesn't need anything or anyone. Everyone and everything needs Allah, but Allah needs no one. He has always existed and will always exist.\n\n'Lam yalid wa lam yoolad' - He begets not, nor was He begotten. Allah was not born from anyone, and He doesn't have children. He is completely different from His creation.\n\n'Wa lam yakul-lahu kufuwan ahad' - And there is none equal to Him. No one and nothing is like Allah. He is beyond our complete understanding.\n\nWhy is this surah so special? It perfectly describes who Allah is in just four short verses. When you understand Al-Ikhlas, you understand the core of Islamic belief.\n\nProphet Muhammad (PBUH) loved this surah so much that he would recite it frequently. Some companions would recite it so often that when the Prophet asked them why, they said, 'Because it describes my Lord.' The Prophet told them their love for this surah would admit them to Paradise!\n\nMemoizing this surah is easy and quick, but its meaning and reward are enormous. When you recite it with understanding and sincerity, you're declaring the most fundamental truth of Islam - that Allah is One, Unique, and unlike anything in His creation.",
+          "duration_minutes": 20,
+          "order_index": 3,
+          "learning_objectives": [
+            "Memorize Surah Al-Ikhlas with proper tajweed",
+            "Understand the concept of Tawheed (Oneness of Allah)",
+            "Learn why this surah equals one-third of the Quran in reward",
+            "Recognize the unique attributes of Allah mentioned in the surah",
+            "Apply the understanding of Allah's Oneness in daily worship"
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "What does 'Al-Ikhlas' mean?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["The Morning", "The Sincerity", "The Night", "The Help"],
+                "correct_answer": "The Sincerity",
+                "explanation": "Al-Ikhlas means 'The Sincerity' or 'The Purity.' It teaches us the pure and sincere belief in Allah's Oneness."
+              },
+              {
+                "question": "How many verses does Surah Al-Ikhlas have?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["2", "3", "4", "5"],
+                "correct_answer": "4",
+                "explanation": "Surah Al-Ikhlas has four short but powerful verses that describe Allah's unique nature."
+              },
+              {
+                "question": "What does 'Allahu Ahad' mean?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Allah is the Greatest", "Allah is One", "Allah is Merciful", "Allah is the Creator"],
+                "correct_answer": "Allah is One",
+                "explanation": "Allahu Ahad means 'Allah is One.' This is the foundation of Islamic belief - that Allah is the One and Only God."
+              },
+              {
+                "question": "True or False: Prophet Muhammad said Surah Al-Ikhlas equals one-third of the Quran in reward.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "True",
+                "explanation": "The Prophet (PBUH) taught that reciting Surah Al-Ikhlas equals the reward of reciting one-third of the entire Quran!"
+              },
+              {
+                "question": "What does 'Samad' mean?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["The One", "The Eternal and Absolute", "The Merciful", "The Powerful"],
+                "correct_answer": "The Eternal and Absolute",
+                "explanation": "Samad means Allah is Eternal and Absolute - He doesn't need anything or anyone, but everyone needs Him."
+              },
+              {
+                "question": "According to Surah Al-Ikhlas, does Allah have children?",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "False",
+                "explanation": "The surah clearly states 'Lam yalid' - He does not have children. Allah is completely different from His creation."
+              },
+              {
+                "question": "What is 'Tawheed'?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Praying five times", "Believing in Allah's Oneness", "Fasting in Ramadan", "Giving charity"],
+                "correct_answer": "Believing in Allah's Oneness",
+                "explanation": "Tawheed is the Islamic concept of believing that Allah is One and unique. Surah Al-Ikhlas is all about Tawheed."
+              },
+              {
+                "question": "True or False: There is someone or something equal to Allah.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "False",
+                "explanation": "The surah ends by stating 'there is none equal to Him.' Allah is unique and incomparable."
+              },
+              {
+                "question": "Why did the Prophet Muhammad love this surah?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Because it's short", "Because it describes Allah perfectly", "Because it's easy", "Because it's the first surah"],
+                "correct_answer": "Because it describes Allah perfectly",
+                "explanation": "The Prophet loved this surah because it perfectly describes who Allah is - One, Eternal, and unlike anything in creation."
+              },
+              {
+                "question": "What main concept does Surah Al-Ikhlas teach?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["How to pray", "The Oneness of Allah", "Stories of prophets", "How to fast"],
+                "correct_answer": "The Oneness of Allah",
+                "explanation": "The main teaching of Surah Al-Ikhlas is Tawheed - the Oneness and Uniqueness of Allah. This is the most fundamental belief in Islam."
+              }
+            ]
+          }
+        },
+        {
+          "title": "Surah Al-Falaq - The Daybreak",
+          "content": "Surah Al-Falaq is one of the two 'protection surahs' in the Quran. Prophet Muhammad (peace be upon him) used to recite this surah every morning and evening for protection from all kinds of harm. It's like a shield that keeps us safe!\n\n'Al-Falaq' means 'The Daybreak' or 'The Dawn.' Just as the morning light breaks through the darkness, this surah helps us seek protection from all the dark and harmful things in life.\n\nLet's understand what this beautiful surah teaches us:\n\n'Qul a'udhu bi Rabbil-falaq' - Say: I seek refuge in the Lord of the daybreak. We're asking Allah to protect us. Allah created the dawn, and He has power over everything that happens in the day and night.\n\n'Min sharri ma khalaq' - From the evil of what He has created. We ask Allah to protect us from the harm that any of His creatures might cause. This includes bad people, harmful animals, or anything that could hurt us.\n\n'Wa min sharri ghasiqin idha waqab' - And from the evil of darkness when it settles. When night falls and it gets dark, we ask Allah to protect us from any harm that might come with the darkness.\n\n'Wa min sharrin-naffathati fil 'uqad' - And from the evil of those who practice witchcraft. We seek protection from people who try to harm others through magic or evil practices.\n\n'Wa min sharri hasidin idha hasad' - And from the evil of the envier when he envies. Sometimes people feel jealous and wish bad things for others. We ask Allah to protect us from the harm of jealous people.\n\nProphet Muhammad (PBUH) taught us to recite this surah three times every morning and evening. He also told us to blow gently on our hands after reciting it and wipe our hands over our body, starting from our head. This is a special way to ask for Allah's protection.\n\nWhen you recite Al-Falaq, you're trusting Allah completely to keep you safe. Remember, no one can harm you except with Allah's permission, and when you seek His protection sincerely, He will protect you from all evil!\n\nThis surah teaches us that Allah is the Lord of everything - day and night, light and darkness. He is the most powerful, and only He can truly protect us. So instead of being afraid, we turn to Allah and feel safe and protected.",
+          "duration_minutes": 22,
+          "order_index": 4,
+          "learning_objectives": [
+            "Memorize Surah Al-Falaq with correct pronunciation",
+            "Understand the different types of evils mentioned in the surah",
+            "Learn the proper way to recite this surah for protection",
+            "Recognize the importance of seeking refuge in Allah",
+            "Practice reciting Al-Falaq every morning and evening"
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "What does 'Al-Falaq' mean?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["The Night", "The Daybreak", "The Protection", "The Morning"],
+                "correct_answer": "The Daybreak",
+                "explanation": "Al-Falaq means 'The Daybreak' or 'The Dawn' - when the morning light breaks through the darkness."
+              },
+              {
+                "question": "How many times should we recite Al-Falaq for protection according to the Prophet?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Once", "Twice", "Three times", "Five times"],
+                "correct_answer": "Three times",
+                "explanation": "Prophet Muhammad (PBUH) taught us to recite Al-Falaq three times every morning and evening for protection."
+              },
+              {
+                "question": "What is the main purpose of Surah Al-Falaq?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["To praise Allah", "To seek protection from evil", "To ask for forgiveness", "To tell a story"],
+                "correct_answer": "To seek protection from evil",
+                "explanation": "Surah Al-Falaq is a protection surah. We recite it to seek Allah's refuge from various types of evil and harm."
+              },
+              {
+                "question": "True or False: Prophet Muhammad used to recite this surah only at night.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "False",
+                "explanation": "The Prophet (PBUH) recited this surah both in the morning and evening for complete protection throughout the day and night."
+              },
+              {
+                "question": "From what do we seek protection in the verse 'min sharri ghasiqin idha waqab'?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Evil of the day", "Evil of darkness when it settles", "Evil of animals", "Evil of water"],
+                "correct_answer": "Evil of darkness when it settles",
+                "explanation": "We seek protection from the evil that comes with darkness and night time."
+              },
+              {
+                "question": "What should we do after reciting Al-Falaq according to the Prophet's teaching?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Close our eyes", "Blow on our hands and wipe over our body", "Stand up", "Say Ameen"],
+                "correct_answer": "Blow on our hands and wipe over our body",
+                "explanation": "The Prophet taught us to blow gently on our hands after reciting and then wipe them over our body for protection."
+              },
+              {
+                "question": "From whose evil do we seek protection at the end of this surah?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["The angry person", "The sick person", "The envious person", "The poor person"],
+                "correct_answer": "The envious person",
+                "explanation": "We seek protection from 'the evil of the envier when he envies' - people who feel jealous and might wish us harm."
+              },
+              {
+                "question": "True or False: Surah Al-Falaq protects us from witchcraft and magic.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "True",
+                "explanation": "Yes, one verse specifically asks for protection from 'those who practice witchcraft' or blow on knots (a type of magic)."
+              },
+              {
+                "question": "Who has the power to protect us according to this surah?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Our parents", "Our teachers", "Only Allah", "Our friends"],
+                "correct_answer": "Only Allah",
+                "explanation": "We say 'I seek refuge in the Lord of the daybreak' - we ask Allah for protection because only He has the power to protect us from all harm."
+              },
+              {
+                "question": "What does this surah teach us about dealing with fear?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["To hide from danger", "To seek Allah's protection", "To fight back", "To run away"],
+                "correct_answer": "To seek Allah's protection",
+                "explanation": "Instead of being afraid, this surah teaches us to turn to Allah and ask for His protection from all types of evil."
+              }
+            ]
+          }
+        },
+        {
+          "title": "Surah An-Nas - The Mankind",
+          "content": "Surah An-Nas is the final surah of the Quran and the companion to Surah Al-Falaq. Together, these two surahs provide complete protection for believers. Prophet Muhammad (peace be upon him) called them 'Al-Mu'awwidhatayn' - the two surahs of refuge.\n\n'An-Nas' means 'The Mankind.' This surah specifically protects us from a very dangerous enemy that we can't see - Shaytan (Satan) and the whispers of evil that come into our hearts and minds.\n\nLet's understand each verse:\n\n'Qul a'udhu bi Rabbin-nas' - Say: I seek refuge in the Lord of mankind. We begin by acknowledging that Allah is the Lord and Master of all people. He created us and knows us better than we know ourselves.\n\n'Malikin-nas' - The King of mankind. Allah is not just our Lord, but also our King. He has complete authority over all people.\n\n'Ilahin-nas' - The God of mankind. Allah is the only God worthy of worship. We worship Him alone and turn to Him for help.\n\nNotice how this surah mentions three qualities of Allah - He is our Lord (Rabb), our King (Malik), and our God (Ilah). This shows us how close Allah is to us and how much we need Him.\n\n'Min sharril-waswasil-khannas' - From the evil of the sneaking whisperer. This is Shaytan, who sneaks into our hearts and minds to whisper bad thoughts and ideas.\n\n'Alladhi yuwaswisu fi sudoorin-nas' - Who whispers into the hearts of mankind. Shaytan doesn't force us to do wrong things. Instead, he whispers evil suggestions into our hearts, trying to make bad things look attractive.\n\n'Minal-jinnati wan-nas' - From among the jinn and mankind. Evil whispers can come from Shaytan (who is from the jinn) or from bad people who encourage us to do wrong things.\n\nThis surah teaches us something very important: we have an enemy we can't see (Shaytan) who tries to make us disobey Allah. But when we seek Allah's protection, Shaytan can't harm us.\n\nThe Prophet (PBUH) taught us to recite this surah three times every morning and evening, just like Al-Falaq. When you feel bad thoughts or someone encourages you to do something wrong, recite An-Nas and seek Allah's protection!\n\nRemember: Shaytan is weak. He can only whisper - he can't force you. When you trust in Allah and seek His refuge, you become stronger than any whisper of evil!",
+          "duration_minutes": 23,
+          "order_index": 5,
+          "learning_objectives": [
+            "Memorize Surah An-Nas perfectly",
+            "Understand who Shaytan is and how he whispers evil",
+            "Learn the three beautiful names of Allah mentioned in the surah",
+            "Recognize the importance of seeking refuge from evil thoughts",
+            "Practice using this surah when facing temptation or bad thoughts"
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "What does 'An-Nas' mean?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["The Dawn", "The Mankind", "The Protection", "The Last"],
+                "correct_answer": "The Mankind",
+                "explanation": "An-Nas means 'The Mankind.' This surah is about seeking Allah's protection for all people."
+              },
+              {
+                "question": "How many qualities of Allah are mentioned in Surah An-Nas?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["One", "Two", "Three", "Four"],
+                "correct_answer": "Three",
+                "explanation": "Three qualities are mentioned: Rabb (Lord), Malik (King), and Ilah (God) of mankind."
+              },
+              {
+                "question": "From whom do we seek protection in this surah?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Wild animals", "Bad weather", "The whisperer (Shaytan)", "Darkness"],
+                "correct_answer": "The whisperer (Shaytan)",
+                "explanation": "We seek protection from 'the sneaking whisperer' - this is Shaytan and evil whispers that come into our hearts."
+              },
+              {
+                "question": "True or False: Shaytan can force us to do bad things.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "False",
+                "explanation": "Shaytan cannot force us to do anything. He can only whisper evil suggestions. We have the choice to listen or to seek Allah's protection."
+              },
+              {
+                "question": "Where does the whisperer whisper to?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["In our ears", "In our hearts", "In our homes", "In our books"],
+                "correct_answer": "In our hearts",
+                "explanation": "The surah says Shaytan 'whispers into the hearts of mankind' - he puts bad thoughts and ideas into our hearts and minds."
+              },
+              {
+                "question": "Evil whispers can come from which two sources according to this surah?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Animals and birds", "Jinn and mankind", "Night and day", "Adults and children"],
+                "correct_answer": "Jinn and mankind",
+                "explanation": "The surah mentions that evil whispers come 'from among the jinn and mankind' - both from Shaytan (jinn) and from bad people."
+              },
+              {
+                "question": "What should we do when we have bad thoughts?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Ignore them", "Recite An-Nas and seek Allah's protection", "Tell everyone", "Feel sad"],
+                "correct_answer": "Recite An-Nas and seek Allah's protection",
+                "explanation": "When we have bad thoughts or feel tempted to do wrong, we should recite An-Nas and ask Allah to protect us from evil whispers."
+              },
+              {
+                "question": "True or False: Surah An-Nas is the last surah in the Quran.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "True",
+                "explanation": "Yes, An-Nas is the 114th and final surah of the Quran."
+              },
+              {
+                "question": "What does 'waswas' mean?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Loud voice", "Whisper", "Shout", "Song"],
+                "correct_answer": "Whisper",
+                "explanation": "Waswas means 'whisper.' It describes how Shaytan doesn't shout at us but whispers quietly, trying to make evil seem attractive."
+              },
+              {
+                "question": "What are the two surahs of protection called together?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Al-Mu'minoon", "Al-Mu'awwidhatayn", "Al-Mursalat", "Al-Muzzammil"],
+                "correct_answer": "Al-Mu'awwidhatayn",
+                "explanation": "Prophet Muhammad (PBUH) called Al-Falaq and An-Nas 'Al-Mu'awwidhatayn' - the two surahs of refuge or protection."
+              }
+            ]
+          }
+        },
+        {
+          "title": "Surah Al-Asr - The Time",
+          "content": "Surah Al-Asr is a short but mighty surah that contains a complete formula for success in this life and the next! Some scholars say that if people truly understood and followed just this one surah, it would be enough guidance for their entire lives.\n\n'Al-Asr' means 'The Time' or 'The Afternoon.' Time is very precious, and Allah is taking an oath by time in this surah. When Allah swears by something, it means that thing is very important!\n\nLet's understand this powerful surah verse by verse:\n\n'Wal-'Asr' - By time! Allah is swearing by time itself. Time is valuable - every second, minute, and hour matters. Once time passes, we can never get it back. That's why we must use our time wisely!\n\n'Innal-insana lafi khusr' - Indeed, mankind is in loss. This is a serious warning! Allah is telling us that human beings are naturally headed towards loss and failure. But don't worry - the next verse tells us how to save ourselves!\n\n'Illal-latheena aamanu wa 'amilus-salihati wa tawa saw bil-haqqi wa tawa saw bis-sabr' - Except for those who have believed and done righteous deeds and advised each other to truth and advised each other to patience.\n\nThis verse gives us four keys to success:\n\n1. BELIEVE (Aamanu): Have strong faith in Allah, His prophets, His books, and the Day of Judgment. Believe in your heart and show it through your actions.\n\n2. DO GOOD DEEDS (Amilus-salihati): It's not enough just to believe - we must do good things! Pray, be kind to others, help people, obey our parents, and do what Allah loves.\n\n3. ENCOURAGE TRUTH (Tawasau bil-Haqq): Share good knowledge with others. When you learn something good, teach it to your friends and family. Remind people about Allah and what's right.\n\n4. BE PATIENT (Tawasau bis-Sabr): Encourage each other to be patient. Life can be hard sometimes, but we should help each other stay strong and not give up on doing good.\n\nImagine if everyone followed these four simple steps! The world would be a much better place. This surah teaches us that true success isn't about money, fame, or toys - it's about believing in Allah, doing good, and helping others stay on the right path.\n\nThe Companions of the Prophet (peace be upon him) would not leave each other after meeting until one of them recited this surah to the other. They understood how important this message is!\n\nSo, are you ready to be among the successful people and not among those in loss? Follow these four golden rules from Surah Al-Asr!",
+          "duration_minutes": 25,
+          "order_index": 6,
+          "learning_objectives": [
+            "Memorize Surah Al-Asr completely",
+            "Understand the four keys to success mentioned in the surah",
+            "Recognize the value of time and using it wisely",
+            "Learn the importance of belief combined with good actions",
+            "Apply the principles of encouraging truth and patience in daily life"
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "What does 'Al-Asr' mean?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["The Morning", "The Time", "The Success", "The People"],
+                "correct_answer": "The Time",
+                "explanation": "Al-Asr means 'The Time' or 'The Afternoon.' Allah swears by time in this surah, showing how precious and important it is."
+              },
+              {
+                "question": "How many verses does Surah Al-Asr have?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["2", "3", "4", "5"],
+                "correct_answer": "3",
+                "explanation": "Surah Al-Asr has three short verses, but they contain a complete formula for success in life!"
+              },
+              {
+                "question": "According to the surah, mankind is naturally in what state?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Success", "Loss", "Happiness", "Confusion"],
+                "correct_answer": "Loss",
+                "explanation": "Allah says 'Indeed, mankind is in loss' - but then He tells us exactly how to save ourselves from this loss."
+              },
+              {
+                "question": "How many keys to success are mentioned in Surah Al-Asr?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Two", "Three", "Four", "Five"],
+                "correct_answer": "Four",
+                "explanation": "The surah mentions four keys: believe, do good deeds, encourage truth, and be patient."
+              },
+              {
+                "question": "True or False: According to this surah, believing in Allah alone is enough for success.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "False",
+                "explanation": "The surah teaches that belief must be combined with good deeds, encouraging truth, and patience. All four are necessary for true success."
+              },
+              {
+                "question": "What does 'tawasau bil-haqq' mean?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Pray five times", "Encourage/advise each other to truth", "Fast during Ramadan", "Give charity"],
+                "correct_answer": "Encourage/advise each other to truth",
+                "explanation": "Tawasau bil-haqq means to encourage and advise each other about truth and what is right. We should share good knowledge with others."
+              },
+              {
+                "question": "What did the Companions do before leaving each other after meeting?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Pray together", "Recite Surah Al-Asr", "Eat together", "Shake hands"],
+                "correct_answer": "Recite Surah Al-Asr",
+                "explanation": "The Companions understood this surah's importance so much that they would recite it to each other before parting ways."
+              },
+              {
+                "question": "True or False: Once time passes, we can get it back if we work hard.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "False",
+                "explanation": "Time is precious because once it passes, we can never get it back. That's why the surah emphasizes using our time wisely."
+              },
+              {
+                "question": "What is the last key to success mentioned in the surah?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Being wealthy", "Being patient", "Being famous", "Being strong"],
+                "correct_answer": "Being patient",
+                "explanation": "The fourth key is 'tawasau bis-sabr' - encouraging each other to be patient and steadfast in doing good."
+              },
+              {
+                "question": "What does this surah teach us about true success?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Success is having lots of money", "Success is being famous", "Success is faith, good deeds, encouraging truth, and patience", "Success is being smart"],
+                "correct_answer": "Success is faith, good deeds, encouraging truth, and patience",
+                "explanation": "The surah defines true success as combining belief in Allah with good actions, sharing truth with others, and supporting each other to be patient."
+              }
+            ]
+          }
+        },
+        {
+          "title": "Surah Al-Kawthar - The Abundance",
+          "content": "Surah Al-Kawthar is the shortest surah in the Quran, with just three verses, but it carries beautiful and powerful meanings! This surah was revealed to comfort and honor Prophet Muhammad (peace be upon him) when some people were making fun of him.\n\n'Al-Kawthar' means 'The Abundance' or 'The Good in Abundance.' It refers to all the countless blessings that Allah has given and will give to the Prophet Muhammad and his followers.\n\nLet's understand each verse:\n\n'Inna a'tayna kal-kawthar' - Indeed, We have granted you Al-Kawthar. Allah is telling the Prophet that He has given him abundant good! What is Al-Kawthar? Most scholars say it's a special river in Paradise that Allah will give to the Prophet Muhammad. Imagine a river so beautiful and pure that its water is whiter than milk, sweeter than honey, and cooler than ice!\n\nBut Al-Kawthar means more than just this river. It also means:\n- The Quran itself (the abundant guidance)\n- The Prophet's large following of believers throughout history\n- All the blessings Allah gave him in this life and the next\n- The honor and high status he has with Allah\n\nWhen people said mean things about the Prophet, claiming he had nothing, Allah revealed this surah to show that actually, the Prophet has been given everything good in abundance!\n\n'Fasalli li-rabbika wanhar' - So pray to your Lord and sacrifice. Out of gratitude for all these blessings, we should worship Allah sincerely. We should pray to Him alone and make sacrifices (like sacrificing an animal during Eid al-Adha) only for His sake, not to show off or for any other reason.\n\n'Inna shani-aka huwal-abtar' - Indeed, your enemy is the one cut off. Allah is telling the Prophet that those who hate him and insult him are the real losers. They will be cut off from all good, and their memory will fade away. The Prophet's name, on the other hand, is remembered and honored by billions of Muslims worldwide every day!\n\nThis surah teaches us several important lessons:\n1. Allah always takes care of those who follow Him\n2. No matter what mean things people say, Allah knows the truth\n3. We should be grateful for Allah's blessings and worship Him sincerely\n4. Those who hate good people will ultimately fail\n\nWhen you recite this surah, remember all the blessings Allah has given you - your family, your health, your food, and most importantly, the gift of Islam!",
+          "duration_minutes": 22,
+          "order_index": 7,
+          "learning_objectives": [
+            "Memorize Surah Al-Kawthar perfectly",
+            "Understand what Al-Kawthar means and its significance",
+            "Learn about the special river in Paradise",
+            "Recognize the importance of gratitude and sincere worship",
+            "Understand that Allah honors and protects His believers"
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "What does 'Al-Kawthar' mean?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["The Time", "The Abundance", "The Prayer", "The People"],
+                "correct_answer": "The Abundance",
+                "explanation": "Al-Kawthar means 'The Abundance' or 'The Good in Abundance' - it refers to countless blessings from Allah."
+              },
+              {
+                "question": "How many verses does Surah Al-Kawthar have?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["2", "3", "4", "5"],
+                "correct_answer": "3",
+                "explanation": "Surah Al-Kawthar has just three verses, making it the shortest surah in the Quran."
+              },
+              {
+                "question": "What is Al-Kawthar often understood to be?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["A mountain", "A river in Paradise", "A city", "A star"],
+                "correct_answer": "A river in Paradise",
+                "explanation": "Al-Kawthar is often understood to be a special river in Paradise that Allah will give to Prophet Muhammad (PBUH)."
+              },
+              {
+                "question": "True or False: This surah was revealed when people were praising the Prophet.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "False",
+                "explanation": "This surah was revealed to comfort the Prophet when some people were insulting him and saying he had nothing. Allah showed that the Prophet had been given everything good in abundance."
+              },
+              {
+                "question": "What should we do because of Allah's blessings according to this surah?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Boast about them", "Pray to Allah and sacrifice for Him", "Ignore them", "Keep them secret"],
+                "correct_answer": "Pray to Allah and sacrifice for Him",
+                "explanation": "The surah says 'So pray to your Lord and sacrifice' - we should worship Allah sincerely in gratitude for His blessings."
+              },
+              {
+                "question": "Who does Allah say is 'cut off' in this surah?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["The believers", "The Prophet's enemy", "The poor people", "The travelers"],
+                "correct_answer": "The Prophet's enemy",
+                "explanation": "Allah says 'Indeed, your enemy is the one cut off' - those who hated and insulted the Prophet are the real losers, cut off from all good."
+              },
+              {
+                "question": "True or False: Al-Kawthar only refers to a river in Paradise.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "False",
+                "explanation": "While it includes the river in Paradise, Al-Kawthar also refers to all the abundant blessings Allah gave the Prophet, including the Quran, his followers, and his high status."
+              },
+              {
+                "question": "What is the water of the river Al-Kawthar described as?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Hot and dark", "Whiter than milk and sweeter than honey", "Green and thick", "Salty and cold"],
+                "correct_answer": "Whiter than milk and sweeter than honey",
+                "explanation": "The Prophet described the water of Al-Kawthar as whiter than milk, sweeter than honey, and cooler than ice!"
+              },
+              {
+                "question": "What important lesson does this surah teach about gratitude?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Only think about blessings", "Show gratitude through sincere worship", "Tell everyone about blessings", "Write down all blessings"],
+                "correct_answer": "Show gratitude through sincere worship",
+                "explanation": "The surah teaches that when Allah blesses us, we should show gratitude by praying to Him and worshipping Him sincerely."
+              },
+              {
+                "question": "How does this surah comfort believers who face insults?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["It tells them to fight back", "It shows Allah honors and protects His believers", "It tells them to hide", "It tells them to be sad"],
+                "correct_answer": "It shows Allah honors and protects His believers",
+                "explanation": "This surah shows that even when people insult believers, Allah knows the truth and honors those who follow Him. The real losers are those who oppose Allah and His messenger."
+              }
+            ]
+          }
+        },
+        {
+          "title": "Surah Al-Fil - The Elephant",
+          "content": "Surah Al-Fil tells an amazing true story that happened in the year Prophet Muhammad (peace be upon him) was born! It's about how Allah protected the Ka'bah in Makkah from a powerful enemy and his army of elephants. This surah shows us that Allah is the Most Powerful and He always protects what is sacred.\n\nThe story goes like this:\n\nThere was a Christian king named Abraha who ruled Yemen. He built a beautiful church and wanted people to come there instead of going to the Ka'bah in Makkah. But people still loved the Ka'bah and went there for pilgrimage. This made Abraha very angry.\n\nAbraha decided to destroy the Ka'bah! He gathered a huge army with elephants - animals that the Arabs had never seen before and were afraid of. The biggest elephant was named Mahmoud. This powerful army marched toward Makkah to attack the sacred House of Allah.\n\nThe people of Makkah were very worried. How could they fight against such a strong army with elephants? The leader of Makkah at that time, Abdul-Muttalib (the grandfather of Prophet Muhammad), said something very wise: 'We cannot defend the Ka'bah, but the Lord of the Ka'bah will defend it!' He trusted in Allah completely.\n\nLet's understand what happened, as described in Surah Al-Fil:\n\n'Alam tara kayfa fa'ala rabbuka bi as-habil-fil' - Have you not seen how your Lord dealt with the companions of the elephant? Allah is asking us to think about this amazing event.\n\n'Alam yaj'al kaydahum fi tadlil' - Did He not make their plan go wrong? Abraha's evil plan to destroy the Ka'bah completely failed!\n\n'Wa arsala 'alayhim tayran ababil' - And He sent against them birds in flocks. Allah sent special birds that came in groups to defend the Ka'bah.\n\n'Tarmihim bi-hijaratin min sijjil' - Striking them with stones of baked clay. These birds carried small stones and dropped them on Abraha's army.\n\n'Faja'alahum ka-'asfin ma'kul' - And He made them like eaten straw. The mighty army was completely destroyed, like dried leaves that have been crushed and eaten by animals. The elephants wouldn't even move toward the Ka'bah, and the army was defeated without anyone having to fight them!\n\nThis amazing miracle teaches us many lessons:\n1. Allah protects what is sacred - the Ka'bah was built to worship Him, and He defended it\n2. No matter how powerful the enemy seems, Allah is more powerful\n3. Allah can use anything to achieve His purpose - even tiny birds defeated a huge army!\n4. We should trust in Allah, like Abdul-Muttalib did\n5. Those who try to harm Allah's religion will fail\n\nThis event happened in the same year our beloved Prophet Muhammad (peace be upon him) was born. It's called 'The Year of the Elephant.' Isn't it amazing how Allah was already preparing the world for the coming of His final messenger?",
+          "duration_minutes": 28,
+          "order_index": 8,
+          "learning_objectives": [
+            "Memorize Surah Al-Fil with proper pronunciation",
+            "Learn the historical story of Abraha and the elephant army",
+            "Understand how Allah protected the Ka'bah miraculously",
+            "Recognize Allah's power and His protection of sacred things",
+            "Learn to trust in Allah when facing difficult situations"
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "What does 'Al-Fil' mean?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["The Birds", "The Elephant", "The Army", "The Ka'bah"],
+                "correct_answer": "The Elephant",
+                "explanation": "Al-Fil means 'The Elephant.' This surah is named after the elephants in Abraha's army."
+              },
+              {
+                "question": "Who tried to destroy the Ka'bah?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Pharaoh", "Abraha", "Nimrod", "Abu Lahab"],
+                "correct_answer": "Abraha",
+                "explanation": "Abraha was a Christian king who ruled Yemen. He became angry and decided to destroy the Ka'bah."
+              },
+              {
+                "question": "What did Allah send to defend the Ka'bah?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["A huge army", "Angels with swords", "Birds in flocks", "A strong wind"],
+                "correct_answer": "Birds in flocks",
+                "explanation": "Allah sent special birds in flocks that carried stones to defend the Ka'bah and defeat Abraha's army."
+              },
+              {
+                "question": "True or False: The elephants in Abraha's army attacked the Ka'bah.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "False",
+                "explanation": "The elephants, especially the lead elephant Mahmoud, refused to move toward the Ka'bah. Allah caused them not to attack."
+              },
+              {
+                "question": "What were the birds carrying?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Fire", "Stones of baked clay", "Sharp sticks", "Water"],
+                "correct_answer": "Stones of baked clay",
+                "explanation": "The birds carried small stones of baked clay (sijjil) and dropped them on Abraha's army."
+              },
+              {
+                "question": "Who was the leader of Makkah during this event?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Abu Bakr", "Abdul-Muttalib", "Abu Talib", "Umar"],
+                "correct_answer": "Abdul-Muttalib",
+                "explanation": "Abdul-Muttalib, the grandfather of Prophet Muhammad (PBUH), was the leader of Makkah. He trusted that Allah would protect the Ka'bah."
+              },
+              {
+                "question": "What year is this event known as?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["The Year of Sorrow", "The Year of the Elephant", "The Year of Victory", "The Year of Hijrah"],
+                "correct_answer": "The Year of the Elephant",
+                "explanation": "This event happened in 'The Year of the Elephant' - the same year Prophet Muhammad (PBUH) was born!"
+              },
+              {
+                "question": "True or False: A large human army had to fight Abraha to protect the Ka'bah.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "False",
+                "explanation": "No human army had to fight! Allah miraculously defended the Ka'bah using birds, showing that He is the ultimate protector."
+              },
+              {
+                "question": "What happened to Abraha's army according to the surah?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["They ran away", "They became Muslims", "They were destroyed like eaten straw", "They captured the Ka'bah"],
+                "correct_answer": "They were destroyed like eaten straw",
+                "explanation": "The surah says Allah made them 'like eaten straw' - they were completely destroyed and defeated."
+              },
+              {
+                "question": "What is the main lesson of Surah Al-Fil?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Elephants are dangerous", "Allah protects what is sacred and defeats those who try to harm His religion", "Always have a big army", "Birds are powerful"],
+                "correct_answer": "Allah protects what is sacred and defeats those who try to harm His religion",
+                "explanation": "The main lesson is that Allah is all-powerful and protects what is sacred. No matter how strong the enemy seems, Allah can defeat them easily."
+              }
+            ]
+          }
+        },
+        {
+          "title": "Surah Quraysh - The Quraysh Tribe",
+          "content": "Surah Quraysh is closely connected to the story in Surah Al-Fil! After Allah protected the Ka'bah from Abraha's army, the people of Quraysh (the main tribe in Makkah) received many blessings. This surah reminds them to be grateful for these blessings and to worship Allah alone.\n\nThe Quraysh were the tribe that took care of the Ka'bah. Prophet Muhammad (peace be upon him) belonged to this noble tribe. Because of the Ka'bah, Makkah was a sacred city, and people came from all over Arabia for pilgrimage. This brought many benefits to the Quraysh.\n\nLet's understand the beautiful verses of this surah:\n\n'Li-ilafi Quraysh' - For the accustomed security of the Quraysh. This refers to the special blessings and safety that the Quraysh enjoyed. Because of the Ka'bah, their city was considered sacred, and no one would attack them.\n\n'Ilafihim rihlatash-shita-i was-sayf' - Their accustomed security in the winter and summer journeys. The Quraysh were traders. They would travel to Yemen in the winter (when it was warm there) and to Syria in the summer (when it was cooler there) to trade goods. Because everyone respected the people of the Ka'bah's city, the Quraysh could travel safely and trade successfully. They became wealthy from this trade!\n\nImagine traveling through the desert with valuable goods. It could be very dangerous - there were robbers, harsh weather, and many difficulties. But the Quraysh traveled safely because people respected them as the guardians of the sacred house. That's a huge blessing from Allah!\n\n'Fal-ya'budu Rabba hathal-bayt' - Let them worship the Lord of this House. After mentioning all these blessings, Allah gives a simple but important command: Worship the Lord of this House! The Ka'bah (the House) brought them all these benefits, so they should worship the One who owns the Ka'bah - Allah alone!\n\n'Allathee at'amahum min ju' - Who has fed them, saving them from hunger. Allah provided them with food and wealth through the trade that came from the Ka'bah and its visitors.\n\n'Wa aamanahum min khawf' - And made them safe from fear. Allah gave them security and safety. They didn't have to worry about enemies or danger.\n\nThis surah teaches us important lessons:\n1. Every blessing we have comes from Allah\n2. When Allah blesses us, we should thank Him by worshipping Him sincerely\n3. Security, food, and safety are huge blessings we often take for granted\n4. The best way to show gratitude is through worship and obedience\n\nThink about your own life: You have a home, food, family, and safety. These are gifts from Allah! Just like Allah reminded the Quraysh to worship Him, He's reminding us too. Let's be grateful and show it through our prayers and good deeds.\n\nSurah Quraysh is often recited together with Surah Al-Fil because they tell a connected story - how Allah protected the Quraysh's sacred house and blessed them with safety and prosperity.",
+          "duration_minutes": 24,
+          "order_index": 9,
+          "learning_objectives": [
+            "Memorize Surah Quraysh perfectly",
+            "Understand the connection between Surah Al-Fil and Surah Quraysh",
+            "Learn about the blessings the Quraysh received",
+            "Recognize the importance of gratitude through worship",
+            "Apply the lesson of thankfulness for security, food, and safety in daily life"
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "Who were the Quraysh?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["A tribe from Madinah", "The main tribe in Makkah", "A group of travelers", "The companions of the Prophet"],
+                "correct_answer": "The main tribe in Makkah",
+                "explanation": "The Quraysh were the main tribe in Makkah. They were the guardians of the Ka'bah, and Prophet Muhammad (PBUH) belonged to this tribe."
+              },
+              {
+                "question": "What were the two journeys mentioned in this surah?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["East and west", "Winter and summer", "Morning and night", "Sea and land"],
+                "correct_answer": "Winter and summer",
+                "explanation": "The surah mentions the winter and summer trade journeys. The Quraysh would travel to Yemen in winter and to Syria in summer for trade."
+              },
+              {
+                "question": "Why could the Quraysh travel safely for trade?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["They had weapons", "People respected them as guardians of the Ka'bah", "They traveled at night", "They had many guards"],
+                "correct_answer": "People respected them as guardians of the Ka'bah",
+                "explanation": "Because the Quraysh were guardians of the sacred Ka'bah, people throughout Arabia respected them and allowed them to trade safely."
+              },
+              {
+                "question": "True or False: Surah Quraysh is completely unrelated to Surah Al-Fil.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "False",
+                "explanation": "These two surahs are closely connected! After Allah protected the Ka'bah from Abraha (Surah Al-Fil), He blessed the Quraysh with safety and prosperity (Surah Quraysh)."
+              },
+              {
+                "question": "What does Allah command the Quraysh to do in this surah?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Build more houses", "Worship the Lord of the House (Ka'bah)", "Stop trading", "Move to another city"],
+                "correct_answer": "Worship the Lord of the House (Ka'bah)",
+                "explanation": "Allah commands them to 'worship the Lord of this House' - to worship Allah alone, the Owner of the Ka'bah that brought them so many blessings."
+              },
+              {
+                "question": "What two main blessings does Allah mention giving the Quraysh?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Wealth and fame", "Food and safety", "Power and land", "Knowledge and wisdom"],
+                "correct_answer": "Food and safety",
+                "explanation": "The surah mentions that Allah 'fed them, saving them from hunger' and 'made them safe from fear' - food and safety are the two blessings highlighted."
+              },
+              {
+                "question": "What was the main occupation of the Quraysh?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Farming", "Fishing", "Trading", "Building"],
+                "correct_answer": "Trading",
+                "explanation": "The Quraysh were traders. They made profitable trading journeys in winter and summer, which made them wealthy."
+              },
+              {
+                "question": "True or False: The surah teaches that we should worship Allah out of gratitude for His blessings.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "True",
+                "explanation": "Yes! After mentioning Allah's blessings of food and safety, the surah commands worship. This teaches us to show gratitude through sincere worship."
+              },
+              {
+                "question": "What 'House' is referred to in this surah?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Any house in Makkah", "The Prophet's house", "The Ka'bah", "A trading house"],
+                "correct_answer": "The Ka'bah",
+                "explanation": "The 'House' refers to the Ka'bah, the sacred house built by Prophet Ibrahim (AS) for the worship of Allah."
+              },
+              {
+                "question": "What important lesson does Surah Quraysh teach us?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["How to become wealthy", "To be grateful for Allah's blessings and worship Him", "How to travel safely", "How to build a house"],
+                "correct_answer": "To be grateful for Allah's blessings and worship Him",
+                "explanation": "The surah teaches that when Allah blesses us with security, food, and safety, we should show gratitude by worshipping Him alone and sincerely."
+              }
+            ]
+          }
+        },
+        {
+          "title": "Review and Recitation Practice",
+          "content": "Congratulations on reaching the final lesson of 'My First Quran' course! You've learned so many beautiful surahs from the Quran. Now it's time to review everything you've learned and practice your recitation. Let's make sure you remember these precious surahs and can recite them beautifully!\n\nIn this course, you've learned:\n1. Surah Al-Fatihah (The Opening)\n2. Surah Al-Ikhlas (The Sincerity)\n3. Surah Al-Falaq (The Daybreak)\n4. Surah An-Nas (The Mankind)\n5. Surah Al-Asr (The Time)\n6. Surah Al-Kawthar (The Abundance)\n7. Surah Al-Fil (The Elephant)\n8. Surah Quraysh (The Quraysh Tribe)\n\nThese eight surahs are among the most important and frequently recited surahs in Islam. You should feel proud that you've memorized them!\n\n**Tips for Perfect Recitation:**\n\n1. **Tajweed Basics**: Tajweed means reciting the Quran beautifully and correctly. Pay attention to:\n   - Pronouncing each Arabic letter correctly\n   - Pausing at the right places\n   - Making long sounds long (like 'aa' in 'Naas')\n   - Making short sounds short\n\n2. **Practice Regularly**: The Prophet (PBUH) said: 'The one who memorizes the Quran and forgets it is like someone who had a treasure and lost it.' Don't lose your treasure! Recite these surahs every day, even if just a few of them.\n\n3. **Recite in Prayer**: Use these surahs in your daily prayers. In each rak'ah after Al-Fatihah, you can recite any of these surahs. This way, you'll practice them multiple times each day!\n\n4. **Understand the Meaning**: Always remember what the surahs mean. When you recite with understanding, your heart connects with the words, and your recitation becomes more beautiful.\n\n5. **Recite Slowly and Clearly**: Don't rush! The Prophet (PBUH) used to recite slowly and clearly. It's better to recite one surah perfectly than to rush through several.\n\n**Daily Practice Schedule:**\n- After Fajr: Review Al-Fatihah and Al-Ikhlas\n- After Dhuhr: Review Al-Falaq and An-Nas (the protection surahs)\n- After Asr: Review Al-Asr and Al-Kawthar\n- After Maghrib: Review Al-Fil and Quraysh\n- Before sleep: Recite Al-Falaq and An-Nas three times for protection\n\n**Challenge Yourself:**\nNow that you've mastered these surahs, set new goals:\n- Try to teach these surahs to a younger sibling or friend\n- Learn to write these surahs in Arabic\n- Memorize new surahs - continue with Surah Al-Ma'un, Surah Quraysh, Surah Al-Humazah\n- Work on improving your tajweed with a teacher or parent\n\n**Making it a Habit:**\nThe best deeds are those done consistently, even if they're small. Make a habit of:\n- Reciting at least one surah after each prayer\n- Reading from the Quran every day, even if it's just one page\n- Listening to beautiful recitations by skilled reciters\n- Teaching what you've learned to others\n\n**Remember:**\nThe Quran is Allah's speech. Every letter you recite earns you rewards. The Prophet (PBUH) said: 'Whoever reads a letter from the Book of Allah will earn a hasanah (good deed) from it, and one hasanah is equal to ten. I do not say that Alif-Lam-Meem is one letter, but Alif is a letter, Lam is a letter, and Meem is a letter.'\n\nYou've taken wonderful first steps in your Quran journey. Keep going! The Quran is an ocean of knowledge and blessings, and you've just begun to explore it. May Allah bless your efforts and make the Quran a light in your heart, a proof for you, and an intercessor for you on the Day of Judgment. Ameen!\n\nKeep practicing, keep learning, and most importantly, keep loving the Quran!",
+          "duration_minutes": 30,
+          "order_index": 10,
+          "learning_objectives": [
+            "Review and perfectly recite all eight surahs learned in the course",
+            "Understand basic tajweed principles for beautiful recitation",
+            "Develop a daily practice schedule for Quran recitation",
+            "Learn strategies for long-term retention of memorized surahs",
+            "Build confidence in reciting during prayers and daily life"
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "How many surahs did you learn in this course?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["6", "7", "8", "9"],
+                "correct_answer": "8",
+                "explanation": "In this course, you learned eight important surahs from Juz Amma, starting with Al-Fatihah."
+              },
+              {
+                "question": "What does 'Tajweed' mean?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Fast recitation", "Beautiful and correct recitation", "Loud recitation", "Silent recitation"],
+                "correct_answer": "Beautiful and correct recitation",
+                "explanation": "Tajweed means reciting the Quran correctly and beautifully, with proper pronunciation and rules."
+              },
+              {
+                "question": "Which two surahs should be recited three times before sleep for protection?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Al-Ikhlas and Al-Kawthar", "Al-Falaq and An-Nas", "Al-Fil and Quraysh", "Al-Asr and Al-Fatihah"],
+                "correct_answer": "Al-Falaq and An-Nas",
+                "explanation": "Prophet Muhammad (PBUH) taught us to recite Al-Falaq and An-Nas three times every morning and evening for protection."
+              },
+              {
+                "question": "True or False: It's better to rush through many surahs than to recite one slowly and correctly.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "False",
+                "explanation": "It's better to recite slowly and correctly. The Prophet (PBUH) used to recite slowly and clearly, never rushing."
+              },
+              {
+                "question": "What did the Prophet say about memorizing the Quran and then forgetting it?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["It's okay to forget", "It's like losing a treasure", "It's impossible to forget", "It doesn't matter"],
+                "correct_answer": "It's like losing a treasure",
+                "explanation": "The Prophet (PBUH) compared forgetting the Quran to someone who had a treasure and lost it. We should practice regularly so we don't forget!"
+              },
+              {
+                "question": "How many hasanat (good deeds) do you get for each letter of the Quran?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["1", "5", "10", "100"],
+                "correct_answer": "10",
+                "explanation": "The Prophet (PBUH) taught that for each letter you recite from the Quran, you earn one hasanah, which is multiplied by ten!"
+              },
+              {
+                "question": "True or False: You should only recite Al-Fatihah in your daily prayers.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "False",
+                "explanation": "After Al-Fatihah in each rak'ah, you should recite another surah or verses from the Quran. This is a great way to practice what you've memorized!"
+              },
+              {
+                "question": "What is one good way to remember your memorized surahs?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Never recite them", "Only recite once a year", "Recite them daily in prayers", "Write them once and forget"],
+                "correct_answer": "Recite them daily in prayers",
+                "explanation": "Reciting your memorized surahs daily, especially in prayers, helps you remember them and keeps them fresh in your mind."
+              },
+              {
+                "question": "Why is it important to understand the meaning of what you recite?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["It's not important", "Your heart connects with the words", "It makes recitation faster", "It makes memorization harder"],
+                "correct_answer": "Your heart connects with the words",
+                "explanation": "When you understand what you're reciting, your heart connects with Allah's words, and your recitation becomes more meaningful and beautiful."
+              },
+              {
+                "question": "What should you do after completing this course?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Stop learning Quran", "Keep practicing and learning new surahs", "Forget what you learned", "Only recite in Ramadan"],
+                "correct_answer": "Keep practicing and learning new surahs",
+                "explanation": "Completing this course is just the beginning! Keep practicing what you learned, and continue your Quran journey by memorizing more surahs and improving your tajweed."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Complete Quran Study - Beginner Level",
+      "description": "A comprehensive year-long journey through the entire Quran for youth, covering major themes, stories of prophets, Islamic law, and practical application in modern American Muslim life.",
+      "target_audience": "MIDDLE_SCHOOL",
+      "difficulty_level": "BEGINNER",
+      "estimated_duration_weeks": 52,
+      "category": "QURAN_STUDIES",
+      "lessons": [
+        {
+          "title": "Introduction to the Quran - Allah's Complete Guidance",
+          "content": "Welcome to your comprehensive Quran study journey! Over the next year, you'll explore the entire Quran - Allah's final and complete message to humanity. This isn't just about reading words; it's about understanding divine guidance that has transformed billions of lives for over 1,400 years.\n\n**What Makes the Quran Unique?**\n\nThe Quran is completely different from any other book in human history. It is the literal word of Allah, revealed to Prophet Muhammad (peace be upon him) through the Angel Jibril (Gabriel) over a period of 23 years. Every letter, every word, every verse is divine - not one letter has been changed since its revelation.\n\nThink about this: You can pick up a Quran in Makkah, Cairo, Jakarta, London, or Los Angeles, and you'll find the exact same text in Arabic. This is unprecedented in human history. Other ancient texts have multiple versions and variations, but the Quran has remained perfectly preserved.\n\n**The Structure of the Quran**\n\nThe Quran contains 114 chapters called 'surahs.' These surahs vary in length - some have just three verses, while others have hundreds. The surahs are not arranged chronologically (by when they were revealed) but rather in a divinely inspired order that creates a unique reading experience.\n\nThe Quran is also divided into 30 sections called 'juz,' which makes it easy to complete the entire Quran in one month, as many Muslims do during Ramadan.\n\n**Makki and Madani Revelation**\n\nThe Quran was revealed in two main periods:\n\n1. **Makki Surahs** (revealed in Makkah): These focus on faith (iman), monotheism (tawheed), stories of previous prophets, and the Day of Judgment. They address a society that didn't believe in Allah or accountability.\n\n2. **Madani Surahs** (revealed in Madinah): These focus on laws, social systems, family matters, and how to build an Islamic society. They address a community that had already accepted Islam.\n\nUnderstanding this context helps you understand why certain topics are emphasized in different parts of the Quran.\n\n**How to Approach Quran Study**\n\nAs you begin this journey, remember:\n\n1. **Read with Respect**: The Quran is Allah's speech. Approach it with humility and reverence.\n\n2. **Seek Understanding**: Don't just read for completion. Reflect on meanings and ask questions.\n\n3. **Apply the Lessons**: The Quran was revealed for action. Think about how each lesson applies to your life as an American Muslim teenager.\n\n4. **Be Consistent**: It's better to study a little bit every day than to cram everything in one session.\n\n5. **Make Dua**: Ask Allah to help you understand and benefit from what you learn.\n\n**The Quran's Relevance Today**\n\nSome people mistakenly think the Quran is outdated because it was revealed 1,400 years ago. But the Quran addresses timeless human issues: purpose, morality, relationships, justice, spirituality, and social responsibility. Whether you're dealing with peer pressure, social media dilemmas, family challenges, or questions about your purpose, the Quran provides guidance.\n\nAs an American Muslim, you'll find that the Quran helps you navigate the unique challenges of living your faith in a diverse society. It teaches you how to be a faithful Muslim while being a contributing member of your broader community.\n\n**What to Expect in This Course**\n\nThroughout this year, we'll study:\n- Major themes of the Quran\n- Stories of prophets and their lessons\n- Islamic beliefs and practices\n- Laws and guidance for daily life\n- How to apply Quranic wisdom in modern contexts\n- Understanding different interpretations (tafsir)\n\nRemember: This journey is a marathon, not a sprint. By the end, you'll have a comprehensive understanding of the Quran that will serve as a foundation for your entire life. Let's begin this amazing journey together!",
+          "duration_minutes": 45,
+          "order_index": 1,
+          "learning_objectives": [
+            "Understand the divine origin and preservation of the Quran",
+            "Learn the basic structure: 114 surahs and 30 juz",
+            "Distinguish between Makki and Madani revelations",
+            "Develop proper methodology for Quran study",
+            "Recognize the Quran's relevance to contemporary American Muslim life",
+            "Establish realistic expectations for a year-long Quran study journey"
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "Over how many years was the Quran revealed?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["10 years", "20 years", "23 years", "30 years"],
+                "correct_answer": "23 years",
+                "explanation": "The Quran was revealed over a period of 23 years to Prophet Muhammad (PBUH), addressing different situations and gradually building the Muslim community."
+              },
+              {
+                "question": "True or False: The surahs in the Quran are arranged in the order they were revealed.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "False",
+                "explanation": "The surahs are not arranged chronologically but rather in a divinely inspired order. For example, Surah Al-Alaq was the first revealed, but it's near the end of the Quran."
+              },
+              {
+                "question": "How many chapters (surahs) does the Quran have?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["100", "110", "114", "120"],
+                "correct_answer": "114",
+                "explanation": "The Quran contains exactly 114 surahs, ranging from the very short (3 verses) to the very long (286 verses)."
+              },
+              {
+                "question": "What are the 30 sections of the Quran called?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Surahs", "Ayat", "Juz", "Ruku"],
+                "correct_answer": "Juz",
+                "explanation": "The Quran is divided into 30 equal sections called 'juz' (also spelled 'juz''), making it convenient to complete the entire Quran in a month."
+              },
+              {
+                "question": "What is the main focus of Makki surahs?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Laws and regulations", "Faith, monotheism, and Day of Judgment", "Business transactions", "Family law"],
+                "correct_answer": "Faith, monotheism, and Day of Judgment",
+                "explanation": "Makki surahs focus on building faith, establishing monotheism, and teaching about the Day of Judgment, as they were revealed to a society that didn't yet believe."
+              },
+              {
+                "question": "True or False: The Quran's text has remained unchanged since it was revealed.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "True",
+                "explanation": "The Quran has been perfectly preserved since its revelation. Allah promises in the Quran itself: 'Indeed, it is We who sent down the message, and We will be its guardian' (15:9)."
+              },
+              {
+                "question": "Through which angel was the Quran revealed?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Mikail", "Israfil", "Jibril (Gabriel)", "Azrael"],
+                "correct_answer": "Jibril (Gabriel)",
+                "explanation": "The Angel Jibril (Gabriel) brought the revelation from Allah to Prophet Muhammad (PBUH). Jibril is mentioned by name in the Quran."
+              },
+              {
+                "question": "What is the main focus of Madani surahs?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Creation stories", "Laws, society, and Islamic practices", "Stories of ancient nations", "Description of Paradise"],
+                "correct_answer": "Laws, society, and Islamic practices",
+                "explanation": "Madani surahs focus on practical laws, social systems, and how to build an Islamic society, as they were revealed after the Muslim community was established in Madinah."
+              },
+              {
+                "question": "True or False: The Quran was revealed all at once.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "False",
+                "explanation": "The Quran was revealed gradually over 23 years. This gradual revelation allowed Muslims to understand, implement, and adapt to the guidance progressively."
+              },
+              {
+                "question": "Why is the Quran considered relevant for contemporary American Muslims?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Because it was written recently", "Because it addresses timeless human issues and provides ethical guidance", "Because it specifically mentions America", "Because it's written in English"],
+                "correct_answer": "Because it addresses timeless human issues and provides ethical guidance",
+                "explanation": "The Quran addresses universal human concerns like purpose, morality, justice, and relationships. Its principles can guide Muslims in any time and place, including modern America."
+              },
+              {
+                "question": "What should be your primary goal when studying the Quran?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Just reading it quickly", "Understanding and applying its guidance", "Memorizing everything", "Debating with others"],
+                "correct_answer": "Understanding and applying its guidance",
+                "explanation": "While reading and memorization are valuable, the Quran's ultimate purpose is to guide our lives. Understanding and applying its teachings should be our primary goal."
+              },
+              {
+                "question": "What does 'tafsir' mean?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Quranic recitation", "Quranic explanation/interpretation", "Quranic memorization", "Quranic calligraphy"],
+                "correct_answer": "Quranic explanation/interpretation",
+                "explanation": "Tafsir refers to the explanation and interpretation of the Quran. Scholars of tafsir help us understand the meanings, context, and applications of Quranic verses."
+              },
+              {
+                "question": "True or False: You can find different versions of the Quran in different Muslim countries.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "False",
+                "explanation": "There is only one version of the Quran in Arabic. Whether you're in Saudi Arabia, Indonesia, America, or anywhere else, the Arabic text is identical."
+              },
+              {
+                "question": "What is the best approach to studying the Quran?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Read everything in one day", "Study a little bit consistently every day", "Only study during Ramadan", "Don't ask any questions"],
+                "correct_answer": "Study a little bit consistently every day",
+                "explanation": "Consistent, regular study with reflection is better than irregular intensive study. Prophet Muhammad (PBUH) said: 'The deeds most loved by Allah are those done regularly, even if they are small.'"
+              },
+              {
+                "question": "Why is it important to know whether a surah is Makki or Madani?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["It doesn't matter", "It helps understand the context and focus of the revelation", "Only for historical curiosity", "To decide which surahs to read"],
+                "correct_answer": "It helps understand the context and focus of the revelation",
+                "explanation": "Knowing whether a surah is Makki or Madani helps us understand its context, focus, and intended audience, which leads to better comprehension of its message."
+              }
+            ]
+          }
+        },
+        {
+          "title": "Surah Al-Fatihah - Your Daily Conversation with Allah",
+          "content": "Every Muslim recites Surah Al-Fatihah at least 17 times a day in their obligatory prayers. But have you ever deeply thought about what you're saying? This surah isn't just a routine recitation - it's a profound conversation between you and Allah, happening multiple times every single day!\n\n**The Names and Virtues of Al-Fatihah**\n\nAl-Fatihah has many names, each revealing a different aspect of its importance:\n- **Al-Fatihah** (The Opening): It opens the Quran and opens every unit of prayer\n- **Umm al-Kitab** (Mother of the Book): It contains the essence of the entire Quran\n- **As-Sab' al-Mathani** (The Seven Oft-Repeated): Its seven verses are repeated frequently\n- **Ash-Shifa** (The Healing): It has healing properties when recited with faith\n- **As-Salah** (The Prayer): Prayer is not complete without it\n\nProphet Muhammad (PBUH) said: 'The prayer of a person who does not recite Al-Fatihah is incomplete.'\n\n**Understanding Each Verse Deeply**\n\nLet's analyze each verse and understand what you're really saying to Allah:\n\n**Verse 1: Bismillah ir-Rahman ir-Raheem**\n'In the name of Allah, the Most Gracious, the Most Merciful'\n\nYou begin by invoking Allah's name and two of His most important attributes - Rahman and Raheem. Both describe mercy, but with a difference:\n- **Ar-Rahman**: The Most Gracious - His mercy encompasses everyone, believer and non-believer, in this world. The sun shines on everyone, food grows for everyone.\n- **Ar-Raheem**: The Most Merciful - His special mercy for believers in the Hereafter, granting them Paradise.\n\n**Verses 2-4: Praising Allah**\n'All praise is due to Allah, Lord of all the worlds. The Most Gracious, the Most Merciful. Master of the Day of Judgment.'\n\nHere, you're acknowledging Allah's lordship and sovereignty. Think about what each title means:\n- **Rabb al-'Alamin** (Lord of all the worlds): Allah created, sustains, and manages everything - the seen and unseen worlds, this universe and others.\n- **Master of the Day of Judgment**: On that Day, all earthly powers will vanish. Only Allah's judgment will matter.\n\nThis section is pure praise. You're not asking for anything yet - you're simply acknowledging who Allah is.\n\n**Verse 5: The Transition**\n'You alone we worship, and You alone we ask for help.'\n\nThis is where the conversation shifts from praising Allah to making your promise and request. Notice the beautiful structure: 'You alone' - showing exclusive devotion to Allah. In a world full of distractions and things competing for your devotion (popularity, money, social media validation), you're declaring that you worship Allah alone.\n\nThe second part - 'You alone we ask for help' - shows your recognition that true help comes only from Allah. Yes, you might ask teachers for academic help or doctors for medical help, but ultimately, Allah is the source of all assistance.\n\n**Verses 6-7: Your Daily Request**\n'Guide us to the straight path - the path of those upon whom You have bestowed Your favor, not of those who have earned Your anger or who have gone astray.'\n\nThis is your request, and it's profound. You're asking for guidance - not wealth, not fame, not ease, but guidance. Why? Because with guidance, everything else falls into place.\n\nThe 'straight path' (as-sirat al-mustaqim) is the path that leads directly to Allah and Paradise, without deviation. It's the path of:\n- The prophets who received Allah's direct revelation\n- The truthful companions who sacrificed everything for Islam\n- The martyrs who gave their lives for truth\n- The righteous scholars and believers throughout history\n\nYou're also asking to be saved from two dangerous paths:\n1. The path of those who earned Allah's anger: Those who knew the truth but arrogantly rejected it\n2. The path of those who went astray: Those who were lost in ignorance and never found the truth\n\n**The Divine Response**\n\nHere's something amazing: In a hadith qudsi, Allah says that Al-Fatihah is divided between Him and His servant. When you say the verses of praise (1-4), Allah says: 'My servant has praised Me.' When you say verse 5, Allah says: 'This is between Me and My servant.' And when you say verses 6-7, Allah says: 'This is for My servant, and My servant shall have what he asked for.'\n\nYour supplication for guidance is answered! Every time you recite Al-Fatihah sincerely, Allah grants you guidance.\n\n**Practical Application for American Muslim Youth**\n\nAs a young American Muslim, you face unique challenges: balancing faith and modern culture, dealing with peer pressure, navigating social media, making moral choices in complex situations. The path isn't always clear.\n\nThat's why you need to ask for guidance 17+ times a day! You're saying: 'Allah, in this confusing world with so many choices and voices telling me different things, guide me to the right path. Help me be among the righteous, not among those who are misguided.'\n\nWhen you're deciding whether to compromise your values to fit in, remember you just asked Allah for guidance.\nWhen you're choosing between right and wrong, remember you just asked for the straight path.\nWhen you're feeling lost, remember you just asked the Lord of all worlds to guide you.\n\nAl-Fatihah isn't just words - it's your daily spiritual GPS, recalibrating you toward Allah and Paradise, multiple times every day. Make every recitation count!",
+          "duration_minutes": 50,
+          "order_index": 2,
+          "learning_objectives": [
+            "Understand the multiple names and significance of Surah Al-Fatihah",
+            "Analyze each verse with deep comprehension of its meaning",
+            "Recognize Al-Fatihah as a conversation between the servant and Allah",
+            "Distinguish between Ar-Rahman and Ar-Raheem",
+            "Apply the guidance principles to modern American Muslim life challenges",
+            "Develop mindfulness in reciting Al-Fatihah during daily prayers"
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "What is one of the alternative names for Surah Al-Fatihah?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Umm al-Mumineen", "Umm al-Kitab", "Umm al-Quran", "Umm al-Islam"],
+                "correct_answer": "Umm al-Kitab",
+                "explanation": "Al-Fatihah is called 'Umm al-Kitab' (Mother of the Book) because it contains the essence and themes of the entire Quran in just seven verses."
+              },
+              {
+                "question": "What is the difference between Ar-Rahman and Ar-Raheem?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["There is no difference", "Ar-Rahman is general mercy for all in this world; Ar-Raheem is special mercy for believers in the Hereafter", "Ar-Rahman is for animals; Ar-Raheem is for humans", "They are the same name repeated for emphasis"],
+                "correct_answer": "Ar-Rahman is general mercy for all in this world; Ar-Raheem is special mercy for believers in the Hereafter",
+                "explanation": "Ar-Rahman refers to Allah's vast mercy that encompasses all of creation in this world, while Ar-Raheem refers to His special mercy for believers in the Hereafter, granting them Paradise."
+              },
+              {
+                "question": "True or False: Prayer is valid without reciting Al-Fatihah.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "False",
+                "explanation": "Prophet Muhammad (PBUH) said: 'The prayer of a person who does not recite Al-Fatihah is incomplete.' It is an essential component of valid prayer."
+              },
+              {
+                "question": "In the hadith qudsi about Al-Fatihah, what does Allah say when you recite the verses of request (6-7)?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["My servant has praised Me", "This is between Me and My servant", "This is for My servant, and My servant shall have what he asked for", "My servant understands My wisdom"],
+                "correct_answer": "This is for My servant, and My servant shall have what he asked for",
+                "explanation": "When you sincerely ask for guidance in verses 6-7, Allah responds by saying your request is granted - you will have what you asked for."
+              },
+              {
+                "question": "What does 'Rabb al-'Alamin' mean?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["King of the Day", "Lord of all the worlds", "Most Merciful", "The Straight Path"],
+                "correct_answer": "Lord of all the worlds",
+                "explanation": "Rabb al-'Alamin means 'Lord of all the worlds' - referring to Allah's lordship over everything in existence, seen and unseen, in this world and beyond."
+              },
+              {
+                "question": "True or False: In Al-Fatihah, we first ask Allah for what we need, then praise Him.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "False",
+                "explanation": "The proper etiquette shown in Al-Fatihah is to first praise Allah (verses 1-4), then make your requests (verses 6-7). We honor Allah before asking."
+              },
+              {
+                "question": "What is the 'straight path' (as-sirat al-mustaqim)?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["The path to wealth", "The path to success in school", "The path that leads directly to Allah and Paradise without deviation", "The path that's easiest"],
+                "correct_answer": "The path that leads directly to Allah and Paradise without deviation",
+                "explanation": "The straight path is the path of guidance that leads directly to Allah's pleasure and Paradise, following the example of prophets, companions, and the righteous."
+              },
+              {
+                "question": "How many times minimum do Muslims recite Al-Fatihah daily in obligatory prayers?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["5 times", "10 times", "17 times", "20 times"],
+                "correct_answer": "17 times",
+                "explanation": "Muslims recite Al-Fatihah in every rak'ah of prayer. The five daily prayers contain 17 rak'ahs total (2+4+4+3+4), so Al-Fatihah is recited at least 17 times daily."
+              },
+              {
+                "question": "True or False: When you say 'You alone we worship,' you're declaring that you worship Allah only, not fame, money, or anything else.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "True",
+                "explanation": "The phrase 'You alone we worship' (Iyyaka na'budu) is a declaration of exclusive devotion to Allah, rejecting all false objects of worship including materialism, fame, and social status."
+              },
+              {
+                "question": "Who are 'those upon whom You have bestowed Your favor' in Al-Fatihah?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["The wealthy people", "The prophets, companions, martyrs, and the righteous", "The powerful rulers", "The intelligent scholars only"],
+                "correct_answer": "The prophets, companions, martyrs, and the righteous",
+                "explanation": "Allah explains in Surah An-Nisa (4:69) that those favored by Allah include the prophets, the truthful, the martyrs, and the righteous believers - these are the excellent companions on the straight path."
+              },
+              {
+                "question": "What are the two dangerous paths mentioned that we ask Allah to protect us from?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Poverty and illness", "Ignorance and weakness", "The path of those who earned Allah's anger and those who went astray", "The path of laziness and pride"],
+                "correct_answer": "The path of those who earned Allah's anger and those who went astray",
+                "explanation": "We ask Allah to save us from: (1) the path of those who knew the truth but arrogantly rejected it (earned anger), and (2) the path of those lost in ignorance who never found the truth (went astray)."
+              },
+              {
+                "question": "True or False: According to the lesson, Al-Fatihah functions like a spiritual GPS for Muslims.",
+                "type": "TRUE_FALSE",
+                "options": ["True", "False"],
+                "correct_answer": "True",
+                "explanation": "Yes! Just as GPS constantly recalibrates your route, reciting Al-Fatihah 17+ times daily recalibrates your spiritual direction, asking Allah to guide you to the straight path repeatedly."
+              },
+              {
+                "question": "What should you primarily ask Allah for according to Al-Fatihah?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Wealth and health", "Fame and success", "Guidance to the straight path", "Easy life without challenges"],
+                "correct_answer": "Guidance to the straight path",
+                "explanation": "The main request in Al-Fatihah is for guidance (Ihdina as-sirat al-mustaqim). With proper guidance, everything else in life falls into place correctly."
+              },
+              {
+                "question": "Why is it called 'As-Sab' al-Mathani' (The Seven Oft-Repeated)?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["Because it has seven words", "Because it has seven verses and is repeated often in prayers", "Because seven prophets memorized it", "Because it's in the seventh juz"],
+                "correct_answer": "Because it has seven verses and is repeated often in prayers",
+                "explanation": "Al-Fatihah has seven verses and is recited repeatedly in every rak'ah of every prayer, making it the most frequently recited passage of the Quran."
+              },
+              {
+                "question": "How should understanding Al-Fatihah help an American Muslim youth facing peer pressure?",
+                "type": "MULTIPLE_CHOICE",
+                "options": ["It doesn't relate to modern problems", "It reminds them they've asked Allah for guidance multiple times that day", "It only helps with religious issues", "It's just a prayer ritual"],
+                "correct_answer": "It reminds them they've asked Allah for guidance multiple times that day",
+                "explanation": "When facing challenges like peer pressure, remembering that you've asked Allah for guidance 17+ times that day should remind you to seek His path rather than following the crowd away from Islamic values."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

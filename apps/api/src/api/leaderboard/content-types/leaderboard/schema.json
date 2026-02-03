@@ -1,0 +1,84 @@
+{
+  "kind": "collectionType",
+  "collectionName": "leaderboards",
+  "info": {
+    "singularName": "leaderboard",
+    "pluralName": "leaderboards",
+    "displayName": "Leaderboard",
+    "description": "Track user rankings and points"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "total_points": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "courses_completed": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "lessons_completed": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "quizzes_completed": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "average_quiz_score": {
+      "type": "decimal",
+      "required": false,
+      "min": 0,
+      "max": 100
+    },
+    "achievements_earned": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "current_streak": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "longest_streak": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "rank": {
+      "type": "integer",
+      "required": false,
+      "min": 1
+    },
+    "level": {
+      "type": "integer",
+      "required": true,
+      "default": 1,
+      "min": 1
+    },
+    "last_updated": {
+      "type": "datetime",
+      "required": false
+    }
+  }
+}

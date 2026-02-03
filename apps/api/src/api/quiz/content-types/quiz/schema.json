@@ -1,0 +1,85 @@
+{
+  "kind": "collectionType",
+  "collectionName": "quizzes",
+  "info": {
+    "singularName": "quiz",
+    "pluralName": "quizzes",
+    "displayName": "Quiz",
+    "description": "Quizzes for assessing student knowledge"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 255
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": false
+    },
+    "quiz_type": {
+      "type": "enumeration",
+      "enum": ["practice", "assessment", "final"],
+      "required": true,
+      "default": "practice"
+    },
+    "time_limit_minutes": {
+      "type": "integer",
+      "required": false,
+      "min": 1
+    },
+    "passing_score": {
+      "type": "integer",
+      "required": true,
+      "min": 0,
+      "max": 100,
+      "default": 70
+    },
+    "max_attempts": {
+      "type": "integer",
+      "required": false,
+      "min": 1
+    },
+    "randomize_questions": {
+      "type": "boolean",
+      "default": false
+    },
+    "show_correct_answers": {
+      "type": "boolean",
+      "default": true
+    },
+    "questions": {
+      "type": "json",
+      "required": true
+    },
+    "total_points": {
+      "type": "integer",
+      "required": true,
+      "min": 0
+    },
+    "instructions": {
+      "type": "text",
+      "required": false
+    },
+    "lesson": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::lesson.lesson"
+    },
+    "user_progress": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::user-progress.user-progress",
+      "mappedBy": "quiz"
+    }
+  }
+}

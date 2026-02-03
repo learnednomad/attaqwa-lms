@@ -1,0 +1,48 @@
+{
+  "name": "api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Strapi v5 Backend API for AttaqwaMasjid LMS",
+  "scripts": {
+    "build": "strapi build",
+    "console": "strapi console",
+    "deploy": "strapi deploy",
+    "dev": "strapi develop",
+    "develop": "strapi develop",
+    "start": "strapi start",
+    "strapi": "strapi",
+    "upgrade": "npx @strapi/upgrade latest",
+    "upgrade:dry": "npx @strapi/upgrade latest --dry",
+    "seed": "node --loader ts-node/esm scripts/seed/seed-database.ts",
+    "seed:dev": "tsx scripts/seed/seed-database.ts",
+    "seed:api": "tsx scripts/seed/seed-via-api.ts",
+    "seed:comprehensive": "tsx scripts/seed/seed-comprehensive.ts",
+    "seed:users": "tsx scripts/seed/seed-users.ts"
+  },
+  "dependencies": {
+    "@strapi/plugin-cloud": "5.27.0",
+    "@strapi/plugin-users-permissions": "5.27.0",
+    "@strapi/strapi": "5.27.0",
+    "better-sqlite3": "11.3.0",
+    "pg": "^8.16.3",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.0.0",
+    "styled-components": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "tsx": "^4.20.6",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=18.0.0 <=22.x.x",
+    "npm": ">=6.0.0"
+  },
+  "strapi": {
+    "uuid": "d73a8b54-c660-4e60-8472-f16b18551cd3",
+    "installId": "fa57f219e7a0a334c7a5e52f270525a4b16c3952d3c646eece4a335a5025049f"
+  }
+}
