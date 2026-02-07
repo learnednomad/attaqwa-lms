@@ -5,7 +5,7 @@
 
 // Strapi base URL
 const STRAPI_BASE = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
-const API_BASE = `${STRAPI_BASE}/api`;
+const API_BASE = `${STRAPI_BASE}/api/v1`;
 
 // ============================================================================
 // Type Definitions
@@ -80,10 +80,15 @@ export interface QuizQuestion {
 }
 
 export interface Enrollment extends StrapiEntity {
-  status: 'active' | 'completed' | 'dropped';
-  progress_percentage: number;
-  started_at: string;
-  completed_at?: string;
+  enrollment_status: 'pending' | 'active' | 'completed' | 'dropped' | 'suspended';
+  overall_progress: number;
+  enrollment_date: string;
+  completion_date?: string;
+  lessons_completed: number;
+  quizzes_completed: number;
+  average_quiz_score?: number;
+  total_time_spent_minutes: number;
+  last_activity_date?: string;
   user: any;
   course: Course;
 }
@@ -491,9 +496,9 @@ export const enrollmentsApi = {
         data: {
           user: userId,
           course: courseId,
-          status: 'active',
-          progress_percentage: 0,
-          started_at: new Date().toISOString(),
+          enrollment_status: 'active',
+          overall_progress: 0,
+          enrollment_date: new Date().toISOString(),
         },
       }),
     });
@@ -605,7 +610,7 @@ export const aiApi = {
    * Health check for AI service
    */
   getHealth: async () => {
-    const response = await fetch(`${API_BASE}/v1/ai/health`);
+    const response = await fetch(`${API_BASE}/ai/health`);
     if (!response.ok) return null;
     const json = await response.json();
     return json.data;
@@ -615,7 +620,7 @@ export const aiApi = {
    * Semantic search across all content
    */
   search: async (query: string, contentType?: string, limit?: number) => {
-    const response = await fetch(`${API_BASE}/v1/ai/search`, {
+    const response = await fetch(`${API_BASE}/ai/search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query, contentType, limit: limit || 10 }),
@@ -629,7 +634,7 @@ export const aiApi = {
    * Get AI summary for content
    */
   summarize: async (content: string) => {
-    const response = await fetch(`${API_BASE}/v1/ai/summarize`, {
+    const response = await fetch(`${API_BASE}/ai/summarize`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content }),
@@ -644,7 +649,7 @@ export const aiApi = {
    */
   getRecommendations: async (token: string, limit?: number) => {
     const response = await fetch(
-      `${API_BASE}/v1/ai/recommend?limit=${limit || 5}`,
+      `${API_BASE}/ai/recommend?limit=${limit || 5}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

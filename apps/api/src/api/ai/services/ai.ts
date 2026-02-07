@@ -6,6 +6,7 @@
 
 import * as ollamaClient from './ollama-client';
 import * as jobQueue from './job-queue';
+import { stripHtml } from './text-utils';
 import {
   SYSTEM_CONTEXT,
   MODERATION_PROMPT,
@@ -53,25 +54,48 @@ export interface QuizGenerationResult {
 // Helper: Parse JSON from LLM response
 // ============================================================================
 
-function parseJsonResponse<T>(response: string): T {
+function parseJsonResponse<T>(response: string, validate?: (obj: any) => boolean): T {
   // Try to find JSON in the response (LLMs sometimes wrap in markdown code blocks)
   const jsonMatch = response.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
     throw new Error('No valid JSON found in AI response');
   }
-  return JSON.parse(jsonMatch[0]) as T;
+  const parsed = JSON.parse(jsonMatch[0]);
+  if (validate && !validate(parsed)) {
+    throw new Error('AI response does not match expected structure');
+  }
+  return parsed as T;
 }
 
-function stripHtml(html: string): string {
-  return html
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/\s+/g, ' ')
-    .trim();
+function isValidModerationResult(obj: any): boolean {
+  return (
+    typeof obj.score === 'number' &&
+    Array.isArray(obj.flags) &&
+    typeof obj.reasoning === 'string' &&
+    ['approve', 'needs_review', 'reject'].includes(obj.recommendation)
+  );
+}
+
+function isValidTagSuggestion(obj: any): boolean {
+  return (
+    typeof obj.subject === 'string' &&
+    typeof obj.difficulty === 'string' &&
+    typeof obj.ageTier === 'string' &&
+    Array.isArray(obj.keywords)
+  );
+}
+
+function isValidQuizResult(obj: any): boolean {
+  return (
+    Array.isArray(obj.questions) &&
+    obj.questions.length > 0 &&
+    obj.questions.every(
+      (q: any) =>
+        typeof q.question === 'string' &&
+        Array.isArray(q.options) &&
+        typeof q.correctAnswer === 'string'
+    )
+  );
 }
 
 function chunkText(text: string, maxChunkSize: number = 3000): string[] {
@@ -139,7 +163,7 @@ export async function moderate(
     temperature: 0.1, // Low temperature for consistent moderation
   });
 
-  return parseJsonResponse<ModerationResult>(response);
+  return parseJsonResponse<ModerationResult>(response, isValidModerationResult);
 }
 
 /**
@@ -214,7 +238,7 @@ export async function generateTags(
     temperature: 0.2,
   });
 
-  return parseJsonResponse<TagSuggestion>(response);
+  return parseJsonResponse<TagSuggestion>(response, isValidTagSuggestion);
 }
 
 /**
@@ -239,7 +263,7 @@ export async function generateQuiz(
     maxTokens: 4096,
   });
 
-  return parseJsonResponse<QuizGenerationResult>(response);
+  return parseJsonResponse<QuizGenerationResult>(response, isValidQuizResult);
 }
 
 /**

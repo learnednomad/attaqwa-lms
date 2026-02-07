@@ -71,14 +71,14 @@ export interface UserProfile {
   ageTier?: AgeTier;
 }
 
-export type AgeTier = 'children' | 'youth' | 'adults' | 'all';
+export type AgeTier = 'children' | 'youth' | 'adults' | 'seniors';
 
 // Runtime const for AgeTier
 export const AgeTier = {
   CHILDREN: 'children' as const,
   YOUTH: 'youth' as const,
   ADULTS: 'adults' as const,
-  ALL: 'all' as const,
+  SENIORS: 'seniors' as const,
 } as const;
 
 /**
@@ -243,11 +243,13 @@ export interface UserProgress {
   id: string;
   user: Pick<User, 'id' | 'username'>;
   lesson: Pick<Lesson, 'id' | 'title'>;
-  progress: number; // 0-100
-  completed: boolean;
-  quizScore?: number; // 0-100
-  timeSpent: number; // in minutes
-  lastAccessed: string;
+  status: 'not_started' | 'in_progress' | 'completed';
+  progress_percentage: number; // 0-100
+  time_spent_minutes: number;
+  quiz_score?: number; // 0-100
+  quiz_attempts?: number;
+  last_accessed?: string;
+  completed_at?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -256,10 +258,15 @@ export interface CourseEnrollment {
   id: string;
   user: Pick<User, 'id' | 'username'>;
   course: Course;
-  enrolledAt: string;
-  completedAt?: string;
-  status: 'enrolled' | 'in_progress' | 'completed' | 'dropped';
-  progress: number; // 0-100
+  enrollment_status: 'pending' | 'active' | 'completed' | 'dropped' | 'suspended';
+  enrollment_date: string;
+  completion_date?: string;
+  overall_progress: number; // 0-100
+  lessons_completed: number;
+  quizzes_completed: number;
+  average_quiz_score?: number;
+  total_time_spent_minutes: number;
+  last_activity_date?: string;
 }
 
 export interface ProgressStatsResponse {

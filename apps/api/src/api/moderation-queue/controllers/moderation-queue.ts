@@ -23,6 +23,14 @@ export default factories.createCoreController(uid, ({ strapi }) => ({
       return;
     }
 
+    // Only admins and moderators can review content
+    const userRole = user.role?.type;
+    if (userRole !== 'admin' && userRole !== 'moderator') {
+      ctx.status = 403;
+      ctx.body = { error: { message: 'Admin or moderator role required to review content' } };
+      return;
+    }
+
     if (!['approve', 'reject', 'needs_review'].includes(action)) {
       ctx.status = 400;
       ctx.body = { error: { message: 'action must be one of: approve, reject, needs_review' } };

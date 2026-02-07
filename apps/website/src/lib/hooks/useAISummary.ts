@@ -9,10 +9,15 @@ import { useQuery } from '@tanstack/react-query';
 
 const API_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
 
-async function fetchSummary(content: string): Promise<string> {
+async function fetchSummary(content: string, token?: string | null): Promise<string> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   const res = await fetch(`${API_URL}/api/v1/ai/summarize`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify({ content }),
   });
 
@@ -28,10 +33,10 @@ async function fetchSummary(content: string): Promise<string> {
   return json.data.summary;
 }
 
-export function useAISummary(content: string | undefined, enabled: boolean = true) {
+export function useAISummary(content: string | undefined, enabled: boolean = true, token?: string | null) {
   return useQuery({
     queryKey: ['ai-summary', content?.slice(0, 100)],
-    queryFn: () => fetchSummary(content!),
+    queryFn: () => fetchSummary(content!, token),
     enabled: enabled && !!content && content.length > 100,
     staleTime: 60 * 60 * 1000, // 1 hour
     retry: false,

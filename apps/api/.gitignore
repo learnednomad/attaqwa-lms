@@ -101,6 +101,8 @@ node_modules
 # Package managers
 ############################
 
+package-lock.json
+
 .yarn/*
 !.yarn/cache
 !.yarn/unplugged

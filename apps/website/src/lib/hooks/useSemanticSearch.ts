@@ -20,11 +20,17 @@ export interface SearchResult {
 
 async function fetchSearchResults(
   query: string,
-  contentType?: string
+  contentType?: string,
+  token?: string | null
 ): Promise<SearchResult[]> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   const res = await fetch(`${API_URL}/api/v1/ai/search`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify({ query, contentType, limit: 20 }),
   });
 
@@ -37,10 +43,10 @@ async function fetchSearchResults(
   return json.data || [];
 }
 
-export function useSemanticSearch(query: string, contentType?: string) {
+export function useSemanticSearch(query: string, contentType?: string, token?: string | null) {
   return useQuery({
     queryKey: ['ai-search', query, contentType],
-    queryFn: () => fetchSearchResults(query, contentType),
+    queryFn: () => fetchSearchResults(query, contentType, token),
     enabled: query.length >= 3,
     placeholderData: (prev) => prev, // Keep previous data while loading
     staleTime: 30 * 1000, // 30 seconds

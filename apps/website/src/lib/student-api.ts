@@ -129,7 +129,7 @@ export interface UserAchievement {
 }
 
 // API Response wrapper
-interface ApiResponse<T> {
+export interface ApiResponse<T> {
   data: T;
   meta?: {
     pagination?: {

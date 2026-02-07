@@ -225,7 +225,7 @@ export function useTeacherCourseActions() {
     try {
       setLoading(true);
       setError(null);
-      const result = await teacherApi.courses.updateCourse(courseId, data);
+      const result = await teacherApi.courses.updateCourse(courseId, data as Partial<import('../lib/teacher-api').CourseFormData>);
       return result.data;
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to update course');

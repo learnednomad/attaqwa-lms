@@ -7,8 +7,18 @@ import * as aiService from '../services/ai';
 import * as embeddingService from '../services/embedding-service';
 import * as recommendationService from '../services/recommendation-service';
 
-// In Strapi v5 custom controllers (not factory), `strapi` is globally available
-declare const strapi: any;
+// `strapi` is globally typed via @strapi/types
+
+const MAX_CONTENT_LENGTH = 50000; // 50KB max for AI content input
+
+function validateContentLength(content: string, ctx: any): boolean {
+  if (content.length > MAX_CONTENT_LENGTH) {
+    ctx.status = 413;
+    ctx.body = { error: { message: `Content too large. Maximum ${MAX_CONTENT_LENGTH} characters allowed.` } };
+    return false;
+  }
+  return true;
+}
 
 export default {
   /**
@@ -37,6 +47,8 @@ export default {
       ctx.body = { error: { message: 'content and contentType are required' } };
       return;
     }
+
+    if (!validateContentLength(content, ctx)) return;
 
     try {
       if (isAsync) {
@@ -72,6 +84,8 @@ export default {
       return;
     }
 
+    if (!validateContentLength(content, ctx)) return;
+
     try {
       const summary = await aiService.summarize(content);
       ctx.body = { data: { summary } };
@@ -99,6 +113,8 @@ export default {
       return;
     }
 
+    if (!validateContentLength(content, ctx)) return;
+
     try {
       const tags = await aiService.generateTags(content, title);
       ctx.body = { data: tags };
@@ -125,6 +141,8 @@ export default {
       ctx.body = { error: { message: 'content is required' } };
       return;
     }
+
+    if (!validateContentLength(content, ctx)) return;
 
     const count = Math.min(Math.max(parseInt(questionCount) || 5, 1), 20);
     const diff = ['beginner', 'intermediate', 'advanced'].includes(difficulty)
@@ -192,7 +210,8 @@ export default {
       // Fall back to keyword-only search
       try {
         const knex = strapi.db.connection;
-        const searchPattern = `%${query}%`;
+        const escapedQuery = query.replace(/[%_\\]/g, '\\$&');
+        const searchPattern = `%${escapedQuery}%`;
         const result = await knex.raw(
           `SELECT content_type, content_id, title, chunk_text as snippet
            FROM content_embeddings

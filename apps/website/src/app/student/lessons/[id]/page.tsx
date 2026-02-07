@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useLesson, useCourse, useLessons, useProgress, useUpdateLessonProgress } from '@/hooks/use-student-data';
 import type { Lesson, QuizQuestion } from '@/lib/student-api';
+import { AILessonSummary } from '@/components/education/AILessonSummary';
 
 // ── Subject theming ──────────────────────────────────────────────────────────
 
@@ -670,6 +671,11 @@ export default function StudentLessonDetailPage() {
                 </div>
               </CardContent>
             </Card>
+          )}
+
+          {/* AI Summary */}
+          {lesson.content && (
+            <AILessonSummary content={lesson.content} />
           )}
 
           {/* Lesson Content */}

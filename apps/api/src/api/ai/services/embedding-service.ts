@@ -5,8 +5,11 @@
  */
 
 import * as ollamaClient from './ollama-client';
-import * as fs from 'fs';
-import * as path from 'path';
+import { stripHtml, escapeLikePattern } from './text-utils';
+
+// Embedding dimension — must match the model configured in OLLAMA_MODEL
+// Mistral 7B: 4096, nomic-embed-text: 768, all-minilm: 384
+const EMBEDDING_DIMENSION = parseInt(process.env.EMBEDDING_DIMENSION || '4096', 10);
 
 const CHUNK_SIZE = 500;      // tokens (approx chars/4)
 const CHUNK_OVERLAP = 50;    // token overlap between chunks
@@ -17,18 +20,6 @@ const OVERLAP_CHARS = CHUNK_OVERLAP * CHAR_PER_TOKEN;
 // ============================================================================
 // Text Chunking
 // ============================================================================
-
-function stripHtml(html: string): string {
-  return html
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
 
 export function chunkText(text: string): string[] {
   const clean = stripHtml(text);
@@ -51,9 +42,12 @@ export function chunkText(text: string): string[] {
     }
 
     chunks.push(clean.slice(start, end).trim());
+
+    // If we've reached the end, stop
+    if (end >= clean.length) break;
+
     start = end - OVERLAP_CHARS; // overlap
     if (start < 0) start = 0;
-    if (start >= clean.length) break;
   }
 
   return chunks.filter((c) => c.length > 20); // skip tiny chunks
@@ -65,23 +59,47 @@ export function chunkText(text: string): string[] {
 
 /**
  * Run the embeddings migration on bootstrap.
+ * Generates SQL dynamically so the vector dimension matches the configured model.
  */
 export async function runMigration(strapi: any): Promise<void> {
   try {
-    const sqlPath = path.join(__dirname, 'migrations', 'create-embeddings-table.sql');
-    // In production build, the SQL might be at a different relative path
-    let sql: string;
-    try {
-      sql = fs.readFileSync(sqlPath, 'utf-8');
-    } catch {
-      // Try alternate path for compiled output
-      const altPath = path.join(__dirname, '../../src/api/ai/services/migrations/create-embeddings-table.sql');
-      sql = fs.readFileSync(altPath, 'utf-8');
-    }
-
     const knex = strapi.db.connection;
-    await knex.raw(sql);
-    strapi.log.info('Content embeddings table ready');
+
+    await knex.raw('CREATE EXTENSION IF NOT EXISTS vector');
+
+    await knex.raw(`
+      CREATE TABLE IF NOT EXISTS content_embeddings (
+        id SERIAL PRIMARY KEY,
+        content_type VARCHAR(50) NOT NULL,
+        content_id VARCHAR(255) NOT NULL,
+        title TEXT NOT NULL,
+        chunk_text TEXT NOT NULL,
+        chunk_index INTEGER DEFAULT 0,
+        embedding vector(${EMBEDDING_DIMENSION}),
+        metadata JSONB DEFAULT '{}',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `);
+
+    await knex.raw(`
+      CREATE INDEX IF NOT EXISTS idx_embeddings_content
+        ON content_embeddings (content_type, content_id)
+    `);
+
+    await knex.raw(`
+      CREATE INDEX IF NOT EXISTS idx_embeddings_updated
+        ON content_embeddings (updated_at DESC)
+    `);
+
+    // HNSW index for fast approximate nearest neighbor search
+    await knex.raw(`
+      CREATE INDEX IF NOT EXISTS idx_embeddings_hnsw
+        ON content_embeddings USING hnsw (embedding vector_cosine_ops)
+        WITH (m = 16, ef_construction = 64)
+    `);
+
+    strapi.log.info(`Content embeddings table ready (vector dimension: ${EMBEDDING_DIMENSION})`);
   } catch (error: any) {
     strapi.log.warn(`Embeddings migration: ${error.message}`);
   }
@@ -303,7 +321,7 @@ async function keywordSearch(
     FROM content_embeddings
     WHERE (title ILIKE ? OR chunk_text ILIKE ?)
   `;
-  const searchPattern = `%${query}%`;
+  const searchPattern = `%${escapeLikePattern(query)}%`;
   const params: any[] = [searchPattern, searchPattern];
 
   if (options.contentType) {

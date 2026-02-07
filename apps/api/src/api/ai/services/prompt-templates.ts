@@ -96,32 +96,3 @@ Respond in valid JSON format only:
   ]
 }`;
 
-export const SEARCH_QUERY_PROMPT = (query: string) => `
-Rephrase the following search query to improve semantic search results for Islamic educational content. Expand abbreviations, add relevant Islamic terminology synonyms, and clarify intent.
-
-Query: "${query}"
-
-Respond with the expanded query text only, no formatting.`;
-
-export const RECOMMENDATION_PROMPT = (
-  userProfile: string,
-  candidateCourses: string
-) => `
-Given the following student learning profile and available courses, rank the courses by relevance. Consider the student's progress, interests, difficulty progression, and age tier.
-
-Student Profile:
-${userProfile}
-
-Available Courses:
-${candidateCourses}
-
-Respond in valid JSON format only:
-{
-  "rankings": [
-    {
-      "courseId": "<id>",
-      "score": <float 0.0-1.0>,
-      "reason": "<brief reason for recommendation>"
-    }
-  ]
-}`;

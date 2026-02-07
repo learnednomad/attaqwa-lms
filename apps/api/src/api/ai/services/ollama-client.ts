@@ -47,6 +47,7 @@ interface OllamaTagsResponse {
 
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://ollama:11434';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'mistral:7b-instruct-q4_K_M';
+const OLLAMA_EMBED_MODEL = process.env.OLLAMA_EMBED_MODEL || 'nomic-embed-text';
 const OLLAMA_TIMEOUT_MS = parseInt(process.env.OLLAMA_TIMEOUT_MS || '120000', 10);
 const OLLAMA_ENABLED = process.env.OLLAMA_ENABLED !== 'false';
 
@@ -93,11 +94,12 @@ export async function getHealth(): Promise<{
   enabled: boolean;
   baseUrl: string;
   model: string;
+  embedModel: string;
   models: string[];
 }> {
   const enabled = isEnabled();
   if (!enabled) {
-    return { available: false, enabled: false, baseUrl: OLLAMA_BASE_URL, model: OLLAMA_MODEL, models: [] };
+    return { available: false, enabled: false, baseUrl: OLLAMA_BASE_URL, model: OLLAMA_MODEL, embedModel: OLLAMA_EMBED_MODEL, models: [] };
   }
 
   try {
@@ -111,15 +113,15 @@ export async function getHealth(): Promise<{
     clearTimeout(timeout);
 
     if (!response.ok) {
-      return { available: false, enabled: true, baseUrl: OLLAMA_BASE_URL, model: OLLAMA_MODEL, models: [] };
+      return { available: false, enabled: true, baseUrl: OLLAMA_BASE_URL, model: OLLAMA_MODEL, embedModel: OLLAMA_EMBED_MODEL, models: [] };
     }
 
     const data = (await response.json()) as OllamaTagsResponse;
     const models = data.models?.map((m) => m.name) || [];
 
-    return { available: true, enabled: true, baseUrl: OLLAMA_BASE_URL, model: OLLAMA_MODEL, models };
+    return { available: true, enabled: true, baseUrl: OLLAMA_BASE_URL, model: OLLAMA_MODEL, embedModel: OLLAMA_EMBED_MODEL, models };
   } catch {
-    return { available: false, enabled: true, baseUrl: OLLAMA_BASE_URL, model: OLLAMA_MODEL, models: [] };
+    return { available: false, enabled: true, baseUrl: OLLAMA_BASE_URL, model: OLLAMA_MODEL, embedModel: OLLAMA_EMBED_MODEL, models: [] };
   }
 }
 
@@ -199,7 +201,7 @@ export async function embed(
   }
 
   const requestBody: OllamaEmbedRequest = {
-    model: model || OLLAMA_MODEL,
+    model: model || OLLAMA_EMBED_MODEL,
     input: text,
   };
 

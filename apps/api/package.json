@@ -17,7 +17,11 @@
     "seed:dev": "tsx scripts/seed/seed-database.ts",
     "seed:api": "tsx scripts/seed/seed-via-api.ts",
     "seed:comprehensive": "tsx scripts/seed/seed-comprehensive.ts",
-    "seed:users": "tsx scripts/seed/seed-users.ts"
+    "seed:complete": "tsx scripts/seed/seed-complete.ts",
+    "seed:users": "tsx scripts/seed/seed-users.ts",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@strapi/plugin-cloud": "5.27.0",
@@ -31,9 +35,12 @@
     "styled-components": "^6.0.0"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
     "tsx": "^4.20.6",
     "typescript": "^5"
   },

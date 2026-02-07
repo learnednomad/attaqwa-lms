@@ -28,51 +28,58 @@ async function queueModeration(strapi: any, contentType: string, result: any) {
     // Attempt async AI moderation
     const aiService = require('./api/ai/services/ai');
     const job = aiService.moderateAsync(content, contentType, result.age_tier);
+    const contentId = String(result.documentId || result.id);
 
     // Poll for result (non-blocking with timeout)
+    let pollCount = 0;
+    const MAX_POLLS = 90; // 90 * 2s = 3 minutes max
     const pollInterval = setInterval(async () => {
-      const jobResult = aiService.getJob(job.id);
-      if (!jobResult || jobResult.status === 'pending' || jobResult.status === 'processing') return;
+      pollCount++;
+      if (pollCount > MAX_POLLS) {
+        clearInterval(pollInterval);
+        return;
+      }
 
-      clearInterval(pollInterval);
+      try {
+        const jobResult = aiService.getJob(job.id);
+        if (!jobResult || jobResult.status === 'pending' || jobResult.status === 'processing') return;
 
-      if (jobResult.status === 'completed' && jobResult.result) {
-        // Update the moderation queue entry with AI results
-        const entries = await strapi.entityService.findMany(
-          'api::moderation-queue.moderation-queue',
-          {
-            filters: {
-              content_type: contentType,
-              content_id: String(result.documentId || result.id),
-            },
-            sort: { createdAt: 'desc' },
-            limit: 1,
-          }
-        );
+        clearInterval(pollInterval);
 
-        if (entries && entries.length > 0) {
-          await strapi.entityService.update(
+        if (jobResult.status === 'completed' && jobResult.result) {
+          const entries = await strapi.entityService.findMany(
             'api::moderation-queue.moderation-queue',
-            entries[0].id,
             {
-              data: {
-                ai_score: jobResult.result.score,
-                ai_flags: jobResult.result.flags,
-                ai_reasoning: jobResult.result.reasoning,
-                status: jobResult.result.recommendation === 'approve'
-                  ? 'approved'
-                  : jobResult.result.recommendation === 'reject'
-                    ? 'rejected'
-                    : 'needs_review',
-              },
+              filters: { content_type: contentType, content_id: contentId },
+              sort: { createdAt: 'desc' },
+              limit: 1,
             }
           );
+
+          if (entries && entries.length > 0) {
+            await strapi.entityService.update(
+              'api::moderation-queue.moderation-queue',
+              entries[0].id,
+              {
+                data: {
+                  ai_score: jobResult.result.score,
+                  ai_flags: jobResult.result.flags,
+                  ai_reasoning: jobResult.result.reasoning,
+                  status: jobResult.result.recommendation === 'approve'
+                    ? 'approved'
+                    : jobResult.result.recommendation === 'reject'
+                      ? 'rejected'
+                      : 'needs_review',
+                },
+              }
+            );
+          }
         }
+      } catch (pollError: any) {
+        clearInterval(pollInterval);
+        strapi.log.warn(`Moderation poll error for ${contentType}:${contentId}: ${pollError.message}`);
       }
     }, 2000);
-
-    // Stop polling after 3 minutes
-    setTimeout(() => clearInterval(pollInterval), 3 * 60 * 1000);
   } catch (error: any) {
     strapi.log.warn(`AI moderation queue failed for ${contentType}: ${error.message}`);
   }

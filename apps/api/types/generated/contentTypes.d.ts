@@ -877,6 +877,64 @@ export interface ApiLessonLesson extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiModerationQueueModerationQueue
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'moderation_queues';
+  info: {
+    description: 'AI-assisted content moderation queue for Islamic educational content';
+    displayName: 'Moderation Queue';
+    pluralName: 'moderation-queues';
+    singularName: 'moderation-queue';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    ai_flags: Schema.Attribute.JSON;
+    ai_reasoning: Schema.Attribute.Text;
+    ai_score: Schema.Attribute.Float &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 1;
+          min: 0;
+        },
+        number
+      >;
+    content_id: Schema.Attribute.String & Schema.Attribute.Required;
+    content_title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 500;
+      }>;
+    content_type: Schema.Attribute.Enumeration<['course', 'lesson', 'quiz']> &
+      Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::moderation-queue.moderation-queue'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    reviewed_at: Schema.Attribute.DateTime;
+    reviewer: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    reviewer_notes: Schema.Attribute.Text;
+    status: Schema.Attribute.Enumeration<
+      ['pending', 'approved', 'rejected', 'needs_review']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'pending'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiQuizQuiz extends Struct.CollectionTypeSchema {
   collectionName: 'quizzes';
   info: {
@@ -1677,6 +1735,7 @@ declare module '@strapi/strapi' {
       'api::course.course': ApiCourseCourse;
       'api::leaderboard.leaderboard': ApiLeaderboardLeaderboard;
       'api::lesson.lesson': ApiLessonLesson;
+      'api::moderation-queue.moderation-queue': ApiModerationQueueModerationQueue;
       'api::quiz.quiz': ApiQuizQuiz;
       'api::streak.streak': ApiStreakStreak;
       'api::user-achievement.user-achievement': ApiUserAchievementUserAchievement;

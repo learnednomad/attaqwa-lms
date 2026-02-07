@@ -1,9 +1,8 @@
-version: '3.8'
-
+# ============================================================================
+# Production Docker Compose - AttaqwaMasjid LMS
 # ============================================================================
 # SECURITY NOTICE:
-# This file no longer contains hardcoded secrets.
-# Create a .env file in the project root with the following variables:
+# This file requires environment variables. Create a .env file with:
 #
 # POSTGRES_PASSWORD=<strong-password>
 # APP_KEYS=<key1>,<key2>,<key3>,<key4>
@@ -17,14 +16,13 @@ version: '3.8'
 # ============================================================================
 
 services:
-  # PostgreSQL Database
+  # PostgreSQL Database with pgvector
   postgres:
     image: pgvector/pgvector:pg16
     restart: unless-stopped
     environment:
       POSTGRES_DB: attaqwa_lms
       POSTGRES_USER: postgres
-      # SECURITY: Use environment variable, no default
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
     ports:
       - "5432:5432"
@@ -50,7 +48,6 @@ services:
       DATABASE_PORT: 5432
       DATABASE_NAME: attaqwa_lms
       DATABASE_USERNAME: postgres
-      # SECURITY: All secrets from environment variables
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
       DATABASE_SSL: ${DATABASE_SSL:-false}
       APP_KEYS: ${APP_KEYS:?APP_KEYS is required}
@@ -63,9 +60,11 @@ services:
       # Ollama AI configuration
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
       OLLAMA_MODEL: ${OLLAMA_MODEL:-mistral:7b-instruct-q4_K_M}
+      OLLAMA_EMBED_MODEL: ${OLLAMA_EMBED_MODEL:-nomic-embed-text}
       OLLAMA_TIMEOUT_MS: ${OLLAMA_TIMEOUT_MS:-120000}
       OLLAMA_ENABLED: ${OLLAMA_ENABLED:-true}
       OLLAMA_MAX_PARALLEL: ${OLLAMA_MAX_PARALLEL:-2}
+      EMBEDDING_DIMENSION: ${EMBEDDING_DIMENSION:-768}
     ports:
       - "1337:1337"
     depends_on:
@@ -76,7 +75,7 @@ services:
     volumes:
       - api_uploads:/app/apps/api/public/uploads
 
-  # Admin Portal
+  # Admin Portal (Next.js standalone)
   admin:
     build:
       context: .
@@ -85,14 +84,15 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PORT: 3000
+      HOSTNAME: 0.0.0.0
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:1337}
-      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
     ports:
       - "3000:3000"
     depends_on:
-      - api
+      api:
+        condition: service_healthy
 
-  # Website
+  # Website (Next.js standalone)
   website:
     build:
       context: .
@@ -101,12 +101,13 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PORT: 3001
+      HOSTNAME: 0.0.0.0
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:1337}
-      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
     ports:
       - "3001:3001"
     depends_on:
-      - api
+      api:
+        condition: service_healthy
 
   # Ollama - Local LLM Inference
   ollama:
@@ -119,7 +120,7 @@ services:
     environment:
       OLLAMA_MAX_LOADED_MODELS: ${OLLAMA_MAX_LOADED_MODELS:-1}
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:11434/api/tags || exit 1"]
+      test: ["CMD", "ollama", "list"]
       interval: 30s
       timeout: 10s
       retries: 5

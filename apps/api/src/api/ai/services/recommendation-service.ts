@@ -1,7 +1,8 @@
 /**
  * Recommendation Service
  * AI-powered course recommendations based on student progress.
- * Scoring: 40% content similarity, 30% collaborative filtering, 30% curriculum fit.
+ * Scoring: 70% curriculum fit (subject affinity + difficulty progression), 30% collaborative filtering.
+ * When embeddings are available, a similarity boost is applied separately.
  * Falls back to popularity-based recommendations when AI is unavailable.
  */
 
@@ -64,7 +65,7 @@ async function buildUserProfile(strapi: any, userId: string): Promise<UserLearni
     const courseId = String(enrollment.course?.documentId || enrollment.course?.id);
     enrolledCourseIds.push(courseId);
 
-    if (enrollment.status === 'completed') {
+    if (enrollment.enrollment_status === 'completed') {
       completedCourseIds.push(courseId);
     }
 
@@ -75,7 +76,7 @@ async function buildUserProfile(strapi: any, userId: string): Promise<UserLearni
       difficulties.push(enrollment.course.difficulty);
     }
 
-    totalProgress += enrollment.progress || 0;
+    totalProgress += enrollment.overall_progress || 0;
   }
 
   // Get user profile for age tier
@@ -101,7 +102,7 @@ async function buildUserProfile(strapi: any, userId: string): Promise<UserLearni
   );
 
   const totalTimeSpent = (progressEntries || []).reduce(
-    (sum: number, p: any) => sum + (p.timeSpent || 0),
+    (sum: number, p: any) => sum + (p.time_spent_minutes || 0),
     0
   );
 
@@ -165,12 +166,12 @@ function scoreCurriculumFit(
 
   // Difficulty progression: if user completed beginners, suggest intermediate
   const diffOrder = ['beginner', 'intermediate', 'advanced'];
-  const maxCompletedDiff = profile.difficulties
-    .filter((d, i) => profile.completedCourseIds.length > 0)
-    .reduce((max, d) => {
-      const idx = diffOrder.indexOf(d);
-      return idx > max ? idx : max;
-    }, -1);
+  const maxCompletedDiff = profile.completedCourseIds.length > 0
+    ? profile.difficulties.reduce((max, d) => {
+        const idx = diffOrder.indexOf(d);
+        return idx > max ? idx : max;
+      }, -1)
+    : -1;
 
   const candidateDiffIdx = diffOrder.indexOf(candidate.difficulty);
   if (candidateDiffIdx === maxCompletedDiff + 1) {
@@ -243,9 +244,9 @@ export async function getRecommendations(
     const curriculumScore = scoreCurriculumFit(candidate, profile);
     const collaborativeScore = scoreCollaborative(candidate, candidates);
 
-    // Weights: 40% similarity (approximated by curriculum), 30% collaborative, 30% curriculum
-    // Without embeddings available, we use curriculum fit for both similarity and curriculum
-    const totalScore = 0.4 * curriculumScore + 0.3 * collaborativeScore + 0.3 * curriculumScore;
+    // Weights: 70% curriculum fit (includes subject affinity as proxy for similarity), 30% collaborative
+    // When embeddings are available, similarity boost is applied separately below
+    const totalScore = 0.7 * curriculumScore + 0.3 * collaborativeScore;
 
     // Generate reason
     let reason = '';

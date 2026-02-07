@@ -713,13 +713,19 @@ export default async ({ strapi }: { strapi: any }) => {
       console.log('📝 Configuring public API permissions...');
 
       // Define permissions to enable
+      // SECURITY: create/update permissions are only enabled in development
+      const isDev = process.env.NODE_ENV !== 'production';
       const permissionsToEnable = [
-        { controller: 'course', actions: ['find', 'findOne', 'create'] },
-        { controller: 'lesson', actions: ['find', 'findOne', 'create'] },
-        { controller: 'quiz', actions: ['find', 'findOne', 'create'] },
-        { controller: 'achievement', actions: ['find', 'findOne'] },
-        { controller: 'course-enrollment', actions: ['find', 'findOne', 'create'] },
-        { controller: 'user-progress', actions: ['find', 'findOne', 'create', 'update'] },
+        { controller: 'course', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
+        { controller: 'lesson', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
+        { controller: 'quiz', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
+        { controller: 'achievement', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
+        { controller: 'course-enrollment', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
+        { controller: 'user-progress', actions: isDev ? ['find', 'findOne', 'create', 'update'] : ['find', 'findOne'] },
+        { controller: 'user-achievement', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
+        { controller: 'streak', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
+        { controller: 'leaderboard', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
+        { controller: 'moderation-queue', actions: isDev ? ['find', 'findOne', 'create'] : [] },
       ];
 
       for (const { controller, actions } of permissionsToEnable) {
@@ -758,8 +764,11 @@ export default async ({ strapi }: { strapi: any }) => {
       }
 
       console.log('✅ Public permissions configured');
-      console.log('   Enabled: find, findOne, create for Course, Lesson, Quiz');
-      console.log('   ⚠️  Remember to disable create permissions in production!\n');
+      if (isDev) {
+        console.log('   Enabled: find, findOne, create for Course, Lesson, Quiz (development mode)');
+      } else {
+        console.log('   Enabled: find, findOne only (production mode — create/update disabled)');
+      }
     }
 
     // Log available content types

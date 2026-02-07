@@ -1,0 +1,68 @@
+# =============================================================================
+# Caddy Reverse Proxy - AttaqwaMasjid LMS
+# =============================================================================
+# Routes all traffic through a single entry point with auto-TLS.
+# In development (localhost), Caddy serves HTTP only.
+# In production, set DOMAIN env var for automatic HTTPS.
+# =============================================================================
+
+{$DOMAIN:localhost} {
+	# Compression
+	encode gzip zstd
+
+	# Security headers
+	header {
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-XSS-Protection "1; mode=block"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+
+	# Health check endpoints (must be before catch-all)
+	handle /caddy-health {
+		respond "OK" 200
+	}
+
+	handle /api/_health {
+		reverse_proxy api:1337
+	}
+
+	# Strapi API routes
+	handle /api/* {
+		reverse_proxy api:1337
+	}
+
+	# Strapi health endpoint (direct)
+	handle /_health {
+		reverse_proxy api:1337
+	}
+
+	# Strapi uploads (static files)
+	handle /uploads/* {
+		reverse_proxy api:1337
+	}
+
+	# Strapi admin panel (CMS admin, not Next.js admin)
+	handle /admin/strapi/* {
+		reverse_proxy api:1337
+	}
+
+	# Admin portal (Next.js) -> admin service
+	handle /admin* {
+		reverse_proxy admin:3000
+	}
+
+	# Everything else -> website
+	handle {
+		reverse_proxy website:3001
+	}
+
+	# Request logging
+	log {
+		output stdout
+		format json
+		level INFO
+	}
+}
