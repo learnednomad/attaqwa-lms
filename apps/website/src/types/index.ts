@@ -1,37 +1,107 @@
+export type AnnouncementCategory = 'general' | 'ramadan' | 'eid' | 'urgent' | 'community' | 'fundraising';
+
 export interface Announcement {
   id: string;
+  documentId?: string;
   title: string;
   content: string;
-  date: Date;
-  time?: string;
-  eventDate?: Date;
+  category: AnnouncementCategory;
   imageUrl?: string;
   imageAlt?: string;
   pdfUrl?: string;
   isActive: boolean;
-  isArchived: boolean;
-  isEvent?: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  isPinned?: boolean;
+  publishDate?: string;
+  expiryDate?: string;
+  author?: { id: string; username: string };
+  createdAt: string;
+  updatedAt: string;
 }
+
+export type EventCategory = 'lecture' | 'community' | 'youth' | 'sisters' | 'fundraiser' | 'other';
 
 export interface Event {
   id: string;
+  documentId?: string;
   title: string;
   description: string;
-  date: Date;
+  date: string;
   startTime?: string;
   endTime?: string;
   location?: string;
   isIndoor?: boolean;
   isOutdoor?: boolean;
-  prayerTimes?: PrayerTime[];
-  zakatInfo?: ZakatInfo;
   imageUrl?: string;
   imageAlt?: string;
   isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  isRecurring?: boolean;
+  recurrencePattern?: string;
+  maxAttendees?: number;
+  category?: EventCategory;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type PrayerName = 'fajr' | 'sunrise' | 'dhuhr' | 'asr' | 'maghrib' | 'isha';
+
+export interface PrayerTimeOverride {
+  id: string;
+  documentId?: string;
+  date: string;
+  prayer: PrayerName;
+  overrideTime: string;
+  reason?: string;
+  isActive: boolean;
+  createdBy?: { id: string; username: string };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ItikafDurationType = 'full' | 'last_ten' | 'weekend' | 'custom';
+export type ItikafStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
+
+export interface ItikafRegistration {
+  id: string;
+  documentId?: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  gender: 'male' | 'female';
+  age: number;
+  durationType: ItikafDurationType;
+  startDate: string;
+  endDate: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+  medicalConditions?: string;
+  specialRequirements?: string;
+  status: ItikafStatus;
+  notes?: string;
+  user?: { id: string; username: string };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type AppealCategory = 'zakat' | 'sadaqah' | 'building_fund' | 'emergency' | 'education' | 'community';
+
+export interface Appeal {
+  id: string;
+  documentId?: string;
+  title: string;
+  description: string;
+  category: AppealCategory;
+  goalAmount?: number;
+  currentAmount?: number;
+  currency?: string;
+  startDate: string;
+  endDate?: string;
+  isActive: boolean;
+  isFeatured?: boolean;
+  imageUrl?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface PrayerTime {
@@ -77,6 +147,7 @@ export interface DailyPrayerTimes {
     isha: string;
   };
   jummah?: string[]; // Multiple Jummah prayer times
+  tarawih?: string; // Tarawih prayer time (Ramadan only)
 }
 
 export interface Donation {

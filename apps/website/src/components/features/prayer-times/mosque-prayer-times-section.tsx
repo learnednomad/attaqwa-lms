@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Quote } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatTime } from '@attaqwa/shared';
 import { DailyPrayerTimes } from '@/types';
 
 interface MosquePrayerTimesSectionProps {
@@ -142,16 +143,29 @@ export function MosquePrayerTimesSection({
                 <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
                   {prayer.name}
                 </p>
-                <p className="text-xl md:text-3xl font-bold text-gray-900 font-mono"
-                   style={{ fontVariantNumeric: 'tabular-nums' }}>
-                  {prayer.time.replace(' AM', '').replace(' PM', '')}
-                </p>
-                <p className="text-sm md:text-base text-gray-400 mt-0.5">
-                  {prayer.time.includes('AM') ? 'AM' : 'PM'}
-                </p>
+                {(() => {
+                  const formatted = formatTime(prayer.time);
+                  const match = formatted.match(/^(.+?)\s*(AM|PM)$/i);
+                  return match ? (
+                    <>
+                      <p className="text-xl md:text-3xl font-bold text-gray-900 font-mono"
+                         style={{ fontVariantNumeric: 'tabular-nums' }}>
+                        {match[1]}
+                      </p>
+                      <p className="text-sm md:text-base text-gray-400 mt-0.5">
+                        {match[2]}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-xl md:text-3xl font-bold text-gray-900 font-mono"
+                       style={{ fontVariantNumeric: 'tabular-nums' }}>
+                      {formatted}
+                    </p>
+                  );
+                })()}
                 {prayer.iqama && (
                   <p className="text-xs md:text-sm text-emerald-600 mt-2 font-medium whitespace-nowrap">
-                    Iqama: {prayer.iqama}
+                    Iqama: {formatTime(prayer.iqama)}
                   </p>
                 )}
               </div>
@@ -176,6 +190,25 @@ export function MosquePrayerTimesSection({
                       </p>
                     </div>
                   ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Tarawih (Ramadan) */}
+          {prayerTimes.tarawih && (
+            <div className="mt-8 pt-6 border-t border-gray-100">
+              <div className="flex items-center justify-center gap-6 md:gap-12">
+                <p className="text-base md:text-lg font-semibold text-purple-700">
+                  Tarawih Prayer
+                </p>
+                <div className="text-center">
+                  <p className="text-sm md:text-base text-gray-500 mb-1">
+                    Ramadan Nightly Prayer
+                  </p>
+                  <p className="text-xl md:text-2xl font-bold text-purple-700 font-mono">
+                    {formatTime(prayerTimes.tarawih)}
+                  </p>
                 </div>
               </div>
             </div>

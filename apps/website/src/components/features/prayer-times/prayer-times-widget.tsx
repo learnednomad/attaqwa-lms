@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Clock, MapPin } from 'lucide-react';
 import { DailyPrayerTimes } from '@/types';
 import { cn } from '@/lib/utils';
+import { formatTime } from '@attaqwa/shared';
 
 interface PrayerTimesWidgetProps {
   prayerTimes: DailyPrayerTimes;
@@ -13,14 +14,22 @@ interface PrayerTimesWidgetProps {
 }
 
 function parseTimeToMinutes(timeStr: string): number {
-  const match = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-  if (!match) return -1;
-  let hours = parseInt(match[1], 10);
-  const minutes = parseInt(match[2], 10);
-  const period = match[3].toUpperCase();
-  if (period === 'AM' && hours === 12) hours = 0;
-  if (period === 'PM' && hours !== 12) hours += 12;
-  return hours * 60 + minutes;
+  // Handle 12-hour format: "6:18 AM"
+  const match12 = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (match12) {
+    let hours = parseInt(match12[1], 10);
+    const minutes = parseInt(match12[2], 10);
+    const period = match12[3].toUpperCase();
+    if (period === 'AM' && hours === 12) hours = 0;
+    if (period === 'PM' && hours !== 12) hours += 12;
+    return hours * 60 + minutes;
+  }
+  // Handle 24-hour format: "06:18"
+  const match24 = timeStr.match(/^(\d{1,2}):(\d{2})$/);
+  if (match24) {
+    return parseInt(match24[1], 10) * 60 + parseInt(match24[2], 10);
+  }
+  return -1;
 }
 
 function detectCurrentPrayer(prayerTimes: DailyPrayerTimes): string {
@@ -119,7 +128,7 @@ export function PrayerTimesWidget({
               <span className={cn(
                 'font-bold font-mono',
                 currentPrayer === prayer.key ? 'text-emerald-700' : 'text-neutral-900'
-              )}>{prayer.time}</span>
+              )}>{formatTime(prayer.time)}</span>
             </div>
           ))}
         </div>
@@ -195,14 +204,14 @@ export function PrayerTimesWidget({
                   'text-[15px] font-bold font-mono',
                   prayer.isShurooq ? 'text-amber-700' : currentPrayer === prayer.key ? 'text-emerald-700' : 'text-neutral-900'
                 )}>
-                  {prayer.time}
+                  {formatTime(prayer.time)}
                 </span>
               </div>
               {prayer.iqama && (
                 <div className="flex items-baseline gap-1.5 justify-end -mt-0.5">
                   <span className="text-[11px] text-emerald-500">Iqama</span>
                   <span className="text-[15px] font-bold font-mono text-emerald-600">
-                    {prayer.iqama}
+                    {formatTime(prayer.iqama)}
                   </span>
                 </div>
               )}
@@ -228,6 +237,25 @@ export function PrayerTimesWidget({
                     <span className="text-[15px] font-bold font-mono text-amber-700 block -mt-0.5">{time}</span>
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tarawih (Ramadan) */}
+        {prayerTimes.tarawih && (
+          <div className="rounded-lg px-3 py-2 border border-purple-200 bg-purple-50/50">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-5 rounded-full bg-purple-500" />
+                <div>
+                  <span className="text-[15px] font-bold text-purple-800">Tarawih Prayer</span>
+                  <div className="text-[10px] text-purple-500 -mt-0.5">&#1589;&#1604;&#1575;&#1577; &#1575;&#1604;&#1578;&#1585;&#1575;&#1608;&#1610;&#1581;</div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-[10px] text-purple-500">Ramadan</div>
+                <span className="text-[15px] font-bold font-mono text-purple-700 block -mt-0.5">{formatTime(prayerTimes.tarawih)}</span>
               </div>
             </div>
           </div>
