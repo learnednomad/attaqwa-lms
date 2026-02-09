@@ -1,0 +1,9 @@
+{
+  "fajr": "6:45 AM",
+  "dhuhr": "1:15 PM",
+  "asr": "4:15 PM",
+  "maghrib": "+5",
+  "isha": "8:45 PM",
+  "jummah": ["1:00 PM", "2:00 PM"],
+  "updatedAt": "2026-02-08T19:12:01.047Z"
+}

@@ -31,36 +31,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuthStatus = async () => {
     try {
-      const { authApi } = await import('@/lib/api');
-      const data = await authApi.getMe();
-      setUser(data.user);
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      // Don't throw error for auth check - just leave user as null
+      const response = await fetch('/api/admin/auth/me', {
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+      } else {
+        setUser(null);
+      }
+    } catch {
+      // Expected when not authenticated - leave user as null
     } finally {
       setLoading(false);
     }
   };
 
   const login = async (email: string, password: string) => {
-    try {
-      const { authApi } = await import('@/lib/api');
-      const data = await authApi.login({ email, password });
-      setUser(data.user);
-    } catch (error) {
-      console.error('Login failed:', error);
-      throw error;
+    const response = await fetch('/api/admin/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Login failed');
     }
+
+    setUser(data.user);
   };
 
   const logout = async () => {
     try {
-      const { authApi } = await import('@/lib/api');
-      await authApi.logout();
-      setUser(null);
-    } catch (error) {
-      console.error('Logout failed:', error);
-      // Still clear local state even if API call fails
+      await fetch('/api/admin/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch {
+      // Continue with logout even if API call fails
+    } finally {
       setUser(null);
     }
   };
@@ -77,10 +90,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+const defaultAuthContext: AuthContextType = {
+  user: null,
+  loading: false,
+  isAuthenticated: false,
+  isAdmin: false,
+  login: async () => { throw new Error('AuthProvider not available'); },
+  logout: async () => { throw new Error('AuthProvider not available'); },
+};
+
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    return defaultAuthContext;
   }
   return context;
 }

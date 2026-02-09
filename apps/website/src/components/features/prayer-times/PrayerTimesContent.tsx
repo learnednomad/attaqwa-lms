@@ -318,6 +318,50 @@ export function PrayerTimesContent() {
                   </div>
                 </section>
               )}
+
+              {/* Prayer Facilities */}
+              <section aria-labelledby="prayer-facilities">
+                <div className="flex items-center gap-3 mb-6">
+                  <h2
+                    id="prayer-facilities"
+                    className="text-xl font-semibold text-neutral-900"
+                  >
+                    Prayer Facilities
+                  </h2>
+                  <div className="flex-1 h-px bg-neutral-100" />
+                </div>
+                <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-6 sm:p-8">
+                  <div className="space-y-5">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+                        <MapPin className="h-5 w-5 text-emerald-600" aria-hidden="true" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-semibold text-neutral-900">Main Prayer Hall</h3>
+                        <p className="text-sm text-neutral-500 mt-1 leading-relaxed">Spacious prayer area accommodating 500+ worshippers</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+                        <MapPin className="h-5 w-5 text-emerald-600" aria-hidden="true" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-semibold text-neutral-900">Women&apos;s Prayer Area</h3>
+                        <p className="text-sm text-neutral-500 mt-1 leading-relaxed">Dedicated prayer space with separate entrance and facilities</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+                        <MapPin className="h-5 w-5 text-emerald-600" aria-hidden="true" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-semibold text-neutral-900">Wudu Facilities</h3>
+                        <p className="text-sm text-neutral-500 mt-1 leading-relaxed">Clean and modern ablution areas for men and women</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
             </div>
 
             {/* Sidebar */}

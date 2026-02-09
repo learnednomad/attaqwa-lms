@@ -37,6 +37,7 @@ interface IqamahConfig {
   asr: string;
   maghrib: string;
   isha: string;
+  jummah?: string[];
   updatedAt: string | null;
 }
 
@@ -279,6 +280,10 @@ export async function GET(request: NextRequest) {
       qibla,
       iqama: buildIqamaObject(iqamahConfig, timings),
     };
+
+    if (iqamahConfig.jummah && iqamahConfig.jummah.length > 0) {
+      prayerTimes.jummah = iqamahConfig.jummah;
+    }
 
     if (tarawihConfig.enabled || isRamadan(data)) {
       prayerTimes.tarawih = resolveIqamahTime(tarawihConfig.time, timings.isha);

@@ -1,22 +1,21 @@
 import { format } from 'date-fns';
-import { Clock, MapPin, DollarSign } from 'lucide-react';
+import { Clock, MapPin } from 'lucide-react';
 import { Event } from '@/types';
 import { cn } from '@/lib/utils';
 
 interface EventCardProps {
   event: Event;
   className?: string;
-  showPrayerTimes?: boolean;
 }
 
 export function EventCard({
   event,
   className,
-  showPrayerTimes = true,
 }: EventCardProps) {
-  const monthAbbrev = format(event.date, 'MMM').toUpperCase();
-  const dayNumber = format(event.date, 'd');
-  const isPast = event.date < new Date();
+  const dateObj = new Date(event.date);
+  const monthAbbrev = format(dateObj, 'MMM').toUpperCase();
+  const dayNumber = format(dateObj, 'd');
+  const isPast = dateObj < new Date();
 
   const timeRange = event.startTime
     ? event.endTime
@@ -78,40 +77,24 @@ export function EventCard({
           </p>
         )}
 
-        {/* Prayer times + badges */}
-        {showPrayerTimes && event.prayerTimes && event.prayerTimes.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mt-3">
-            {event.prayerTimes.map((prayer, index) => (
-              <span
-                key={index}
-                className="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-md text-xs font-medium"
-              >
-                {prayer.name}: {prayer.time}
-              </span>
-            ))}
-            {event.isIndoor && (
-              <span className="px-2.5 py-1 bg-neutral-100 text-neutral-500 rounded-md text-xs">
-                Indoor
-              </span>
-            )}
-            {event.isOutdoor && (
-              <span className="px-2.5 py-1 bg-neutral-100 text-neutral-500 rounded-md text-xs">
-                Outdoor
-              </span>
-            )}
-          </div>
-        )}
-
-        {/* Zakat info */}
-        {event.zakatInfo && (
-          <div className="mt-3 px-3 py-2 bg-amber-50 border border-amber-100 rounded-lg inline-flex items-center gap-2">
-            <DollarSign className="w-3.5 h-3.5 text-amber-600" />
-            <span className="text-amber-700 font-medium text-xs">
-              Zakat ul Fitr: {event.zakatInfo.currency} ${event.zakatInfo.amount}
-              {event.zakatInfo.description && ` - ${event.zakatInfo.description}`}
+        {/* Badges */}
+        <div className="flex flex-wrap gap-1.5 mt-3">
+          {event.isIndoor && (
+            <span className="px-2.5 py-1 bg-neutral-100 text-neutral-500 rounded-md text-xs">
+              Indoor
             </span>
-          </div>
-        )}
+          )}
+          {event.isOutdoor && (
+            <span className="px-2.5 py-1 bg-neutral-100 text-neutral-500 rounded-md text-xs">
+              Outdoor
+            </span>
+          )}
+          {event.category && (
+            <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-md text-xs font-medium capitalize">
+              {event.category}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -498,6 +498,133 @@ export interface ApiAchievementAchievement extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiAnnouncementAnnouncement
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'announcements';
+  info: {
+    description: 'Masjid announcements for the community';
+    displayName: 'Announcement';
+    pluralName: 'announcements';
+    singularName: 'announcement';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    author: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    category: Schema.Attribute.Enumeration<
+      ['general', 'ramadan', 'eid', 'urgent', 'community', 'fundraising']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'general'>;
+    content: Schema.Attribute.RichText & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    expiryDate: Schema.Attribute.Date;
+    imageAlt: Schema.Attribute.String;
+    imageUrl: Schema.Attribute.String;
+    isActive: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    isPinned: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::announcement.announcement'
+    > &
+      Schema.Attribute.Private;
+    pdfUrl: Schema.Attribute.String;
+    publishDate: Schema.Attribute.Date;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiAppealAppeal extends Struct.CollectionTypeSchema {
+  collectionName: 'appeals';
+  info: {
+    description: 'Financial and community campaign appeals';
+    displayName: 'Appeal';
+    pluralName: 'appeals';
+    singularName: 'appeal';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    category: Schema.Attribute.Enumeration<
+      [
+        'zakat',
+        'sadaqah',
+        'building_fund',
+        'emergency',
+        'education',
+        'community',
+      ]
+    > &
+      Schema.Attribute.Required;
+    contactEmail: Schema.Attribute.String;
+    contactPhone: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    currency: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 3;
+      }> &
+      Schema.Attribute.DefaultTo<'USD'>;
+    currentAmount: Schema.Attribute.Float &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0>;
+    description: Schema.Attribute.RichText & Schema.Attribute.Required;
+    endDate: Schema.Attribute.Date;
+    goalAmount: Schema.Attribute.Float &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+    imageUrl: Schema.Attribute.String;
+    isActive: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    isFeatured: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::appeal.appeal'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    startDate: Schema.Attribute.Date & Schema.Attribute.Required;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiCourseEnrollmentCourseEnrollment
   extends Struct.CollectionTypeSchema {
   collectionName: 'course_enrollments';
@@ -680,6 +807,121 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+  };
+}
+
+export interface ApiEventEvent extends Struct.CollectionTypeSchema {
+  collectionName: 'events';
+  info: {
+    description: 'Masjid events and community gatherings';
+    displayName: 'Event';
+    pluralName: 'events';
+    singularName: 'event';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    category: Schema.Attribute.Enumeration<
+      ['lecture', 'community', 'youth', 'sisters', 'fundraiser', 'other']
+    > &
+      Schema.Attribute.DefaultTo<'other'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    date: Schema.Attribute.Date & Schema.Attribute.Required;
+    description: Schema.Attribute.RichText;
+    endTime: Schema.Attribute.String;
+    imageAlt: Schema.Attribute.String;
+    imageUrl: Schema.Attribute.String;
+    isActive: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    isIndoor: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    isOutdoor: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    isRecurring: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::event.event'> &
+      Schema.Attribute.Private;
+    location: Schema.Attribute.String;
+    maxAttendees: Schema.Attribute.Integer;
+    publishedAt: Schema.Attribute.DateTime;
+    recurrencePattern: Schema.Attribute.String;
+    startTime: Schema.Attribute.String & Schema.Attribute.Required;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiItikafRegistrationItikafRegistration
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'itikaf_registrations';
+  info: {
+    description: "I'tikaf registration management for Ramadan and other periods";
+    displayName: 'Itikaf Registration';
+    pluralName: 'itikaf-registrations';
+    singularName: 'itikaf-registration';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    age: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 13;
+        },
+        number
+      >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    durationType: Schema.Attribute.Enumeration<
+      ['full', 'last_ten', 'weekend', 'custom']
+    > &
+      Schema.Attribute.Required;
+    email: Schema.Attribute.String & Schema.Attribute.Required;
+    emergencyContactName: Schema.Attribute.String & Schema.Attribute.Required;
+    emergencyContactPhone: Schema.Attribute.String & Schema.Attribute.Required;
+    endDate: Schema.Attribute.Date & Schema.Attribute.Required;
+    fullName: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
+    gender: Schema.Attribute.Enumeration<['male', 'female']> &
+      Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::itikaf-registration.itikaf-registration'
+    > &
+      Schema.Attribute.Private;
+    medicalConditions: Schema.Attribute.Text;
+    notes: Schema.Attribute.Text;
+    phone: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    specialRequirements: Schema.Attribute.Text;
+    startDate: Schema.Attribute.Date & Schema.Attribute.Required;
+    status: Schema.Attribute.Enumeration<
+      ['pending', 'approved', 'rejected', 'cancelled']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'pending'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
   };
 }
 
@@ -929,6 +1171,45 @@ export interface ApiModerationQueueModerationQueue
     > &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'pending'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiPrayerTimeOverridePrayerTimeOverride
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'prayer_time_overrides';
+  info: {
+    description: 'Admin overrides for calculated prayer times';
+    displayName: 'Prayer Time Override';
+    pluralName: 'prayer-time-overrides';
+    singularName: 'prayer-time-override';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    date: Schema.Attribute.Date & Schema.Attribute.Required;
+    isActive: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::prayer-time-override.prayer-time-override'
+    > &
+      Schema.Attribute.Private;
+    overrideTime: Schema.Attribute.String & Schema.Attribute.Required;
+    prayer: Schema.Attribute.Enumeration<
+      ['fajr', 'sunrise', 'dhuhr', 'asr', 'maghrib', 'isha']
+    > &
+      Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    reason: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1731,11 +2012,16 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::achievement.achievement': ApiAchievementAchievement;
+      'api::announcement.announcement': ApiAnnouncementAnnouncement;
+      'api::appeal.appeal': ApiAppealAppeal;
       'api::course-enrollment.course-enrollment': ApiCourseEnrollmentCourseEnrollment;
       'api::course.course': ApiCourseCourse;
+      'api::event.event': ApiEventEvent;
+      'api::itikaf-registration.itikaf-registration': ApiItikafRegistrationItikafRegistration;
       'api::leaderboard.leaderboard': ApiLeaderboardLeaderboard;
       'api::lesson.lesson': ApiLessonLesson;
       'api::moderation-queue.moderation-queue': ApiModerationQueueModerationQueue;
+      'api::prayer-time-override.prayer-time-override': ApiPrayerTimeOverridePrayerTimeOverride;
       'api::quiz.quiz': ApiQuizQuiz;
       'api::streak.streak': ApiStreakStreak;
       'api::user-achievement.user-achievement': ApiUserAchievementUserAchievement;

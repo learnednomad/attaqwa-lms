@@ -180,23 +180,13 @@ export function FloatingHeader() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="center"
-                    className={cn(
-                      'min-w-[160px] rounded-lg',
-                      pastHero
-                        ? 'bg-white border border-gray-200 shadow-lg'
-                        : 'bg-white/10 backdrop-blur-sm border border-white/20'
-                    )}
+                    className="min-w-[160px] rounded-lg bg-white border border-gray-200 shadow-lg"
                   >
                     {item.submenu.map((subItem) => (
                       <DropdownMenuItem key={subItem.name} asChild>
                         <Link
                           href={subItem.href}
-                          className={cn(
-                            'w-full cursor-pointer rounded-lg',
-                            pastHero
-                              ? 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
-                              : 'text-white/90 hover:text-white hover:bg-white/10'
-                          )}
+                          className="w-full cursor-pointer rounded-lg text-gray-700 hover:text-gray-900 hover:bg-gray-100"
                         >
                           {subItem.name}
                         </Link>

@@ -2,24 +2,24 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { Announcement } from '@/types';
+import type { Announcement, AnnouncementCategory } from '@/types';
 
-// TODO: Move to @attaqwa/shared in Epic 2
 const createAnnouncementSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   content: z.string().min(1, 'Content is required'),
+  category: z.enum(['general', 'ramadan', 'eid', 'urgent', 'community', 'fundraising']),
   imageUrl: z.string().optional(),
   imageAlt: z.string().optional(),
   pdfUrl: z.string().optional(),
-  isEvent: z.boolean(),
-  eventDate: z.string().optional(),
+  isPinned: z.boolean(),
+  publishDate: z.string().optional(),
+  expiryDate: z.string().optional(),
 });
 
 type CreateAnnouncementInput = z.infer<typeof createAnnouncementSchema>;
@@ -34,39 +34,38 @@ interface AnnouncementFormProps {
 export function AnnouncementForm({ announcement, onSuccess }: AnnouncementFormProps) {
   const router = useRouter();
   const isEditing = !!announcement;
-  
+
   const createMutation = useCreateAnnouncement();
   const updateMutation = useUpdateAnnouncement();
-  
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     watch,
-    setValue,
   } = useForm<CreateAnnouncementInput>({
-    // TODO: Re-enable Zod validation in Epic 2 - temporarily disabled due to type recursion issues
-    // resolver: zodResolver(createAnnouncementSchema),
     defaultValues: announcement ? {
       title: announcement.title,
       content: announcement.content,
+      category: announcement.category,
       imageUrl: announcement.imageUrl || '',
       imageAlt: announcement.imageAlt || '',
       pdfUrl: announcement.pdfUrl || '',
-      isEvent: announcement.isEvent,
-      eventDate: announcement.eventDate ? new Date(announcement.eventDate).toISOString().slice(0, 16) : '',
+      isPinned: announcement.isPinned || false,
+      publishDate: announcement.publishDate || '',
+      expiryDate: announcement.expiryDate || '',
     } : {
       title: '',
       content: '',
+      category: 'general',
       imageUrl: '',
       imageAlt: '',
       pdfUrl: '',
-      isEvent: false,
-      eventDate: '',
+      isPinned: false,
+      publishDate: new Date().toISOString().split('T')[0],
+      expiryDate: '',
     },
   });
-
-  const isEvent = watch('isEvent');
 
   const onSubmit = async (data: CreateAnnouncementInput) => {
     try {
@@ -75,19 +74,19 @@ export function AnnouncementForm({ announcement, onSuccess }: AnnouncementFormPr
           id: announcement.id,
           data: {
             ...data,
-            eventDate: data.eventDate ? new Date(data.eventDate) : undefined,
+            publishDate: data.publishDate || undefined,
+            expiryDate: data.expiryDate || undefined,
           },
         });
       } else {
         await createMutation.mutateAsync({
           ...data,
-          eventDate: data.eventDate ? new Date(data.eventDate) : undefined,
-          date: new Date(),
           isActive: true,
-          isArchived: false,
+          publishDate: data.publishDate || undefined,
+          expiryDate: data.expiryDate || undefined,
         });
       }
-      
+
       if (onSuccess) {
         onSuccess();
       } else {
@@ -138,34 +137,57 @@ export function AnnouncementForm({ announcement, onSuccess }: AnnouncementFormPr
             )}
           </div>
 
-          {/* Is Event Checkbox */}
+          {/* Category */}
+          <div className="space-y-2">
+            <Label htmlFor="category">Category *</Label>
+            <select
+              id="category"
+              {...register('category')}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-islamic-green-500"
+            >
+              <option value="general">General</option>
+              <option value="ramadan">Ramadan</option>
+              <option value="eid">Eid</option>
+              <option value="urgent">Urgent</option>
+              <option value="community">Community</option>
+              <option value="fundraising">Fundraising</option>
+            </select>
+          </div>
+
+          {/* Pinned Checkbox */}
           <div className="flex items-center space-x-2">
             <input
               type="checkbox"
-              id="isEvent"
-              {...register('isEvent')}
+              id="isPinned"
+              {...register('isPinned')}
               className="rounded border-gray-300 text-islamic-green-600 focus:ring-islamic-green-500"
             />
-            <Label htmlFor="isEvent" className="text-sm font-medium">
-              This is an event
+            <Label htmlFor="isPinned" className="text-sm font-medium">
+              Pin this announcement
             </Label>
           </div>
 
-          {/* Event Date - Only show if isEvent is true */}
-          {isEvent && (
+          {/* Publish & Expiry Dates */}
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="eventDate">Event Date & Time</Label>
+              <Label htmlFor="publishDate">Publish Date</Label>
               <Input
-                id="eventDate"
-                type="datetime-local"
-                {...register('eventDate')}
-                className={errors.eventDate ? 'border-red-500' : ''}
+                id="publishDate"
+                type="date"
+                {...register('publishDate')}
               />
-              {errors.eventDate && (
-                <p className="text-sm text-red-600">{errors.eventDate.message}</p>
-              )}
+              <p className="text-xs text-muted-foreground">Defaults to today</p>
             </div>
-          )}
+            <div className="space-y-2">
+              <Label htmlFor="expiryDate">Expiry Date</Label>
+              <Input
+                id="expiryDate"
+                type="date"
+                {...register('expiryDate')}
+              />
+              <p className="text-xs text-muted-foreground">Leave blank for no expiry</p>
+            </div>
+          </div>
 
           {/* Image URL */}
           <div className="space-y-2">

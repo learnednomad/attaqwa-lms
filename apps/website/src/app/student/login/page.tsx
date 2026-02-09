@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, BookOpen, GraduationCap, User } from 'lucide-react';
+import { useStudentAuth } from '@/contexts/StudentAuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,7 +12,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function StudentLoginPage() {
-  const router = useRouter();
+  const { login, loginWithStudentId } = useStudentAuth();
   const [email, setEmail] = useState('student1@attaqwa.test');
   const [password, setPassword] = useState('Student123!');
   const [studentId, setStudentId] = useState('');
@@ -27,31 +27,12 @@ export default function StudentLoginPage() {
     setLoading(true);
 
     try {
-      // Authenticate against Strapi backend
-      const response = await fetch('http://localhost:1337/api/auth/local', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          identifier: loginMethod === 'email' ? email : studentId,
-          password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error?.message || 'Failed to login');
+      if (loginMethod === 'email') {
+        await login(email, password);
+      } else {
+        await loginWithStudentId(studentId, password);
       }
-
-      // Store token and user data from Strapi response
-      if (data.jwt) {
-        localStorage.setItem('studentToken', data.jwt);
-        localStorage.setItem('studentData', JSON.stringify(data.user));
-      }
-
-      router.push('/student/dashboard');
+      // Context handles router.push('/student/dashboard')
     } catch (err: any) {
       setError(err.message || 'Invalid credentials. Please try again.');
     } finally {

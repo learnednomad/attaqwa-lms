@@ -1,104 +1,9 @@
+'use client';
+
 import { AnnouncementCard } from '@/components/features/announcements/announcement-card';
 import { Megaphone, Calendar, Clock, Archive, Search, BookOpen, Heart, Building2, Moon } from 'lucide-react';
-import { Announcement } from '@/types';
-import { generateSEOMetadata } from '@/lib/seo';
+import { useAnnouncements } from '@/lib/hooks/useAnnouncements';
 import { cn } from '@/lib/utils';
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = generateSEOMetadata({
-  title: "Community Announcements - Masjid At-Taqwa",
-  description: "Stay updated with the latest mosque announcements, community news, prayer schedule changes, Islamic events, and important information for our Muslim community.",
-  keywords: [
-    "mosque announcements",
-    "islamic community news",
-    "prayer schedule updates",
-    "ramadan announcements",
-    "eid notifications",
-    "community notices",
-    "islamic events",
-    "mosque updates",
-    "community information",
-    "muslim news"
-  ],
-  canonical: "/announcements",
-  type: "website"
-});
-
-// Mock announcements data - replace with actual API calls
-const mockAnnouncements: Announcement[] = [
-  {
-    id: '1',
-    title: 'Eid ul-Fitr 2025 Prayer Arrangements',
-    content: '<p>Assalamu Alaikum, dear community members,</p><p>We are pleased to announce the arrangements for <strong>Eid ul-Fitr 2025</strong> celebrations:</p><ul><li><strong>First Prayer:</strong> 8:00 AM in the Main Prayer Hall</li><li><strong>Second Prayer:</strong> 9:30 AM in the Outdoor Area</li><li><strong>Community Lunch:</strong> Following the second prayer</li><li><strong>Parking:</strong> Available at nearby locations</li></ul><p>Please bring your prayer rugs and arrive early. May Allah accept our fasting and prayers during this blessed month.</p><p><em>Eid Mubarak in advance!</em></p>',
-    date: new Date('2025-03-30'),
-    time: '8:00 AM & 9:30 AM',
-    isActive: true,
-    isArchived: false,
-    createdAt: new Date('2025-03-15'),
-    updatedAt: new Date('2025-03-20'),
-  },
-  {
-    id: '2',
-    title: 'Ramadan Taraweh Prayer Schedule',
-    content: '<p>During the blessed month of Ramadan, we will be conducting <strong>Taraweh prayers</strong> every evening after Isha prayer.</p><p><strong>Schedule:</strong></p><ul><li><strong>Time:</strong> Starting at 9:00 PM daily</li><li><strong>Duration:</strong> Approximately 1 hour 30 minutes</li><li><strong>Location:</strong> Main Prayer Hall</li></ul><p>We encourage all community members to join us for these special prayers. The Imam will be reciting beautiful portions of the Quran each night.</p>',
-    date: new Date('2025-02-28'),
-    time: '9:00 PM',
-    isActive: true,
-    isArchived: false,
-    createdAt: new Date('2025-02-20'),
-    updatedAt: new Date('2025-02-25'),
-  },
-  {
-    id: '3',
-    title: 'Masjid Renovation Project Update',
-    content: '<p>Alhamdulillah, we are pleased to update you on the progress of our masjid renovation project:</p><p><strong>Completed Work:</strong></p><ul><li>New prayer hall carpeting installation</li><li>LED lighting system upgrade</li><li>Sound system enhancement</li><li>Restroom facility improvements</li></ul><p><strong>Upcoming Phases:</strong></p><ul><li>Community hall expansion (Starting April 2025)</li><li>Parking lot improvements (May 2025)</li><li>Minaret restoration (Summer 2025)</li></ul><p>JazakAllahu khair to all community members who have contributed to this project. May Allah reward your generosity.</p>',
-    date: new Date('2025-03-10'),
-    isActive: true,
-    isArchived: false,
-    createdAt: new Date('2025-03-05'),
-    updatedAt: new Date('2025-03-08'),
-  },
-  {
-    id: '4',
-    title: 'Islamic Education Program Registration Open',
-    content: '<p>Registration is now open for our <strong>Spring 2025 Islamic Education Program</strong>:</p><p><strong>Available Classes:</strong></p><ul><li><strong>Quran Recitation:</strong> Beginner to Advanced levels</li><li><strong>Islamic Studies:</strong> Age-appropriate curriculum</li><li><strong>Arabic Language:</strong> Reading and writing fundamentals</li><li><strong>Youth Programs:</strong> Character building and Islamic values</li></ul><p><strong>Registration Details:</strong></p><ul><li><strong>Registration Period:</strong> March 1-31, 2025</li><li><strong>Classes Begin:</strong> April 15, 2025</li><li><strong>Contact:</strong> education@attaqwa.org or visit the office</li></ul>',
-    date: new Date('2025-03-01'),
-    isActive: true,
-    isArchived: false,
-    createdAt: new Date('2025-02-25'),
-    updatedAt: new Date('2025-03-01'),
-  },
-  {
-    id: '5',
-    title: 'Community Iftar Program - Volunteers Needed',
-    content: '<p>As we prepare for the blessed month of Ramadan, we are organizing daily <strong>Community Iftar</strong> programs.</p><p><strong>Volunteer Opportunities:</strong></p><ul><li>Food preparation and cooking</li><li>Setup and cleanup coordination</li><li>Serving and hospitality</li><li>Childcare assistance</li></ul><p><strong>Iftar Schedule:</strong></p><ul><li><strong>Daily:</strong> Throughout Ramadan</li><li><strong>Time:</strong> 30 minutes before Maghrib</li><li><strong>Capacity:</strong> 200+ community members</li></ul><p>To volunteer or sponsor an Iftar, please contact our coordinator at community@attaqwa.org</p>',
-    date: new Date('2025-02-15'),
-    isActive: true,
-    isArchived: false,
-    createdAt: new Date('2025-02-10'),
-    updatedAt: new Date('2025-02-12'),
-  },
-  {
-    id: '6',
-    title: 'Winter Prayer Time Schedule Adjustment',
-    content: '<p>Due to daylight saving time changes, please note the updated prayer times effective immediately:</p><p><strong>Updated Schedule:</strong></p><ul><li><strong>Fajr:</strong> 5:45 AM</li><li><strong>Sunrise:</strong> 7:15 AM</li><li><strong>Dhuhr:</strong> 12:30 PM</li><li><strong>Asr:</strong> 3:45 PM</li><li><strong>Maghrib:</strong> 6:15 PM</li><li><strong>Isha:</strong> 7:30 PM</li></ul><p>These times will remain in effect until further notice. Please check our prayer time display or website for daily updates.</p>',
-    date: new Date('2025-01-15'),
-    isActive: false,
-    isArchived: true,
-    createdAt: new Date('2025-01-10'),
-    updatedAt: new Date('2025-01-12'),
-  },
-];
-
-const activeAnnouncements = mockAnnouncements.filter(ann => ann.isActive && !ann.isArchived);
-const archivedAnnouncements = mockAnnouncements.filter(ann => ann.isArchived);
-
-const stats = [
-  { label: 'Active Announcements', value: String(activeAnnouncements.length), icon: Megaphone },
-  { label: 'Update Frequency', value: 'Weekly', icon: Calendar },
-  { label: 'Last Updated', value: 'Today', icon: Clock },
-  { label: 'Archived Items', value: String(archivedAnnouncements.length), icon: Archive },
-];
 
 const filterTags = ['All', 'Prayer Schedule', 'Events', 'Ramadan', 'Education', 'Community'];
 
@@ -112,6 +17,19 @@ const categories = [
 ];
 
 export default function AnnouncementsPage() {
+  const { data, isLoading } = useAnnouncements({ limit: 50 });
+
+  const announcements = data?.data || [];
+  const activeAnnouncements = announcements.filter(ann => ann.isActive);
+  const archivedAnnouncements = announcements.filter(ann => !ann.isActive);
+
+  const stats = [
+    { label: 'Active Announcements', value: String(activeAnnouncements.length), icon: Megaphone },
+    { label: 'Update Frequency', value: 'Weekly', icon: Calendar },
+    { label: 'Last Updated', value: 'Today', icon: Clock },
+    { label: 'Archived Items', value: String(archivedAnnouncements.length), icon: Archive },
+  ];
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -195,7 +113,11 @@ export default function AnnouncementsPage() {
             <div className="flex-1 h-px bg-neutral-100" />
           </div>
 
-          {activeAnnouncements.length > 0 ? (
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+            </div>
+          ) : activeAnnouncements.length > 0 ? (
             <div className="space-y-4">
               {activeAnnouncements.map((announcement) => (
                 <AnnouncementCard key={announcement.id} announcement={announcement} />

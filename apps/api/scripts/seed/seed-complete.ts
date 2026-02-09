@@ -742,6 +742,261 @@ async function seedModerationQueue(
   console.log(`  Total moderation items: ${total}`);
 }
 
+// ─── Phase 10: Announcements ──────────────────────────────────────────────
+
+async function seedAnnouncements(adminJwt: string): Promise<void> {
+  console.log('\n--- Phase 10: Announcements ---');
+
+  if (!adminJwt) {
+    console.log('  ! No admin JWT available, skipping announcements');
+    return;
+  }
+
+  const existRes = await apiAuth(
+    `${CM_BASE}/api::announcement.announcement?page=1&pageSize=1`,
+    adminJwt,
+  );
+  const existingCount = existRes.body?.pagination?.total || 0;
+  if (existingCount >= 5) {
+    console.log(`  = ${existingCount} announcements exist, skipping`);
+    return;
+  }
+
+  const items = [
+    { title: 'Masjid Renovation Update', content: 'Alhamdulillah, the renovation of the main prayer hall is progressing well. The new carpet installation will be completed by the end of this month. We appreciate your patience during this time.', category: 'general', isActive: true, isPinned: true },
+    { title: 'Ramadan Preparation Meeting', content: 'Join us this Saturday after Dhuhr prayer for a community meeting to prepare for the blessed month of Ramadan. We will discuss the Taraweeh schedule, iftar arrangements, and volunteer opportunities.', category: 'ramadan', isActive: true, isPinned: false },
+    { title: 'Eid al-Fitr Prayer Announcement', content: 'Eid al-Fitr prayer will be held at 8:00 AM in the main hall and overflow area. Please arrive early. Takbeer will begin at 7:30 AM. Bring your own prayer mats.', category: 'eid', isActive: true, isPinned: true },
+    { title: 'Urgent: Parking Lot Closure', content: 'Due to emergency utility work, the east parking lot will be closed from Monday to Wednesday. Please use the west entrance and street parking. We apologize for any inconvenience.', category: 'urgent', isActive: true, isPinned: false },
+    { title: 'Community Iftar Program', content: 'Every Friday during Ramadan, we will host a community iftar. Volunteers needed for setup and food preparation. Contact the office to sign up.', category: 'community', isActive: true, isPinned: false },
+    { title: 'Annual Fundraising Dinner', content: 'Join us for our annual fundraising dinner on March 15th at 7:00 PM. Special guest speaker Sheikh Ahmad. Tickets available at the masjid office or online. All proceeds go to the education fund.', category: 'fundraising', isActive: true, isPinned: false },
+    { title: 'New Youth Program Launch', content: 'Exciting news! We are launching a new youth mentorship program for ages 13-18. Weekly sessions every Saturday after Asr prayer. Registration is now open.', category: 'community', isActive: true, isPinned: false },
+    { title: 'Past Announcement - Archived', content: 'This is a past announcement that has been deactivated for testing purposes.', category: 'general', isActive: false, isPinned: false },
+  ];
+
+  let total = 0;
+  for (const item of items) {
+    const res = await cmCreate('api::announcement.announcement', adminJwt, item);
+    if (res.ok && res.body?.data) {
+      total++;
+      console.log(`  + [${item.category}] ${item.title}`);
+    } else {
+      console.error(`  ! ${item.title}: ${JSON.stringify(res.body?.error?.message || res.status)}`);
+    }
+    await sleep(100);
+  }
+  console.log(`  Total announcements: ${total}`);
+}
+
+// ─── Phase 11: Events ─────────────────────────────────────────────────────
+
+async function seedEvents(adminJwt: string): Promise<void> {
+  console.log('\n--- Phase 11: Events ---');
+
+  if (!adminJwt) {
+    console.log('  ! No admin JWT available, skipping events');
+    return;
+  }
+
+  const existRes = await apiAuth(
+    `${CM_BASE}/api::event.event?page=1&pageSize=1`,
+    adminJwt,
+  );
+  const existingCount = existRes.body?.pagination?.total || 0;
+  if (existingCount >= 4) {
+    console.log(`  = ${existingCount} events exist, skipping`);
+    return;
+  }
+
+  const today = new Date();
+  const futureDate = (days: number) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() + days);
+    return d.toISOString().split('T')[0];
+  };
+  const pastDate = (days: number) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() - days);
+    return d.toISOString().split('T')[0];
+  };
+
+  const items = [
+    { title: 'Friday Khutbah: The Power of Dua', description: 'Join us for this weeks Friday khutbah on the importance and etiquette of making dua.', date: futureDate(2), startTime: '13:00', endTime: '14:00', location: 'Main Prayer Hall', isIndoor: true, isActive: true, category: 'lecture' },
+    { title: 'Community Potluck Dinner', description: 'Monthly community gathering with food, fellowship, and fun for the whole family. Please bring a dish to share.', date: futureDate(10), startTime: '18:00', endTime: '21:00', location: 'Community Hall', isIndoor: true, isActive: true, category: 'community' },
+    { title: 'Youth Basketball Tournament', description: 'Annual youth basketball tournament for ages 12-18. Registration required. Prizes for top teams.', date: futureDate(21), startTime: '10:00', endTime: '16:00', location: 'Gymnasium', isIndoor: true, isActive: true, category: 'youth', maxAttendees: 60 },
+    { title: 'Sisters Halaqa: Tafseer of Surah Maryam', description: 'Weekly sisters study circle focusing on the tafseer of Surah Maryam. All sisters welcome.', date: futureDate(5), startTime: '11:00', endTime: '12:30', location: 'Sisters Prayer Room', isIndoor: true, isActive: true, isRecurring: true, recurrencePattern: 'weekly', category: 'sisters' },
+    { title: 'Past: Islamic History Lecture', description: 'A lecture on the golden age of Islamic civilization and its contributions to science and arts.', date: pastDate(14), startTime: '19:00', endTime: '20:30', location: 'Main Prayer Hall', isIndoor: true, isActive: false, category: 'lecture' },
+    { title: 'Past: Annual Charity Walk', description: 'Community charity walk to raise funds for local food bank. 5K route through the neighborhood.', date: pastDate(30), startTime: '09:00', endTime: '12:00', location: 'Masjid Parking Lot', isOutdoor: true, isActive: false, category: 'fundraiser' },
+  ];
+
+  let total = 0;
+  for (const item of items) {
+    const res = await cmCreate('api::event.event', adminJwt, item);
+    if (res.ok && res.body?.data) {
+      total++;
+      console.log(`  + [${item.category}] ${item.title}`);
+    } else {
+      console.error(`  ! ${item.title}: ${JSON.stringify(res.body?.error?.message || res.status)}`);
+    }
+    await sleep(100);
+  }
+  console.log(`  Total events: ${total}`);
+}
+
+// ─── Phase 12: Prayer Time Overrides ──────────────────────────────────────
+
+async function seedPrayerTimeOverrides(adminJwt: string): Promise<void> {
+  console.log('\n--- Phase 12: Prayer Time Overrides ---');
+
+  if (!adminJwt) {
+    console.log('  ! No admin JWT available, skipping prayer time overrides');
+    return;
+  }
+
+  const existRes = await apiAuth(
+    `${CM_BASE}/api::prayer-time-override.prayer-time-override?page=1&pageSize=1`,
+    adminJwt,
+  );
+  const existingCount = existRes.body?.pagination?.total || 0;
+  if (existingCount >= 2) {
+    console.log(`  = ${existingCount} prayer time overrides exist, skipping`);
+    return;
+  }
+
+  const today = new Date();
+  const futureDate = (days: number) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() + days);
+    return d.toISOString().split('T')[0];
+  };
+
+  const items = [
+    { date: futureDate(1), prayer: 'isha', overrideTime: '20:30', reason: 'Ramadan adjustment - earlier Isha for Taraweeh', isActive: true },
+    { date: futureDate(2), prayer: 'isha', overrideTime: '20:30', reason: 'Ramadan adjustment - earlier Isha for Taraweeh', isActive: true },
+    { date: futureDate(3), prayer: 'fajr', overrideTime: '05:15', reason: 'Daylight saving time correction', isActive: true },
+  ];
+
+  let total = 0;
+  for (const item of items) {
+    const res = await cmCreate('api::prayer-time-override.prayer-time-override', adminJwt, item);
+    if (res.ok && res.body?.data) {
+      total++;
+      console.log(`  + [${item.prayer}] ${item.date}: ${item.overrideTime} (${item.reason})`);
+    } else {
+      console.error(`  ! ${item.date} ${item.prayer}: ${JSON.stringify(res.body?.error?.message || res.status)}`);
+    }
+    await sleep(100);
+  }
+  console.log(`  Total prayer time overrides: ${total}`);
+}
+
+// ─── Phase 13: I'tikaf Registrations ──────────────────────────────────────
+
+async function seedItikafRegistrations(adminJwt: string): Promise<void> {
+  console.log('\n--- Phase 13: I\'tikaf Registrations ---');
+
+  if (!adminJwt) {
+    console.log('  ! No admin JWT available, skipping i\'tikaf registrations');
+    return;
+  }
+
+  const existRes = await apiAuth(
+    `${CM_BASE}/api::itikaf-registration.itikaf-registration?page=1&pageSize=1`,
+    adminJwt,
+  );
+  const existingCount = existRes.body?.pagination?.total || 0;
+  if (existingCount >= 3) {
+    console.log(`  = ${existingCount} i'tikaf registrations exist, skipping`);
+    return;
+  }
+
+  const items: {
+    fullName: string;
+    email: string;
+    phone: string;
+    gender: string;
+    age: number;
+    durationType: string;
+    startDate: string;
+    endDate: string;
+    emergencyContactName: string;
+    emergencyContactPhone: string;
+    medicalConditions?: string;
+    specialRequirements?: string;
+    status: string;
+    notes?: string;
+  }[] = [
+    { fullName: 'Ahmed Ibrahim', email: 'ahmed@example.com', phone: '617-555-0101', gender: 'male', age: 32, durationType: 'last_ten', startDate: '2026-03-10', endDate: '2026-03-20', emergencyContactName: 'Sarah Ibrahim', emergencyContactPhone: '617-555-0102', status: 'approved', notes: 'Returning participant' },
+    { fullName: 'Omar Hassan', email: 'omar@example.com', phone: '617-555-0201', gender: 'male', age: 25, durationType: 'full', startDate: '2026-03-01', endDate: '2026-03-30', emergencyContactName: 'Yusuf Hassan', emergencyContactPhone: '617-555-0202', medicalConditions: 'Mild asthma - carries inhaler', status: 'approved' },
+    { fullName: 'Khalid Mansour', email: 'khalid@example.com', phone: '617-555-0301', gender: 'male', age: 45, durationType: 'weekend', startDate: '2026-03-14', endDate: '2026-03-16', emergencyContactName: 'Amina Mansour', emergencyContactPhone: '617-555-0302', status: 'pending' },
+    { fullName: 'Bilal Thompson', email: 'bilal@example.com', phone: '617-555-0401', gender: 'male', age: 19, durationType: 'last_ten', startDate: '2026-03-10', endDate: '2026-03-20', emergencyContactName: 'James Thompson', emergencyContactPhone: '617-555-0402', specialRequirements: 'First time - needs guidance on i\'tikaf etiquette', status: 'pending' },
+    { fullName: 'Youssef Ali', email: 'youssef@example.com', phone: '617-555-0501', gender: 'male', age: 55, durationType: 'custom', startDate: '2026-03-15', endDate: '2026-03-18', emergencyContactName: 'Layla Ali', emergencyContactPhone: '617-555-0502', medicalConditions: 'Diabetes - needs regular meals', status: 'rejected', notes: 'Capacity reached for requested dates' },
+  ];
+
+  let total = 0;
+  for (const item of items) {
+    const { status: desiredStatus, ...createData } = item;
+    const res = await cmCreate('api::itikaf-registration.itikaf-registration', adminJwt, createData);
+    if (res.ok && res.body?.data) {
+      if (desiredStatus !== 'pending') {
+        await sqlUpdateStatus('itikaf_registrations', res.body.data.id, desiredStatus);
+      }
+      total++;
+      console.log(`  + [${desiredStatus}] ${item.fullName}`);
+    } else {
+      console.error(`  ! ${item.fullName}: ${JSON.stringify(res.body?.error?.message || res.status)}`);
+    }
+    await sleep(100);
+  }
+  console.log(`  Total i'tikaf registrations: ${total}`);
+}
+
+// ─── Phase 14: Appeals ────────────────────────────────────────────────────
+
+async function seedAppeals(adminJwt: string): Promise<void> {
+  console.log('\n--- Phase 14: Appeals ---');
+
+  if (!adminJwt) {
+    console.log('  ! No admin JWT available, skipping appeals');
+    return;
+  }
+
+  const existRes = await apiAuth(
+    `${CM_BASE}/api::appeal.appeal?page=1&pageSize=1`,
+    adminJwt,
+  );
+  const existingCount = existRes.body?.pagination?.total || 0;
+  if (existingCount >= 2) {
+    console.log(`  = ${existingCount} appeals exist, skipping`);
+    return;
+  }
+
+  const today = new Date();
+  const futureDate = (days: number) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() + days);
+    return d.toISOString().split('T')[0];
+  };
+
+  const items = [
+    { title: 'Ramadan Zakat Fund 2026', description: 'Collect and distribute Zakat al-Fitr and Zakat al-Mal during the blessed month of Ramadan. All funds will be distributed to eligible recipients in our local community.', category: 'zakat', goalAmount: 50000, currentAmount: 32450, currency: 'USD', startDate: futureDate(-10), endDate: futureDate(30), isActive: true, isFeatured: true, contactEmail: 'zakat@attaqwa.org' },
+    { title: 'Masjid Expansion - Phase 2', description: 'The second phase of our masjid expansion project includes adding a new multipurpose hall, expanded parking, and improved accessibility features. Your generous contributions will help us serve the growing community.', category: 'building_fund', goalAmount: 500000, currentAmount: 175000, currency: 'USD', startDate: futureDate(-60), endDate: futureDate(180), isActive: true, isFeatured: true, contactEmail: 'expansion@attaqwa.org', contactPhone: '617-555-1000' },
+    { title: 'Emergency Relief - Palestine', description: 'Emergency humanitarian aid collection for families affected by the crisis in Palestine. All funds will be distributed through verified humanitarian organizations.', category: 'emergency', goalAmount: 25000, currentAmount: 21300, currency: 'USD', startDate: futureDate(-30), isActive: true, isFeatured: false, contactEmail: 'relief@attaqwa.org' },
+  ];
+
+  let total = 0;
+  for (const item of items) {
+    const res = await cmCreate('api::appeal.appeal', adminJwt, item);
+    if (res.ok && res.body?.data) {
+      total++;
+      console.log(`  + [${item.category}] ${item.title}: $${item.currentAmount}/$${item.goalAmount}`);
+    } else {
+      console.error(`  ! ${item.title}: ${JSON.stringify(res.body?.error?.message || res.status)}`);
+    }
+    await sleep(100);
+  }
+  console.log(`  Total appeals: ${total}`);
+}
+
 // ─── Main ──────────────────────────────────────────────────────────────────
 
 async function main() {
@@ -810,6 +1065,21 @@ async function main() {
 
   // Phase 9
   await seedModerationQueue(courses, lessons, adminJwt);
+
+  // Phase 10
+  await seedAnnouncements(adminJwt);
+
+  // Phase 11
+  await seedEvents(adminJwt);
+
+  // Phase 12
+  await seedPrayerTimeOverrides(adminJwt);
+
+  // Phase 13
+  await seedItikafRegistrations(adminJwt);
+
+  // Phase 14
+  await seedAppeals(adminJwt);
 
   // Cleanup
   await closePg();

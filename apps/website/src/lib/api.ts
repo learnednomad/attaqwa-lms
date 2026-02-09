@@ -23,7 +23,10 @@ import type {
   ErrorResponse,
   Announcement,
   Event,
-  PrayerTime
+  PrayerTime,
+  PrayerTimeOverride,
+  ItikafRegistration,
+  Appeal,
 } from '@/types';
 
 // Auth types now consolidated in @attaqwa/shared-types
@@ -38,6 +41,13 @@ export class ApiError extends Error {
   }
 }
 
+// In-memory JWT storage for client-side auth
+let _authToken: string | null = null;
+
+export function getAuthToken() {
+  return _authToken;
+}
+
 async function makeRequest<T>(
   endpoint: string,
   options: RequestInit = {}
@@ -48,14 +58,17 @@ async function makeRequest<T>(
     'Content-Type': 'application/json',
   };
 
-  // SECURITY: No localStorage token - authentication via httpOnly cookies
+  // Add JWT token if available
+  if (_authToken) {
+    defaultHeaders['Authorization'] = `Bearer ${_authToken}`;
+  }
+
   const response = await fetch(url, {
     ...options,
     headers: {
       ...defaultHeaders,
       ...options.headers,
     },
-    // SECURITY: Include cookies for httpOnly token authentication
     credentials: 'include',
   });
 
@@ -76,45 +89,149 @@ async function makeRequest<T>(
   return response.json();
 }
 
+// Strapi returns { data, meta: { pagination: { page, pageSize, pageCount, total } } }
+// Our PaginatedResponse expects { data, pagination: { page, limit, total } }
+interface StrapiPaginatedResponse<T> {
+  data: T[];
+  meta: {
+    pagination: {
+      page: number;
+      pageSize: number;
+      pageCount: number;
+      total: number;
+    };
+  };
+}
+
+function transformPaginated<T>(strapi: StrapiPaginatedResponse<T>): PaginatedResponse<T> {
+  return {
+    data: strapi.data,
+    pagination: {
+      page: strapi.meta.pagination.page,
+      limit: strapi.meta.pagination.pageSize,
+      total: strapi.meta.pagination.total,
+      totalPages: strapi.meta.pagination.pageCount,
+    },
+    success: true,
+  };
+}
+
+// Build Strapi v5 compatible query params
+function buildStrapiQuery(params?: {
+  page?: number;
+  limit?: number;
+  filters?: Record<string, string | boolean | number>;
+  sort?: string;
+}): string {
+  if (!params) return '';
+  const searchParams = new URLSearchParams();
+  if (params.page) searchParams.append('pagination[page]', params.page.toString());
+  if (params.limit) searchParams.append('pagination[pageSize]', params.limit.toString());
+  if (params.filters) {
+    for (const [key, value] of Object.entries(params.filters)) {
+      if (value !== undefined) {
+        searchParams.append(`filters[${key}][$eq]`, String(value));
+      }
+    }
+  }
+  if (params.sort) searchParams.append('sort', params.sort);
+  return searchParams.toString();
+}
+
 // Auth API (using v1 endpoints)
 export const authApi = {
   login: async (credentials: LoginInput): Promise<{ user: AuthUser }> => {
-    // SECURITY: Server sets httpOnly cookie, we only receive user data
-    const response = await makeRequest<{ user: AuthUser; token?: string }>(
+    // Strapi expects 'identifier' not 'email' for the login endpoint
+    const response = await makeRequest<{
+      jwt: string;
+      user: { id: number; username: string; email: string; role?: { type: string } };
+    }>(
       API_V1_ENDPOINTS.LOGIN,
       {
         method: 'POST',
-        body: JSON.stringify(credentials),
+        body: JSON.stringify({
+          identifier: credentials.email,
+          password: credentials.password,
+        }),
       }
     );
 
-    // SECURITY: Don't expose token to client code
-    return { user: response.user };
+    // Store JWT for subsequent requests
+    _authToken = response.jwt;
+
+    // Map Strapi user to our AuthUser type
+    // After login, fetch /me to get role (login response doesn't include it)
+    const strapiMe = await makeRequest<{
+      id: number;
+      username: string;
+      email: string;
+      role?: { type: string };
+    }>(API_V1_ENDPOINTS.ME);
+
+    const roleType = strapiMe.role?.type;
+    const user: AuthUser = {
+      id: String(response.user.id),
+      email: response.user.email,
+      name: response.user.username,
+      role: roleType === 'admin' ? 'admin' : 'user',
+    };
+
+    return { user };
   },
 
   register: async (userData: RegisterInput): Promise<{ user: AuthUser }> => {
-    // SECURITY: Server sets httpOnly cookie, we only receive user data
-    const response = await makeRequest<{ user: AuthUser; token?: string }>(
+    const response = await makeRequest<{
+      jwt: string;
+      user: { id: number; username: string; email: string };
+    }>(
       API_V1_ENDPOINTS.REGISTER,
       {
         method: 'POST',
-        body: JSON.stringify(userData),
+        body: JSON.stringify({
+          username: userData.name,
+          email: userData.email,
+          password: userData.password,
+        }),
       }
     );
 
-    // SECURITY: Don't expose token to client code
-    return { user: response.user };
+    _authToken = response.jwt;
+
+    const user: AuthUser = {
+      id: String(response.user.id),
+      email: response.user.email,
+      name: response.user.username,
+      role: 'user',
+    };
+
+    return { user };
   },
 
   logout: async (): Promise<void> => {
-    // SECURITY: Server clears httpOnly cookie
-    await makeRequest(API_V1_ENDPOINTS.LOGOUT, {
-      method: 'POST',
-    });
+    _authToken = null;
   },
 
   getMe: async (): Promise<{ user: AuthUser }> => {
-    return makeRequest<{ user: AuthUser }>(API_V1_ENDPOINTS.ME);
+    if (!_authToken) {
+      throw new ApiError(401, 'Not authenticated');
+    }
+
+    const strapiUser = await makeRequest<{
+      id: number;
+      username: string;
+      email: string;
+      role?: { type: string };
+    }>(API_V1_ENDPOINTS.ME);
+
+    const roleType = strapiUser.role?.type;
+    const user: AuthUser = {
+      id: String(strapiUser.id),
+      email: strapiUser.email,
+      name: strapiUser.username,
+      role: roleType === 'admin' ? 'admin' : 'user',
+    };
+
+    return { user };
   },
 };
 
@@ -126,16 +243,15 @@ export const announcementsApi = {
     isEvent?: boolean;
     isActive?: boolean;
   }): Promise<PaginatedResponse<Announcement>> => {
-    const searchParams = new URLSearchParams();
-    if (params?.page) searchParams.append('page', params.page.toString());
-    if (params?.limit) searchParams.append('limit', params.limit.toString());
-    if (params?.isEvent !== undefined) searchParams.append('isEvent', params.isEvent.toString());
-    if (params?.isActive !== undefined) searchParams.append('isActive', params.isActive.toString());
+    const filters: Record<string, string | boolean | number> = {};
+    if (params?.isEvent !== undefined) filters.isEvent = params.isEvent;
+    if (params?.isActive !== undefined) filters.isActive = params.isActive;
 
-    const query = searchParams.toString();
+    const query = buildStrapiQuery({ page: params?.page, limit: params?.limit, filters });
     const endpoint = query ? `${API_V1_ENDPOINTS.ANNOUNCEMENTS}?${query}` : API_V1_ENDPOINTS.ANNOUNCEMENTS;
 
-    return makeRequest<PaginatedResponse<Announcement>>(endpoint);
+    const raw = await makeRequest<StrapiPaginatedResponse<Announcement>>(endpoint);
+    return transformPaginated(raw);
   },
 
   getById: async (id: string): Promise<ApiResponse<Announcement>> => {
@@ -145,14 +261,14 @@ export const announcementsApi = {
   create: async (data: Omit<Announcement, 'id' | 'authorId' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Announcement>> => {
     return makeRequest<ApiResponse<Announcement>>(API_V1_ENDPOINTS.ANNOUNCEMENTS, {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify({ data }),
     });
   },
 
   update: async (id: string, data: Partial<Announcement>): Promise<ApiResponse<Announcement>> => {
     return makeRequest<ApiResponse<Announcement>>(`${API_V1_ENDPOINTS.ANNOUNCEMENTS}/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(data),
+      body: JSON.stringify({ data }),
     });
   },
 
@@ -171,16 +287,17 @@ export const eventsApi = {
     upcoming?: boolean;
     isActive?: boolean;
   }): Promise<PaginatedResponse<Event>> => {
-    const searchParams = new URLSearchParams();
-    if (params?.page) searchParams.append('page', params.page.toString());
-    if (params?.limit) searchParams.append('limit', params.limit.toString());
-    if (params?.upcoming !== undefined) searchParams.append('upcoming', params.upcoming.toString());
-    if (params?.isActive !== undefined) searchParams.append('isActive', params.isActive.toString());
+    const filters: Record<string, string | boolean | number> = {};
+    if (params?.isActive !== undefined) filters.isActive = params.isActive;
+    // 'upcoming' is not a Strapi field - handle via date filter
+    // For now, just sort by date descending
+    const sort = params?.upcoming ? 'date:asc' : 'date:desc';
 
-    const query = searchParams.toString();
+    const query = buildStrapiQuery({ page: params?.page, limit: params?.limit, filters, sort });
     const endpoint = query ? `${API_V1_ENDPOINTS.EVENTS}?${query}` : API_V1_ENDPOINTS.EVENTS;
 
-    return makeRequest<PaginatedResponse<Event>>(endpoint);
+    const raw = await makeRequest<StrapiPaginatedResponse<Event>>(endpoint);
+    return transformPaginated(raw);
   },
 
   getById: async (id: string): Promise<ApiResponse<Event>> => {
@@ -190,14 +307,14 @@ export const eventsApi = {
   create: async (data: Omit<Event, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Event>> => {
     return makeRequest<ApiResponse<Event>>(API_V1_ENDPOINTS.EVENTS, {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify({ data }),
     });
   },
 
   update: async (id: string, data: Partial<Event>): Promise<ApiResponse<Event>> => {
     return makeRequest<ApiResponse<Event>>(`${API_V1_ENDPOINTS.EVENTS}/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(data),
+      body: JSON.stringify({ data }),
     });
   },
 
@@ -261,10 +378,141 @@ export const prayerTimesApi = {
   },
 };
 
+// Prayer Time Overrides API (using v1 endpoints)
+export const prayerTimeOverridesApi = {
+  getAll: async (params?: {
+    page?: number;
+    limit?: number;
+    isActive?: boolean;
+  }): Promise<PaginatedResponse<PrayerTimeOverride>> => {
+    const filters: Record<string, string | boolean | number> = {};
+    if (params?.isActive !== undefined) filters.isActive = params.isActive;
+
+    const query = buildStrapiQuery({ page: params?.page, limit: params?.limit, filters });
+    const endpoint = query ? `${API_V1_ENDPOINTS.PRAYER_TIME_OVERRIDES}?${query}` : API_V1_ENDPOINTS.PRAYER_TIME_OVERRIDES;
+
+    const raw = await makeRequest<StrapiPaginatedResponse<PrayerTimeOverride>>(endpoint);
+    return transformPaginated(raw);
+  },
+
+  getById: async (id: string): Promise<ApiResponse<PrayerTimeOverride>> => {
+    return makeRequest<ApiResponse<PrayerTimeOverride>>(`${API_V1_ENDPOINTS.PRAYER_TIME_OVERRIDES}/${id}`);
+  },
+
+  create: async (data: Omit<PrayerTimeOverride, 'id' | 'documentId' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<PrayerTimeOverride>> => {
+    return makeRequest<ApiResponse<PrayerTimeOverride>>(API_V1_ENDPOINTS.PRAYER_TIME_OVERRIDES, {
+      method: 'POST',
+      body: JSON.stringify({ data }),
+    });
+  },
+
+  update: async (id: string, data: Partial<PrayerTimeOverride>): Promise<ApiResponse<PrayerTimeOverride>> => {
+    return makeRequest<ApiResponse<PrayerTimeOverride>>(`${API_V1_ENDPOINTS.PRAYER_TIME_OVERRIDES}/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ data }),
+    });
+  },
+
+  delete: async (id: string): Promise<ApiResponse<{ message: string }>> => {
+    return makeRequest<ApiResponse<{ message: string }>>(`${API_V1_ENDPOINTS.PRAYER_TIME_OVERRIDES}/${id}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
+// I'tikaf Registrations API (using v1 endpoints)
+export const itikafRegistrationsApi = {
+  getAll: async (params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+  }): Promise<PaginatedResponse<ItikafRegistration>> => {
+    const filters: Record<string, string | boolean | number> = {};
+    if (params?.status) filters.status = params.status;
+
+    const query = buildStrapiQuery({ page: params?.page, limit: params?.limit, filters });
+    const endpoint = query ? `${API_V1_ENDPOINTS.ITIKAF_REGISTRATIONS}?${query}` : API_V1_ENDPOINTS.ITIKAF_REGISTRATIONS;
+
+    const raw = await makeRequest<StrapiPaginatedResponse<ItikafRegistration>>(endpoint);
+    return transformPaginated(raw);
+  },
+
+  getById: async (id: string): Promise<ApiResponse<ItikafRegistration>> => {
+    return makeRequest<ApiResponse<ItikafRegistration>>(`${API_V1_ENDPOINTS.ITIKAF_REGISTRATIONS}/${id}`);
+  },
+
+  create: async (data: Omit<ItikafRegistration, 'id' | 'documentId' | 'status' | 'notes' | 'user' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<ItikafRegistration>> => {
+    return makeRequest<ApiResponse<ItikafRegistration>>(API_V1_ENDPOINTS.ITIKAF_REGISTRATIONS, {
+      method: 'POST',
+      body: JSON.stringify({ data }),
+    });
+  },
+
+  update: async (id: string, data: Partial<ItikafRegistration>): Promise<ApiResponse<ItikafRegistration>> => {
+    return makeRequest<ApiResponse<ItikafRegistration>>(`${API_V1_ENDPOINTS.ITIKAF_REGISTRATIONS}/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ data }),
+    });
+  },
+
+  delete: async (id: string): Promise<ApiResponse<{ message: string }>> => {
+    return makeRequest<ApiResponse<{ message: string }>>(`${API_V1_ENDPOINTS.ITIKAF_REGISTRATIONS}/${id}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
+// Appeals API (using v1 endpoints)
+export const appealsApi = {
+  getAll: async (params?: {
+    page?: number;
+    limit?: number;
+    isActive?: boolean;
+    category?: string;
+  }): Promise<PaginatedResponse<Appeal>> => {
+    const filters: Record<string, string | boolean | number> = {};
+    if (params?.isActive !== undefined) filters.isActive = params.isActive;
+    if (params?.category) filters.category = params.category;
+
+    const query = buildStrapiQuery({ page: params?.page, limit: params?.limit, filters });
+    const endpoint = query ? `${API_V1_ENDPOINTS.APPEALS}?${query}` : API_V1_ENDPOINTS.APPEALS;
+
+    const raw = await makeRequest<StrapiPaginatedResponse<Appeal>>(endpoint);
+    return transformPaginated(raw);
+  },
+
+  getById: async (id: string): Promise<ApiResponse<Appeal>> => {
+    return makeRequest<ApiResponse<Appeal>>(`${API_V1_ENDPOINTS.APPEALS}/${id}`);
+  },
+
+  create: async (data: Omit<Appeal, 'id' | 'documentId' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Appeal>> => {
+    return makeRequest<ApiResponse<Appeal>>(API_V1_ENDPOINTS.APPEALS, {
+      method: 'POST',
+      body: JSON.stringify({ data }),
+    });
+  },
+
+  update: async (id: string, data: Partial<Appeal>): Promise<ApiResponse<Appeal>> => {
+    return makeRequest<ApiResponse<Appeal>>(`${API_V1_ENDPOINTS.APPEALS}/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ data }),
+    });
+  },
+
+  delete: async (id: string): Promise<ApiResponse<{ message: string }>> => {
+    return makeRequest<ApiResponse<{ message: string }>>(`${API_V1_ENDPOINTS.APPEALS}/${id}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
 // Export a single API object for convenience
 export const api = {
   auth: authApi,
   announcements: announcementsApi,
   events: eventsApi,
   prayerTimes: prayerTimesApi,
+  prayerTimeOverrides: prayerTimeOverridesApi,
+  itikafRegistrations: itikafRegistrationsApi,
+  appeals: appealsApi,
 };

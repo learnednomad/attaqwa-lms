@@ -1,8 +1,6 @@
-import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Quote } from 'lucide-react';
+import { Quote } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { formatTime } from '@attaqwa/shared';
 import { DailyPrayerTimes } from '@/types';
 
 interface MosquePrayerTimesSectionProps {
@@ -50,14 +48,6 @@ export function MosquePrayerTimesSection({
   location = "Doraville, Georgia",
   prayerTimes
 }: MosquePrayerTimesSectionProps) {
-  const prayers = [
-    { name: 'Fajr', time: prayerTimes.fajr, iqama: prayerTimes.iqama?.fajr, key: 'fajr' },
-    { name: 'Dhuhr', time: prayerTimes.dhuhr, iqama: prayerTimes.iqama?.dhuhr, key: 'dhuhr' },
-    { name: 'Asr', time: prayerTimes.asr, iqama: prayerTimes.iqama?.asr, key: 'asr' },
-    { name: 'Maghrib', time: prayerTimes.maghrib, iqama: prayerTimes.iqama?.maghrib, key: 'maghrib' },
-    { name: 'Isha', time: prayerTimes.isha, iqama: prayerTimes.iqama?.isha, key: 'isha' }
-  ];
-
   // Select a hadith based on the day of the year for variety
   const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
   const todaysHadith = hadithCollection[dayOfYear % hadithCollection.length];
@@ -117,102 +107,6 @@ export function MosquePrayerTimesSection({
               </span>
             </div>
           </div>
-        </div>
-
-        {/* Prayer Times Grid - Full Width Below */}
-        <div className="mt-8 pt-5 border-t border-gray-200">
-          <div className="flex items-center justify-between mb-5">
-            <h3 className="text-sm md:text-base font-semibold text-gray-500 uppercase tracking-wider">
-              Today&apos;s Prayer Times
-            </h3>
-            <Link
-              href="/prayer-times"
-              className="inline-flex items-center gap-1.5 text-emerald-600 hover:text-emerald-700 font-medium text-sm md:text-base group"
-            >
-              Full Schedule
-              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
-
-          <div className="flex gap-2 overflow-x-auto pb-2 sm:grid sm:grid-cols-5 sm:gap-6 sm:overflow-visible sm:pb-0">
-            {prayers.map((prayer) => (
-              <div
-                key={prayer.key}
-                className="text-center flex-shrink-0 min-w-[70px] sm:min-w-0"
-              >
-                <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
-                  {prayer.name}
-                </p>
-                {(() => {
-                  const formatted = formatTime(prayer.time);
-                  const match = formatted.match(/^(.+?)\s*(AM|PM)$/i);
-                  return match ? (
-                    <>
-                      <p className="text-xl md:text-3xl font-bold text-gray-900 font-mono"
-                         style={{ fontVariantNumeric: 'tabular-nums' }}>
-                        {match[1]}
-                      </p>
-                      <p className="text-sm md:text-base text-gray-400 mt-0.5">
-                        {match[2]}
-                      </p>
-                    </>
-                  ) : (
-                    <p className="text-xl md:text-3xl font-bold text-gray-900 font-mono"
-                       style={{ fontVariantNumeric: 'tabular-nums' }}>
-                      {formatted}
-                    </p>
-                  );
-                })()}
-                {prayer.iqama && (
-                  <p className="text-xs md:text-sm text-emerald-600 mt-2 font-medium whitespace-nowrap">
-                    Iqama: {formatTime(prayer.iqama)}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Jummah Times */}
-          {prayerTimes.jummah && prayerTimes.jummah.length > 0 && (
-            <div className="mt-8 pt-6 border-t border-gray-100">
-              <div className="flex items-center justify-center gap-6 md:gap-12">
-                <p className="text-base md:text-lg font-semibold text-amber-700">
-                  Jumu&apos;ah Prayer
-                </p>
-                <div className="flex gap-6 md:gap-10">
-                  {prayerTimes.jummah.map((time, index) => (
-                    <div key={index} className="text-center">
-                      <p className="text-sm md:text-base text-gray-500 mb-1">
-                        {index === 0 ? '1st' : '2nd'} Khutbah
-                      </p>
-                      <p className="text-xl md:text-2xl font-bold text-amber-700 font-mono">
-                        {time}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Tarawih (Ramadan) */}
-          {prayerTimes.tarawih && (
-            <div className="mt-8 pt-6 border-t border-gray-100">
-              <div className="flex items-center justify-center gap-6 md:gap-12">
-                <p className="text-base md:text-lg font-semibold text-purple-700">
-                  Tarawih Prayer
-                </p>
-                <div className="text-center">
-                  <p className="text-sm md:text-base text-gray-500 mb-1">
-                    Ramadan Nightly Prayer
-                  </p>
-                  <p className="text-xl md:text-2xl font-bold text-purple-700 font-mono">
-                    {formatTime(prayerTimes.tarawih)}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </section>

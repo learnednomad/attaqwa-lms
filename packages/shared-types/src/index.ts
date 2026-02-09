@@ -546,3 +546,113 @@ export interface OllamaHealthStatus {
   model: string;
   models: string[];
 }
+
+// ============================================================================
+// Masjid Admin Types
+// ============================================================================
+
+export type AnnouncementCategory = 'general' | 'ramadan' | 'eid' | 'urgent' | 'community' | 'fundraising';
+
+export interface Announcement {
+  id: string;
+  documentId?: string;
+  title: string;
+  content: string;
+  category: AnnouncementCategory;
+  imageUrl?: string;
+  imageAlt?: string;
+  pdfUrl?: string;
+  isActive: boolean;
+  isPinned?: boolean;
+  publishDate?: string;
+  expiryDate?: string;
+  author?: Pick<User, 'id' | 'username'>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type EventCategory = 'lecture' | 'community' | 'youth' | 'sisters' | 'fundraiser' | 'other';
+
+export interface MasjidEvent {
+  id: string;
+  documentId?: string;
+  title: string;
+  description: string;
+  date: string;
+  startTime?: string;
+  endTime?: string;
+  location?: string;
+  isIndoor?: boolean;
+  isOutdoor?: boolean;
+  imageUrl?: string;
+  imageAlt?: string;
+  isActive: boolean;
+  isRecurring?: boolean;
+  recurrencePattern?: string;
+  maxAttendees?: number;
+  category?: EventCategory;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type PrayerName = 'fajr' | 'sunrise' | 'dhuhr' | 'asr' | 'maghrib' | 'isha';
+
+export interface PrayerTimeOverride {
+  id: string;
+  documentId?: string;
+  date: string;
+  prayer: PrayerName;
+  overrideTime: string;
+  reason?: string;
+  isActive: boolean;
+  createdBy?: Pick<User, 'id' | 'username'>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ItikafDurationType = 'full' | 'last_ten' | 'weekend' | 'custom';
+export type ItikafStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
+
+export interface ItikafRegistration {
+  id: string;
+  documentId?: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  gender: 'male' | 'female';
+  age: number;
+  durationType: ItikafDurationType;
+  startDate: string;
+  endDate: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+  medicalConditions?: string;
+  specialRequirements?: string;
+  status: ItikafStatus;
+  notes?: string;
+  user?: Pick<User, 'id' | 'username'>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type AppealCategory = 'zakat' | 'sadaqah' | 'building_fund' | 'emergency' | 'education' | 'community';
+
+export interface Appeal {
+  id: string;
+  documentId?: string;
+  title: string;
+  description: string;
+  category: AppealCategory;
+  goalAmount?: number;
+  currentAmount?: number;
+  currency?: string;
+  startDate: string;
+  endDate?: string;
+  isActive: boolean;
+  isFeatured?: boolean;
+  imageUrl?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  createdAt: string;
+  updatedAt: string;
+}

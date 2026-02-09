@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { BookOpen, Book, Compass, Calendar, ChevronRight, GraduationCap, FileText, Headphones } from 'lucide-react';
+import { BookOpen, Book, Compass, Calendar, ChevronRight, GraduationCap, FileText, Headphones, Heart } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Islamic Resources | Masjid At-Taqwa',
@@ -65,6 +65,19 @@ const resources = [
       'Islamic events',
       'Sacred months',
       'Moon phases'
+    ]
+  },
+  {
+    id: 'new-muslim',
+    title: 'New Muslim Guide',
+    description: 'Comprehensive resources and downloadable guides for those beginning their journey in Islam',
+    href: '/resources/new-muslim',
+    icon: Heart,
+    features: [
+      'Shahada & Five Pillars',
+      'Prayer and Wudu guides',
+      'Downloadable PDF resources',
+      'Community integration support'
     ]
   }
 ];

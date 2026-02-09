@@ -25,6 +25,7 @@ export const navigation: NavItem[] = [
       { name: 'Hadith Collections', href: '/resources/hadith-collections' },
       { name: 'Qibla Direction', href: '/resources/qibla-direction' },
       { name: 'Islamic Calendar', href: '/resources/islamic-calendar' },
+      { name: 'New Muslim Guide', href: '/resources/new-muslim' },
       { name: 'All Resources', href: '/resources' },
     ],
   },
@@ -51,6 +52,7 @@ export const footerResources = [
   { name: 'Hadith Collections', href: '/resources/hadith-collections' },
   { name: 'Qibla Direction', href: '/resources/qibla-direction' },
   { name: 'Islamic Calendar', href: '/resources/islamic-calendar' },
+  { name: 'New Muslim Guide', href: '/resources/new-muslim' },
 ];
 
 export const footerAbout = [

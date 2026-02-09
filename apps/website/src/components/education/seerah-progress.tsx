@@ -6,19 +6,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { 
-  Trophy, 
-  Target, 
-  TrendingUp, 
+import {
+  Trophy,
+  Target,
+  TrendingUp,
   Clock,
   Award,
-  Calendar,
   BookOpen,
   CheckCircle
 } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
 
 interface ProgressData {
   moduleProgress: any[];
@@ -65,14 +61,12 @@ export function SeerahProgress() {
 
   const checkAuthAndFetchProgress = async () => {
     try {
-      // Check if user is authenticated
       const authResponse = await fetch('/api/auth/me', {
         credentials: 'include',
       });
 
       if (authResponse.ok) {
         setIsAuthenticated(true);
-        // Fetch progress data
         const progressResponse = await fetch('/api/seerah/progress', {
           credentials: 'include',
         });
@@ -99,33 +93,31 @@ export function SeerahProgress() {
 
   if (loading) {
     return (
-      <Card className="mb-8">
-        <CardContent className="py-8">
-          <div className="text-center text-gray-500">Loading progress...</div>
-        </CardContent>
-      </Card>
+      <div className="rounded-xl border border-neutral-200 bg-white p-8">
+        <div className="text-center text-sm text-neutral-400">Loading progress...</div>
+      </div>
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <Card className="mb-8 bg-islamic-green-50">
-        <CardContent className="py-8">
-          <div className="text-center">
-            <BookOpen className="w-12 h-12 text-islamic-green-600 mx-auto mb-4" />
-            <h3 className="font-semibold text-lg mb-2">Track Your Learning Journey</h3>
-            <p className="text-gray-600 mb-4">
-              Sign in to track your progress, earn achievements, and get certificates
-            </p>
-            <a 
-              href="/signin?redirect=/education/seerah" 
-              className="inline-flex items-center justify-center px-4 py-2 bg-islamic-green-600 text-white rounded-lg hover:bg-islamic-green-700"
-            >
-              Sign In to Start Learning
-            </a>
+      <div className="rounded-xl border border-neutral-200 bg-white p-8">
+        <div className="text-center">
+          <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center mx-auto mb-4">
+            <BookOpen className="w-4 h-4 text-emerald-600" />
           </div>
-        </CardContent>
-      </Card>
+          <h3 className="text-sm font-semibold text-neutral-900 mb-1">Track Your Learning Journey</h3>
+          <p className="text-xs text-neutral-500 mb-4">
+            Sign in to track your progress, earn achievements, and get certificates
+          </p>
+          <a
+            href="/student/login?redirect=/education/seerah"
+            className="inline-flex items-center justify-center px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors"
+          >
+            Sign In to Start Learning
+          </a>
+        </div>
+      </div>
     );
   }
 
@@ -133,182 +125,171 @@ export function SeerahProgress() {
     return null;
   }
 
-  const overallProgress = progressData.learningPath 
-    ? (progressData.statistics.modulesCompleted / 8) * 100 
+  const overallProgress = progressData.learningPath
+    ? (progressData.statistics.modulesCompleted / 8) * 100
     : 0;
 
   return (
-    <div className="space-y-6 mb-8">
-      {/* Overall Progress Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Learning Progress</CardTitle>
-          <CardDescription>
-            Track your journey through the authentic Seerah curriculum
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            {/* Progress Bar */}
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-gray-600">Overall Completion</span>
-                <span className="font-semibold">
-                  {progressData.statistics.modulesCompleted} of 8 modules
-                </span>
-              </div>
-              <Progress value={overallProgress} className="h-3" />
-              <p className="text-xs text-gray-500 mt-1">
-                {Math.round(overallProgress)}% Complete
-              </p>
-            </div>
+    <div className="space-y-3">
+      {/* Overall Progress */}
+      <div className="rounded-xl border border-neutral-200 bg-white p-5">
+        <h3 className="text-sm font-semibold text-neutral-900 mb-1">Your Learning Progress</h3>
+        <p className="text-xs text-neutral-400 mb-4">
+          Track your journey through the authentic Seerah curriculum
+        </p>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <StatCard
-                icon={<BookOpen className="w-5 h-5" />}
-                label="Modules Started"
-                value={progressData.statistics.modulesStarted.toString()}
-                color="text-islamic-green-600"
-              />
-              <StatCard
-                icon={<CheckCircle className="w-5 h-5" />}
-                label="Completed"
-                value={progressData.statistics.modulesCompleted.toString()}
-                color="text-islamic-green-600"
-              />
-              <StatCard
-                icon={<Clock className="w-5 h-5" />}
-                label="Time Spent"
-                value={formatTime(progressData.statistics.totalTimeSpent)}
-                color="text-islamic-gold-600"
-              />
-              <StatCard
-                icon={<Target className="w-5 h-5" />}
-                label="Avg Score"
-                value={`${Math.round(progressData.statistics.averageScore)}%`}
-                color="text-islamic-gold-600"
-              />
-            </div>
-
-            {/* Current Streak */}
-            {progressData.statistics.currentStreak > 0 && (
-              <div className="bg-islamic-gold-50 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-islamic-gold-100 rounded-lg">
-                      <TrendingUp className="w-5 h-5 text-islamic-gold-600" />
-                    </div>
-                    <div>
-                      <p className="font-semibold text-islamic-navy">
-                        {progressData.statistics.currentStreak} Day Streak!
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Keep learning daily to maintain your streak
-                      </p>
-                    </div>
-                  </div>
-                  <span className="text-2xl">🔥</span>
-                </div>
-              </div>
-            )}
+        {/* Progress Bar */}
+        <div className="mb-5">
+          <div className="flex justify-between text-xs mb-1.5">
+            <span className="text-neutral-400">Overall Completion</span>
+            <span className="font-medium text-neutral-600">
+              {progressData.statistics.modulesCompleted} of 8 modules
+            </span>
           </div>
-        </CardContent>
-      </Card>
+          <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-emerald-500 rounded-full transition-all"
+              style={{ width: `${overallProgress}%` }}
+            />
+          </div>
+          <p className="text-[10px] text-neutral-400 mt-1">
+            {Math.round(overallProgress)}% Complete
+          </p>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <StatCard
+            icon={<BookOpen className="w-3.5 h-3.5" />}
+            label="Modules Started"
+            value={progressData.statistics.modulesStarted.toString()}
+          />
+          <StatCard
+            icon={<CheckCircle className="w-3.5 h-3.5" />}
+            label="Completed"
+            value={progressData.statistics.modulesCompleted.toString()}
+          />
+          <StatCard
+            icon={<Clock className="w-3.5 h-3.5" />}
+            label="Time Spent"
+            value={formatTime(progressData.statistics.totalTimeSpent)}
+          />
+          <StatCard
+            icon={<Target className="w-3.5 h-3.5" />}
+            label="Avg Score"
+            value={`${Math.round(progressData.statistics.averageScore)}%`}
+          />
+        </div>
+
+        {/* Current Streak */}
+        {progressData.statistics.currentStreak > 0 && (
+          <div className="mt-4 bg-amber-50 border border-amber-100 rounded-lg p-3">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+                <TrendingUp className="w-4 h-4 text-amber-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-neutral-900">
+                  {progressData.statistics.currentStreak} Day Streak!
+                </p>
+                <p className="text-xs text-neutral-500">
+                  Keep learning daily to maintain your streak
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Achievements and Certificates */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Recent Achievements */}
-        {progressData.achievements.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-islamic-gold-600" />
-                Recent Achievements
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+      {(progressData.achievements.length > 0 || progressData.certificates.length > 0) && (
+        <div className="grid md:grid-cols-2 gap-3">
+          {/* Recent Achievements */}
+          {progressData.achievements.length > 0 && (
+            <div className="rounded-xl border border-neutral-200 bg-white p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-7 h-7 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center">
+                  <Trophy className="h-3.5 w-3.5 text-amber-600" />
+                </div>
+                <h3 className="text-sm font-semibold text-neutral-900">Recent Achievements</h3>
+              </div>
               <div className="space-y-3">
                 {progressData.achievements.slice(0, 3).map((item) => (
                   <div key={item.achievement.id} className="flex items-start gap-3">
-                    <span className="text-2xl">{item.achievement.icon}</span>
+                    <span className="text-xl">{item.achievement.icon}</span>
                     <div className="flex-1">
-                      <p className="font-medium text-sm">
+                      <p className="text-sm font-medium text-neutral-900">
                         {item.achievement.title}
                       </p>
-                      <p className="text-xs text-gray-600">
+                      <p className="text-xs text-neutral-400">
                         {item.achievement.description}
                       </p>
                       <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="outline" className="text-xs">
+                        <span className="rounded-md border border-neutral-200 bg-neutral-50 px-1.5 py-0.5 text-[10px] font-semibold text-neutral-500">
                           +{item.achievement.points} pts
-                        </Badge>
+                        </span>
                         {item.achievement.isRare && (
-                          <Badge className="bg-islamic-gold-600 text-white text-xs">
+                          <span className="rounded-md border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
                             Rare
-                          </Badge>
+                          </span>
                         )}
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        )}
+            </div>
+          )}
 
-        {/* Certificates */}
-        {progressData.certificates.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Award className="w-5 h-5 text-islamic-green-600" />
-                Your Certificates
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+          {/* Certificates */}
+          {progressData.certificates.length > 0 && (
+            <div className="rounded-xl border border-neutral-200 bg-white p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-7 h-7 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center">
+                  <Award className="h-3.5 w-3.5 text-emerald-600" />
+                </div>
+                <h3 className="text-sm font-semibold text-neutral-900">Your Certificates</h3>
+              </div>
               <div className="space-y-3">
                 {progressData.certificates.map((cert) => (
-                  <div 
+                  <div
                     key={cert.id}
-                    className="p-3 bg-islamic-green-50 rounded-lg"
+                    className="bg-emerald-50/50 border border-emerald-100 rounded-lg p-3"
                   >
-                    <p className="font-medium text-sm mb-1">
+                    <p className="text-sm font-medium text-neutral-900 mb-1">
                       {cert.title}
                     </p>
-                    <p className="text-xs text-gray-600">
+                    <p className="text-xs text-neutral-400">
                       Issued: {new Date(cert.issuedAt).toLocaleDateString()}
                     </p>
-                    <p className="text-xs text-islamic-green-700 font-mono mt-1">
+                    <p className="text-xs text-emerald-700 font-mono mt-1">
                       {cert.verificationCode}
                     </p>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
-function StatCard({ 
-  icon, 
-  label, 
-  value, 
-  color 
-}: { 
-  icon: React.ReactNode; 
-  label: string; 
+function StatCard({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
   value: string;
-  color: string;
 }) {
   return (
-    <div className="bg-gray-50 rounded-lg p-4">
-      <div className={`${color} mb-2`}>{icon}</div>
-      <p className="text-xs text-gray-600">{label}</p>
-      <p className="text-lg font-semibold">{value}</p>
+    <div className="bg-neutral-50 rounded-lg p-3">
+      <div className="text-emerald-600 mb-1.5">{icon}</div>
+      <p className="text-[10px] text-neutral-400">{label}</p>
+      <p className="text-sm font-semibold text-neutral-900">{value}</p>
     </div>
   );
 }

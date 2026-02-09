@@ -74,7 +74,7 @@ export function NextLessonBanner({ nextLesson, streak }: NextLessonBannerProps) 
             </Link>
           ) : (
             <Link
-              href="/courses"
+              href="/student/courses"
               className="flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 font-medium text-green-700 transition-colors hover:bg-green-50"
             >
               Browse Courses

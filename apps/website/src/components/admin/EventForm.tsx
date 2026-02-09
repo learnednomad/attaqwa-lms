@@ -50,7 +50,7 @@ export function EventForm({ event, onSuccess }: EventFormProps) {
     defaultValues: event ? {
       title: event.title,
       description: event.description,
-      date: new Date(event.date).toISOString().slice(0, 16),
+      date: event.date,
       startTime: event.startTime || '',
       endTime: event.endTime || '',
       location: event.location || '',
@@ -61,7 +61,7 @@ export function EventForm({ event, onSuccess }: EventFormProps) {
     } : {
       title: '',
       description: '',
-      date: '',
+      date: new Date().toISOString().split('T')[0],
       startTime: '',
       endTime: '',
       location: '',
@@ -76,7 +76,6 @@ export function EventForm({ event, onSuccess }: EventFormProps) {
     try {
       const eventData = {
         ...data,
-        date: new Date(data.date),
         isActive: true,
       };
 
@@ -141,13 +140,14 @@ export function EventForm({ event, onSuccess }: EventFormProps) {
 
           {/* Date */}
           <div className="space-y-2">
-            <Label htmlFor="date">Date & Time *</Label>
+            <Label htmlFor="date">Event Date *</Label>
             <Input
               id="date"
-              type="datetime-local"
+              type="date"
               {...register('date')}
               className={errors.date ? 'border-red-500' : ''}
             />
+            <p className="text-xs text-muted-foreground">Defaults to today</p>
             {errors.date && (
               <p className="text-sm text-red-600">{errors.date.message}</p>
             )}
@@ -163,11 +163,12 @@ export function EventForm({ event, onSuccess }: EventFormProps) {
                 {...register('startTime')}
                 className={errors.startTime ? 'border-red-500' : ''}
               />
+              <p className="text-xs text-muted-foreground">Optional</p>
               {errors.startTime && (
                 <p className="text-sm text-red-600">{errors.startTime.message}</p>
               )}
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="endTime">End Time</Label>
               <Input
@@ -176,6 +177,7 @@ export function EventForm({ event, onSuccess }: EventFormProps) {
                 {...register('endTime')}
                 className={errors.endTime ? 'border-red-500' : ''}
               />
+              <p className="text-xs text-muted-foreground">Optional</p>
               {errors.endTime && (
                 <p className="text-sm text-red-600">{errors.endTime.message}</p>
               )}

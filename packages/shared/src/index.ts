@@ -44,6 +44,11 @@ export const API_V1_ENDPOINTS = {
   EVENTS: '/api/v1/events',
   EDUCATION_CONTENT: '/api/v1/education-contents',
 
+  // Masjid Admin Resources
+  PRAYER_TIME_OVERRIDES: '/api/v1/prayer-time-overrides',
+  ITIKAF_REGISTRATIONS: '/api/v1/itikaf-registrations',
+  APPEALS: '/api/v1/appeals',
+
   // AI Endpoints
   AI_HEALTH: '/api/v1/ai/health',
   AI_MODERATE: '/api/v1/ai/moderate',
@@ -144,6 +149,9 @@ export const CACHE_KEYS = {
   AI_SEARCH: 'ai-search',
   AI_RECOMMENDATIONS: 'ai-recommendations',
   AI_MODERATION: 'ai-moderation',
+  PRAYER_TIME_OVERRIDES: 'prayer-time-overrides',
+  ITIKAF_REGISTRATIONS: 'itikaf-registrations',
+  APPEALS: 'appeals',
 } as const;
 
 export const CACHE_TTL = {
@@ -160,6 +168,24 @@ export const CACHE_TTL = {
  * Format time in 12-hour format
  */
 export function formatTime(date: Date | string): string {
+  if (typeof date === 'string') {
+    // Handle plain time strings like "19:30" or "09:00"
+    const timeMatch = date.match(/^(\d{1,2}):(\d{2})$/);
+    if (timeMatch) {
+      const d = new Date();
+      d.setHours(parseInt(timeMatch[1], 10), parseInt(timeMatch[2], 10), 0);
+      return d.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+    }
+    // Handle 12-hour format strings like "6:45 AM" or "12:30 PM"
+    const time12Match = date.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    if (time12Match) {
+      return `${parseInt(time12Match[1], 10)}:${time12Match[2]} ${time12Match[3].toUpperCase()}`;
+    }
+  }
   const d = typeof date === 'string' ? new Date(date) : date;
   return d.toLocaleTimeString('en-US', {
     hour: 'numeric',

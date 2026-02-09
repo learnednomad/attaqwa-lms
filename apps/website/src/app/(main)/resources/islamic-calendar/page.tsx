@@ -1,9 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Calendar, Moon, Star, Info, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, Moon, Star, Info, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { fetchIslamicCalendar } from '@/lib/services/islamic-api';
 
 interface IslamicDate {
@@ -62,7 +60,6 @@ export default function IslamicCalendarPage() {
   const [selectedMonth, setSelectedMonth] = useState<number>(0);
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
 
-  // Initialize currentDate on client side only to avoid hydration mismatch
   useEffect(() => {
     setCurrentDate(new Date());
   }, []);
@@ -90,32 +87,29 @@ export default function IslamicCalendarPage() {
   };
 
   const calculateUpcomingEvents = (islamicData: IslamicDate) => {
-    // Filter and sort upcoming events based on current Islamic date
     const currentMonth = islamicData.month.number;
     const currentDay = parseInt(islamicData.day);
-    
+
     const upcoming = islamicEvents
       .map(event => {
         const [day, month] = event.date.split(' ');
         const monthNum = islamicMonths.find(m => m.name === month)?.number || 0;
         const dayNum = parseInt(day);
-        
-        // Calculate days until event
+
         let daysUntil = 0;
         if (monthNum > currentMonth) {
           daysUntil = (monthNum - currentMonth) * 30 + (dayNum - currentDay);
         } else if (monthNum === currentMonth && dayNum > currentDay) {
           daysUntil = dayNum - currentDay;
         } else {
-          // Event is next year
           daysUntil = (12 - currentMonth + monthNum) * 30 + dayNum;
         }
-        
+
         return { ...event, daysUntil, monthNum, dayNum };
       })
       .sort((a, b) => a.daysUntil - b.daysUntil)
       .slice(0, 5);
-    
+
     setUpcomingEvents(upcoming);
   };
 
@@ -129,248 +123,266 @@ export default function IslamicCalendarPage() {
   const getEventTypeColor = (type: string) => {
     switch (type) {
       case 'celebration':
-        return 'bg-islamic-gold-100 text-islamic-gold-700 border-islamic-gold-200';
+        return 'bg-amber-50 text-amber-700 border border-amber-200';
       case 'important':
-        return 'bg-islamic-green-100 text-islamic-green-700 border-islamic-green-200';
+        return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
       case 'special':
-        return 'bg-islamic-navy-100 text-islamic-navy-700 border-islamic-navy-200';
+        return 'bg-indigo-50 text-indigo-700 border border-indigo-200';
       default:
-        return 'bg-gray-100 text-gray-700 border-gray-200';
+        return 'bg-neutral-50 text-neutral-700 border border-neutral-200';
+    }
+  };
+
+  const getEventIcon = (type: string) => {
+    switch (type) {
+      case 'celebration':
+        return <Sparkles className="w-4 h-4 text-amber-600" />;
+      case 'important':
+        return <Star className="w-4 h-4 text-emerald-600" />;
+      case 'special':
+        return <Moon className="w-4 h-4 text-indigo-600" />;
+      default:
+        return <Calendar className="w-4 h-4 text-neutral-600" />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-islamic-green-50 via-white to-islamic-gold-50/30">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl lg:text-5xl font-bold text-islamic-navy-800 mb-4">
-            📅 Islamic Calendar
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <section className="border-b border-neutral-100">
+        <div className="max-w-5xl mx-auto px-6 py-16 text-center">
+          <p className="text-xs font-semibold tracking-[0.2em] uppercase text-emerald-700 mb-3">
+            Resources
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-neutral-900 mb-4">
+            Islamic Calendar
           </h1>
-          <p className="text-xl text-islamic-navy-600 max-w-3xl mx-auto">
+          <p className="text-base text-neutral-500 max-w-2xl mx-auto leading-relaxed">
             Hijri calendar with important Islamic dates, events, and observances
           </p>
         </div>
+      </section>
 
+      <div className="max-w-5xl mx-auto px-6">
         {loading ? (
-          <Card className="mb-12">
-            <CardContent className="py-12">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-islamic-green-600 mx-auto"></div>
-                <p className="mt-4 text-islamic-navy-600">Loading Islamic calendar...</p>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="py-20 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto" />
+            <p className="mt-4 text-sm text-neutral-500">Loading Islamic calendar...</p>
+          </div>
         ) : (
           <>
-            {/* Today's Date Display */}
-            <Card className="mb-12 bg-gradient-to-r from-islamic-navy-500 to-islamic-navy-600 text-white border-0">
-              <CardHeader>
-                <CardTitle className="text-2xl text-white flex items-center justify-between">
-                  <span className="flex items-center gap-2">
-                    <Calendar className="w-6 h-6" />
-                    Today's Date
-                  </span>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => navigateMonth(-1)}
-                      className="p-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => setCurrentDate(new Date())}
-                      className="px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors text-sm"
-                    >
-                      Today
-                    </button>
-                    <button
-                      onClick={() => navigateMonth(1)}
-                      className="p-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {islamicDate && currentDate && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* Islamic Date */}
-                    <div className="text-center md:text-left">
-                      <p className="text-white/80 mb-2">Hijri Date</p>
-                      <p className="text-4xl font-bold mb-2">
-                        {islamicDate.day} {islamicDate.month.en}
-                      </p>
-                      <p className="text-2xl font-arabic mb-2" dir="rtl">
-                        {islamicDate.day} {islamicDate.month.ar}
-                      </p>
-                      <p className="text-xl">
-                        Year {islamicDate.year} AH
-                      </p>
-                    </div>
+            {/* Today's Date + Navigation */}
+            <section className="py-10">
+              {/* Navigation */}
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3 mb-0">
+                  <h2 className="text-xl font-semibold text-neutral-900">Today&apos;s Date</h2>
+                  <div className="flex-1 h-px bg-neutral-100" />
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => navigateMonth(-1)}
+                    className="rounded-lg border border-neutral-200 bg-white p-2 text-neutral-700 hover:bg-neutral-50 transition-colors"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setCurrentDate(new Date())}
+                    className="rounded-lg border border-neutral-200 bg-white px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors"
+                  >
+                    Today
+                  </button>
+                  <button
+                    onClick={() => navigateMonth(1)}
+                    className="rounded-lg border border-neutral-200 bg-white p-2 text-neutral-700 hover:bg-neutral-50 transition-colors"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
 
-                    {/* Gregorian Date */}
-                    <div className="text-center md:text-right">
-                      <p className="text-white/80 mb-2">Gregorian Date</p>
-                      <p className="text-4xl font-bold mb-2">
-                        {currentDate.getDate()} {currentDate.toLocaleDateString('en-US', { month: 'long' })}
-                      </p>
-                      <p className="text-xl">
-                        {currentDate.getFullYear()} CE
-                      </p>
-                      <p className="text-white/80 mt-2">
-                        {currentDate.toLocaleDateString('en-US', { weekday: 'long' })}
-                      </p>
+              {/* Date Cards */}
+              {islamicDate && currentDate && (
+                <div className="grid md:grid-cols-2 gap-5">
+                  {/* Hijri Date */}
+                  <div className="rounded-xl border border-neutral-200 bg-white p-6 sm:p-8">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center">
+                        <Moon className="h-5 w-5 text-emerald-600" />
+                      </div>
+                      <p className="text-sm font-medium text-neutral-500">Hijri Date</p>
                     </div>
-                  </div>
-                )}
-
-                {/* Special Day Notification */}
-                {islamicDate?.holidays && islamicDate.holidays.length > 0 && (
-                  <div className="mt-6 p-4 bg-white/20 rounded-lg">
-                    <p className="text-white font-semibold flex items-center gap-2">
-                      <Star className="w-5 h-5" />
-                      Today is: {islamicDate.holidays.join(', ')}
+                    <p className="text-3xl font-bold text-neutral-900 mb-1">
+                      {islamicDate.day} {islamicDate.month.en}
+                    </p>
+                    <p className="text-xl font-arabic text-neutral-500 mb-2" dir="rtl">
+                      {islamicDate.day} {islamicDate.month.ar}
+                    </p>
+                    <p className="text-sm text-neutral-500">
+                      Year {islamicDate.year} AH
                     </p>
                   </div>
-                )}
-              </CardContent>
-            </Card>
+
+                  {/* Gregorian Date */}
+                  <div className="rounded-xl border border-neutral-200 bg-white p-6 sm:p-8">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center">
+                        <Calendar className="h-5 w-5 text-emerald-600" />
+                      </div>
+                      <p className="text-sm font-medium text-neutral-500">Gregorian Date</p>
+                    </div>
+                    <p className="text-3xl font-bold text-neutral-900 mb-1">
+                      {currentDate.getDate()} {currentDate.toLocaleDateString('en-US', { month: 'long' })}
+                    </p>
+                    <p className="text-sm text-neutral-500 mb-2">
+                      {currentDate.getFullYear()} CE
+                    </p>
+                    <p className="text-sm text-neutral-500">
+                      {currentDate.toLocaleDateString('en-US', { weekday: 'long' })}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Special Day Notification */}
+              {islamicDate?.holidays && islamicDate.holidays.length > 0 && (
+                <div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50/40 p-4 flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+                    <Star className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <p className="text-sm font-medium text-neutral-900">
+                    Today is: {islamicDate.holidays.join(', ')}
+                  </p>
+                </div>
+              )}
+            </section>
 
             {/* Islamic Months */}
-            <Card className="mb-12">
-              <CardHeader>
-                <CardTitle className="text-2xl">Islamic Months</CardTitle>
-                <CardDescription>The twelve months of the Hijri calendar</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {islamicMonths.map((month) => (
-                    <div
-                      key={month.number}
-                      className={`border rounded-lg p-4 transition-all ${
-                        selectedMonth === month.number
-                          ? 'border-islamic-green-500 bg-islamic-green-50'
-                          : 'border-gray-200 hover:border-islamic-green-300'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h3 className="font-semibold text-islamic-navy-800">
-                            {month.number}. {month.name}
-                          </h3>
-                          <p className="text-lg font-arabic text-islamic-navy-600" dir="rtl">
-                            {month.arabic}
-                          </p>
-                        </div>
-                        <Badge variant="outline" className="text-xs">
-                          {month.days} days
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-islamic-navy-600">
-                        {month.significance}
-                      </p>
-                      {month.number === 1 || month.number === 7 || month.number === 11 || month.number === 12 ? (
-                        <Badge className="mt-2 bg-islamic-gold-100 text-islamic-gold-700 border-islamic-gold-200">
-                          Sacred Month
-                        </Badge>
-                      ) : null}
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <section className="pb-16">
+              <div className="flex items-center gap-3 mb-8">
+                <h2 className="text-xl font-semibold text-neutral-900">Islamic Months</h2>
+                <div className="flex-1 h-px bg-neutral-100" />
+              </div>
+              <p className="text-sm text-neutral-500 mb-6">The twelve months of the Hijri calendar</p>
 
-            {/* Upcoming Events */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl">Upcoming Islamic Events</CardTitle>
-                </CardHeader>
-                <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {islamicMonths.map((month) => (
+                  <div
+                    key={month.number}
+                    className={`rounded-xl border p-5 transition-colors ${
+                      selectedMonth === month.number
+                        ? 'border-emerald-200 bg-emerald-50/40'
+                        : 'border-neutral-200 bg-white hover:border-neutral-300'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h3 className="text-sm font-semibold text-neutral-900">
+                          {month.number}. {month.name}
+                        </h3>
+                        <p className="text-base font-arabic text-neutral-500 mt-0.5" dir="rtl">
+                          {month.arabic}
+                        </p>
+                      </div>
+                      <span className="text-xs font-medium text-neutral-500 border border-neutral-200 rounded-md px-2 py-0.5">
+                        {month.days} days
+                      </span>
+                    </div>
+                    <p className="text-sm text-neutral-500 mt-2">
+                      {month.significance}
+                    </p>
+                    {(month.number === 1 || month.number === 7 || month.number === 11 || month.number === 12) && (
+                      <span className="inline-block mt-3 text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 rounded-md px-2 py-0.5">
+                        Sacred Month
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Upcoming Events & Moon Phases */}
+            <section className="pb-16">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Upcoming Events */}
+                <div>
+                  <div className="flex items-center gap-3 mb-6">
+                    <h2 className="text-xl font-semibold text-neutral-900">Upcoming Events</h2>
+                    <div className="flex-1 h-px bg-neutral-100" />
+                  </div>
                   <div className="space-y-3">
                     {upcomingEvents.map((event, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div key={index} className="rounded-xl border border-neutral-200 bg-white p-4 flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-islamic-green-100 rounded-lg flex items-center justify-center">
-                            {event.type === 'celebration' ? '🎉' : event.type === 'important' ? '⭐' : '🌙'}
+                          <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+                            {getEventIcon(event.type)}
                           </div>
                           <div>
-                            <p className="font-semibold text-islamic-navy-800">{event.name}</p>
-                            <p className="text-sm text-islamic-navy-600">{event.arabic}</p>
+                            <p className="text-sm font-semibold text-neutral-900">{event.name}</p>
+                            <p className="text-xs text-neutral-500">{event.arabic}</p>
                           </div>
                         </div>
-                        <Badge className={getEventTypeColor(event.type)}>
+                        <span className={`text-xs font-medium rounded-md px-2 py-0.5 ${getEventTypeColor(event.type)}`}>
                           {event.daysUntil === 0 ? 'Today' : `${event.daysUntil} days`}
-                        </Badge>
+                        </span>
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl">Moon Phases</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-center">
-                      <div className="w-32 h-32 bg-islamic-navy-100 rounded-full flex items-center justify-center">
-                        <Moon className="w-20 h-20 text-islamic-navy-600" />
+                {/* Moon Phases */}
+                <div>
+                  <div className="flex items-center gap-3 mb-6">
+                    <h2 className="text-xl font-semibold text-neutral-900">Moon Phases</h2>
+                    <div className="flex-1 h-px bg-neutral-100" />
+                  </div>
+                  <div className="rounded-xl border border-neutral-200 bg-white p-6">
+                    <div className="flex items-center justify-center mb-5">
+                      <div className="w-28 h-28 bg-neutral-100 rounded-full flex items-center justify-center">
+                        <Moon className="w-16 h-16 text-neutral-400" />
                       </div>
                     </div>
-                    <p className="text-center text-islamic-navy-600">
+                    <p className="text-center text-sm text-neutral-500 leading-relaxed mb-5">
                       The Islamic calendar follows lunar cycles. Each month begins with the sighting of the new crescent moon.
                     </p>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div className="p-2 bg-islamic-navy-50 rounded text-center">
-                        <p className="font-semibold">New Moon</p>
-                        <p className="text-islamic-navy-600">Month begins</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="rounded-lg bg-neutral-50 p-3 text-center">
+                        <p className="text-sm font-medium text-neutral-900">New Moon</p>
+                        <p className="text-xs text-neutral-500 mt-0.5">Month begins</p>
                       </div>
-                      <div className="p-2 bg-islamic-navy-50 rounded text-center">
-                        <p className="font-semibold">Full Moon</p>
-                        <p className="text-islamic-navy-600">Mid-month</p>
+                      <div className="rounded-lg bg-neutral-50 p-3 text-center">
+                        <p className="text-sm font-medium text-neutral-900">Full Moon</p>
+                        <p className="text-xs text-neutral-500 mt-0.5">Mid-month</p>
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+              </div>
+            </section>
 
-            {/* Important Notes */}
-            <Card className="bg-islamic-gold-50 border-islamic-gold-200">
-              <CardHeader>
-                <CardTitle className="text-xl">About the Islamic Calendar</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <Info className="w-5 h-5 text-islamic-gold-600 mt-0.5" />
-                  <p className="text-sm text-islamic-navy-600">
-                    The Islamic (Hijri) calendar is a lunar calendar consisting of 12 months and 354 or 355 days
-                  </p>
+            {/* About the Islamic Calendar */}
+            <section className="pb-20">
+              <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-6 sm:p-8">
+                <h2 className="text-base font-semibold text-neutral-900 mb-5">About the Islamic Calendar</h2>
+                <div className="space-y-3">
+                  {[
+                    'The Islamic (Hijri) calendar is a lunar calendar consisting of 12 months and 354 or 355 days',
+                    'It began with the Hijra (migration) of Prophet Muhammad ﷺ from Makkah to Madinah in 622 CE',
+                    'Four months are considered sacred: Muharram, Rajab, Dhu al-Qidah, and Dhu al-Hijjah',
+                    'Dates may vary by 1-2 days depending on moon sighting and geographical location',
+                  ].map((text, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
+                        <Info className="w-4 h-4 text-emerald-600" />
+                      </div>
+                      <p className="text-sm text-neutral-500 leading-relaxed pt-2">
+                        {text}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-start gap-3">
-                  <Info className="w-5 h-5 text-islamic-gold-600 mt-0.5" />
-                  <p className="text-sm text-islamic-navy-600">
-                    It began with the Hijra (migration) of Prophet Muhammad ﷺ from Makkah to Madinah in 622 CE
-                  </p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Info className="w-5 h-5 text-islamic-gold-600 mt-0.5" />
-                  <p className="text-sm text-islamic-navy-600">
-                    Four months are considered sacred: Muharram, Rajab, Dhu al-Qidah, and Dhu al-Hijjah
-                  </p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Info className="w-5 h-5 text-islamic-gold-600 mt-0.5" />
-                  <p className="text-sm text-islamic-navy-600">
-                    Dates may vary by 1-2 days depending on moon sighting and geographical location
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </section>
           </>
         )}
       </div>

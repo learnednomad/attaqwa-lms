@@ -726,6 +726,12 @@ export default async ({ strapi }: { strapi: any }) => {
         { controller: 'streak', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
         { controller: 'leaderboard', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
         { controller: 'moderation-queue', actions: isDev ? ['find', 'findOne', 'create'] : [] },
+        // Masjid admin portal content types
+        { controller: 'announcement', actions: ['find', 'findOne'] },
+        { controller: 'event', actions: ['find', 'findOne'] },
+        { controller: 'prayer-time-override', actions: isDev ? ['find', 'findOne', 'create'] : [] },
+        { controller: 'itikaf-registration', actions: ['find', 'findOne', 'create'] },
+        { controller: 'appeal', actions: ['find', 'findOne'] },
       ];
 
       for (const { controller, actions } of permissionsToEnable) {

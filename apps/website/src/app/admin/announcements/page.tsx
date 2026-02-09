@@ -5,20 +5,27 @@ import { useAnnouncements, useDeleteAnnouncement } from '@/lib/hooks/useAnnounce
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Calendar, FileText, Eye } from 'lucide-react';
+import { Plus, Edit, Trash2, FileText, Eye, Pin } from 'lucide-react';
 import Link from 'next/link';
 import { formatDate, truncateText } from '@attaqwa/shared';
-import type { Announcement } from '@/types';
+import type { Announcement, AnnouncementCategory } from '@/types';
+
+const categoryColors: Record<AnnouncementCategory, string> = {
+  general: 'bg-gray-100 text-gray-800',
+  ramadan: 'bg-purple-100 text-purple-800',
+  eid: 'bg-green-100 text-green-800',
+  urgent: 'bg-red-100 text-red-800',
+  community: 'bg-blue-100 text-blue-800',
+  fundraising: 'bg-yellow-100 text-yellow-800',
+};
 
 export default function AnnouncementsPage() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [filter, setFilter] = useState<'all' | 'announcements' | 'events'>('all');
-  
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+
   const { data, isLoading, error } = useAnnouncements({
     page: currentPage,
     limit: 10,
-    ...(filter === 'announcements' && { isEvent: false }),
-    ...(filter === 'events' && { isEvent: true }),
   });
 
   const deleteMutation = useDeleteAnnouncement();
@@ -63,7 +70,10 @@ export default function AnnouncementsPage() {
     );
   }
 
-  const announcements: Announcement[] = data?.data || [];
+  const allAnnouncements: Announcement[] = data?.data || [];
+  const announcements = categoryFilter === 'all'
+    ? allAnnouncements
+    : allAnnouncements.filter(a => a.category === categoryFilter);
   const pagination = data?.pagination;
 
   return (
@@ -79,31 +89,25 @@ export default function AnnouncementsPage() {
         </Button>
       </div>
 
-      {/* Filters */}
-      <div className="flex space-x-2">
+      {/* Category Filters */}
+      <div className="flex flex-wrap gap-2">
         <Button
-          variant={filter === 'all' ? 'default' : 'outline'}
+          variant={categoryFilter === 'all' ? 'default' : 'outline'}
           size="sm"
-          onClick={() => setFilter('all')}
+          onClick={() => setCategoryFilter('all')}
         >
           All
         </Button>
-        <Button
-          variant={filter === 'announcements' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setFilter('announcements')}
-        >
-          <FileText className="w-4 h-4 mr-1" />
-          Announcements
-        </Button>
-        <Button
-          variant={filter === 'events' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setFilter('events')}
-        >
-          <Calendar className="w-4 h-4 mr-1" />
-          Events
-        </Button>
+        {(['general', 'ramadan', 'eid', 'urgent', 'community', 'fundraising'] as AnnouncementCategory[]).map((cat) => (
+          <Button
+            key={cat}
+            variant={categoryFilter === cat ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setCategoryFilter(cat)}
+          >
+            <span className="capitalize">{cat}</span>
+          </Button>
+        ))}
       </div>
 
       {/* Announcements List */}
@@ -132,10 +136,15 @@ export default function AnnouncementsPage() {
                     <div className="flex items-center space-x-3">
                       <h3 className="font-semibold text-gray-900">{announcement.title}</h3>
                       <div className="flex items-center space-x-2">
-                        {announcement.isEvent && (
-                          <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                            <Calendar className="w-3 h-3 mr-1" />
-                            Event
+                        {announcement.category && (
+                          <Badge className={categoryColors[announcement.category]}>
+                            <span className="capitalize">{announcement.category}</span>
+                          </Badge>
+                        )}
+                        {announcement.isPinned && (
+                          <Badge variant="secondary" className="bg-amber-100 text-amber-800">
+                            <Pin className="w-3 h-3 mr-1" />
+                            Pinned
                           </Badge>
                         )}
                         <Badge
@@ -150,16 +159,13 @@ export default function AnnouncementsPage() {
                         </Badge>
                       </div>
                     </div>
-                    
+
                     <p className="text-gray-600 text-sm">
-                      {truncateText(announcement.content, 150)}
+                      {truncateText(announcement.content.replace(/<[^>]*>/g, ''), 150)}
                     </p>
-                    
+
                     <div className="flex items-center space-x-4 text-xs text-gray-500">
                       <span>Created: {formatDate(new Date(announcement.createdAt))}</span>
-                      {announcement.eventDate && (
-                        <span>Event: {formatDate(new Date(announcement.eventDate))}</span>
-                      )}
                       {announcement.imageUrl && (
                         <span className="flex items-center">
                           <Eye className="w-3 h-3 mr-1" />
@@ -174,7 +180,7 @@ export default function AnnouncementsPage() {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2 ml-4">
                     <Button size="sm" variant="outline" asChild>
                       <Link href={`/admin/announcements/${announcement.id}/edit`}>
@@ -209,11 +215,11 @@ export default function AnnouncementsPage() {
           >
             Previous
           </Button>
-          
+
           <span className="text-sm text-gray-600 px-3">
             Page {currentPage} of {pagination.totalPages}
           </span>
-          
+
           <Button
             variant="outline"
             size="sm"

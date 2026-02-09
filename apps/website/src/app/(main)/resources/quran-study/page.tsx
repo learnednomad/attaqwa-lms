@@ -1,6 +1,6 @@
-import { BookOpen, ChevronRight, Layers, Scroll, Volume2 } from 'lucide-react';
-import { fetchDailyAyah, popularSurahs, baqarahGroups } from '@/lib/services/quran-api';
-import { AudioButton } from '@/components/features/quran/audio-button';
+import { BookOpen, ChevronRight, Layers, Volume2 } from 'lucide-react';
+import { fetchMushafPage, popularSurahs, baqarahGroups } from '@/lib/services/quran-api';
+import { MushafPageViewer } from '@/components/features/quran/mushaf-page-viewer';
 
 export const metadata = {
   title: 'Quran Study & Tafsir | Masjid At-Taqwa',
@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 export default async function QuranStudyPage() {
-  const dailyAyah = await fetchDailyAyah();
+  const mushafPage = await fetchMushafPage();
 
   return (
     <div className="min-h-screen bg-white">
@@ -23,61 +23,21 @@ export default async function QuranStudyPage() {
             Quran Study & Tafsir
           </h1>
           <p className="text-base text-neutral-500 max-w-2xl mx-auto leading-relaxed">
-            Daily Ayah with translation and contextual study of the Holy Quran.
-            Study Surahs with verses grouped by themes and context.
+            Read the Holy Quran from the Mushaf Al-Madinah (Hafs an Asim).
+            Navigate full pages with Uthmani script.
           </p>
         </div>
       </section>
 
       <div className="max-w-5xl mx-auto px-6">
-        {/* Ayah of the Day */}
-        {dailyAyah && (
+        {/* Mushaf Page */}
+        {mushafPage && (
           <section className="py-10">
             <div className="flex items-center gap-3 mb-6">
-              <h2 className="text-xl font-semibold text-neutral-900">Ayah of the Day</h2>
+              <h2 className="text-xl font-semibold text-neutral-900">Mushaf Al-Madinah</h2>
               <div className="flex-1 h-px bg-neutral-100" />
             </div>
-            <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden">
-              <div className="border-l-4 border-emerald-500 p-6 sm:p-8">
-                {/* Reference info */}
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center">
-                      <Scroll className="h-3.5 w-3.5 text-emerald-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-neutral-900">
-                        Surah {dailyAyah.surahEnglishName} ({dailyAyah.surahName})
-                      </p>
-                      <p className="text-xs text-neutral-400">
-                        {dailyAyah.surahNumber}:{dailyAyah.numberInSurah} &middot; Juz {dailyAyah.juz} &middot; {dailyAyah.revelationType}
-                      </p>
-                    </div>
-                  </div>
-                  <AudioButton src={dailyAyah.audio} />
-                </div>
-
-                {/* Arabic text */}
-                <div className="bg-neutral-50/50 rounded-lg p-6 mb-6">
-                  <p
-                    className="text-2xl sm:text-3xl leading-[2] font-arabic text-neutral-900 text-right"
-                    dir="rtl"
-                  >
-                    {dailyAyah.text}
-                  </p>
-                </div>
-
-                {/* Translation */}
-                <div className="border-t border-neutral-100 pt-5">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-2">
-                    Translation
-                  </p>
-                  <p className="text-sm text-neutral-700 leading-relaxed">
-                    {dailyAyah.translation}
-                  </p>
-                </div>
-              </div>
-            </div>
+            <MushafPageViewer initialPage={mushafPage} />
           </section>
         )}
 

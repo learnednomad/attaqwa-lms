@@ -1,106 +1,8 @@
+'use client';
+
 import { EventCard } from '@/components/features/events/event-card';
 import { Calendar, Clock, MapPin, Users, BookOpen, Heart } from 'lucide-react';
-import { Event } from '@/types';
-import { generateSEOMetadata } from '@/lib/seo';
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = generateSEOMetadata({
-  title: "Islamic Events & Activities - Masjid At-Taqwa",
-  description: "Join our Islamic community events including Eid prayers, Ramadan programs, educational workshops, family gatherings, and special religious observances. View upcoming events and register to participate.",
-  keywords: [
-    "islamic events",
-    "eid prayers",
-    "ramadan activities",
-    "islamic workshops",
-    "community events",
-    "mosque programs",
-    "islamic education",
-    "family events",
-    "religious ceremonies",
-    "jummah programs"
-  ],
-  canonical: "/events",
-  type: "website"
-});
-
-// Mock events data - replace with actual API calls
-const mockEvents: Event[] = [
-  {
-    id: '1',
-    title: 'Eid ul-Fitr 2025 Celebration',
-    description: 'Celebrate the end of Ramadan with our community. Multiple prayer times available with outdoor arrangements for families.',
-    date: new Date('2025-03-30'),
-    startTime: '8:00 AM',
-    endTime: '11:00 AM',
-    location: 'Masjid At-Taqwa Main Hall & Outdoor Area',
-    isIndoor: true,
-    isOutdoor: true,
-    prayerTimes: [
-      { name: '1st Eid Prayer', time: '8:00 AM', location: 'Main Hall' },
-      { name: '2nd Eid Prayer', time: '9:30 AM', location: 'Outdoor Area' },
-    ],
-    zakatInfo: {
-      amount: 10,
-      currency: 'USD',
-      description: 'per person (Zakat ul-Fitr)',
-    },
-    isActive: true,
-    createdAt: new Date('2025-03-01'),
-    updatedAt: new Date('2025-03-15'),
-  },
-  {
-    id: '2',
-    title: 'Ramadan Taraweh Prayers',
-    description: 'Join us for daily Taraweh prayers throughout the blessed month of Ramadan. Special recitations and community atmosphere.',
-    date: new Date('2025-02-28'),
-    startTime: '9:00 PM',
-    endTime: '10:30 PM',
-    location: 'Main Prayer Hall',
-    isIndoor: true,
-    isOutdoor: false,
-    isActive: true,
-    createdAt: new Date('2025-02-20'),
-    updatedAt: new Date('2025-02-25'),
-  },
-  {
-    id: '3',
-    title: 'Islamic Studies Workshop Series',
-    description: 'Monthly educational workshop covering Quran, Hadith, Fiqh, and Islamic history. Suitable for all ages and knowledge levels.',
-    date: new Date('2025-08-15'),
-    startTime: '2:00 PM',
-    endTime: '4:00 PM',
-    location: 'Education Center',
-    isIndoor: true,
-    isOutdoor: false,
-    isActive: true,
-    createdAt: new Date('2025-08-01'),
-    updatedAt: new Date('2025-08-10'),
-  },
-  {
-    id: '4',
-    title: 'Community Iftar Gathering',
-    description: 'Break your fast with the community during Ramadan. Free communal Iftar with traditional foods and fellowship.',
-    date: new Date('2025-03-15'),
-    startTime: '7:30 PM',
-    endTime: '9:00 PM',
-    location: 'Community Hall',
-    isIndoor: true,
-    isOutdoor: false,
-    isActive: true,
-    createdAt: new Date('2025-03-01'),
-    updatedAt: new Date('2025-03-10'),
-  },
-];
-
-const upcomingEvents = mockEvents.filter(event => event.date >= new Date()).sort((a, b) => a.date.getTime() - b.date.getTime());
-const pastEvents = mockEvents.filter(event => event.date < new Date()).sort((a, b) => b.date.getTime() - a.date.getTime());
-
-const stats = [
-  { label: 'Upcoming Events', value: String(upcomingEvents.length), icon: Calendar },
-  { label: 'Regular Programs', value: 'Weekly', icon: Clock },
-  { label: 'Community Members', value: '200+', icon: Users },
-  { label: 'Event Venues', value: '5', icon: MapPin },
-];
+import { useEvents } from '@/lib/hooks/useEvents';
 
 const categories = [
   {
@@ -121,6 +23,23 @@ const categories = [
 ];
 
 export default function EventsPage() {
+  const { data, isLoading } = useEvents({ limit: 50 });
+
+  const events = data?.data || [];
+  const upcomingEvents = events
+    .filter(event => new Date(event.date) >= new Date())
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const pastEvents = events
+    .filter(event => new Date(event.date) < new Date())
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  const stats = [
+    { label: 'Upcoming Events', value: String(upcomingEvents.length), icon: Calendar },
+    { label: 'Regular Programs', value: 'Weekly', icon: Clock },
+    { label: 'Community Members', value: '200+', icon: Users },
+    { label: 'Event Venues', value: '5', icon: MapPin },
+  ];
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -173,7 +92,11 @@ export default function EventsPage() {
             <div className="flex-1 h-px bg-neutral-100" />
           </div>
 
-          {upcomingEvents.length > 0 ? (
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+            </div>
+          ) : upcomingEvents.length > 0 ? (
             <div className="space-y-4">
               {upcomingEvents.map((event) => (
                 <EventCard key={event.id} event={event} />

@@ -326,8 +326,8 @@ export function generateEventStructuredData(event: any) {
     '@type': 'Event',
     name: event.title,
     description: event.description,
-    startDate: `${event.date.toISOString().split('T')[0]}T${convertTo24Hour(event.startTime)}:00`,
-    endDate: `${event.date.toISOString().split('T')[0]}T${convertTo24Hour(event.endTime)}:00`,
+    startDate: `${typeof event.date === 'string' ? event.date : new Date(event.date).toISOString().split('T')[0]}T${convertTo24Hour(event.startTime)}:00`,
+    endDate: `${typeof event.date === 'string' ? event.date : new Date(event.date).toISOString().split('T')[0]}T${convertTo24Hour(event.endTime)}:00`,
     location: {
       '@type': 'Place',
       name: event.location || MOSQUE_LOCATION.name,

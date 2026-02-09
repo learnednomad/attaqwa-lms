@@ -3,24 +3,31 @@
 import { useAnnouncements } from '@/lib/hooks/useAnnouncements';
 import { useEvents } from '@/lib/hooks/useEvents';
 import { useTodayPrayerTimes } from '@/lib/hooks/usePrayerTimes';
+import { useAppeals } from '@/lib/hooks/useAppeals';
+import { useItikafRegistrations } from '@/lib/hooks/useItikafRegistrations';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { 
-  Megaphone, 
-  Calendar, 
-  Clock, 
+import {
+  Megaphone,
+  Calendar,
+  Clock,
   Users,
-  TrendingUp,
+  Heart,
+  Moon,
   Activity
 } from 'lucide-react';
 import Link from 'next/link';
 import { formatTime } from '@attaqwa/shared';
-import type { Announcement, Event } from '@/types';
 
 export default function AdminDashboard() {
   const { data: announcements } = useAnnouncements({ limit: 5, isActive: true });
   const { data: upcomingEvents } = useEvents({ upcoming: true, limit: 5 });
-  const { data: prayerTimes } = useTodayPrayerTimes(42.3601, -71.0589); // Boston coordinates
+  const { data: prayerTimes } = useTodayPrayerTimes(42.3601, -71.0589);
+  const { data: appeals } = useAppeals({ isActive: true, limit: 10 });
+  const { data: itikafRegistrations } = useItikafRegistrations({ limit: 10 });
+
+  const activeAppealsCount = appeals?.data?.length || 0;
+  const pendingItikafCount = itikafRegistrations?.data?.filter(r => r.status === 'pending').length || 0;
 
   const stats = [
     {
@@ -38,18 +45,18 @@ export default function AdminDashboard() {
       bgColor: 'bg-green-100',
     },
     {
-      title: 'Active Users',
-      value: '42', // Mock data
-      icon: Users,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-100',
+      title: 'Active Appeals',
+      value: activeAppealsCount,
+      icon: Heart,
+      color: 'text-red-600',
+      bgColor: 'bg-red-100',
     },
     {
-      title: 'Monthly Growth',
-      value: '+12%',
-      icon: TrendingUp,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-100',
+      title: "Pending I'tikaf",
+      value: pendingItikafCount,
+      icon: Moon,
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-100',
     },
   ];
 
@@ -59,7 +66,7 @@ export default function AdminDashboard() {
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-gray-600 mt-2">
-          Welcome to the admin dashboard. Here's an overview of your mosque's digital presence.
+          Welcome to the admin dashboard. Here&apos;s an overview of your mosque&apos;s digital presence.
         </p>
       </div>
 
@@ -88,14 +95,14 @@ export default function AdminDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Clock className="w-5 h-5" />
-              <span>Today's Prayer Times</span>
+              <span>Today&apos;s Prayer Times</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
             {prayerTimes ? (
               <div className="space-y-3">
                 {Object.entries(prayerTimes)
-                  .filter(([key]) => key !== 'date' && key !== 'qibla')
+                  .filter(([key, value]) => key !== 'date' && key !== 'qibla' && typeof value === 'string')
                   .map(([prayer, time]) => (
                     <div key={prayer} className="flex justify-between items-center">
                       <span className="capitalize font-medium text-gray-700">
@@ -110,7 +117,7 @@ export default function AdminDashboard() {
                   <div className="flex justify-between items-center">
                     <span className="font-medium text-gray-700">Qibla Direction</span>
                     <span className="font-mono text-islamic-green-600">
-                      {prayerTimes.qibla}°
+                      {prayerTimes.qibla}&deg;
                     </span>
                   </div>
                 </div>
@@ -177,7 +184,7 @@ export default function AdminDashboard() {
                     <p className="text-sm text-gray-600 mt-1">{event.description}</p>
                     <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
                       <span>{new Date(event.date).toLocaleDateString()}</span>
-                      {event.startTime && <span>{formatTime(event.startTime)}</span>}
+                      {event.startTime && <span>{event.startTime}</span>}
                       {event.location && <span>{event.location}</span>}
                     </div>
                   </div>
@@ -213,9 +220,15 @@ export default function AdminDashboard() {
               </Link>
             </Button>
             <Button asChild className="w-full justify-start" variant="outline">
-              <Link href="/admin/users">
-                <Users className="w-4 h-4 mr-2" />
-                Manage Users
+              <Link href="/admin/appeals/new">
+                <Heart className="w-4 h-4 mr-2" />
+                Create Appeal
+              </Link>
+            </Button>
+            <Button asChild className="w-full justify-start" variant="outline">
+              <Link href="/admin/itikaf">
+                <Moon className="w-4 h-4 mr-2" />
+                Manage I&apos;tikaf
               </Link>
             </Button>
           </CardContent>

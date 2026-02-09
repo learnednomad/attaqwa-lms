@@ -306,7 +306,7 @@ export default function QiblaDirectionPage() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <a href="/services/salah-prayer" className="flex items-center justify-between p-3 bg-white rounded-lg hover:shadow-md transition-shadow">
+                  <a href="/prayer-times" className="flex items-center justify-between p-3 bg-white rounded-lg hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-islamic-green-100 rounded-lg flex items-center justify-center">
                         🕌

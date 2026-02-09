@@ -1,113 +1,98 @@
 import { useQuery } from '@tanstack/react-query';
 import type { DailyPrayerTimes } from '@/types';
 
+const API_BASE = '/api/v1/prayer-times';
+
+// Default: Masjid At-Taqwa, Doraville, GA
+const DEFAULT_LAT = 33.9114;
+const DEFAULT_LNG = -84.2614;
+
 export function usePrayerTimes(latitude?: number, longitude?: number) {
+  const lat = latitude || DEFAULT_LAT;
+  const lng = longitude || DEFAULT_LNG;
+
   return useQuery<DailyPrayerTimes>({
-    queryKey: ['prayer-times', latitude, longitude],
+    queryKey: ['prayer-times', lat, lng],
     queryFn: async () => {
-      if (!latitude || !longitude) {
-        throw new Error('Latitude and longitude are required');
-      }
-
-      const response = await fetch(`/api/prayer-times?latitude=${latitude}&longitude=${longitude}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch prayer times');
-      }
-
+      const response = await fetch(
+        `${API_BASE}?latitude=${lat}&longitude=${lng}`
+      );
+      if (!response.ok) throw new Error('Failed to fetch prayer times');
       const result = await response.json();
       return result.prayerTimes;
     },
-    enabled: !!(latitude && longitude),
   });
 }
 
 // Hook for today's prayer times
 export function useTodayPrayerTimes(latitude?: number, longitude?: number) {
+  const lat = latitude || DEFAULT_LAT;
+  const lng = longitude || DEFAULT_LNG;
+
   return useQuery<DailyPrayerTimes>({
-    queryKey: ['prayer-times-today', latitude, longitude],
+    queryKey: ['prayer-times-today', lat, lng],
     queryFn: async () => {
-      if (!latitude || !longitude) {
-        throw new Error('Latitude and longitude are required');
-      }
-
       const today = new Date().toISOString().split('T')[0];
-      const response = await fetch(`/api/prayer-times?latitude=${latitude}&longitude=${longitude}&date=${today}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch today\'s prayer times');
-      }
-
+      const response = await fetch(
+        `${API_BASE}?latitude=${lat}&longitude=${lng}&date=${today}`
+      );
+      if (!response.ok) throw new Error("Failed to fetch today's prayer times");
       const result = await response.json();
       return result.prayerTimes;
     },
-    enabled: !!(latitude && longitude),
     refetchInterval: 1000 * 60 * 60, // Refetch every hour
   });
 }
 
-// Hook for week's prayer times
+interface WeekDayData {
+  date: string;
+  prayerTimes: {
+    fajr: string;
+    sunrise: string;
+    dhuhr: string;
+    asr: string;
+    maghrib: string;
+    isha: string;
+  };
+}
+
+// Hook for week's prayer times (single API call)
 export function useWeekPrayerTimes(latitude?: number, longitude?: number) {
-  return useQuery({
-    queryKey: ['prayer-times-week', latitude, longitude],
+  const lat = latitude || DEFAULT_LAT;
+  const lng = longitude || DEFAULT_LNG;
+
+  return useQuery<WeekDayData[]>({
+    queryKey: ['prayer-times-week', lat, lng],
     queryFn: async () => {
-      if (!latitude || !longitude) {
-        throw new Error('Latitude and longitude are required');
-      }
-
-      const today = new Date();
-      const weekData = [];
-
-      for (let i = 0; i < 7; i++) {
-        const date = new Date(today);
-        date.setDate(today.getDate() + i);
-        const dateStr = date.toISOString().split('T')[0];
-
-        const response = await fetch(`/api/prayer-times?latitude=${latitude}&longitude=${longitude}&date=${dateStr}`);
-        if (response.ok) {
-          const result = await response.json();
-          weekData.push({
-            date: dateStr,
-            prayerTimes: result.prayerTimes,
-          });
-        }
-      }
-
-      return weekData;
+      const today = new Date().toISOString().split('T')[0];
+      const response = await fetch(
+        `${API_BASE}?latitude=${lat}&longitude=${lng}&date=${today}&range=week`
+      );
+      if (!response.ok) throw new Error("Failed to fetch week's prayer times");
+      const result = await response.json();
+      return result.data;
     },
-    enabled: !!(latitude && longitude),
     refetchInterval: 1000 * 60 * 60 * 24, // Refetch daily
   });
 }
 
-// Hook for month's prayer times
+// Hook for month's prayer times (single API call via Aladhan calendar endpoint)
 export function useMonthPrayerTimes(latitude?: number, longitude?: number) {
-  return useQuery({
-    queryKey: ['prayer-times-month', latitude, longitude],
+  const lat = latitude || DEFAULT_LAT;
+  const lng = longitude || DEFAULT_LNG;
+
+  return useQuery<WeekDayData[]>({
+    queryKey: ['prayer-times-month', lat, lng],
     queryFn: async () => {
-      if (!latitude || !longitude) {
-        throw new Error('Latitude and longitude are required');
-      }
-
-      const today = new Date();
-      const monthData = [];
-      const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-
-      for (let i = 1; i <= daysInMonth; i++) {
-        const date = new Date(today.getFullYear(), today.getMonth(), i);
-        const dateStr = date.toISOString().split('T')[0];
-
-        const response = await fetch(`/api/prayer-times?latitude=${latitude}&longitude=${longitude}&date=${dateStr}`);
-        if (response.ok) {
-          const result = await response.json();
-          monthData.push({
-            date: dateStr,
-            prayerTimes: result.prayerTimes,
-          });
-        }
-      }
-      
-      return monthData;
+      const today = new Date().toISOString().split('T')[0];
+      const response = await fetch(
+        `${API_BASE}?latitude=${lat}&longitude=${lng}&date=${today}&range=month`
+      );
+      if (!response.ok)
+        throw new Error("Failed to fetch month's prayer times");
+      const result = await response.json();
+      return result.data;
     },
-    enabled: !!(latitude && longitude),
     refetchInterval: 1000 * 60 * 60 * 24, // Refetch daily
   });
 }

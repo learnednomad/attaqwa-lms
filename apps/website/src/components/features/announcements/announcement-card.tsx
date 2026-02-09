@@ -14,8 +14,9 @@ export function AnnouncementCard({
   className,
   compact = false,
 }: AnnouncementCardProps) {
-  const monthAbbrev = format(announcement.date, 'MMM').toUpperCase();
-  const dayNumber = format(announcement.date, 'd');
+  const dateObj = new Date(announcement.createdAt);
+  const monthAbbrev = format(dateObj, 'MMM').toUpperCase();
+  const dayNumber = format(dateObj, 'd');
 
   // Strip HTML tags for plain text preview
   const plainTextContent = announcement.content.replace(/<[^>]*>/g, '');
@@ -24,7 +25,7 @@ export function AnnouncementCard({
     <div
       className={cn(
         'flex rounded-xl border border-neutral-200 bg-white overflow-hidden',
-        announcement.isArchived && 'opacity-70',
+        !announcement.isActive && 'opacity-70',
         className
       )}
     >
@@ -43,13 +44,6 @@ export function AnnouncementCard({
         <h3 className="text-sm font-semibold text-neutral-900 leading-snug">
           {announcement.title}
         </h3>
-
-        {announcement.time && (
-          <div className="flex items-center gap-1.5 text-xs text-neutral-500 mt-1.5">
-            <Clock className="w-3 h-3 text-neutral-400" />
-            <span className="font-medium text-neutral-600">{announcement.time}</span>
-          </div>
-        )}
 
         <p
           className={cn(
