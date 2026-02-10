@@ -1,10 +1,8 @@
 /**
- * API Client
+ * API Client — Strapi Content APIs
  *
- * SECURITY IMPROVEMENTS:
- * - Removed localStorage token storage (XSS vulnerability)
- * - Authentication is handled via httpOnly cookies
- * - All requests include credentials for cookie-based auth
+ * Auth is handled by BetterAuth (see src/lib/auth.ts and src/lib/auth-client.ts).
+ * Strapi is used as a pure content API with a server-side API token.
  */
 
 import {
@@ -29,23 +27,16 @@ import type {
   Appeal,
 } from '@/types';
 
-// Auth types now consolidated in @attaqwa/shared-types
 export type { AuthUser, LoginInput, RegisterInput };
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
+const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN;
 
 export class ApiError extends Error {
   constructor(public statusCode: number, message: string) {
     super(message);
     this.name = 'ApiError';
   }
-}
-
-// In-memory JWT storage for client-side auth
-let _authToken: string | null = null;
-
-export function getAuthToken() {
-  return _authToken;
 }
 
 async function makeRequest<T>(
@@ -58,9 +49,9 @@ async function makeRequest<T>(
     'Content-Type': 'application/json',
   };
 
-  // Add JWT token if available
-  if (_authToken) {
-    defaultHeaders['Authorization'] = `Bearer ${_authToken}`;
+  // Use Strapi API token for server-to-server content requests
+  if (STRAPI_API_TOKEN) {
+    defaultHeaders['Authorization'] = `Bearer ${STRAPI_API_TOKEN}`;
   }
 
   const response = await fetch(url, {
@@ -137,103 +128,6 @@ function buildStrapiQuery(params?: {
   if (params.sort) searchParams.append('sort', params.sort);
   return searchParams.toString();
 }
-
-// Auth API (using v1 endpoints)
-export const authApi = {
-  login: async (credentials: LoginInput): Promise<{ user: AuthUser }> => {
-    // Strapi expects 'identifier' not 'email' for the login endpoint
-    const response = await makeRequest<{
-      jwt: string;
-      user: { id: number; username: string; email: string; role?: { type: string } };
-    }>(
-      API_V1_ENDPOINTS.LOGIN,
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          identifier: credentials.email,
-          password: credentials.password,
-        }),
-      }
-    );
-
-    // Store JWT for subsequent requests
-    _authToken = response.jwt;
-
-    // Map Strapi user to our AuthUser type
-    // After login, fetch /me to get role (login response doesn't include it)
-    const strapiMe = await makeRequest<{
-      id: number;
-      username: string;
-      email: string;
-      role?: { type: string };
-    }>(API_V1_ENDPOINTS.ME);
-
-    const roleType = strapiMe.role?.type;
-    const user: AuthUser = {
-      id: String(response.user.id),
-      email: response.user.email,
-      name: response.user.username,
-      role: roleType === 'admin' ? 'admin' : 'user',
-    };
-
-    return { user };
-  },
-
-  register: async (userData: RegisterInput): Promise<{ user: AuthUser }> => {
-    const response = await makeRequest<{
-      jwt: string;
-      user: { id: number; username: string; email: string };
-    }>(
-      API_V1_ENDPOINTS.REGISTER,
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          username: userData.name,
-          email: userData.email,
-          password: userData.password,
-        }),
-      }
-    );
-
-    _authToken = response.jwt;
-
-    const user: AuthUser = {
-      id: String(response.user.id),
-      email: response.user.email,
-      name: response.user.username,
-      role: 'user',
-    };
-
-    return { user };
-  },
-
-  logout: async (): Promise<void> => {
-    _authToken = null;
-  },
-
-  getMe: async (): Promise<{ user: AuthUser }> => {
-    if (!_authToken) {
-      throw new ApiError(401, 'Not authenticated');
-    }
-
-    const strapiUser = await makeRequest<{
-      id: number;
-      username: string;
-      email: string;
-      role?: { type: string };
-    }>(API_V1_ENDPOINTS.ME);
-
-    const roleType = strapiUser.role?.type;
-    const user: AuthUser = {
-      id: String(strapiUser.id),
-      email: strapiUser.email,
-      name: strapiUser.username,
-      role: roleType === 'admin' ? 'admin' : 'user',
-    };
-
-    return { user };
-  },
-};
 
 // Announcements API (using v1 endpoints)
 export const announcementsApi = {
@@ -508,7 +402,6 @@ export const appealsApi = {
 
 // Export a single API object for convenience
 export const api = {
-  auth: authApi,
   announcements: announcementsApi,
   events: eventsApi,
   prayerTimes: prayerTimesApi,

@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { createContext, useContext } from 'react';
+import { authClient } from '@/lib/auth-client';
 
 interface User {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'user';
+  role: string;
 }
 
 interface AuthContextType {
@@ -21,66 +22,31 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: session, isPending } = authClient.useSession();
 
-  // Check for existing session on mount
-  useEffect(() => {
-    checkAuthStatus();
-  }, []);
-
-  const checkAuthStatus = async () => {
-    try {
-      const response = await fetch('/api/admin/auth/me', {
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
-      } else {
-        setUser(null);
+  const user: User | null = session?.user
+    ? {
+        id: session.user.id,
+        email: session.user.email,
+        name: session.user.name,
+        role: session.user.role ?? 'user',
       }
-    } catch {
-      // Expected when not authenticated - leave user as null
-    } finally {
-      setLoading(false);
-    }
-  };
+    : null;
 
   const login = async (email: string, password: string) => {
-    const response = await fetch('/api/admin/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ email, password }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || 'Login failed');
+    const { error } = await authClient.signIn.email({ email, password });
+    if (error) {
+      throw new Error(error.message || 'Login failed');
     }
-
-    setUser(data.user);
   };
 
   const logout = async () => {
-    try {
-      await fetch('/api/admin/auth/logout', {
-        method: 'POST',
-        credentials: 'include',
-      });
-    } catch {
-      // Continue with logout even if API call fails
-    } finally {
-      setUser(null);
-    }
+    await authClient.signOut();
   };
 
   const value: AuthContextType = {
     user,
-    loading,
+    loading: isPending,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'admin',
     login,

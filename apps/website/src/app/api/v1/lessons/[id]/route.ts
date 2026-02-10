@@ -1,13 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAnyAuthToken } from '@/lib/auth-cookies';
 import { verifyAuth } from '@/middleware/auth';
 
 const STRAPI_URL = process.env.STRAPI_URL || 'http://localhost:1337';
-
-async function getToken(): Promise<string | null> {
-  const result = await getAnyAuthToken();
-  return result?.token || null;
-}
+const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN;
 
 /**
  * GET /api/v1/lessons/[id]
@@ -94,7 +89,7 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
 
-    const token = await getToken();
+    const token = STRAPI_API_TOKEN;
     const authHeader = request.headers.get('authorization');
 
     const response = await fetch(`${STRAPI_URL}/api/v1/lessons/${id}`, {
@@ -161,7 +156,7 @@ export async function DELETE(
 
     const { id } = await params;
 
-    const token = await getToken();
+    const token = STRAPI_API_TOKEN;
     const authHeader = request.headers.get('authorization');
 
     const response = await fetch(`${STRAPI_URL}/api/v1/lessons/${id}`, {

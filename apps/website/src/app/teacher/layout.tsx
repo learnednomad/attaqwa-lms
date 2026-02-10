@@ -1,40 +1,23 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { authClient } from '@/lib/auth-client';
 
 const PUBLIC_TEACHER_PATHS = ['/teacher/login', '/teacher/forgot-password'];
 
 function TeacherAuthGuard({ children }: { children: React.ReactNode }) {
+  const { data: session, isPending } = authClient.useSession();
   const pathname = usePathname();
   const router = useRouter();
-  const [isAuthed, setIsAuthed] = useState<boolean | null>(null);
 
   const isPublicPage = PUBLIC_TEACHER_PATHS.includes(pathname);
 
   useEffect(() => {
-    if (isPublicPage) {
-      setIsAuthed(true);
-      return;
+    if (!isPublicPage && !isPending && !session) {
+      router.push('/teacher/login');
     }
-
-    const checkAuth = async () => {
-      try {
-        const res = await fetch('/api/teacher/auth/me', { credentials: 'include' });
-        if (res.ok) {
-          setIsAuthed(true);
-        } else {
-          setIsAuthed(false);
-          router.push('/teacher/login');
-        }
-      } catch {
-        setIsAuthed(false);
-        router.push('/teacher/login');
-      }
-    };
-
-    checkAuth();
-  }, [pathname, isPublicPage, router]);
+  }, [session, isPending, isPublicPage, router]);
 
   // Public pages render immediately
   if (isPublicPage) {
@@ -42,7 +25,7 @@ function TeacherAuthGuard({ children }: { children: React.ReactNode }) {
   }
 
   // Loading state
-  if (isAuthed === null) {
+  if (isPending) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600" />
@@ -51,7 +34,7 @@ function TeacherAuthGuard({ children }: { children: React.ReactNode }) {
   }
 
   // Not authenticated - will redirect via useEffect
-  if (!isAuthed) {
+  if (!session) {
     return null;
   }
 

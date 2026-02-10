@@ -1,52 +1,32 @@
 /**
  * Authentication Hook
- * Provides authentication methods and state
+ * Provides authentication methods and state via BetterAuth
  */
 
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect } from 'react';
-
-import { strapiClient } from '@attaqwa/api-client';
-import { useAuthStore } from '@/lib/store/auth-store';
+import { useCallback } from 'react';
+import { authClient } from '@/lib/auth-client';
 
 export function useAuth() {
   const router = useRouter();
-  const { user, token, isAuthenticated, isLoading, login, logout, setUser, setLoading } =
-    useAuthStore();
+  const { data: session, isPending } = authClient.useSession();
 
-  // Initialize auth state on mount
-  useEffect(() => {
-    const initAuth = async () => {
-      if (token) {
-        try {
-          strapiClient.setAuth(token);
-          const userData = await strapiClient.getMe();
-          setUser(userData);
-          setLoading(false);
-        } catch (error) {
-          console.error('Failed to initialize auth:', error);
-          logout();
-          strapiClient.clearAuth();
-          setLoading(false);
-        }
-      } else {
-        setLoading(false);
-      }
-    };
-
-    initAuth();
-  }, []);
+  const user = session?.user ?? null;
+  const isAuthenticated = !!user;
+  const isLoading = isPending;
 
   const signIn = useCallback(
     async (identifier: string, password: string) => {
       try {
-        const { user: userData, token: authToken } = await strapiClient.login(
-          identifier,
-          password
-        );
-        login(userData, authToken);
+        const { error } = await authClient.signIn.email({
+          email: identifier,
+          password,
+        });
+        if (error) {
+          return { success: false, error: error.message || 'Login failed' };
+        }
         router.push('/dashboard');
         return { success: true };
       } catch (error: any) {
@@ -56,26 +36,25 @@ export function useAuth() {
         };
       }
     },
-    [login, router]
+    [router]
   );
 
   const signOut = useCallback(async () => {
-    logout();
-    strapiClient.clearAuth();
+    await authClient.signOut();
     router.push('/login');
-  }, [logout, router]);
+  }, [router]);
 
   const checkRole = useCallback(
     (allowedRoles: string[]) => {
-      if (!user || !user.role) return false;
-      return allowedRoles.includes(user.role.type);
+      if (!user?.role) return false;
+      return allowedRoles.includes(user.role);
     },
     [user]
   );
 
   return {
     user,
-    token,
+    token: null, // No more token — sessions are cookie-based
     isAuthenticated,
     isLoading,
     signIn,

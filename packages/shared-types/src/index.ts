@@ -58,7 +58,7 @@ export interface UserRole {
   id: string;
   name: string;
   description: string;
-  type: 'authenticated' | 'teacher' | 'admin' | 'student' | 'parent';
+  type: 'admin' | 'moderator' | 'teacher' | 'student' | 'parent' | 'user';
 }
 
 export interface UserProfile {
@@ -88,7 +88,10 @@ export interface AuthUser {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'user';
+  role: 'admin' | 'moderator' | 'teacher' | 'student' | 'parent' | 'user';
+  banned?: boolean;
+  banReason?: string;
+  banExpires?: string;
 }
 
 export interface LoginInput {

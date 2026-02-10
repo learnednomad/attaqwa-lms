@@ -126,6 +126,21 @@ jobs:
           category: "trivy-${{ matrix.target }}"
 
   # ---------------------------------------------------------------------------
+  # Deploy to Coolify
+  # ---------------------------------------------------------------------------
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Coolify
+        run: |
+          curl -sSf -X GET \
+            "${{ secrets.COOLIFY_URL }}/api/v1/services/${{ secrets.COOLIFY_SERVICE_UUID }}/restart" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
+            -H "Content-Type: application/json"
+
+  # ---------------------------------------------------------------------------
   # Validate compose configuration
   # ---------------------------------------------------------------------------
   validate:

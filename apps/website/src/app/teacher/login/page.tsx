@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { GraduationCap, Mail, Lock, Loader2 } from 'lucide-react';
+import { authClient } from '@/lib/auth-client';
 
 export default function TeacherLoginPage() {
   const router = useRouter();
@@ -22,22 +23,14 @@ export default function TeacherLoginPage() {
     setError('');
 
     try {
-      const response = await fetch('/api/teacher/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email, password }),
+      const { error: authError } = await authClient.signIn.email({
+        email,
+        password,
       });
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Invalid credentials');
+      if (authError) {
+        throw new Error(authError.message || 'Invalid credentials');
       }
-
-      const data = await response.json();
-
-      // Store display info in localStorage (non-sensitive)
-      localStorage.setItem('teacherData', JSON.stringify(data.user));
 
       router.push('/teacher/dashboard');
     } catch (err) {

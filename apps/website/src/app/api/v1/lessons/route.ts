@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAnyAuthToken } from '@/lib/auth-cookies';
 import { verifyAuth } from '@/middleware/auth';
 
 const STRAPI_URL = process.env.STRAPI_URL || 'http://localhost:1337';
+const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN;
 
 /**
  * GET /api/v1/lessons
@@ -97,15 +97,12 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const authHeader = request.headers.get('authorization');
-    const authResult = await getAnyAuthToken();
-    const token = authResult?.token || null;
 
     const response = await fetch(`${STRAPI_URL}/api/v1/lessons`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: authHeader || `Bearer ${token}`,
+        Authorization: `Bearer ${STRAPI_API_TOKEN}`,
       },
       body: JSON.stringify({ data: body.data || body }),
     });
