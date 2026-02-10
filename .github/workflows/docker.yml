@@ -173,6 +173,14 @@ jobs:
 
       - name: Validate base compose
         run: docker compose -f docker-compose.yml config --quiet
+        env:
+          POSTGRES_PASSWORD: test
+          APP_KEYS: k1,k2,k3,k4
+          API_TOKEN_SALT: test
+          ADMIN_JWT_SECRET: test
+          TRANSFER_TOKEN_SALT: test
+          ENCRYPTION_KEY: test
+          JWT_SECRET: test
 
       - name: Validate production compose
         run: docker compose -f docker-compose.yml -f docker-compose.prod.yml config --quiet

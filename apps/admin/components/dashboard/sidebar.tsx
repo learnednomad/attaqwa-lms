@@ -83,11 +83,11 @@ export function Sidebar() {
       <div className="border-t border-charcoal-200 p-4">
         <div className="flex items-center space-x-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-700">
-            {user?.username?.charAt(0).toUpperCase() || 'U'}
+            {user?.name?.charAt(0).toUpperCase() || 'U'}
           </div>
           <div className="flex-1 overflow-hidden">
             <p className="truncate text-sm font-medium text-charcoal-900">
-              {user?.username || 'User'}
+              {user?.name || 'User'}
             </p>
             <p className="truncate text-xs text-charcoal-500">
               {user?.role?.name || 'Teacher'}

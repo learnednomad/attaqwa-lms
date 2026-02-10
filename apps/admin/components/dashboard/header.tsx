@@ -49,11 +49,11 @@ export function Header() {
               className="flex items-center space-x-3 rounded-lg p-2 hover:bg-charcoal-50"
             >
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-700">
-                {user?.username?.charAt(0).toUpperCase() || 'U'}
+                {user?.name?.charAt(0).toUpperCase() || 'U'}
               </div>
               <div className="hidden text-left lg:block">
                 <p className="text-sm font-medium text-charcoal-900">
-                  {user?.username || 'User'}
+                  {user?.name || 'User'}
                 </p>
                 <p className="text-xs text-charcoal-500">
                   {user?.role?.name || 'Teacher'}
@@ -71,7 +71,7 @@ export function Header() {
                 <div className="absolute right-0 top-full z-20 mt-2 w-56 rounded-lg border border-charcoal-200 bg-white shadow-lg">
                   <div className="p-4 border-b border-charcoal-200">
                     <p className="text-sm font-medium text-charcoal-900">
-                      {user?.username}
+                      {user?.name}
                     </p>
                     <p className="text-xs text-charcoal-500">{user?.email}</p>
                   </div>
