@@ -56,7 +56,7 @@ export function Header() {
                   {user?.name || 'User'}
                 </p>
                 <p className="text-xs text-charcoal-500">
-                  {user?.role?.name || 'Teacher'}
+                  {user?.role || 'Teacher'}
                 </p>
               </div>
             </button>

@@ -90,7 +90,7 @@ export function Sidebar() {
               {user?.name || 'User'}
             </p>
             <p className="truncate text-xs text-charcoal-500">
-              {user?.role?.name || 'Teacher'}
+              {user?.role || 'Teacher'}
             </p>
           </div>
         </div>
