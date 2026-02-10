@@ -1,0 +1,548 @@
+{
+  "courses": [
+    {
+      "id": "course_001",
+      "title": "Stories of the Prophets for Kids",
+      "slug": "stories-of-the-prophets-for-kids",
+      "description": "Captivating stories from the lives of Allah's prophets, teaching moral values and Islamic lessons through engaging narratives perfect for children.",
+      "age_tier": "children",
+      "subject": "seerah",
+      "difficulty": "beginner",
+      "duration_weeks": 16,
+      "schedule": "1 lesson per week, 25 minutes each",
+      "instructor": "Sister Fatima Rahman",
+      "is_featured": true,
+      "learning_outcomes": [
+        "Learn inspiring stories of 10 prophets",
+        "Understand moral lessons from each prophet's life",
+        "Build strong Islamic character and values",
+        "Develop love for prophets and messengers",
+        "Apply prophetic wisdom in daily life"
+      ],
+      "publishedAt": "2024-10-31T00:00:00.000Z",
+      "lessons": [
+        {
+          "lesson_id": "lesson_001_001",
+          "title": "Prophet Adam (AS) - The First Human",
+          "slug": "prophet-adam-first-human",
+          "description": "Learn about the creation of the first human being and prophet, Adam (AS), and the important lessons from his story.",
+          "lesson_order": 1,
+          "lesson_type": "reading",
+          "duration_minutes": 25,
+          "content": "<h1>Prophet Adam (AS) - The First Human</h1>\n\n<h2>Introduction</h2>\n<p>Prophet Adam (AS) was the very first human being created by Allah. He was also the first prophet sent to guide humanity. His story teaches us important lessons about faith, forgiveness, and obeying Allah.</p>\n\n<h2>The Creation of Adam</h2>\n<p>Allah created Adam (AS) from clay and breathed life into him. The angels were commanded to bow to Adam as a sign of respect. All the angels bowed except Iblis (Satan), who refused because of pride and jealousy.</p>\n\n<div class='story-box'>\n<h3>Living in Paradise</h3>\n<p>Allah placed Adam and his wife Hawwa (Eve) in Paradise. They could eat from any tree except one special tree. But Satan whispered to them and tricked them into eating from the forbidden tree.</p>\n</div>\n\n<h2>The Mistake and Forgiveness</h2>\n<p>When Adam and Hawwa realized their mistake, they felt very sorry. They asked Allah to forgive them with sincere hearts. Allah, the Most Merciful, forgave them and sent them to Earth.</p>\n\n<h3>Life on Earth</h3>\n<p>On Earth, Adam (AS) became the first prophet. He taught his children about Allah and how to worship Him. He showed them right from wrong and how to live good lives.</p>\n\n<h2>Lessons We Learn</h2>\n<ul>\n<li><strong>Everyone Makes Mistakes:</strong> Even prophets can make mistakes, but what matters is saying sorry to Allah.</li>\n<li><strong>Allah is Forgiving:</strong> When we make mistakes and truly repent, Allah will forgive us.</li>\n<li><strong>Obey Allah:</strong> We should always try to follow Allah's commands.</li>\n<li><strong>Beware of Satan:</strong> Satan tries to trick us, but we should be strong and resist.</li>\n<li><strong>Family is Important:</strong> Adam taught his family about Allah, showing us the importance of learning together.</li>\n</ul>\n\n<h2>Fun Activity</h2>\n<p>Think about a time when you made a mistake. Did you say sorry? How did it make you feel? Remember, Allah loves those who ask for forgiveness!</p>\n\n<h2>Prayer to Remember</h2>\n<p class='arabic-text'>رَبَّنَا ظَلَمْنَا أَنفُسَنَا</p>\n<p><em>\"Our Lord, we have wronged ourselves.\"</em> - This is what Adam and Hawwa said when asking for forgiveness.</p>",
+          "video_url": null,
+          "interactive_content": {
+            "activities": [
+              "Draw a picture of Paradise",
+              "Write three ways to say sorry to Allah",
+              "Share the story with family"
+            ],
+            "vocabulary": ["Prophet", "Paradise", "Forgiveness", "Repentance"]
+          },
+          "learning_objectives": [
+            "Understand that Adam (AS) was the first human and prophet",
+            "Learn about the importance of asking Allah for forgiveness",
+            "Recognize that Satan tries to lead us astray",
+            "Appreciate the value of obeying Allah's commands",
+            "Understand that everyone makes mistakes"
+          ],
+          "prerequisites": null,
+          "is_free": true,
+          "is_preview": true,
+          "publishedAt": "2024-10-31T00:00:00.000Z"
+        },
+        {
+          "lesson_id": "lesson_001_002",
+          "title": "Prophet Nuh (Noah) - The Patient Prophet",
+          "slug": "prophet-nuh-patient-prophet",
+          "description": "Discover the story of Prophet Nuh and his unwavering patience in calling people to worship Allah for 950 years.",
+          "lesson_order": 2,
+          "lesson_type": "reading",
+          "duration_minutes": 25,
+          "content": "<h1>Prophet Nuh (Noah) - The Patient Prophet</h1>\n\n<h2>Introduction</h2>\n<p>Prophet Nuh (AS) was one of the greatest prophets. He lived for a very long time and showed incredible patience while calling his people to believe in Allah.</p>\n\n<h2>Nuh's Mission</h2>\n<p>The people in Nuh's time had forgotten about Allah. They worshipped idols made of stone and wood. Nuh (AS) spent 950 years (almost 1,000 years!) inviting people to worship only Allah, but most people refused to listen.</p>\n\n<div class='story-box'>\n<h3>Day and Night</h3>\n<p>Nuh (AS) never gave up. He called people to Allah during the day and at night. He spoke to them kindly and with wisdom, but they made fun of him and called him crazy.</p>\n</div>\n\n<h2>Building the Ark</h2>\n<p>Allah commanded Nuh to build a huge ship (called an Ark) on dry land, far from water. People laughed at him, asking, \"Why are you building a boat in the middle of nowhere?\" But Nuh (AS) trusted Allah and kept building.</p>\n\n<h3>The Great Flood</h3>\n<p>When the Ark was ready, Allah told Nuh to bring his family and pairs of every animal onto the ship. Then, the rain began to pour, and water gushed from the ground. The whole Earth was covered with water! Only those on the Ark were saved.</p>\n\n<h2>After the Flood</h2>\n<p>When the flood ended, the Ark landed on a mountain. Nuh and the believers thanked Allah. They started a new life, worshipping Allah alone and teaching their children the right path.</p>\n\n<h2>Lessons We Learn</h2>\n<ul>\n<li><strong>Be Patient:</strong> Good things take time. Nuh waited 950 years and never gave up!</li>\n<li><strong>Trust Allah:</strong> Even when people laughed at him, Nuh trusted Allah's plan.</li>\n<li><strong>Never Stop Trying:</strong> We should keep doing good even if others don't appreciate it.</li>\n<li><strong>Obey Your Parents:</strong> The believers listened to Nuh and were saved.</li>\n<li><strong>Worship Only Allah:</strong> Allah alone deserves our worship, not idols or false gods.</li>\n<li><strong>Gratitude:</strong> After being saved, Nuh thanked Allah, teaching us to be grateful.</li>\n</ul>\n\n<h2>Fun Facts</h2>\n<ul>\n<li>Nuh lived for about 1,000 years!</li>\n<li>The Ark was like a giant floating zoo with all kinds of animals</li>\n<li>Some people believe the Ark rested on Mount Judi in Turkey</li>\n</ul>\n\n<h2>Think About It</h2>\n<p>What would you do if you had to wait almost 1,000 years for something? Would you give up or keep trying like Prophet Nuh?</p>",
+          "video_url": null,
+          "interactive_content": {
+            "activities": [
+              "Draw Nuh's Ark with animals",
+              "Count how long 950 years is",
+              "Practice being patient this week"
+            ],
+            "vocabulary": ["Patience", "Ark", "Flood", "Idols", "Perseverance"]
+          },
+          "learning_objectives": [
+            "Learn about Prophet Nuh's 950-year mission",
+            "Understand the importance of patience and perseverance",
+            "Recognize the consequences of rejecting Allah's message",
+            "Appreciate the value of trusting Allah's plan",
+            "Learn about the Great Flood and the Ark"
+          ],
+          "prerequisites": "lesson_001_001",
+          "is_free": true,
+          "is_preview": true,
+          "publishedAt": "2024-10-31T00:00:00.000Z"
+        },
+        {
+          "lesson_id": "lesson_001_003",
+          "title": "Prophet Ibrahim (Abraham) - Friend of Allah",
+          "slug": "prophet-ibrahim-friend-of-allah",
+          "description": "Explore the remarkable life of Prophet Ibrahim, who showed complete faith in Allah and became known as the Friend of Allah.",
+          "lesson_order": 3,
+          "lesson_type": "reading",
+          "duration_minutes": 25,
+          "content": "<h1>Prophet Ibrahim (Abraham) - Friend of Allah</h1>\n\n<h2>Introduction</h2>\n<p>Prophet Ibrahim (AS) is called 'Khalilullah' - the Friend of Allah. He showed such strong faith and trust in Allah that he is honored in Islam, Christianity, and Judaism as a great prophet.</p>\n\n<h2>Ibrahim's Search for Truth</h2>\n<p>When Ibrahim was young, his people worshipped idols. His own father made idols from stone! But young Ibrahim wondered, \"How can these statues that can't even move be gods?\"</p>\n\n<div class='story-box'>\n<h3>Breaking the Idols</h3>\n<p>One day, when everyone left for a festival, Ibrahim went to the temple and broke all the idols except the biggest one. When people returned and asked who did this, Ibrahim said, \"Ask the big idol!\" This made them realize idols can't speak or do anything.</p>\n</div>\n\n<h2>The Fire That Wouldn't Burn</h2>\n<p>The king, Nimrod, became very angry and ordered Ibrahim to be thrown into a huge fire. But Allah commanded the fire: \"O fire! Be cool and safe for Ibrahim!\" The fire didn't harm Ibrahim at all - it was a miracle!</p>\n\n<h3>Building the Kaaba</h3>\n<p>Years later, Allah commanded Ibrahim and his son Ismail to build the Kaaba in Mecca. They built it stone by stone, praying for Allah's acceptance. The Kaaba became the holiest place in Islam, where millions of Muslims go for Hajj.</p>\n\n<h2>The Great Test</h2>\n<p>Ibrahim's biggest test came when Allah asked him in a dream to sacrifice his beloved son Ismail. Both father and son were ready to obey Allah. But just as Ibrahim was about to sacrifice his son, Allah sent an angel with a ram to sacrifice instead. This showed their complete trust in Allah!</p>\n\n<h3>Celebrating Eid al-Adha</h3>\n<p>Muslims remember this sacrifice every year during Eid al-Adha, when we sacrifice animals and share meat with the poor, just as Ibrahim did.</p>\n\n<h2>Lessons We Learn</h2>\n<ul>\n<li><strong>Use Your Brain:</strong> Ibrahim questioned idol worship and searched for the truth.</li>\n<li><strong>Be Brave:</strong> Ibrahim stood up for what was right even when everyone disagreed.</li>\n<li><strong>Trust Allah Completely:</strong> Ibrahim trusted Allah even in the hardest tests.</li>\n<li><strong>Obey Your Parents:</strong> Ismail obeyed his father when asked to make a sacrifice.</li>\n<li><strong>Allah Protects Believers:</strong> The fire couldn't hurt Ibrahim because Allah protected him.</li>\n<li><strong>Question False Beliefs:</strong> Don't follow something just because everyone else does.</li>\n<li><strong>Building Legacy:</strong> The Kaaba stands today because of Ibrahim's devotion.</li>\n</ul>\n\n<h2>Family Connection</h2>\n<p>Did you know? Prophet Muhammad (peace be upon him) is from the family line of Prophet Ibrahim! When we pray, we send blessings on both Muhammad and Ibrahim.</p>\n\n<h2>Reflection</h2>\n<p>Think about a time when you had to choose between what's right and what's popular. What did you do? Ibrahim always chose what Allah wanted, no matter what.</p>",
+          "video_url": null,
+          "interactive_content": {
+            "activities": [
+              "Visit a mosque and see the direction to Kaaba",
+              "Learn about Eid al-Adha traditions",
+              "Practice saying the prayer we say in Salah for Ibrahim"
+            ],
+            "vocabulary": ["Kaaba", "Sacrifice", "Hajj", "Eid al-Adha", "Khalilullah"]
+          },
+          "learning_objectives": [
+            "Understand why Ibrahim is called the Friend of Allah",
+            "Learn about Ibrahim's unwavering faith and trust in Allah",
+            "Discover the story of building the Kaaba",
+            "Understand the significance of the sacrifice story",
+            "Connect Ibrahim's legacy to modern Islamic practices"
+          ],
+          "prerequisites": "lesson_001_002",
+          "is_free": false,
+          "is_preview": false,
+          "publishedAt": "2024-10-31T00:00:00.000Z"
+        },
+        {
+          "lesson_id": "lesson_001_004",
+          "title": "Prophet Musa (Moses) - Standing Against Pharaoh",
+          "slug": "prophet-musa-standing-against-pharaoh",
+          "description": "Learn about Prophet Musa's courage in confronting Pharaoh and leading the Children of Israel to freedom.",
+          "lesson_order": 4,
+          "lesson_type": "reading",
+          "duration_minutes": 25,
+          "content": "<h1>Prophet Musa (Moses) - Standing Against Pharaoh</h1>\n\n<h2>Introduction</h2>\n<p>Prophet Musa (AS) is one of the greatest messengers of Allah. His story of courage, leadership, and trust in Allah has inspired people for thousands of years.</p>\n\n<h2>A Baby in a Basket</h2>\n<p>Pharaoh, the evil king of Egypt, ordered that all baby boys born to the Children of Israel be killed. To save baby Musa, his mother placed him in a basket and set it in the river, trusting Allah to protect him. Amazingly, Pharaoh's own wife found the basket and decided to raise Musa in the palace!</p>\n\n<div class='story-box'>\n<h3>Growing Up in the Palace</h3>\n<p>Musa grew up as a prince in Pharaoh's palace, but he never forgot his people. When he saw injustice, he couldn't stay quiet. One day, he helped someone who was being beaten, but things went wrong, and Musa had to flee Egypt.</p>\n</div>\n\n<h2>The Burning Bush</h2>\n<p>Years later, while Musa was traveling, he saw a fire on a mountain. When he went closer, he heard Allah's voice coming from the fire! Allah commanded him: \"Go back to Egypt and tell Pharaoh to free the Children of Israel and stop claiming to be a god.\"</p>\n\n<h3>Musa's Mission</h3>\n<p>Musa was afraid because he had a speech difficulty, but Allah gave him his brother Harun (Aaron) as a helper. Together, they went to Pharaoh and said, \"Let the Children of Israel go!\" But Pharaoh was too proud and refused.</p>\n\n<h2>The Miraculous Staff</h2>\n<p>Allah gave Musa a special staff (stick). When Musa threw it down, it turned into a real snake! When he struck the ground with it, water would gush out. These miracles showed that Allah's power is greater than anything.</p>\n\n<h3>The Ten Plagues</h3>\n<p>Because Pharaoh refused to listen, Allah sent ten plagues to Egypt: blood, frogs, lice, flies, disease, boils, hail, locusts, darkness, and finally, a severe punishment. After each plague, Pharaoh would promise to let the people go, but then break his promise.</p>\n\n<h2>Crossing the Red Sea</h2>\n<p>Finally, Musa led the Children of Israel out of Egypt. But Pharaoh changed his mind and chased them with his army! When they reached the Red Sea, the people thought they were trapped. But Allah commanded Musa to strike the sea with his staff - and the sea split into two! The people walked through on dry ground, with walls of water on both sides. When Pharaoh's army tried to follow, the water came crashing down and they were drowned.</p>\n\n<h2>Lessons We Learn</h2>\n<ul>\n<li><strong>Allah's Plan is Perfect:</strong> Musa's mother trusted Allah, and He protected her baby.</li>\n<li><strong>Stand Against Injustice:</strong> Musa couldn't watch people being treated unfairly.</li>\n<li><strong>Don't Be Proud:</strong> Pharaoh's pride led to his destruction.</li>\n<li><strong>Trust Allah in Difficult Times:</strong> Even facing the Red Sea, Musa trusted Allah.</li>\n<li><strong>Allah Protects the Believers:</strong> The sea split for believers but drowned the enemies.</li>\n<li><strong>Miracles Are Real:</strong> Allah can do anything - even make a stick turn into a snake!</li>\n<li><strong>Never Give Up:</strong> Musa faced Pharaoh many times but never stopped trying.</li>\n</ul>\n\n<h2>Connection to Today</h2>\n<p>When we face bullies or see unfair treatment, we should be brave like Musa and stand up for what's right. And when we face big problems that seem impossible, we should remember: Allah helped Musa split the sea - He can help us too!</p>",
+          "video_url": null,
+          "interactive_content": {
+            "activities": [
+              "Draw the Red Sea splitting",
+              "List the ten plagues in order",
+              "Role-play: Musa standing up to Pharaoh",
+              "Write about a time you stood up for what's right"
+            ],
+            "vocabulary": ["Pharaoh", "Plague", "Miracle", "Staff", "Exodus"]
+          },
+          "learning_objectives": [
+            "Learn about Musa's miraculous rescue as a baby",
+            "Understand the mission Allah gave to Musa",
+            "Discover the story of the ten plagues",
+            "Appreciate the miracle of the Red Sea splitting",
+            "Learn about standing up against injustice",
+            "Recognize Allah's power through miracles"
+          ],
+          "prerequisites": "lesson_001_003",
+          "is_free": false,
+          "is_preview": false,
+          "publishedAt": "2024-10-31T00:00:00.000Z"
+        },
+        {
+          "lesson_id": "lesson_001_005",
+          "title": "Prophet Yusuf (Joseph) - The Dream Interpreter",
+          "slug": "prophet-yusuf-dream-interpreter",
+          "description": "Discover the beautiful story of Prophet Yusuf, his patience through hardships, and his eventual triumph.",
+          "lesson_order": 5,
+          "lesson_type": "reading",
+          "duration_minutes": 25,
+          "content": "<h1>Prophet Yusuf (Joseph) - The Dream Interpreter</h1>\n\n<h2>Introduction</h2>\n<p>The story of Prophet Yusuf (AS) is one of the most beautiful stories in the Quran. It teaches us about patience, forgiveness, and trusting Allah's plan even when life is very hard.</p>\n\n<h2>The Special Dream</h2>\n<p>When Yusuf was a young boy, he saw a dream: eleven stars, the sun, and the moon were bowing to him. He told his father, Prophet Yaqub (Jacob), about this dream. His father knew this meant Yusuf would become very important one day, but he warned him not to tell his brothers.</p>\n\n<div class='story-box'>\n<h3>Jealous Brothers</h3>\n<p>Yusuf had eleven brothers, but his father loved Yusuf and his younger brother Binyamin the most. This made the other brothers very jealous. They plotted to get rid of Yusuf.</p>\n</div>\n\n<h2>Thrown in the Well</h2>\n<p>One day, the brothers took young Yusuf with them to play. They threw him in a deep, dark well and told their father that a wolf had eaten him! But Allah protected Yusuf. Some travelers found him and took him to Egypt where he was sold as a slave.</p>\n\n<h3>Tested in Egypt</h3>\n<p>In Egypt, a rich man's wife tried to make Yusuf do something wrong, but Yusuf refused because he feared Allah. Even though Yusuf was innocent, he was put in prison for years. But Yusuf never lost hope in Allah.</p>\n\n<h2>The Gift of Dreams</h2>\n<p>In prison, Yusuf interpreted dreams for other prisoners. News of his ability reached the king, who was having troubling dreams. Yusuf explained that the king's dream meant seven years of good harvest would be followed by seven years of famine. The king was so impressed that he freed Yusuf and made him a minister in charge of food storage!</p>\n\n<h3>Reunion with Family</h3>\n<p>When the famine came, Yusuf's brothers came to Egypt to buy food. They didn't recognize him, but Yusuf recognized them! After testing them to see if they had changed, Yusuf revealed who he was. He forgave his brothers and brought his entire family, including his father Yaqub, to live with him in Egypt. The dream came true - his brothers (eleven stars), father (sun), and mother (moon) bowed to him in respect!</p>\n\n<h2>Lessons We Learn</h2>\n<ul>\n<li><strong>Trust Allah's Plan:</strong> Yusuf went from a well to a prison to a palace - all part of Allah's plan.</li>\n<li><strong>Stay Pure:</strong> Yusuf refused to do wrong even when it was hard.</li>\n<li><strong>Be Patient:</strong> Yusuf waited years in prison but never gave up hope.</li>\n<li><strong>Forgive Others:</strong> Even though his brothers hurt him badly, Yusuf forgave them.</li>\n<li><strong>Dreams Can Come True:</strong> Yusuf's childhood dream came true after many years.</li>\n<li><strong>Don't Be Jealous:</strong> The brothers' jealousy caused pain for everyone.</li>\n<li><strong>Family Love:</strong> Despite everything, the family reunited with love and forgiveness.</li>\n<li><strong>Use Your Talents:</strong> Yusuf used his gift of interpreting dreams to help others.</li>\n</ul>\n\n<h2>A Special Chapter</h2>\n<p>The story of Yusuf is so beautiful that Allah dedicated an entire chapter (Surah) in the Quran to it - Surah Yusuf. Allah calls it \"the best of stories.\"</p>\n\n<h2>Think About It</h2>\n<p>Imagine being thrown in a well by your own brothers, sold as a slave, falsely accused, and put in prison. Would you still trust Allah? Would you forgive those who hurt you? Yusuf did all of this with patience and grace.</p>\n\n<h2>Prayer Connection</h2>\n<p>When Yusuf's father lost his sight from crying for Yusuf, he said: \"I only complain of my grief and sorrow to Allah.\" This teaches us that when we're sad, we should talk to Allah in our prayers.</p>",
+          "video_url": null,
+          "interactive_content": {
+            "activities": [
+              "Draw Yusuf's dream (11 stars, sun, and moon)",
+              "Create a timeline of Yusuf's journey",
+              "Write a forgiveness letter like Yusuf did",
+              "Share a dream you had and what it might mean"
+            ],
+            "vocabulary": ["Dream", "Interpretation", "Patience", "Forgiveness", "Jealousy", "Famine"]
+          },
+          "learning_objectives": [
+            "Understand the significance of Yusuf's dream",
+            "Learn about patience through hardship",
+            "Recognize the importance of maintaining integrity",
+            "Appreciate the power of forgiveness",
+            "See how Allah's plan unfolds over time",
+            "Connect the story to Surah Yusuf in the Quran"
+          ],
+          "prerequisites": "lesson_001_004",
+          "is_free": false,
+          "is_preview": false,
+          "publishedAt": "2024-10-31T00:00:00.000Z"
+        },
+        {
+          "lesson_id": "lesson_001_006",
+          "title": "Prophet Sulaiman (Solomon) - The Wise King",
+          "slug": "prophet-sulaiman-wise-king",
+          "description": "Learn about Prophet Sulaiman's great wisdom, his ability to communicate with animals, and his magnificent kingdom.",
+          "lesson_order": 6,
+          "lesson_type": "reading",
+          "duration_minutes": 25,
+          "content": "<h1>Prophet Sulaiman (Solomon) - The Wise King</h1>\n\n<h2>Introduction</h2>\n<p>Prophet Sulaiman (AS) was the son of Prophet Dawud (David). Allah blessed him with a kingdom unlike any other - he could understand the language of animals and birds, and even commanded the jinn (supernatural beings) and the wind!</p>\n\n<h2>A Special Gift</h2>\n<p>When Sulaiman became king, he prayed to Allah for a kingdom that no one else would ever have. Allah granted his prayer and gave him amazing powers. But Sulaiman never became proud - he always thanked Allah for everything.</p>\n\n<div class='story-box'>\n<h3>Talking to Animals</h3>\n<p>One day, Sulaiman was traveling with his army of people, jinn, and birds. He heard a tiny ant warning the other ants: \"Go into your homes, or Sulaiman's army might step on you!\" Sulaiman smiled and thanked Allah for letting him hear the ant. He made sure his army didn't harm any ants.</p>\n</div>\n\n<h2>The Hoopoe Bird's Message</h2>\n<p>Sulaiman noticed that the Hoopoe bird was missing from the assembly. When the bird returned, it brought news of a queen named Bilqis who ruled a wealthy kingdom. The people there worshipped the sun instead of Allah!</p>\n\n<h3>The Queen of Sheba</h3>\n<p>Sulaiman sent a letter to Queen Bilqis, inviting her to worship only Allah. The queen was very wise and decided to visit Sulaiman. Before she arrived, Sulaiman asked, \"Who can bring me her throne?\" A powerful jinn said he could do it in hours, but a righteous man with knowledge from Allah brought it in the blink of an eye - faster than light!</p>\n\n<h2>The Queen Accepts Islam</h2>\n<p>When Queen Bilqis saw her throne in Sulaiman's palace and witnessed the magnificent glass floor (which looked like water), she realized that Sulaiman's power came from Allah. She declared her belief in Allah and joined Sulaiman in worshipping the One True God.</p>\n\n<h3>Building the Temple</h3>\n<p>Sulaiman ordered the jinn to build a magnificent temple for worship. The jinn worked hard because Sulaiman commanded them with Allah's permission. This showed that even supernatural beings must obey Allah's prophets.</p>\n\n<h2>Sulaiman's Wisdom</h2>\n<p>Sulaiman was famous for his incredible wisdom. People came from all over the world to seek his advice and learn from him. Two women once came arguing over a baby, both claiming to be the mother. Sulaiman suggested cutting the baby in half! The real mother immediately said, \"No! Give the baby to her!\" Sulaiman knew the real mother would rather give up her baby than see it harmed. His wisdom solved the problem perfectly.</p>\n\n<h2>Lessons We Learn</h2>\n<ul>\n<li><strong>Be Grateful:</strong> Despite his great kingdom, Sulaiman always thanked Allah.</li>\n<li><strong>Care for All Creatures:</strong> Sulaiman cared about even the smallest ant.</li>\n<li><strong>Wisdom is a Gift:</strong> Real wisdom comes from Allah, not just books.</li>\n<li><strong>Use Power Wisely:</strong> Sulaiman had great power but never misused it.</li>\n<li><strong>Invite to Truth:</strong> Sulaiman kindly invited the queen to Islam.</li>\n<li><strong>Stay Humble:</strong> Despite his kingdom, Sulaiman remained humble before Allah.</li>\n<li><strong>Knowledge is Power:</strong> The man with knowledge brought the throne faster than the strong jinn.</li>\n<li><strong>Communication Matters:</strong> Even understanding animals helped Sulaiman be just and kind.</li>\n</ul>\n\n<h2>Amazing Facts</h2>\n<ul>\n<li>Sulaiman could control the wind - it would carry him and his throne wherever he wanted!</li>\n<li>His army included humans, jinn, and birds</li>\n<li>He understood the language of every creature</li>\n<li>His kingdom stretched far and wide, with peace and prosperity</li>\n</ul>\n\n<h2>Modern Connection</h2>\n<p>Today, scientists study how animals communicate. Imagine if we could understand what they're saying! Sulaiman had this gift from Allah. It reminds us that Allah's creation is full of wonders, and every creature has its own way of praising the Creator.</p>\n\n<h2>Think About It</h2>\n<p>If you could talk to animals, what would you ask them? What would you tell them about Allah? Remember, even though we can't understand their language, all creatures worship Allah in their own way.</p>",
+          "video_url": null,
+          "interactive_content": {
+            "activities": [
+              "Research real ant behavior and communication",
+              "Draw Sulaiman's magnificent palace with glass floor",
+              "Practice solving problems wisely like Sulaiman",
+              "Learn bird names in Arabic and English"
+            ],
+            "vocabulary": ["Wisdom", "Kingdom", "Jinn", "Hoopoe", "Temple", "Justice"]
+          },
+          "learning_objectives": [
+            "Learn about Sulaiman's unique gifts from Allah",
+            "Understand the story of the ant and importance of caring for all creatures",
+            "Discover how Sulaiman invited Queen Bilqis to Islam",
+            "Appreciate wisdom and justice in leadership",
+            "Recognize the importance of gratitude despite blessings",
+            "Learn about respect for all of Allah's creation"
+          ],
+          "prerequisites": "lesson_001_005",
+          "is_free": false,
+          "is_preview": false,
+          "publishedAt": "2024-10-31T00:00:00.000Z"
+        },
+        {
+          "lesson_id": "lesson_001_007",
+          "title": "Prophet Yunus (Jonah) - In the Belly of the Whale",
+          "slug": "prophet-yunus-belly-of-whale",
+          "description": "Discover the remarkable story of Prophet Yunus and the powerful prayer that saved him from the belly of a whale.",
+          "lesson_order": 7,
+          "lesson_type": "reading",
+          "duration_minutes": 25,
+          "content": "<h1>Prophet Yunus (Jonah) - In the Belly of the Whale</h1>\n\n<h2>Introduction</h2>\n<p>The story of Prophet Yunus (AS) is one of the most amazing stories in the Quran. It teaches us about patience, the power of prayer, and that Allah always forgives those who turn back to Him.</p>\n\n<h2>The Stubborn People</h2>\n<p>Allah sent Yunus to guide the people of Nineveh, a city where people had turned away from Allah. Yunus worked hard to teach them about worshipping Allah alone, but the people were very stubborn and refused to listen. This made Yunus feel frustrated and sad.</p>\n\n<div class='story-box'>\n<h3>Leaving Too Soon</h3>\n<p>After trying for a long time, Yunus became so upset that he decided to leave the city without waiting for Allah's permission. He thought his job was done and that Allah would punish these people. He boarded a ship and sailed away from Nineveh.</p>\n</div>\n\n<h2>The Storm and the Whale</h2>\n<p>While Yunus was on the ship, a terrible storm began. The ship rocked dangerously, and the sailors thought they would sink. In those days, people believed they should cast lots (like drawing straws) to see who brought bad luck. When they did this, Yunus's name came up every time.</p>\n\n<h3>Into the Sea</h3>\n<p>Yunus realized he had made a mistake by leaving without Allah's command. He jumped into the stormy sea to save the others. As soon as he jumped, the storm calmed down. But Yunus was now alone in the vast ocean!</p>\n\n<h2>Swallowed by a Whale</h2>\n<p>By Allah's command, an enormous whale swallowed Yunus whole. Can you imagine being inside a whale? It was dark, scary, and lonely. Yunus was alive but trapped in the whale's belly, deep in the ocean. Anyone else might have given up hope, but Yunus knew what to do - he turned to Allah!</p>\n\n<h3>The Powerful Prayer</h3>\n<p>In the darkness of the whale's belly, Yunus made a special prayer to Allah:</p>\n<p class='arabic-text'>لَا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ</p>\n<p><em>\"La ilaha illa Anta, Subhanaka, inni kuntu mina adh-dhalimin\"</em></p>\n<p>This means: \"There is no god but You, Glory be to You! Indeed, I have been of the wrongdoers.\"</p>\n\n<h2>Rescued and Forgiven</h2>\n<p>Allah heard Yunus's sincere prayer and forgave him. The whale swam to the shore and gently spit Yunus out onto the beach. Yunus was weak and had been affected by the whale's stomach, but he was alive! Allah caused a gourd plant to grow quickly, giving Yunus shade and nutrition as he recovered.</p>\n\n<h3>A Second Chance</h3>\n<p>Something amazing happened back in Nineveh! When Yunus left, the people saw signs of coming punishment. They suddenly realized they were wrong and turned to Allah, praying and asking for forgiveness. Allah, being Most Merciful, forgave them too! Yunus returned to find his people had become believers - his mission was successful after all!</p>\n\n<h2>Lessons We Learn</h2>\n<ul>\n<li><strong>Never Give Up:</strong> Keep trying even when people don't listen at first.</li>\n<li><strong>Trust Allah's Timing:</strong> Yunus left too early. Always trust Allah's perfect timing.</li>\n<li><strong>The Power of Dua:</strong> Yunus's prayer from the whale's belly is one of the most powerful prayers.</li>\n<li><strong>Allah Always Forgives:</strong> When we sincerely admit our mistakes, Allah forgives.</li>\n<li><strong>Everyone Deserves a Chance:</strong> The people of Nineveh changed when given a chance.</li>\n<li><strong>Patience is Important:</strong> Prophets must be patient even when the job is hard.</li>\n<li><strong>Nothing is Impossible for Allah:</strong> Surviving inside a whale? Only by Allah's mercy!</li>\n<li><strong>Ask Allah in Hard Times:</strong> No matter how difficult life gets, turn to Allah.</li>\n</ul>\n\n<h2>The Special Prayer</h2>\n<p>The prayer Yunus made is so powerful that Prophet Muhammad (peace be upon him) told us that whoever says it sincerely, Allah will answer their prayer. Many Muslims recite it when facing difficulties. It's a reminder that admitting our mistakes and calling on Allah can save us from any hardship.</p>\n\n<h2>Scientific Wonder</h2>\n<p>Can a person really survive inside a whale? Most whales have throats too small to swallow a human, but sperm whales have very large throats. While it's nearly impossible naturally, Allah can make anything happen! For Yunus, the whale became a safe place, not a death trap - all by Allah's will.</p>\n\n<h2>Think About It</h2>\n<p>Have you ever made a mistake and felt like you were in a dark place, like Yunus in the whale? Remember his prayer - it can help you too! Allah is always ready to forgive and help those who turn to Him.</p>\n\n<h2>Fun Activity</h2>\n<p>Memorize Yunus's special prayer in Arabic and English. Try saying it when you face a difficult situation this week!</p>",
+          "video_url": null,
+          "interactive_content": {
+            "activities": [
+              "Memorize Yunus's prayer (dua)",
+              "Draw the whale in the ocean",
+              "Learn about different types of whales",
+              "Practice admitting mistakes like Yunus did"
+            ],
+            "vocabulary": ["Repentance", "Dua", "Patience", "Nineveh", "Mercy", "Forgiveness"]
+          },
+          "learning_objectives": [
+            "Understand the story of Prophet Yunus and his mission",
+            "Learn the powerful prayer Yunus made in the whale",
+            "Recognize the importance of not giving up on people",
+            "Appreciate Allah's mercy and forgiveness",
+            "Learn about trusting Allah's timing",
+            "Understand that sincere repentance is always accepted"
+          ],
+          "prerequisites": "lesson_001_006",
+          "is_free": false,
+          "is_preview": false,
+          "publishedAt": "2024-10-31T00:00:00.000Z"
+        },
+        {
+          "lesson_id": "lesson_001_008",
+          "title": "Prophet Isa (Jesus) - The Miraculous Prophet",
+          "slug": "prophet-isa-miraculous-prophet",
+          "description": "Learn about the miraculous birth and life of Prophet Isa, honored in Islam as a great messenger of Allah.",
+          "lesson_order": 8,
+          "lesson_type": "reading",
+          "duration_minutes": 25,
+          "content": "<h1>Prophet Isa (Jesus) - The Miraculous Prophet</h1>\n\n<h2>Introduction</h2>\n<p>Prophet Isa (Jesus) (AS) is one of the greatest prophets in Islam. His story is filled with miracles that show Allah's power. Muslims love and respect Prophet Isa very much and believe he will return before the Day of Judgment.</p>\n\n<h2>The Miraculous Birth</h2>\n<p>Isa's mother, Maryam (Mary), was a very pious and devoted woman. She spent her time worshipping Allah in the temple. One day, the Angel Jibril (Gabriel) appeared to her and gave her amazing news: she would have a son who would be a great prophet. Maryam was surprised because she wasn't married, but the angel told her this was Allah's will - a miracle!</p>\n\n<div class='story-box'>\n<h3>The Baby Speaks</h3>\n<p>When Isa was born, people questioned Maryam about having a baby without marriage. Maryam didn't say anything but pointed to baby Isa in the cradle. The people said, \"How can we talk to a baby?\" Then, by Allah's miracle, baby Isa spoke! He said: \"I am the servant of Allah. He has given me the Scripture and made me a prophet.\" Everyone was amazed!</p>\n</div>\n\n<h2>Growing Up</h2>\n<p>As Isa grew, he was kind, wise, and devoted to worshipping Allah. He learned the Torah (the scripture given to Prophet Musa) and became known for his knowledge and piety.</p>\n\n<h3>The Amazing Miracles</h3>\n<p>Allah gave Isa incredible miracles to prove he was a prophet:</p>\n<ul>\n<li><strong>Healing the Sick:</strong> Isa could cure people who were blind from birth and those with leprosy, just by Allah's permission.</li>\n<li><strong>Bringing the Dead to Life:</strong> By Allah's will, Isa could bring dead people back to life!</li>\n<li><strong>Knowing the Unknown:</strong> Isa knew what people ate and what they stored in their homes, showing his connection to Allah.</li>\n<li><strong>Creating a Bird:</strong> Isa made a clay bird, breathed into it, and by Allah's permission, it became a real bird that flew away!</li>\n<li><strong>The Heavenly Table:</strong> When his disciples asked for a sign, Allah sent down a table spread with food from heaven.</li>\n</ul>\n\n<h2>The Message of Isa</h2>\n<p>Isa's message was the same as all prophets before him: worship Allah alone and follow His commands. He taught people to be kind, to pray, to give charity, and to be good to their parents. He came to confirm the Torah and to bring a new message called the Injil (Gospel).</p>\n\n<h3>The Disciples</h3>\n<p>Isa had sincere followers called disciples (Hawariyyun) who believed in him and helped spread his message. They are honored in Islam for their faith and dedication.</p>\n\n<h2>Not Crucified</h2>\n<p>Some people became jealous of Isa and plotted to kill him. They thought they crucified him on a cross, but Islam teaches us that Allah saved Isa! Allah made someone else look like Isa, and that person was taken instead. Allah raised Isa up to the heavens, and he is alive there now, waiting to return to Earth before the Day of Judgment.</p>\n\n<h2>Important Beliefs About Isa</h2>\n<p>Muslims believe:</p>\n<ul>\n<li>Isa is a human prophet, not the son of God (Allah has no children)</li>\n<li>Isa is the Messiah (Al-Masih) mentioned in scriptures</li>\n<li>Isa performed miracles by Allah's permission, not his own power</li>\n<li>Isa was not crucified or killed but was raised to heaven alive</li>\n<li>Isa will return to Earth before the Day of Judgment</li>\n<li>Isa never claimed to be God and always worshipped Allah</li>\n</ul>\n\n<h2>Maryam: The Best Woman</h2>\n<p>Isa's mother, Maryam, is the only woman mentioned by name in the Quran. She has an entire chapter (Surah Maryam) named after her! She is honored as one of the best women ever created. Her patience, faith, and piety are examples for all Muslims.</p>\n\n<h2>Lessons We Learn</h2>\n<ul>\n<li><strong>Miracles Show Allah's Power:</strong> Isa's miracles remind us Allah can do anything.</li>\n<li><strong>Respect All Prophets:</strong> Muslims must respect and love all prophets, including Isa.</li>\n<li><strong>Don't Exaggerate:</strong> Isa was a prophet, not God - we shouldn't exaggerate about anyone.</li>\n<li><strong>True Worship is for Allah Alone:</strong> All prophets taught worship of One God.</li>\n<li><strong>Miracles Aren't Everything:</strong> What matters is the message of worshipping Allah.</li>\n<li><strong>Mothers Are Honored:</strong> Maryam's honor shows how Islam values righteous mothers.</li>\n<li><strong>Be Kind and Generous:</strong> Isa taught kindness, charity, and good manners.</li>\n<li><strong>Truth Will Prevail:</strong> Even though people plotted, Allah protected Isa.</li>\n</ul>\n\n<h2>Connection to Prophet Muhammad</h2>\n<p>Prophet Muhammad (peace be upon him) said, \"I am the closest of all people to Jesus, the son of Mary, in this world and the Hereafter.\" Both taught the same message: worship Allah alone. Muslims send blessings on both prophets and await Isa's return.</p>\n\n<h2>Think About It</h2>\n<p>Isa performed amazing miracles, but he never forgot that all power belongs to Allah. When we achieve something great, do we remember to thank Allah? Do we stay humble like Isa?</p>",
+          "video_url": null,
+          "interactive_content": {
+            "activities": [
+              "Read Surah Maryam (Chapter 19)",
+              "List similarities between Isa and other prophets",
+              "Draw a timeline of Isa's life",
+              "Write about what you'll do when Isa returns"
+            ],
+            "vocabulary": ["Messiah", "Miracle", "Disciple", "Gospel", "Piety", "Ascension"]
+          },
+          "learning_objectives": [
+            "Understand Isa's miraculous birth and role as a prophet",
+            "Learn about the miracles Allah gave to Isa",
+            "Recognize Islamic beliefs about Isa versus other religions",
+            "Appreciate the honor of Maryam in Islam",
+            "Understand that Isa was not crucified but raised to heaven",
+            "Learn about Isa's expected return before the Day of Judgment"
+          ],
+          "prerequisites": "lesson_001_007",
+          "is_free": false,
+          "is_preview": false,
+          "publishedAt": "2024-10-31T00:00:00.000Z"
+        },
+        {
+          "lesson_id": "lesson_001_009",
+          "title": "Prophet Muhammad (ﷺ) - The Final Messenger (Part 1)",
+          "slug": "prophet-muhammad-final-messenger-part-1",
+          "description": "Begin learning about the life of Prophet Muhammad (peace be upon him), from his birth to the first revelation.",
+          "lesson_order": 9,
+          "lesson_type": "reading",
+          "duration_minutes": 25,
+          "content": "<h1>Prophet Muhammad (ﷺ) - The Final Messenger (Part 1)</h1>\n\n<h2>Introduction</h2>\n<p>Prophet Muhammad (peace be upon him) is the last and final messenger sent by Allah to all of humanity. His life, teachings, and character are examples for us to follow forever. This lesson covers his early life and the beginning of his prophethood.</p>\n\n<h2>A Special Birth</h2>\n<p>Muhammad (ﷺ) was born in Mecca in the Year of the Elephant (571 CE). His father Abdullah died before he was born, and sadly, his mother Aminah passed away when he was only six years old. He became an orphan at a very young age, but Allah had great plans for him.</p>\n\n<div class='story-box'>\n<h3>Growing Up</h3>\n<p>Muhammad's grandfather Abdul Muttalib took care of him, but he also died when Muhammad was eight. Then his uncle Abu Talib became his guardian. Even as a child, Muhammad was known for being truthful, trustworthy, and kind. People called him \"Al-Amin\" (The Trustworthy) and \"As-Sadiq\" (The Truthful).</p>\n</div>\n\n<h2>The Young Muhammad</h2>\n<p>As a young man, Muhammad worked as a shepherd, taking care of sheep. Later, he became a merchant, traveling with trading caravans. He was always honest in his business and never cheated anyone. Even though Mecca was full of idol worship and bad behavior, Muhammad never worshipped idols and always stayed away from wrongdoing.</p>\n\n<h3>Marriage to Khadijah</h3>\n<p>A wealthy businesswoman named Khadijah hired Muhammad to manage her trade. She was so impressed by his honesty and character that she wanted to marry him. They got married when Muhammad was 25 and Khadijah was 40. They had a beautiful marriage full of love and respect. Khadijah became his best friend, supporter, and the first person to believe in him as a prophet.</p>\n\n<h2>The Cave of Hira</h2>\n<p>Muhammad often went to a cave called Hira on top of a mountain near Mecca. He would spend days there thinking about Allah and the meaning of life. He was bothered by the idol worship and injustice he saw in Mecca and wanted to find the truth.</p>\n\n<h3>The First Revelation</h3>\n<p>When Muhammad was 40 years old, something incredible happened. He was meditating in the Cave of Hira during the month of Ramadan when Angel Jibril (Gabriel) appeared to him in his true form! The angel said, \"Read!\" Muhammad replied, \"I cannot read\" (he was unlettered). The angel embraced him tightly and said again, \"Read!\" This happened three times.</p>\n\n<p>Then the angel revealed the first verses of the Quran:</p>\n<p class='arabic-text'>اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ</p>\n<p><em>\"Read in the name of your Lord who created...\"</em> (Quran 96:1)</p>\n\n<h2>The Reaction</h2>\n<p>Muhammad was frightened by this experience. He rushed home to Khadijah, trembling, and said, \"Cover me! Cover me!\" Khadijah comforted him and listened to his story. She believed him immediately and said, \"Allah would never disgrace you. You keep good relations with your family, help the poor, serve your guests, and assist those who are in need.\"</p>\n\n<h3>Confirmation of Prophethood</h3>\n<p>Khadijah took Muhammad to her elderly cousin Waraqah ibn Nawfal, a Christian scholar who knew about previous prophets. When Waraqah heard the story, he said, \"This is the same angel that was sent to Musa (Moses)! You are the prophet of this nation!\" This confirmed that Muhammad was indeed chosen by Allah as the final messenger.</p>\n\n<h2>The Early Message</h2>\n<p>At first, Muhammad quietly invited people close to him to Islam. His wife Khadijah was the first believer, followed by his young cousin Ali, his best friend Abu Bakr, and his freed slave Zayd. These early Muslims would pray in secret because most people in Mecca worshipped idols and didn't want to hear about One God.</p>\n\n<h3>Public Preaching Begins</h3>\n<p>After three years, Allah commanded Muhammad to preach openly. He climbed Mount Safa and called the people of Mecca. When they gathered, he asked, \"If I told you an army was coming from behind this mountain, would you believe me?\" They said, \"Yes, you never lie.\" Then he said, \"I am warning you of a severe punishment if you don't worship Allah alone.\" Some people believed, but many became angry, especially his own uncle Abu Lahab.</p>\n\n<h2>Lessons We Learn</h2>\n<ul>\n<li><strong>Good Character from Youth:</strong> Even before prophethood, Muhammad was known for honesty.</li>\n<li><strong>Think and Reflect:</strong> Muhammad spent time thinking about life and truth.</li>\n<li><strong>Support is Important:</strong> Khadijah's belief and support helped Muhammad tremendously.</li>\n<li><strong>Start with Family:</strong> Muhammad taught his closest family first.</li>\n<li><strong>Truth Speaks for Itself:</strong> People trusted Muhammad's message because they knew he never lied.</li>\n<li><strong>Prophets Face Challenges:</strong> Even Muhammad faced rejection and hardship.</li>\n<li><strong>Never Give Up:</strong> Despite opposition, Muhammad continued his mission.</li>\n</ul>\n\n<h2>Muhammad's Character</h2>\n<p>Even his enemies admitted Muhammad was truthful, honest, kind to animals, generous to the poor, respectful to elders, and loving to children. He never cheated, lied, or hurt anyone. This is why his message spread - people trusted him.</p>\n\n<h2>Think About It</h2>\n<p>Imagine being 40 years old and suddenly being told you're a prophet! Would you be brave enough to tell others, knowing they might laugh at you or hurt you? Muhammad (ﷺ) was brave because he trusted Allah completely.</p>\n\n<h2>Our Connection</h2>\n<p>Every day, when we say \"Ash-hadu anna Muhammadan Rasulullah\" (I bear witness that Muhammad is the Messenger of Allah), we're acknowledging what started in that cave 1,400 years ago - the final message to all of humanity.</p>\n\n<p><strong>Next lesson: Part 2 will cover the persecution in Mecca, the migration to Medina, and the spread of Islam!</strong></p>",
+          "video_url": null,
+          "interactive_content": {
+            "activities": [
+              "Create a timeline of Muhammad's early life",
+              "Memorize the first revelation (Quran 96:1-5)",
+              "List Muhammad's character traits you want to develop",
+              "Visit a mosque and learn about the Prophet's life"
+            ],
+            "vocabulary": ["Al-Amin", "As-Sadiq", "Revelation", "Prophethood", "Cave of Hira", "Angel Jibril"]
+          },
+          "learning_objectives": [
+            "Learn about Prophet Muhammad's early life and upbringing",
+            "Understand his reputation for honesty and trustworthiness",
+            "Discover the story of the first revelation in Cave Hira",
+            "Learn about the first believers including Khadijah",
+            "Understand how the message of Islam began",
+            "Recognize Muhammad's exemplary character from childhood"
+          ],
+          "prerequisites": "lesson_001_008",
+          "is_free": false,
+          "is_preview": false,
+          "publishedAt": "2024-10-31T00:00:00.000Z"
+        },
+        {
+          "lesson_id": "lesson_001_010",
+          "title": "Prophet Muhammad (ﷺ) - The Final Messenger (Part 2)",
+          "slug": "prophet-muhammad-final-messenger-part-2",
+          "description": "Continue learning about the Hijrah to Medina, the spread of Islam, and the Prophet's legacy.",
+          "lesson_order": 10,
+          "lesson_type": "reading",
+          "duration_minutes": 25,
+          "content": "<h1>Prophet Muhammad (ﷺ) - The Final Messenger (Part 2)</h1>\n\n<h2>Persecution in Mecca</h2>\n<p>As more people accepted Islam, the leaders of Mecca became very angry. They worshipped idols and made money from pilgrims who visited these idols. Islam taught that only Allah should be worshipped, which threatened their power and wealth.</p>\n\n<div class='story-box'>\n<h3>Muslims Suffer</h3>\n<p>The early Muslims faced terrible persecution. They were beaten, tortured, and boycotted. Some Muslims, like Bilal (an African slave), were tortured in the desert heat. But they stayed strong in their faith. They remembered that Paradise awaited those who remained patient.</p>\n</div>\n\n<h2>The Night Journey and Ascension</h2>\n<p>During the most difficult time, after losing his beloved wife Khadijah and his uncle Abu Talib, Allah honored Prophet Muhammad with a miraculous night journey. In one night, he traveled from Mecca to Jerusalem (Isra) and then ascended through the seven heavens (Mi'raj) to meet Allah. He met all the previous prophets in the heavens, and Allah gave him the gift of five daily prayers for all Muslims.</p>\n\n<h3>Migration to Medina (Hijrah)</h3>\n<p>The persecution became so severe that Muslims needed a safe place. Some Muslims were invited to a city called Yathrib (later renamed Medina - the City of the Prophet). Allah gave permission for Muslims to migrate there. This migration, called the Hijrah, was so important that the Islamic calendar starts from this year (622 CE).</p>\n\n<h2>The Prophet's Migration</h2>\n<p>When the Prophet was about to leave, the enemies plotted to kill him in his sleep. But Allah warned him. The Prophet asked Ali to sleep in his bed that night, and he slipped out with his best friend Abu Bakr. They hid in a cave called Thawr for three days. Allah sent a spider to weave a web at the cave entrance and a pigeon to build a nest, so the enemies thought, \"No one could be inside - look at the undisturbed web and nest!\" This saved them!</p>\n\n<h3>Life in Medina</h3>\n<p>In Medina, the Prophet built a society based on justice, equality, and faith. The first thing he did was build a masjid (mosque) where Muslims could pray together. He made a peace treaty between the Muslims who migrated (Muhajirun) and the people of Medina who helped them (Ansar). These Muslims loved each other so much that they shared their homes, money, and food!</p>\n\n<h2>Important Events</h2>\n<p>Several important things happened in Medina:</p>\n<ul>\n<li><strong>Constitution of Medina:</strong> A document guaranteeing rights for Muslims, Jews, and others to live peacefully together</li>\n<li><strong>Direction of Prayer Changed:</strong> From Jerusalem to Mecca, toward the Kaaba</li>\n<li><strong>Islamic Practices Established:</strong> Fasting in Ramadan, Zakat (charity), Eid celebrations, and more</li>\n<li><strong>Several Battles:</strong> Muslims had to defend themselves against Meccan attacks (Badr, Uhud, Khandaq)</li>\n<li><strong>Treaty of Hudaybiyyah:</strong> A peace treaty that seemed unfavorable but led to victory</li>\n</ul>\n\n<h2>The Conquest of Mecca</h2>\n<p>Eight years after leaving Mecca, the Prophet returned with 10,000 Muslims - but without fighting! When the Meccans saw this huge, disciplined army, most surrendered peacefully. The Prophet entered his hometown humbly, with his head bowed. He forgave his worst enemies, even those who had tortured Muslims for years!</p>\n\n<h3>A Lesson in Forgiveness</h3>\n<p>The Prophet stood at the Kaaba and asked the people of Mecca: \"What do you think I will do with you?\" They said, \"You are a noble brother, son of a noble brother.\" He said, \"Go, you are free!\" No revenge, no punishment - just pure forgiveness. This is true strength of character!</p>\n\n<h2>The Farewell Sermon</h2>\n<p>In his last pilgrimage, the Prophet gave a famous sermon to over 100,000 Muslims. He reminded everyone about important values:</p>\n<ul>\n<li>All humans are equal regardless of race or color</li>\n<li>Protect women's rights and treat them kindly</li>\n<li>Pay back loans and trust others' belongings</li>\n<li>Life and property are sacred</li>\n<li>Follow the Quran and his teachings</li>\n</ul>\n<p>He asked, \"Have I delivered the message?\" Everyone said, \"Yes!\" He pointed to the sky and said, \"O Allah, bear witness!\"</p>\n\n<h2>The Final Days</h2>\n<p>Shortly after returning to Medina, Prophet Muhammad (ﷺ) fell ill. He passed away on Monday, 12th Rabi al-Awwal (June 8, 632 CE) in the arms of his beloved wife Aisha. He was 63 years old. The companions were heartbroken. Abu Bakr reminded everyone: \"Whoever worshipped Muhammad, know that Muhammad is dead. But whoever worshipped Allah, know that Allah is Ever-Living and never dies.\"</p>\n\n<h2>The Prophet's Legacy</h2>\n<p>In just 23 years, Muhammad (ﷺ) transformed Arabia from idol worship, tribal wars, and injustice to a civilization based on faith, justice, and mercy. Today, over 1.8 billion Muslims follow his teachings. His message continues to spread, and his example guides us daily.</p>\n\n<h2>Lessons We Learn</h2>\n<ul>\n<li><strong>Patience in Hardship:</strong> Despite persecution, the Prophet never gave up.</li>\n<li><strong>Forgiveness is Strength:</strong> He forgave his worst enemies.</li>\n<li><strong>Justice and Equality:</strong> Islam treats all people equally.</li>\n<li><strong>Family and Community:</strong> The Prophet cared for orphans, widows, and the poor.</li>\n<li><strong>Education Matters:</strong> The first word revealed was \"Read!\"</li>\n<li><strong>Mercy to All:</strong> He was kind to humans, animals, and nature.</li>\n<li><strong>Lead by Example:</strong> He lived the way he taught others to live.</li>\n</ul>\n\n<h2>How to Follow His Example Today</h2>\n<ul>\n<li>Be honest and trustworthy in everything</li>\n<li>Treat parents, elders, and teachers with respect</li>\n<li>Be kind to animals and the environment</li>\n<li>Help those who are poor or in need</li>\n<li>Study hard and seek knowledge</li>\n<li>Pray five times a day like he taught</li>\n<li>Treat everyone fairly regardless of differences</li>\n<li>Forgive those who wrong you</li>\n</ul>\n\n<h2>Our Connection</h2>\n<p>Every time we say \"peace be upon him\" after his name, every time we pray as he prayed, every time we follow his teachings - we keep his legacy alive. He may have left this world, but his message lives forever in our hearts and in the Quran.</p>\n\n<h2>Think About It</h2>\n<p>If you could meet Prophet Muhammad (ﷺ), what would you ask him? What would you thank him for? Remember, the best way to honor him is to follow his beautiful example in our daily lives.</p>\n\n<p class='arabic-text'>صلى الله عليه وسلم</p>\n<p><em>May Allah's peace and blessings be upon him.</em></p>",
+          "video_url": null,
+          "interactive_content": {
+            "activities": [
+              "Create a poster of lessons from Farewell Sermon",
+              "Write how you'll follow the Prophet's example",
+              "Make a timeline of major events in Medina",
+              "Share Prophet stories with family"
+            ],
+            "vocabulary": ["Hijrah", "Medina", "Muhajirun", "Ansar", "Farewell Sermon", "Legacy"]
+          },
+          "learning_objectives": [
+            "Understand the persecution Muslims faced in Mecca",
+            "Learn about the miraculous Night Journey and Ascension",
+            "Discover the significance of the Hijrah to Medina",
+            "Understand key events in Medina including battles",
+            "Learn about the peaceful conquest of Mecca",
+            "Appreciate the Prophet's legacy and his final sermon",
+            "Understand how to follow his example today"
+          ],
+          "prerequisites": "lesson_001_009",
+          "is_free": false,
+          "is_preview": false,
+          "publishedAt": "2024-10-31T00:00:00.000Z"
+        }
+      ],
+      "quizzes": [
+        {
+          "quiz_id": "quiz_001_001",
+          "lesson_id": "lesson_001_001",
+          "title": "Quiz: Prophet Adam (AS) - The First Human",
+          "slug": "quiz-prophet-adam-first-human",
+          "description": "Test your knowledge about Prophet Adam, the first human and prophet.",
+          "quiz_type": "practice",
+          "time_limit_minutes": 15,
+          "passing_score": 70,
+          "max_attempts": 3,
+          "randomize_questions": true,
+          "show_correct_answers": true,
+          "total_points": 50,
+          "instructions": "<p>Answer all questions about Prophet Adam. You have 15 minutes and up to 3 attempts. Passing score is 70%.</p>",
+          "publishedAt": "2024-10-31T00:00:00.000Z",
+          "questions": [
+            {
+              "type": "multiple_choice",
+              "question": "Who was the first human created by Allah?",
+              "options": ["Prophet Nuh", "Prophet Adam", "Prophet Ibrahim", "Prophet Musa"],
+              "correct_answer": "Prophet Adam",
+              "explanation": "Prophet Adam (AS) was the first human being and the first prophet created by Allah.",
+              "points": 5
+            },
+            {
+              "type": "multiple_choice",
+              "question": "What did Allah create Adam from?",
+              "options": ["Water", "Fire", "Clay", "Light"],
+              "correct_answer": "Clay",
+              "explanation": "Allah created Adam from clay and then breathed life into him.",
+              "points": 5
+            },
+            {
+              "type": "multiple_choice",
+              "question": "Who refused to bow to Adam out of pride?",
+              "options": ["Angel Jibril", "Iblis (Satan)", "Angel Mikail", "All angels"],
+              "correct_answer": "Iblis (Satan)",
+              "explanation": "Iblis refused to bow to Adam because of pride and jealousy, and became Satan.",
+              "points": 5
+            },
+            {
+              "type": "true_false",
+              "question": "Adam and Hawwa (Eve) were placed in Paradise and could eat from all trees.",
+              "options": ["True", "False"],
+              "correct_answer": "False",
+              "explanation": "They could eat from all trees except one forbidden tree that Allah warned them about.",
+              "points": 5
+            },
+            {
+              "type": "multiple_choice",
+              "question": "What did Adam and Hawwa do after they made a mistake?",
+              "options": ["They blamed each other", "They asked Allah for forgiveness", "They ran away", "They made excuses"],
+              "correct_answer": "They asked Allah for forgiveness",
+              "explanation": "Adam and Hawwa sincerely asked Allah for forgiveness, and Allah forgave them.",
+              "points": 5
+            },
+            {
+              "type": "true_false",
+              "question": "Allah never forgave Adam and Hawwa for their mistake.",
+              "options": ["True", "False"],
+              "correct_answer": "False",
+              "explanation": "Allah is Most Merciful and forgave them when they sincerely repented.",
+              "points": 5
+            },
+            {
+              "type": "multiple_choice",
+              "question": "Where did Allah send Adam and Hawwa after their mistake?",
+              "options": ["To another paradise", "To the moon", "To Earth", "To the stars"],
+              "correct_answer": "To Earth",
+              "explanation": "Allah sent Adam and Hawwa to live on Earth, where Adam became the first prophet.",
+              "points": 5
+            },
+            {
+              "type": "multiple_choice",
+              "question": "What important lesson do we learn from Adam's mistake?",
+              "options": ["Never make mistakes", "Everyone makes mistakes, but asking forgiveness is important", "Mistakes cannot be forgiven", "Hide your mistakes"],
+              "correct_answer": "Everyone makes mistakes, but asking forgiveness is important",
+              "explanation": "The story teaches us that even prophets can make mistakes, but sincere repentance leads to Allah's forgiveness.",
+              "points": 5
+            },
+            {
+              "type": "true_false",
+              "question": "Satan tries to trick humans just like he tricked Adam and Hawwa.",
+              "options": ["True", "False"],
+              "correct_answer": "True",
+              "explanation": "Satan continues to try to lead people astray, so we must be aware and strong in our faith.",
+              "points": 5
+            },
+            {
+              "type": "multiple_choice",
+              "question": "What did Adam teach his children on Earth?",
+              "options": ["How to build houses", "About Allah and how to worship Him", "How to hunt animals", "How to make fire"],
+              "correct_answer": "About Allah and how to worship Him",
+              "explanation": "As the first prophet, Adam taught his children about Allah, right from wrong, and how to live good lives.",
+              "points": 5
+            }
+          ]
+        },
+        {
+          "quiz_id": "quiz_001_002",
+          "lesson_id": "lesson_001_002",
+          "title": "Quiz: Prophet Nuh (Noah) - The Patient Prophet",
+          "slug": "quiz-prophet-nuh-patient-prophet",
+          "description": "Test your knowledge about Prophet Nuh and his 950-year mission.",
+          "quiz_type": "practice",
+          "time_limit_minutes": 15,
+          "passing_score": 70,
+          "max_attempts": 3,
+          "randomize_questions": true,
+          "show_correct_answers": true,
+          "total_points": 55,
+          "instructions": "<p>Answer all questions about Prophet Nuh. You have 15 minutes and up to 3 attempts.</p>",
+          "publishedAt": "2024-10-31T00:00:00.000Z",
+          "questions": [
+            {
+              "type": "multiple_choice",
+              "question": "How long did Prophet Nuh call his people to worship Allah?",
+              "options": ["50 years", "500 years", "950 years", "100 years"],
+              "correct_answer": "950 years",
+              "explanation": "Prophet Nuh called his people to Islam for 950 years, showing incredible patience.",
+              "points": 5
+            },
+            {
+              "type": "multiple_choice",
+              "question": "What were the people of Nuh worshipping instead of Allah?",
+              "options": ["The sun", "Idols made of stone and wood", "Animals", "Trees"],
+              "correct_answer": "Idols made of stone and wood",
+              "explanation": "The people had forgotten Allah and worshipped idols they made from stone and wood.",
+              "points": 5
+            },
+            {
+              "type": "true_false",
+              "question": "Prophet Nuh gave up calling people to Islam after they rejected him.",
+              "options": ["True", "False"],
+              "correct_answer": "False",
+              "explanation": "Nuh never gave up. He continued calling people day and night for 950 years.",
+              "points": 5
+            },
+            {
+              "type": "multiple_choice",
+              "question": "What did Allah command Nuh to build?",
+              "options": ["A palace", "A huge ship (Ark)", "A temple", "A wall"],
+              "correct_answer": "A huge ship (Ark)",
+              "explanation": "Allah commanded Nuh to build a huge ship called the Ark on dry land.",
+              "points": 5
+            },
+            {
+              "type": "multiple_choice",
+              "question": "Why did people laugh at Nuh when he was building the Ark?",
+              "options": ["It was too small", "He was building a boat far from water", "It was painted funny colors", "It had no roof"],
+              "correct_answer": "He was building a boat far from water",
+              "explanation": "People laughed because he was building a huge ship on dry land, far from any water.",
+              "points": 5
+            },
+            {
+              "type": "true_false",
+              "question": "Nuh brought pairs of every animal onto the Ark.",
+              "options": ["True", "False"],
+              "correct_answer": "True",
+              "explanation": "Allah commanded Nuh to bring pairs of every animal species onto the Ark.",
+              "points": 5
+            },
+            {
+              "type": "multiple_choice",
+              "question": "What happened after Nuh and the believers entered the Ark?",
+              "options": ["It started to snow", "A great flood covered the Earth", "The sun disappeared", "An earthquake occurred"],
+              "correct_answer": "A great flood covered the Earth",
+              "explanation": "Rain poured down and water gushed from the ground, covering the entire Earth.",
+              "points": 5
+            },
+            {
+              "type": "multiple_choice",
+              "question": "Who was saved from the flood?",
+              "options": ["Everyone", "Only Nuh", "Nuh, believers, and the animals on the Ark", "Half the people"],
+              "correct_answer": "Nuh, believers, and the animals on the Ark",
+              "explanation": "Only those who believed and entered the Ark with Nuh were saved.",
+              "points": 5
+            },
+            {
+              "type": "true_false",
+              "question": "The main lesson from Nuh's story is to be patient and never give up doing good.",
+              "options": ["True", "False"],
+              "correct_answer": "True",
+              "explanation": "Nuh's patience for 950 years teaches us to persevere in doing good even if results take time.",
+              "points": 5
+            },
+            {
+              "type": "multiple_choice",
+              "question": "What did Nuh and the believers do after the flood ended?",
+              "options": ["They were sad", "They thanked Allah and started a new life", "They went back to their old city", "They built more ships"],
+              "correct_answer": "They thanked Allah and started a new life",
+              "explanation": "After being saved, they were grateful to Allah and began a new life worshipping Him alone.",
+              "points": 5
+            },
+            {
+              "type": "multiple_choice",
+              "question": "What important quality did Prophet Nuh show throughout his 950-year mission?",
+              "options": ["Anger", "Patience and trust in Allah", "Fear", "Greed"],
+              "correct_answer": "Patience and trust in Allah",
+              "explanation": "Despite mockery and rejection, Nuh showed unwavering patience and trust in Allah's plan.",
+              "points": 5
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

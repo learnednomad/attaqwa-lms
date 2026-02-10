@@ -4,7 +4,7 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { 
+import {
   LayoutDashboard,
   Megaphone,
   Calendar,
@@ -12,7 +12,9 @@ import {
   Users,
   BookOpen,
   Settings,
-  LogOut
+  LogOut,
+  Moon,
+  Heart,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -38,6 +40,16 @@ const adminNavItems = [
     title: 'Prayer Times',
     href: '/admin/prayer-times',
     icon: Clock,
+  },
+  {
+    title: "I'tikaf",
+    href: '/admin/itikaf',
+    icon: Moon,
+  },
+  {
+    title: 'Appeals',
+    href: '/admin/appeals',
+    icon: Heart,
   },
   {
     title: 'Users',
@@ -83,17 +95,17 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     }
   };
 
+  // Login page bypasses all auth checks - render immediately
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-islamic-green-600"></div>
       </div>
     );
-  }
-
-  // For login page, just render the children without admin layout
-  if (isLoginPage) {
-    return <>{children}</>;
   }
 
   if (!isAuthenticated || !isAdmin) {

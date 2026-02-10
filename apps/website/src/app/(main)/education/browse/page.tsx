@@ -1,27 +1,22 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import {
   Search,
   Filter,
   Grid,
   List,
   BookOpen,
-  Loader2
+  X,
 } from 'lucide-react';
 import { EducationContentCard } from '@/components/features/education/EducationContentCard';
 import { useCourses } from '@/lib/hooks/use-strapi-courses';
 
-// Local type definitions matching Strapi schema
 type AgeTier = 'children' | 'youth' | 'adults' | 'all';
 type IslamicSubject = 'quran' | 'hadith' | 'fiqh' | 'aqeedah' | 'seerah' | 'arabic' | 'islamic_history' | 'akhlaq' | 'tajweed';
 type DifficultyLevel = 'beginner' | 'intermediate' | 'advanced';
 type EducationContentType = 'LESSON' | 'QUIZ' | 'VIDEO' | 'ARTICLE';
 
-// Strapi uses lowercase values
 const subjects: { value: string; label: string }[] = [
   { value: 'quran', label: 'Quran' },
   { value: 'hadith', label: 'Hadith' },
@@ -41,10 +36,10 @@ const ageTiers: { value: string; label: string }[] = [
   { value: 'all', label: 'All Ages' }
 ];
 
-const difficultyLevels: { value: string; label: string; color: string }[] = [
-  { value: 'beginner', label: 'Beginner', color: 'bg-green-100 text-green-800' },
-  { value: 'intermediate', label: 'Intermediate', color: 'bg-yellow-100 text-yellow-800' },
-  { value: 'advanced', label: 'Advanced', color: 'bg-red-100 text-red-800' }
+const difficultyLevels: { value: string; label: string }[] = [
+  { value: 'beginner', label: 'Beginner' },
+  { value: 'intermediate', label: 'Intermediate' },
+  { value: 'advanced', label: 'Advanced' }
 ];
 
 export default function EducationBrowsePage() {
@@ -56,15 +51,13 @@ export default function EducationBrowsePage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Fetch courses with API filters
   const { data: coursesResponse, isLoading, isError, error } = useCourses({
     subject: selectedSubject,
     age_tier: selectedAgeTier,
-    difficulty: selectedDifficulty, // Changed from difficulty_level
+    difficulty: selectedDifficulty,
     search: searchQuery,
   });
 
-  // Transform Strapi courses to match EducationContentCard format
   const courses = useMemo(() => {
     if (!coursesResponse?.data) return [];
 
@@ -74,14 +67,14 @@ export default function EducationBrowsePage() {
         id: course.documentId,
         title: course.title,
         description: course.description,
-        subject: course.subject as IslamicSubject, // Keep lowercase to match Strapi
-        ageTier: course.age_tier as AgeTier, // Keep lowercase to match Strapi
-        difficultyLevel: course.difficulty as DifficultyLevel, // Keep lowercase to match Strapi
-        contentType: 'LESSON' as EducationContentType, // Courses contain lessons
-        estimatedDuration: (course.duration_weeks || 0) * 60, // Convert weeks to minutes approximation
+        subject: course.subject as IslamicSubject,
+        ageTier: course.age_tier as AgeTier,
+        difficultyLevel: course.difficulty as DifficultyLevel,
+        contentType: 'LESSON' as EducationContentType,
+        estimatedDuration: (course.duration_weeks || 0) * 60,
         thumbnailUrl: course.thumbnail?.url,
         isPublished: true,
-        tags: undefined, // Tags not available in Strapi course schema
+        tags: undefined,
         createdAt: new Date(course.createdAt),
         updatedAt: new Date(course.updatedAt),
         author: { id: '1', name: course.instructor || 'Instructor' },
@@ -92,7 +85,6 @@ export default function EducationBrowsePage() {
       }));
   }, [coursesResponse]);
 
-  // Client-side sorting
   const sortedCourses = useMemo(() => {
     const sorted = [...courses];
     sorted.sort((a, b) => {
@@ -120,225 +112,241 @@ export default function EducationBrowsePage() {
   const activeFiltersCount = [selectedAgeTier, selectedSubject, selectedDifficulty].filter(Boolean).length;
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-islamic-navy-800 mb-4">
-          Browse Educational Content
-        </h1>
-        <p className="text-lg text-gray-600 max-w-3xl">
-          Explore our comprehensive library of Islamic educational content. Use filters to find exactly what you're looking for.
-        </p>
-      </div>
-
-      {/* Search and Controls */}
-      <Card className="mb-6">
-        <CardContent className="p-6">
-          <div className="flex flex-col lg:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search lessons, topics, keywords, or tags..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-islamic-green-500 focus:border-transparent text-lg"
-                />
-              </div>
-            </div>
-
-            {/* Controls */}
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setShowFilters(!showFilters)}
-                className="relative"
-              >
-                <Filter className="h-4 w-4 mr-2" />
-                Filters
-                {activeFiltersCount > 0 && (
-                  <Badge className="ml-2 bg-islamic-green-600 text-white">
-                    {activeFiltersCount}
-                  </Badge>
-                )}
-              </Button>
-
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-islamic-green-500"
-              >
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
-                <option value="duration">Shortest First</option>
-              </select>
-
-              <div className="flex border border-gray-300 rounded-lg">
-                <Button
-                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('grid')}
-                  className="rounded-r-none"
-                >
-                  <Grid className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                  className="rounded-l-none"
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Filters Panel */}
-          {showFilters && (
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* Age Tier Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Age Group</label>
-                  <select
-                    value={selectedAgeTier || ''}
-                    onChange={(e) => setSelectedAgeTier(e.target.value || undefined)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-islamic-green-500"
-                  >
-                    <option value="">All Ages</option>
-                    {ageTiers.map((tier) => (
-                      <option key={tier.value} value={tier.value}>
-                        {tier.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Subject Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
-                  <select
-                    value={selectedSubject || ''}
-                    onChange={(e) => setSelectedSubject(e.target.value || undefined)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-islamic-green-500"
-                  >
-                    <option value="">All Subjects</option>
-                    {subjects.map((subject) => (
-                      <option key={subject.value} value={subject.value}>
-                        {subject.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Difficulty Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Difficulty</label>
-                  <select
-                    value={selectedDifficulty || ''}
-                    onChange={(e) => setSelectedDifficulty(e.target.value || undefined)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-islamic-green-500"
-                  >
-                    <option value="">All Levels</option>
-                    {difficultyLevels.map((level) => (
-                      <option key={level.value} value={level.value}>
-                        {level.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {activeFiltersCount > 0 && (
-                <div className="mt-4 flex justify-between items-center">
-                  <p className="text-sm text-gray-600">
-                    {sortedCourses.length} result{sortedCourses.length !== 1 ? 's' : ''} found with current filters
-                  </p>
-                  <Button variant="ghost" onClick={clearFilters} size="sm">
-                    Clear All Filters
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Loading State */}
-      {isLoading && (
-        <div className="flex justify-center items-center py-12">
-          <Loader2 className="h-12 w-12 animate-spin text-islamic-green-600" />
-          <span className="ml-4 text-lg text-gray-600">Loading courses...</span>
+      <section className="border-b border-neutral-100">
+        <div className="max-w-5xl mx-auto px-6 py-16 text-center">
+          <p className="text-xs font-semibold tracking-[0.2em] uppercase text-emerald-700 mb-3">
+            Education
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-neutral-900 mb-4">
+            Browse Courses
+          </h1>
+          <p className="text-base text-neutral-500 max-w-2xl mx-auto leading-relaxed">
+            Explore our comprehensive library of Islamic educational content. Use filters to find exactly what you&apos;re looking for.
+          </p>
         </div>
-      )}
+      </section>
 
-      {/* Error State */}
-      {isError && (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <div className="h-16 w-16 text-red-400 mx-auto mb-4">⚠️</div>
-            <h3 className="text-xl font-semibold text-gray-600 mb-2">Failed to load courses</h3>
-            <p className="text-gray-500 mb-4">
-              {error?.message || 'Something went wrong. Please try again later.'}
-            </p>
-            <Button
-              variant="outline"
-              onClick={() => window.location.reload()}
-            >
-              Retry
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Results */}
-      {!isLoading && !isError && (
-        <>
-          <div className="mb-4 flex justify-between items-center">
-            <p className="text-gray-600">
-              Showing {sortedCourses.length} course{sortedCourses.length !== 1 ? 's' : ''}
-            </p>
-          </div>
-
-          {/* Content Grid/List */}
-          {sortedCourses.length > 0 ? (
-            <div
-              className={
-                viewMode === 'grid'
-                  ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
-                  : 'space-y-4'
-              }
-            >
-              {sortedCourses.map((content) => (
-                <div key={content.id} className={viewMode === 'list' ? 'w-full' : ''}>
-                  <EducationContentCard
-                    content={content}
-                    onClick={(content) => {
-                      window.location.href = `/education/courses/${content.id}`;
-                    }}
+      <div className="max-w-5xl mx-auto px-6">
+        {/* Search and Controls */}
+        <section className="py-8">
+          <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-5">
+            <div className="flex flex-col lg:flex-row gap-4">
+              {/* Search */}
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                  <input
+                    type="text"
+                    placeholder="Search lessons, topics, keywords..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full rounded-lg border border-neutral-200 bg-white pl-10 pr-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300"
                   />
                 </div>
-              ))}
+              </div>
+
+              {/* Controls */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="relative flex items-center gap-2 rounded-lg border border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors"
+                >
+                  <Filter className="h-4 w-4" />
+                  Filters
+                  {activeFiltersCount > 0 && (
+                    <span className="ml-1 flex items-center justify-center w-5 h-5 rounded-full bg-emerald-600 text-white text-xs font-medium">
+                      {activeFiltersCount}
+                    </span>
+                  )}
+                </button>
+
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className="rounded-lg border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300"
+                >
+                  <option value="newest">Newest First</option>
+                  <option value="oldest">Oldest First</option>
+                  <option value="duration">Shortest First</option>
+                </select>
+
+                <div className="flex rounded-lg border border-neutral-200 overflow-hidden">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`p-2.5 transition-colors ${
+                      viewMode === 'grid'
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-white text-neutral-500 hover:bg-neutral-50'
+                    }`}
+                  >
+                    <Grid className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`p-2.5 transition-colors ${
+                      viewMode === 'list'
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-white text-neutral-500 hover:bg-neutral-50'
+                    }`}
+                  >
+                    <List className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
             </div>
-          ) : (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-600 mb-2">No courses found</h3>
-                <p className="text-gray-500 mb-4">
-                  Try adjusting your search terms or filters to find what you're looking for.
+
+            {/* Filters Panel */}
+            {showFilters && (
+              <div className="mt-5 pt-5 border-t border-neutral-100">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* Age Tier Filter */}
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">Age Group</label>
+                    <select
+                      value={selectedAgeTier || ''}
+                      onChange={(e) => setSelectedAgeTier(e.target.value || undefined)}
+                      className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300"
+                    >
+                      <option value="">All Ages</option>
+                      {ageTiers.map((tier) => (
+                        <option key={tier.value} value={tier.value}>
+                          {tier.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Subject Filter */}
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">Subject</label>
+                    <select
+                      value={selectedSubject || ''}
+                      onChange={(e) => setSelectedSubject(e.target.value || undefined)}
+                      className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300"
+                    >
+                      <option value="">All Subjects</option>
+                      {subjects.map((subject) => (
+                        <option key={subject.value} value={subject.value}>
+                          {subject.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Difficulty Filter */}
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">Difficulty</label>
+                    <select
+                      value={selectedDifficulty || ''}
+                      onChange={(e) => setSelectedDifficulty(e.target.value || undefined)}
+                      className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300"
+                    >
+                      <option value="">All Levels</option>
+                      {difficultyLevels.map((level) => (
+                        <option key={level.value} value={level.value}>
+                          {level.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {activeFiltersCount > 0 && (
+                  <div className="mt-4 flex justify-between items-center">
+                    <p className="text-sm text-neutral-500">
+                      {sortedCourses.length} result{sortedCourses.length !== 1 ? 's' : ''} found
+                    </p>
+                    <button
+                      onClick={clearFilters}
+                      className="flex items-center gap-1.5 text-sm font-medium text-neutral-500 hover:text-neutral-700 transition-colors"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                      Clear All Filters
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Loading State */}
+        {isLoading && (
+          <div className="py-20 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto" />
+            <p className="mt-4 text-sm text-neutral-500">Loading courses...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {isError && (
+          <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-12 text-center">
+            <div className="w-12 h-12 rounded-lg bg-red-50 border border-red-100 flex items-center justify-center mx-auto mb-4">
+              <X className="h-5 w-5 text-red-500" />
+            </div>
+            <h3 className="text-base font-semibold text-neutral-900 mb-2">Failed to load courses</h3>
+            <p className="text-sm text-neutral-500 mb-5 max-w-md mx-auto">
+              {error?.message || 'Something went wrong. Please try again later.'}
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="rounded-lg border border-neutral-200 bg-white px-5 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
+        {/* Results */}
+        {!isLoading && !isError && (
+          <section className="pb-20">
+            <div className="mb-5">
+              <p className="text-sm text-neutral-500">
+                Showing {sortedCourses.length} course{sortedCourses.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+
+            {sortedCourses.length > 0 ? (
+              <div
+                className={
+                  viewMode === 'grid'
+                    ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5'
+                    : 'space-y-4'
+                }
+              >
+                {sortedCourses.map((content) => (
+                  <div key={content.id} className={viewMode === 'list' ? 'w-full' : ''}>
+                    <EducationContentCard
+                      content={content}
+                      onClick={(content) => {
+                        window.location.href = `/education/courses/${content.id}`;
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-12 text-center">
+                <div className="w-12 h-12 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center mx-auto mb-4">
+                  <BookOpen className="h-5 w-5 text-emerald-600" />
+                </div>
+                <h3 className="text-base font-semibold text-neutral-900 mb-2">No courses found</h3>
+                <p className="text-sm text-neutral-500 mb-5 max-w-md mx-auto">
+                  Try adjusting your search terms or filters to find what you&apos;re looking for.
                 </p>
-                <Button variant="outline" onClick={clearFilters}>
+                <button
+                  onClick={clearFilters}
+                  className="rounded-lg border border-neutral-200 bg-white px-5 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors"
+                >
                   Clear All Filters
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-        </>
-      )}
+                </button>
+              </div>
+            )}
+          </section>
+        )}
+      </div>
     </div>
   );
 }

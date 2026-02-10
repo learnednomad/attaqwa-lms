@@ -64,3 +64,10 @@ coverage/
 .bmad-core/
 .bmad-*/
 .playwright-mcp/
+
+# Test screenshots and backups
+*.png
+!apps/website/public/**/*.png
+!apps/**/public/**/*.png
+backups/
+test-screenshots/

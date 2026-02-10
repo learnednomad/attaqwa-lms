@@ -1,0 +1,65 @@
+{
+  "kind": "collectionType",
+  "collectionName": "streaks",
+  "info": {
+    "singularName": "streak",
+    "pluralName": "streaks",
+    "displayName": "Streak",
+    "description": "Track daily learning streaks for users"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "current_streak": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "longest_streak": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "last_activity_date": {
+      "type": "date",
+      "required": false
+    },
+    "streak_start_date": {
+      "type": "date",
+      "required": false
+    },
+    "total_days_active": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "streak_history": {
+      "type": "json",
+      "required": false
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "streak_frozen": {
+      "type": "boolean",
+      "default": false
+    },
+    "freeze_count": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    }
+  }
+}

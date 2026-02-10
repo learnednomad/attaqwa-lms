@@ -1,17 +1,8 @@
 'use client';
 
-/**
- * Student Authentication Context
- *
- * SECURITY IMPROVEMENTS:
- * - Removed localStorage token storage (XSS vulnerability)
- * - Token is now stored in httpOnly cookies by the server
- * - Client only receives user data, never the raw token
- * - All auth state is managed via API calls with credentials: 'include'
- */
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext } from 'react';
 import { useRouter } from 'next/navigation';
+import { authClient } from '@/lib/auth-client';
 
 interface User {
   id: string;
@@ -19,22 +10,6 @@ interface User {
   studentId?: string;
   name: string;
   role: string;
-  enrolledCourses?: Array<{
-    courseId: string;
-    courseName: string;
-    courseCode?: string;
-    instructor?: string;
-    enrolledAt: string;
-    progress?: number;
-  }>;
-  recentSubmissions?: Array<{
-    id: string;
-    assignmentTitle: string;
-    submittedAt: string;
-    grade?: number;
-    status: string;
-  }>;
-  unreadNotifications?: number;
 }
 
 interface AuthContextType {
@@ -49,114 +24,52 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function StudentAuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: session, isPending, refetch } = authClient.useSession();
   const router = useRouter();
 
-  // Check authentication status on mount
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      const response = await fetch('/api/student/auth/me', {
-        // SECURITY: Include cookies for httpOnly token
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
-      } else {
-        setUser(null);
+  const user: User | null = session?.user
+    ? {
+        id: session.user.id,
+        email: session.user.email,
+        name: session.user.name,
+        role: session.user.role ?? 'user',
       }
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+    : null;
 
   const login = async (email: string, password: string) => {
-    try {
-      const response = await fetch('/api/student/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        // SECURITY: Include cookies - server will set httpOnly cookie
-        credentials: 'include',
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
-      }
-
-      // SECURITY: Only store user data, NOT the token
-      // Token is stored in httpOnly cookie by the server
-      setUser(data.user);
-
-      router.push('/student/dashboard');
-    } catch (error) {
-      throw error;
+    const { error } = await authClient.signIn.email({ email, password });
+    if (error) {
+      throw new Error(error.message || 'Login failed');
     }
+    router.push('/student/dashboard');
   };
 
   const loginWithStudentId = async (studentId: string, password: string) => {
-    try {
-      const response = await fetch('/api/student/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        // SECURITY: Include cookies - server will set httpOnly cookie
-        credentials: 'include',
-        body: JSON.stringify({ studentId, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
-      }
-
-      // SECURITY: Only store user data, NOT the token
-      setUser(data.user);
-
-      router.push('/student/dashboard');
-    } catch (error) {
-      throw error;
+    // Student ID login: use the student ID as the email identifier
+    // This assumes student IDs are mapped to email addresses in the system
+    const { error } = await authClient.signIn.email({
+      email: studentId,
+      password,
+    });
+    if (error) {
+      throw new Error(error.message || 'Login failed');
     }
+    router.push('/student/dashboard');
   };
 
   const logout = async () => {
-    try {
-      await fetch('/api/student/auth/logout', {
-        method: 'POST',
-        // SECURITY: Include cookies for server to clear httpOnly cookie
-        credentials: 'include',
-      });
-    } catch (error) {
-      console.error('Logout API call failed:', error);
-      // Continue with logout even if API call fails
-    } finally {
-      // Clear local state
-      setUser(null);
-      router.push('/student/login');
-    }
+    await authClient.signOut();
+    router.push('/student/login');
   };
 
   const refreshUser = async () => {
-    await checkAuth();
+    await refetch();
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, loginWithStudentId, logout, refreshUser }}>
+    <AuthContext.Provider
+      value={{ user, loading: isPending, login, loginWithStudentId, logout, refreshUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

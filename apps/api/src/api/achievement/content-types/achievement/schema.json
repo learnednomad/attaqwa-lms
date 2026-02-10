@@ -1,0 +1,78 @@
+{
+  "kind": "collectionType",
+  "collectionName": "achievements",
+  "info": {
+    "singularName": "achievement",
+    "pluralName": "achievements",
+    "displayName": "Achievement",
+    "description": "Achievements and badges that students can earn"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 255
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "achievement_type": {
+      "type": "enumeration",
+      "enum": ["course_completion", "quiz_mastery", "streak", "participation", "special"],
+      "required": true
+    },
+    "icon": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "badge_image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "points": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "criteria": {
+      "type": "json",
+      "required": true
+    },
+    "rarity": {
+      "type": "enumeration",
+      "enum": ["common", "uncommon", "rare", "epic", "legendary"],
+      "required": true,
+      "default": "common"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "display_order": {
+      "type": "integer",
+      "required": false,
+      "default": 0
+    },
+    "user_achievements": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::user-achievement.user-achievement",
+      "mappedBy": "achievement"
+    }
+  }
+}

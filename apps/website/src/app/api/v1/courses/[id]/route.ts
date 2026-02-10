@@ -1,16 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAnyAuthToken } from '@/lib/auth-cookies';
 import { verifyAuth } from '@/middleware/auth';
 
 const STRAPI_URL = process.env.STRAPI_URL || 'http://localhost:1337';
-
-/**
- * Get auth token from cookies for authenticated requests
- */
-async function getAuthToken(): Promise<string | null> {
-  const result = await getAnyAuthToken();
-  return result?.token || null;
-}
+const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN;
 
 /**
  * GET /api/v1/courses/[id]
@@ -119,16 +111,15 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
 
-    // Get auth token for Strapi forwarding
-    const token = await getAuthToken();
-    const authHeader = request.headers.get('authorization');
+    // Use Strapi API token for server-to-server requests
+    const token = STRAPI_API_TOKEN;
 
     // Try v1 API first, fall back to standard Strapi API
     let response = await fetch(`${STRAPI_URL}/api/v1/courses/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: authHeader || `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ data: body.data || body }),
     });
@@ -139,7 +130,7 @@ export async function PUT(
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: authHeader || `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ data: body.data || body }),
       });
@@ -209,16 +200,15 @@ export async function DELETE(
 
     const { id } = await params;
 
-    // Get auth token for Strapi forwarding
-    const token = await getAuthToken();
-    const authHeader = request.headers.get('authorization');
+    // Use Strapi API token for server-to-server requests
+    const token = STRAPI_API_TOKEN;
 
     // Try v1 API first, fall back to standard Strapi API
     let response = await fetch(`${STRAPI_URL}/api/v1/courses/${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: authHeader || `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -228,7 +218,7 @@ export async function DELETE(
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: authHeader || `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
     }

@@ -1,8 +1,7 @@
 /**
  * Strapi API Client for Next.js Web Admin
- * Handles authentication, requests, and error handling
- *
- * Updated: 2025-12-10 - Now uses v1 versioned endpoints
+ * Handles content API requests with server-side API token.
+ * Auth is handled by BetterAuth (see lib/auth-client.ts).
  */
 
 import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios';
@@ -10,13 +9,13 @@ import { API_V1_ENDPOINTS, API_CONFIG } from '@attaqwa/shared';
 
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337/api';
+const STRAPI_API_TOKEN = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
 
 // API Version configuration
 const API_VERSION = API_CONFIG.CURRENT_VERSION; // 'v1'
 
 class StrapiClient {
   private client: AxiosInstance;
-  private token: string | null = null;
 
   constructor() {
     this.client = axios.create({
@@ -26,11 +25,11 @@ class StrapiClient {
       },
     });
 
-    // Request interceptor to add auth token
+    // Request interceptor to add API token
     this.client.interceptors.request.use(
       (config) => {
-        if (this.token) {
-          config.headers.Authorization = `Bearer ${this.token}`;
+        if (STRAPI_API_TOKEN) {
+          config.headers.Authorization = `Bearer ${STRAPI_API_TOKEN}`;
         }
         return config;
       },
@@ -42,88 +41,11 @@ class StrapiClient {
       (response) => response,
       async (error) => {
         if (error.response?.status === 401) {
-          // Token expired, clear auth and redirect to login
-          this.clearAuth();
-          if (typeof window !== 'undefined') {
-            window.location.href = '/login';
-          }
+          console.error('[StrapiClient] Unauthorized — check STRAPI_API_TOKEN');
         }
         return Promise.reject(error);
       }
     );
-
-    // Load token from localStorage on client
-    if (typeof window !== 'undefined') {
-      const storedToken = localStorage.getItem('strapi_token');
-      if (storedToken) {
-        this.token = storedToken;
-      }
-    }
-  }
-
-  // Authentication methods
-  async login(identifier: string, password: string) {
-    try {
-      const response = await this.client.post('/auth/local', {
-        identifier,
-        password,
-      });
-
-      const { jwt, user } = response.data;
-      this.setAuth(jwt);
-
-      return { user, token: jwt };
-    } catch (error: any) {
-      throw new Error(error.response?.data?.error?.message || 'Login failed');
-    }
-  }
-
-  async register(username: string, email: string, password: string) {
-    try {
-      const response = await this.client.post('/auth/local/register', {
-        username,
-        email,
-        password,
-      });
-
-      const { jwt, user } = response.data;
-      this.setAuth(jwt);
-
-      return { user, token: jwt };
-    } catch (error: any) {
-      throw new Error(error.response?.data?.error?.message || 'Registration failed');
-    }
-  }
-
-  async getMe() {
-    try {
-      const response = await this.client.get('/users/me', {
-        params: {
-          populate: ['role', 'profile', 'profile.avatar'],
-        },
-      });
-      return response.data;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.error?.message || 'Failed to fetch user');
-    }
-  }
-
-  setAuth(token: string) {
-    this.token = token;
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('strapi_token', token);
-    }
-  }
-
-  clearAuth() {
-    this.token = null;
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('strapi_token');
-    }
-  }
-
-  isAuthenticated(): boolean {
-    return !!this.token;
   }
 
   // Generic CRUD methods
@@ -245,11 +167,6 @@ export const adminApiEndpoints = {
   // Gamification (v1 versioned)
   leaderboards: `/${API_VERSION}/leaderboards`,
   streaks: `/${API_VERSION}/streaks`,
-
-  // Auth (standard Strapi - no version prefix)
-  login: '/auth/local',
-  register: '/auth/local/register',
-  me: '/users/me',
 
   // File upload (standard Strapi)
   upload: '/upload',

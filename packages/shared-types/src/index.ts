@@ -58,7 +58,7 @@ export interface UserRole {
   id: string;
   name: string;
   description: string;
-  type: 'authenticated' | 'teacher' | 'admin' | 'student' | 'parent';
+  type: 'admin' | 'moderator' | 'teacher' | 'student' | 'parent' | 'user';
 }
 
 export interface UserProfile {
@@ -71,14 +71,14 @@ export interface UserProfile {
   ageTier?: AgeTier;
 }
 
-export type AgeTier = 'children' | 'youth' | 'adults' | 'all';
+export type AgeTier = 'children' | 'youth' | 'adults' | 'seniors';
 
 // Runtime const for AgeTier
 export const AgeTier = {
   CHILDREN: 'children' as const,
   YOUTH: 'youth' as const,
   ADULTS: 'adults' as const,
-  ALL: 'all' as const,
+  SENIORS: 'seniors' as const,
 } as const;
 
 /**
@@ -88,7 +88,10 @@ export interface AuthUser {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'user';
+  role: 'admin' | 'moderator' | 'teacher' | 'student' | 'parent' | 'user';
+  banned?: boolean;
+  banReason?: string;
+  banExpires?: string;
 }
 
 export interface LoginInput {
@@ -243,11 +246,13 @@ export interface UserProgress {
   id: string;
   user: Pick<User, 'id' | 'username'>;
   lesson: Pick<Lesson, 'id' | 'title'>;
-  progress: number; // 0-100
-  completed: boolean;
-  quizScore?: number; // 0-100
-  timeSpent: number; // in minutes
-  lastAccessed: string;
+  status: 'not_started' | 'in_progress' | 'completed';
+  progress_percentage: number; // 0-100
+  time_spent_minutes: number;
+  quiz_score?: number; // 0-100
+  quiz_attempts?: number;
+  last_accessed?: string;
+  completed_at?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -256,10 +261,15 @@ export interface CourseEnrollment {
   id: string;
   user: Pick<User, 'id' | 'username'>;
   course: Course;
-  enrolledAt: string;
-  completedAt?: string;
-  status: 'enrolled' | 'in_progress' | 'completed' | 'dropped';
-  progress: number; // 0-100
+  enrollment_status: 'pending' | 'active' | 'completed' | 'dropped' | 'suspended';
+  enrollment_date: string;
+  completion_date?: string;
+  overall_progress: number; // 0-100
+  lessons_completed: number;
+  quizzes_completed: number;
+  average_quiz_score?: number;
+  total_time_spent_minutes: number;
+  last_activity_date?: string;
 }
 
 export interface ProgressStatsResponse {
@@ -458,4 +468,194 @@ export interface CourseAnalytics {
     lessonTitle: string;
     completionRate: number;
   }[];
+}
+
+// ============================================================================
+// AI / Ollama Types
+// ============================================================================
+
+export interface ModerationResult {
+  score: number;
+  flags: ModerationFlag[];
+  reasoning: string;
+  recommendation: 'approve' | 'needs_review' | 'reject';
+}
+
+export interface ModerationFlag {
+  type: 'ACCURACY' | 'AGE_APPROPRIATENESS' | 'CULTURAL_SENSITIVITY' | 'QUALITY' | 'SAFETY';
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  description: string;
+}
+
+export interface TagSuggestion {
+  subject: string;
+  difficulty: string;
+  ageTier: string;
+  keywords: string[];
+}
+
+export type AIJobStatus = 'pending' | 'processing' | 'completed' | 'failed';
+
+export interface AIJob<T = any> {
+  id: string;
+  type: string;
+  status: AIJobStatus;
+  result?: T;
+  error?: string;
+  createdAt: number;
+  startedAt?: number;
+  completedAt?: number;
+}
+
+export interface SemanticSearchResult {
+  contentType: string;
+  contentId: string;
+  title: string;
+  snippet: string;
+  score: number;
+  metadata?: Record<string, any>;
+}
+
+export interface ContentRecommendation {
+  courseId: string;
+  title: string;
+  description: string;
+  score: number;
+  reason: string;
+  difficulty: CourseDifficulty;
+  category: CourseCategory;
+}
+
+export interface ModerationQueueItem {
+  id: string;
+  contentType: string;
+  contentId: string;
+  contentTitle: string;
+  status: 'pending' | 'approved' | 'rejected' | 'needs_review';
+  aiScore: number;
+  aiFlags: ModerationFlag[];
+  aiReasoning: string;
+  reviewer?: Pick<User, 'id' | 'username'>;
+  reviewerNotes?: string;
+  reviewedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OllamaHealthStatus {
+  available: boolean;
+  enabled: boolean;
+  baseUrl: string;
+  model: string;
+  models: string[];
+}
+
+// ============================================================================
+// Masjid Admin Types
+// ============================================================================
+
+export type AnnouncementCategory = 'general' | 'ramadan' | 'eid' | 'urgent' | 'community' | 'fundraising';
+
+export interface Announcement {
+  id: string;
+  documentId?: string;
+  title: string;
+  content: string;
+  category: AnnouncementCategory;
+  imageUrl?: string;
+  imageAlt?: string;
+  pdfUrl?: string;
+  isActive: boolean;
+  isPinned?: boolean;
+  publishDate?: string;
+  expiryDate?: string;
+  author?: Pick<User, 'id' | 'username'>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type EventCategory = 'lecture' | 'community' | 'youth' | 'sisters' | 'fundraiser' | 'other';
+
+export interface MasjidEvent {
+  id: string;
+  documentId?: string;
+  title: string;
+  description: string;
+  date: string;
+  startTime?: string;
+  endTime?: string;
+  location?: string;
+  isIndoor?: boolean;
+  isOutdoor?: boolean;
+  imageUrl?: string;
+  imageAlt?: string;
+  isActive: boolean;
+  isRecurring?: boolean;
+  recurrencePattern?: string;
+  maxAttendees?: number;
+  category?: EventCategory;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type PrayerName = 'fajr' | 'sunrise' | 'dhuhr' | 'asr' | 'maghrib' | 'isha';
+
+export interface PrayerTimeOverride {
+  id: string;
+  documentId?: string;
+  date: string;
+  prayer: PrayerName;
+  overrideTime: string;
+  reason?: string;
+  isActive: boolean;
+  createdBy?: Pick<User, 'id' | 'username'>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ItikafDurationType = 'full' | 'last_ten' | 'weekend' | 'custom';
+export type ItikafStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
+
+export interface ItikafRegistration {
+  id: string;
+  documentId?: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  gender: 'male' | 'female';
+  age: number;
+  durationType: ItikafDurationType;
+  startDate: string;
+  endDate: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+  medicalConditions?: string;
+  specialRequirements?: string;
+  status: ItikafStatus;
+  notes?: string;
+  user?: Pick<User, 'id' | 'username'>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type AppealCategory = 'zakat' | 'sadaqah' | 'building_fund' | 'emergency' | 'education' | 'community';
+
+export interface Appeal {
+  id: string;
+  documentId?: string;
+  title: string;
+  description: string;
+  category: AppealCategory;
+  goalAmount?: number;
+  currentAmount?: number;
+  currency?: string;
+  startDate: string;
+  endDate?: string;
+  isActive: boolean;
+  isFeatured?: boolean;
+  imageUrl?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  createdAt: string;
+  updatedAt: string;
 }

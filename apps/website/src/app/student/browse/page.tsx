@@ -12,6 +12,7 @@ import {
   Clock, Play, ChevronDown, ChevronUp, Plus, BarChart3
 } from 'lucide-react';
 import { useCourses } from '@/lib/hooks/use-strapi-courses';
+import { SemanticSearch } from '@/components/features/SemanticSearch';
 
 const subjects = [
   { value: 'quran', label: 'Quran' },
@@ -237,13 +238,18 @@ export default function StudentBrowsePage() {
         </Link>
       </div>
 
-      {/* Search Bar */}
+      {/* AI Semantic Search */}
+      <div className="mb-6">
+        <SemanticSearch />
+      </div>
+
+      {/* Keyword Filter Bar */}
       <div className="flex flex-col lg:flex-row gap-3 mb-6">
         <div className="flex-1 relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
           <input
             type="text"
-            placeholder="Search courses, subjects, instructors..."
+            placeholder="Filter courses by keyword..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-[15px] focus:ring-2 focus:ring-emerald-500 focus:border-transparent placeholder:text-gray-400 transition-shadow"

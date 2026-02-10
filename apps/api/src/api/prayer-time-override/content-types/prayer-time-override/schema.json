@@ -1,0 +1,42 @@
+{
+  "kind": "collectionType",
+  "collectionName": "prayer_time_overrides",
+  "info": {
+    "singularName": "prayer-time-override",
+    "pluralName": "prayer-time-overrides",
+    "displayName": "Prayer Time Override",
+    "description": "Admin overrides for calculated prayer times"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "date": {
+      "type": "date",
+      "required": true
+    },
+    "prayer": {
+      "type": "enumeration",
+      "enum": ["fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha"],
+      "required": true
+    },
+    "overrideTime": {
+      "type": "string",
+      "required": true
+    },
+    "reason": {
+      "type": "string"
+    },
+    "isActive": {
+      "type": "boolean",
+      "required": true,
+      "default": true
+    },
+    "createdBy": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    }
+  }
+}

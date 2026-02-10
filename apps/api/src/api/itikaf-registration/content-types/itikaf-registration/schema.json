@@ -1,0 +1,80 @@
+{
+  "kind": "collectionType",
+  "collectionName": "itikaf_registrations",
+  "info": {
+    "singularName": "itikaf-registration",
+    "pluralName": "itikaf-registrations",
+    "displayName": "Itikaf Registration",
+    "description": "I'tikaf registration management for Ramadan and other periods"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "fullName": {
+      "type": "string",
+      "required": true,
+      "maxLength": 255
+    },
+    "email": {
+      "type": "string",
+      "required": true
+    },
+    "phone": {
+      "type": "string",
+      "required": true
+    },
+    "gender": {
+      "type": "enumeration",
+      "enum": ["male", "female"],
+      "required": true
+    },
+    "age": {
+      "type": "integer",
+      "required": true,
+      "min": 13
+    },
+    "durationType": {
+      "type": "enumeration",
+      "enum": ["full", "last_ten", "weekend", "custom"],
+      "required": true
+    },
+    "startDate": {
+      "type": "date",
+      "required": true
+    },
+    "endDate": {
+      "type": "date",
+      "required": true
+    },
+    "emergencyContactName": {
+      "type": "string",
+      "required": true
+    },
+    "emergencyContactPhone": {
+      "type": "string",
+      "required": true
+    },
+    "medicalConditions": {
+      "type": "text"
+    },
+    "specialRequirements": {
+      "type": "text"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["pending", "approved", "rejected", "cancelled"],
+      "required": true,
+      "default": "pending"
+    },
+    "notes": {
+      "type": "text"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    }
+  }
+}

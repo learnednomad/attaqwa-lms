@@ -1,0 +1,84 @@
+{
+  "kind": "collectionType",
+  "collectionName": "user_progresses",
+  "info": {
+    "singularName": "user-progress",
+    "pluralName": "user-progresses",
+    "displayName": "User Progress",
+    "description": "Track user progress through lessons and quizzes"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "lesson": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::lesson.lesson",
+      "inversedBy": "user_progress"
+    },
+    "quiz": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::quiz.quiz",
+      "inversedBy": "user_progress"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["not_started", "in_progress", "completed"],
+      "required": true,
+      "default": "not_started"
+    },
+    "progress_percentage": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0,
+      "max": 100
+    },
+    "time_spent_minutes": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "quiz_score": {
+      "type": "integer",
+      "required": false,
+      "min": 0,
+      "max": 100
+    },
+    "quiz_attempts": {
+      "type": "integer",
+      "required": false,
+      "default": 0,
+      "min": 0
+    },
+    "quiz_answers": {
+      "type": "json",
+      "required": false
+    },
+    "last_accessed": {
+      "type": "datetime",
+      "required": false
+    },
+    "completed_at": {
+      "type": "datetime",
+      "required": false
+    },
+    "notes": {
+      "type": "text",
+      "required": false
+    },
+    "bookmarks": {
+      "type": "json",
+      "required": false
+    }
+  }
+}

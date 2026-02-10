@@ -1,4 +1,5 @@
-import { Heart, Users, BookOpen, Phone, Mail, Calendar, Clock, MapPin, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
+import { Heart, Users, BookOpen, Phone, Mail, Calendar, Clock, MapPin, ChevronRight, ArrowRight } from 'lucide-react';
 
 export const metadata = {
   title: 'Services | Masjid At-Taqwa',
@@ -319,6 +320,42 @@ export default function ServicesPage() {
                 </div>
               );
             })}
+          </div>
+        </section>
+
+        {/* Digital Services */}
+        <section className="pb-16">
+          <div className="flex items-center gap-3 mb-8">
+            <h2 className="text-xl font-semibold text-neutral-900">Online & Digital Services</h2>
+            <div className="flex-1 h-px bg-neutral-100" />
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              { name: 'Prayer Times & Iqamah', href: '/prayer-times', desc: 'Daily prayer schedules, Jummah times, and Iqamah announcements' },
+              { name: 'Ramadan Services', href: '/services/ramadan-services', desc: 'Tarawee, Iftar, Tahajjud, and community Ramadan programs' },
+              { name: 'Donate & Zakat', href: '/donate', desc: 'Zakat calculator, Sadaqah, and community donation programs' },
+              { name: 'Quran Learning', href: '/services/quran-learning', desc: 'Quran recitation classes, Hifz program, and Tajweed training' },
+              { name: 'Islamic Education', href: '/education', desc: 'Online courses, Seerah curriculum, and student portal' },
+              { name: 'Community Events', href: '/events', desc: 'Upcoming events, gatherings, and community programs' },
+            ].map((service) => (
+              <Link
+                key={service.href}
+                href={service.href}
+                className="group rounded-xl border border-neutral-200 bg-white p-6 flex flex-col hover:border-emerald-200 hover:shadow-sm transition-all"
+              >
+                <h3 className="text-sm font-semibold text-neutral-900 leading-snug mb-2 group-hover:text-emerald-700 transition-colors">
+                  {service.name}
+                </h3>
+                <p className="text-sm text-neutral-500 leading-relaxed flex-1">
+                  {service.desc}
+                </p>
+                <div className="mt-4 flex items-center text-xs font-medium text-emerald-600">
+                  Visit page
+                  <ArrowRight className="h-3 w-3 ml-1 group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </Link>
+            ))}
           </div>
         </section>
 

@@ -325,7 +325,7 @@ export function useCourseProgress(userId: string | undefined, courseSlug: string
   const { enrollment, isEnrolled, isLoading } = useIsEnrolled(userId, courseSlug);
 
   return {
-    progress: enrollment?.progress_percentage || 0,
+    progress: enrollment?.overall_progress || 0,
     isEnrolled,
     isLoading,
   };

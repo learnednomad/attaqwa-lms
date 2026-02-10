@@ -1,13 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ApiError } from '@/lib/api';
 import { MOSQUE_INFO } from '@attaqwa/shared';
 
 export default function AdminLoginPage() {
@@ -20,10 +19,11 @@ export default function AdminLoginPage() {
   const router = useRouter();
 
   // Redirect if already authenticated as admin
-  if (isAuthenticated && isAdmin) {
-    router.push('/admin');
-    return null;
-  }
+  useEffect(() => {
+    if (isAuthenticated && isAdmin) {
+      router.push('/admin');
+    }
+  }, [isAuthenticated, isAdmin, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,15 +33,8 @@ export default function AdminLoginPage() {
     try {
       await login(email, password);
       router.push('/admin');
-    } catch (error) {
-      console.error('Login error details:', error);
-      if (error instanceof ApiError) {
-        setError(error.message);
-      } else if (error instanceof Error) {
-        setError(`Error: ${error.message}`);
-      } else {
-        setError(`Unexpected error: ${JSON.stringify(error)}`);
-      }
+    } catch (err: any) {
+      setError(err.message || 'Invalid credentials. Please try again.');
     } finally {
       setLoading(false);
     }

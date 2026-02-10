@@ -1,0 +1,108 @@
+{
+  "kind": "collectionType",
+  "collectionName": "lessons",
+  "info": {
+    "singularName": "lesson",
+    "pluralName": "lessons",
+    "displayName": "Lesson",
+    "description": "Individual lessons within courses with flexible content types"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 255
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": false
+    },
+    "lesson_order": {
+      "type": "integer",
+      "required": true,
+      "min": 1
+    },
+    "lesson_type": {
+      "type": "enumeration",
+      "enum": ["video", "reading", "interactive", "quiz", "practice"],
+      "required": true
+    },
+    "duration_minutes": {
+      "type": "integer",
+      "required": true,
+      "min": 1
+    },
+    "content": {
+      "type": "richtext",
+      "required": false
+    },
+    "video_url": {
+      "type": "string",
+      "required": false
+    },
+    "video_file": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["videos"]
+    },
+    "audio_file": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["audios"]
+    },
+    "attachments": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": ["images", "files", "videos", "audios"]
+    },
+    "interactive_content": {
+      "type": "json",
+      "required": false
+    },
+    "learning_objectives": {
+      "type": "json",
+      "required": false
+    },
+    "prerequisites": {
+      "type": "text",
+      "required": false
+    },
+    "is_free": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_preview": {
+      "type": "boolean",
+      "default": false
+    },
+    "course": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::course.course",
+      "inversedBy": "lessons"
+    },
+    "quiz": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::quiz.quiz"
+    },
+    "user_progress": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::user-progress.user-progress",
+      "mappedBy": "lesson"
+    }
+  }
+}

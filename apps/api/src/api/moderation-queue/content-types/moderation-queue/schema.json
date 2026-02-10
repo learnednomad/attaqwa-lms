@@ -1,0 +1,58 @@
+{
+  "kind": "collectionType",
+  "collectionName": "moderation_queues",
+  "info": {
+    "singularName": "moderation-queue",
+    "pluralName": "moderation-queues",
+    "displayName": "Moderation Queue",
+    "description": "AI-assisted content moderation queue for Islamic educational content"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "content_type": {
+      "type": "enumeration",
+      "enum": ["course", "lesson", "quiz"],
+      "required": true
+    },
+    "content_id": {
+      "type": "string",
+      "required": true
+    },
+    "content_title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 500
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["pending", "approved", "rejected", "needs_review"],
+      "default": "pending",
+      "required": true
+    },
+    "ai_score": {
+      "type": "float",
+      "min": 0,
+      "max": 1
+    },
+    "ai_flags": {
+      "type": "json"
+    },
+    "ai_reasoning": {
+      "type": "text"
+    },
+    "reviewer": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "reviewer_notes": {
+      "type": "text"
+    },
+    "reviewed_at": {
+      "type": "datetime"
+    }
+  }
+}

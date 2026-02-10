@@ -1,0 +1,54 @@
+{
+  "kind": "collectionType",
+  "collectionName": "user_achievements",
+  "info": {
+    "singularName": "user-achievement",
+    "pluralName": "user-achievements",
+    "displayName": "User Achievement",
+    "description": "Track achievements earned by users"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "achievement": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::achievement.achievement",
+      "inversedBy": "user_achievements"
+    },
+    "earned_date": {
+      "type": "datetime",
+      "required": true
+    },
+    "progress": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0,
+      "max": 100
+    },
+    "is_completed": {
+      "type": "boolean",
+      "default": false
+    },
+    "completion_data": {
+      "type": "json",
+      "required": false
+    },
+    "is_displayed": {
+      "type": "boolean",
+      "default": true
+    },
+    "notes": {
+      "type": "text",
+      "required": false
+    }
+  }
+}

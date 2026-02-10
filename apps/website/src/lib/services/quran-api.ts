@@ -15,6 +15,25 @@ export interface DailyAyah {
   audio: string;
 }
 
+export interface MushafPageAyah {
+  number: number;
+  numberInSurah: number;
+  text: string;
+  surahNumber: number;
+  surahName: string;
+  surahEnglishName: string;
+  juz: number;
+  hizbQuarter: number;
+}
+
+export interface MushafPage {
+  pageNumber: number;
+  ayahs: MushafPageAyah[];
+  juz: number;
+  /** distinct surahs that appear on this page */
+  surahs: { number: number; name: string; englishName: string }[];
+}
+
 export interface ContextGroup {
   title: string;
   ayahRange: [number, number];
@@ -62,6 +81,65 @@ export async function fetchDailyAyah(): Promise<DailyAyah | null> {
     };
   } catch (error) {
     console.error('[quran-api] Error fetching daily ayah:', error);
+    return null;
+  }
+}
+
+export async function fetchMushafPage(page?: number): Promise<MushafPage | null> {
+  try {
+    let pageNumber: number;
+    if (page && page >= 1 && page <= 604) {
+      pageNumber = page;
+    } else {
+      const today = new Date();
+      const dayOfYear = Math.floor(
+        (today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000
+      );
+      pageNumber = (dayOfYear % 604) + 1;
+    }
+
+    const res = await fetch(
+      `${QURAN_API_BASE}/page/${pageNumber}/quran-uthmani`,
+      { next: { revalidate: 3600 } }
+    );
+
+    if (!res.ok) {
+      throw new Error(`API returned ${res.status}`);
+    }
+
+    const json = await res.json();
+    const ayahsData = json.data.ayahs;
+
+    const ayahs: MushafPageAyah[] = ayahsData.map((a: any) => ({
+      number: a.number,
+      numberInSurah: a.numberInSurah,
+      text: a.text,
+      surahNumber: a.surah.number,
+      surahName: a.surah.name,
+      surahEnglishName: a.surah.englishName,
+      juz: a.juz,
+      hizbQuarter: a.hizbQuarter,
+    }));
+
+    const surahMap = new Map<number, { number: number; name: string; englishName: string }>();
+    for (const a of ayahs) {
+      if (!surahMap.has(a.surahNumber)) {
+        surahMap.set(a.surahNumber, {
+          number: a.surahNumber,
+          name: a.surahName,
+          englishName: a.surahEnglishName,
+        });
+      }
+    }
+
+    return {
+      pageNumber,
+      ayahs,
+      juz: ayahs[0]?.juz ?? 1,
+      surahs: Array.from(surahMap.values()),
+    };
+  } catch (error) {
+    console.error('[quran-api] Error fetching mushaf page:', error);
     return null;
   }
 }

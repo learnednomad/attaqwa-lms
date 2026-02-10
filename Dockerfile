@@ -1,53 +1,87 @@
-# Base stage with Node.js
+# =============================================================================
+# Multi-stage Dockerfile for AttaqwaMasjid LMS Monorepo
+# Targets: api, admin, website
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Base: Node.js with pnpm
+# ---------------------------------------------------------------------------
 FROM node:22-alpine AS base
 
-# Install pnpm
+RUN apk add --no-cache libc6-compat dumb-init
 RUN npm install -g pnpm@10.12.3
 
 WORKDIR /app
 
-# Copy workspace configuration
-COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
-
-# Dependencies stage
+# ---------------------------------------------------------------------------
+# Dependencies: Install all workspace dependencies (cached layer)
+# ---------------------------------------------------------------------------
 FROM base AS dependencies
 
-# Copy all package.json files
+# Copy only lockfiles and manifests first (cache layer)
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+
+# Copy all package.json files explicitly (glob patterns unreliable in COPY)
 COPY apps/api/package.json ./apps/api/
 COPY apps/admin/package.json ./apps/admin/
 COPY apps/website/package.json ./apps/website/
-COPY packages/*/package.json ./packages/*/
+COPY packages/shared-types/package.json ./packages/shared-types/
+COPY packages/api-client/package.json ./packages/api-client/
+COPY packages/shared/package.json ./packages/shared/
 
-# Install dependencies
+# Install all dependencies (including dev for building)
 RUN pnpm install --frozen-lockfile
 
-# Builder stage for API
-FROM base AS api-builder
+# ---------------------------------------------------------------------------
+# Source: Copy all source code on top of installed dependencies
+# ---------------------------------------------------------------------------
+FROM dependencies AS source
 
-COPY --from=dependencies /app/node_modules ./node_modules
-COPY --from=dependencies /app/apps ./apps
-COPY --from=dependencies /app/packages ./packages
+# Copy root tsconfig (extended by apps/website/tsconfig.json)
+COPY tsconfig.json ./
+COPY apps/ ./apps/
+COPY packages/ ./packages/
 
-# Copy source files
-COPY apps/api ./apps/api
-COPY packages ./packages
+# ===========================================================================
+# API (Strapi v5)
+# ===========================================================================
 
-# Build API
+FROM source AS api-builder
+
 WORKDIR /app/apps/api
 RUN pnpm build
 
-# API production stage
+# --- API Production ---
 FROM node:22-alpine AS api
 
+RUN apk add --no-cache dumb-init
 RUN npm install -g pnpm@10.12.3
+RUN addgroup -g 1001 -S nodejs && adduser -S strapi -u 1001
 
 WORKDIR /app
 
-# Copy built application
-COPY --from=api-builder /app/apps/api ./apps/api
+# Copy workspace config for pnpm
+COPY --from=dependencies /app/pnpm-lock.yaml /app/pnpm-workspace.yaml /app/package.json ./
+COPY --from=dependencies /app/apps/api/package.json ./apps/api/
+COPY --from=dependencies /app/packages/shared-types/package.json ./packages/shared-types/
+
+# Copy node_modules (Strapi requires full monorepo deps at runtime)
 COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=dependencies /app/apps/api/node_modules ./apps/api/node_modules
+
+# Copy Strapi build output (dist includes compiled config, src, and admin)
+COPY --from=api-builder /app/apps/api/dist ./apps/api/dist
+COPY --from=source /app/apps/api/src ./apps/api/src
+# Use compiled JS config from dist (Strapi production can't load .ts files)
+COPY --from=api-builder /app/apps/api/dist/config ./apps/api/config
+COPY --from=source /app/packages/shared-types ./packages/shared-types
+
+# Set ownership
+RUN chown -R strapi:nodejs /app/apps/api
 
 WORKDIR /app/apps/api
+
+USER strapi
 
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
@@ -55,72 +89,85 @@ ENV PORT=1337
 
 EXPOSE 1337
 
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
+  CMD wget --quiet --tries=1 --spider http://127.0.0.1:1337/_health || exit 1
+
+ENTRYPOINT ["dumb-init", "--"]
 CMD ["pnpm", "start"]
 
-# Builder stage for Admin
-FROM base AS admin-builder
+# ===========================================================================
+# Admin (Next.js 15 - standalone)
+# ===========================================================================
 
-COPY --from=dependencies /app/node_modules ./node_modules
-COPY --from=dependencies /app/apps ./apps
-COPY --from=dependencies /app/packages ./packages
-
-COPY apps/admin ./apps/admin
-COPY packages ./packages
+FROM source AS admin-builder
 
 WORKDIR /app/apps/admin
+# Ensure public directory exists (may not exist in all setups)
+RUN mkdir -p public
 RUN pnpm build
 
-# Admin production stage
+# --- Admin Production ---
 FROM node:22-alpine AS admin
 
-RUN npm install -g pnpm@10.12.3
+RUN apk add --no-cache dumb-init
+RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 
 WORKDIR /app
 
-COPY --from=admin-builder /app/apps/admin/.next ./apps/admin/.next
-COPY --from=admin-builder /app/apps/admin/public ./apps/admin/public
-COPY --from=admin-builder /app/apps/admin/package.json ./apps/admin/
-COPY --from=dependencies /app/node_modules ./node_modules
+# Copy standalone output (self-contained with dependencies)
+COPY --from=admin-builder --chown=nextjs:nodejs /app/apps/admin/.next/standalone ./
+# Copy static assets and public files
+COPY --from=admin-builder --chown=nextjs:nodejs /app/apps/admin/.next/static ./apps/admin/.next/static
+COPY --from=admin-builder --chown=nextjs:nodejs /app/apps/admin/public ./apps/admin/public
 
-WORKDIR /app/apps/admin
+USER nextjs
 
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 
 EXPOSE 3000
 
-CMD ["pnpm", "start"]
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+  CMD wget --quiet --tries=1 --spider http://127.0.0.1:3000 || exit 1
 
-# Builder stage for Website
-FROM base AS website-builder
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["node", "apps/admin/server.js"]
 
-COPY --from=dependencies /app/node_modules ./node_modules
-COPY --from=dependencies /app/apps ./apps
-COPY --from=dependencies /app/packages ./packages
+# ===========================================================================
+# Website (Next.js 16 - standalone)
+# ===========================================================================
 
-COPY apps/website ./apps/website
-COPY packages ./packages
+FROM source AS website-builder
 
 WORKDIR /app/apps/website
 RUN pnpm build
 
-# Website production stage
+# --- Website Production ---
 FROM node:22-alpine AS website
 
-RUN npm install -g pnpm@10.12.3
+RUN apk add --no-cache dumb-init
+RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 
 WORKDIR /app
 
-COPY --from=website-builder /app/apps/website/.next ./apps/website/.next
-COPY --from=website-builder /app/apps/website/public ./apps/website/public
-COPY --from=website-builder /app/apps/website/package.json ./apps/website/
-COPY --from=dependencies /app/node_modules ./node_modules
+# Copy standalone output (self-contained with dependencies)
+COPY --from=website-builder --chown=nextjs:nodejs /app/apps/website/.next/standalone ./
+# Copy static assets and public files
+COPY --from=website-builder --chown=nextjs:nodejs /app/apps/website/.next/static ./apps/website/.next/static
+COPY --from=website-builder --chown=nextjs:nodejs /app/apps/website/public ./apps/website/public
 
-WORKDIR /app/apps/website
+USER nextjs
 
 ENV NODE_ENV=production
 ENV PORT=3001
+ENV HOSTNAME=0.0.0.0
+ENV NEXT_TELEMETRY_DISABLED=1
 
 EXPOSE 3001
 
-CMD ["pnpm", "start"]
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+  CMD wget --quiet --tries=1 --spider http://127.0.0.1:3001 || exit 1
+
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["node", "apps/website/server.js"]

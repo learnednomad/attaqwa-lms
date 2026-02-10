@@ -39,5 +39,8 @@
     "monorepo"
   ],
   "author": "AttaqwaMasjid",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "shadcn": "^3.8.4"
+  }
 }

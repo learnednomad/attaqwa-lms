@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { NotificationPanel, NotificationItem, generateMockNotifications } from '@/components/notifications/notification-panel';
+import { Recommendations } from '@/components/education/Recommendations';
 
 interface StudentData {
   id: string;
@@ -494,6 +495,11 @@ export default function StudentDashboard() {
                 </div>
               </CardContent>
             </Card>
+          </div>
+
+          {/* AI Course Recommendations */}
+          <div className="mb-6">
+            <Recommendations token={typeof window !== 'undefined' ? localStorage.getItem('studentToken') : null} />
           </div>
 
           {/* Main Content Grid */}

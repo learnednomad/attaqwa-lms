@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { createContext, useContext } from 'react';
+import { authClient } from '@/lib/auth-client';
 
 interface User {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'user';
+  role: string;
 }
 
 interface AuthContextType {
@@ -21,53 +22,31 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: session, isPending } = authClient.useSession();
 
-  // Check for existing session on mount
-  useEffect(() => {
-    checkAuthStatus();
-  }, []);
-
-  const checkAuthStatus = async () => {
-    try {
-      const { authApi } = await import('@/lib/api');
-      const data = await authApi.getMe();
-      setUser(data.user);
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      // Don't throw error for auth check - just leave user as null
-    } finally {
-      setLoading(false);
-    }
-  };
+  const user: User | null = session?.user
+    ? {
+        id: session.user.id,
+        email: session.user.email,
+        name: session.user.name,
+        role: session.user.role ?? 'user',
+      }
+    : null;
 
   const login = async (email: string, password: string) => {
-    try {
-      const { authApi } = await import('@/lib/api');
-      const data = await authApi.login({ email, password });
-      setUser(data.user);
-    } catch (error) {
-      console.error('Login failed:', error);
-      throw error;
+    const { error } = await authClient.signIn.email({ email, password });
+    if (error) {
+      throw new Error(error.message || 'Login failed');
     }
   };
 
   const logout = async () => {
-    try {
-      const { authApi } = await import('@/lib/api');
-      await authApi.logout();
-      setUser(null);
-    } catch (error) {
-      console.error('Logout failed:', error);
-      // Still clear local state even if API call fails
-      setUser(null);
-    }
+    await authClient.signOut();
   };
 
   const value: AuthContextType = {
     user,
-    loading,
+    loading: isPending,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'admin',
     login,
@@ -77,10 +56,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+const defaultAuthContext: AuthContextType = {
+  user: null,
+  loading: false,
+  isAuthenticated: false,
+  isAdmin: false,
+  login: async () => { throw new Error('AuthProvider not available'); },
+  logout: async () => { throw new Error('AuthProvider not available'); },
+};
+
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    return defaultAuthContext;
   }
   return context;
 }
