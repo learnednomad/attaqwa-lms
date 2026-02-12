@@ -8,16 +8,16 @@ export const navigation: NavItem[] = [
   { name: 'Prayer Times', href: '/prayer-times' },
   { name: 'About', href: '/about' },
   { name: 'Services', href: '/services' },
-  {
-    name: 'Education',
-    submenu: [
-      { name: 'Programs', href: '/education' },
-      { name: 'Seerah Curriculum', href: '/education/seerah' },
-      { name: 'Browse Courses', href: '/education/browse' },
-      { name: 'Student Portal', href: '/student/dashboard' },
-      { name: 'Teacher Portal', href: '/teacher/dashboard' },
-    ],
-  },
+  // {
+  //   name: 'Education',
+  //   submenu: [
+  //     { name: 'Programs', href: '/education' },
+  //     { name: 'Seerah Curriculum', href: '/education/seerah' },
+  //     { name: 'Browse Courses', href: '/education/browse' },
+  //     { name: 'Student Portal', href: '/student/dashboard' },
+  //     { name: 'Teacher Portal', href: '/teacher/dashboard' },
+  //   ],
+  // },
   {
     name: 'Resources',
     submenu: [
@@ -58,6 +58,6 @@ export const footerResources = [
 export const footerAbout = [
   { name: 'About Us', href: '/about' },
   { name: 'Services', href: '/services' },
-  { name: 'Education Programs', href: '/education' },
+  // { name: 'Education Programs', href: '/education' },
   { name: 'Announcements', href: '/announcements' },
 ];
