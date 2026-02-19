@@ -13,8 +13,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function StudentLoginPage() {
   const { login, loginWithStudentId } = useStudentAuth();
-  const [email, setEmail] = useState('student1@attaqwa.test');
-  const [password, setPassword] = useState('Student123!');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [studentId, setStudentId] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -175,32 +175,34 @@ export default function StudentLoginPage() {
               </Button>
             </form>
 
-            {/* Demo Accounts */}
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <p className="text-sm text-gray-600 mb-3">Demo Student Accounts:</p>
-              <div className="space-y-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="w-full justify-start"
-                  onClick={() => handleDemoLogin('student1@attaqwa.test', 'Student123!')}
-                >
-                  <User className="mr-2 h-4 w-4" />
-                  Ahmed Abdullah (student1@attaqwa.test)
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="w-full justify-start"
-                  onClick={() => handleDemoLogin('student2@attaqwa.test', 'Student123!')}
-                >
-                  <User className="mr-2 h-4 w-4" />
-                  Fatima Hassan (student2@attaqwa.test)
-                </Button>
+            {/* Demo Accounts - development only */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <p className="text-sm text-gray-600 mb-3">Demo Student Accounts:</p>
+                <div className="space-y-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="w-full justify-start"
+                    onClick={() => handleDemoLogin('student1@attaqwa.test', 'Student123!')}
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    Ahmed Abdullah (student1@attaqwa.test)
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="w-full justify-start"
+                    onClick={() => handleDemoLogin('student2@attaqwa.test', 'Student123!')}
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    Fatima Hassan (student2@attaqwa.test)
+                  </Button>
+                </div>
               </div>
-            </div>
+            )}
           </CardContent>
           <CardFooter className="flex flex-col space-y-2">
             <div className="text-sm text-gray-600 text-center">

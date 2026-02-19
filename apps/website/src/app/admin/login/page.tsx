@@ -10,8 +10,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { MOSQUE_INFO } from '@attaqwa/shared';
 
 export default function AdminLoginPage() {
-  const [email, setEmail] = useState('admin@attaqwa.test');
-  const [password, setPassword] = useState('Admin123!');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
@@ -94,13 +94,15 @@ export default function AdminLoginPage() {
             </Button>
           </form>
 
-          <div className="mt-6 p-4 bg-islamic-gold-50 border border-islamic-gold-200 rounded-lg">
-            <p className="text-sm text-islamic-gold-700 font-medium mb-2">Demo Credentials:</p>
-            <p className="text-xs text-islamic-gold-600">
-              Email: admin@attaqwa.test<br />
-              Password: Admin123!
-            </p>
-          </div>
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mt-6 p-4 bg-islamic-gold-50 border border-islamic-gold-200 rounded-lg">
+              <p className="text-sm text-islamic-gold-700 font-medium mb-2">Demo Credentials:</p>
+              <p className="text-xs text-islamic-gold-600">
+                Email: admin@attaqwa.test<br />
+                Password: Admin123!
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

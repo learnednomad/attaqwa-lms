@@ -48,9 +48,14 @@ export async function fetchAuthenticHadith(
     // Using Sunnah.com API structure
     const apiUrl = `https://api.sunnah.com/v1/collections/${collection}/books/${bookNumber || 1}/hadiths`;
     
+    const apiKey = process.env.NEXT_PUBLIC_SUNNAH_API_KEY;
+    if (!apiKey) {
+      throw new Error('NEXT_PUBLIC_SUNNAH_API_KEY is not configured');
+    }
+
     const response = await fetch(apiUrl, {
       headers: {
-        'x-api-key': process.env.NEXT_PUBLIC_SUNNAH_API_KEY || 'demo-key'
+        'x-api-key': apiKey
       }
     });
 
