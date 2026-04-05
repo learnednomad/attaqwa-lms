@@ -1,31 +1,23 @@
 /**
  * Strapi API Client for AttaqwaMasjid LMS
  * Shared client for web applications (admin & website)
- * Handles authentication, requests, and error handling
+ * Uses NEXT_PUBLIC_STRAPI_API_TOKEN for authentication (BetterAuth handles user auth separately)
  */
 
 import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios';
-import type { User } from '@attaqwa/shared-types';
 
 export interface StrapiClientConfig {
   strapiUrl?: string;
   apiUrl?: string;
-  storageKey?: string;
-  onUnauthorized?: () => void;
 }
 
 export class StrapiClient {
   private client: AxiosInstance;
-  private token: string | null = null;
-  private storageKey: string;
   private strapiUrl: string;
-  private onUnauthorized?: () => void;
 
   constructor(config: StrapiClientConfig = {}) {
     this.strapiUrl = config.strapiUrl || process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
     const apiUrl = config.apiUrl || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337/api';
-    this.storageKey = config.storageKey || 'strapi_token';
-    this.onUnauthorized = config.onUnauthorized;
 
     this.client = axios.create({
       baseURL: apiUrl,
@@ -34,11 +26,12 @@ export class StrapiClient {
       },
     });
 
-    // Request interceptor to add auth token
+    // Request interceptor to add API token
     this.client.interceptors.request.use(
       (config) => {
-        if (this.token) {
-          config.headers.Authorization = `Bearer ${this.token}`;
+        const apiToken = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
+        if (apiToken) {
+          config.headers.Authorization = `Bearer ${apiToken}`;
         }
         return config;
       },
@@ -49,99 +42,9 @@ export class StrapiClient {
     this.client.interceptors.response.use(
       (response) => response,
       async (error) => {
-        if (error.response?.status === 401) {
-          // Token expired, clear auth
-          this.clearAuth();
-          if (this.onUnauthorized) {
-            this.onUnauthorized();
-          } else if (typeof window !== 'undefined') {
-            window.location.href = '/login';
-          }
-        }
         return Promise.reject(error);
       }
     );
-
-    // Load token from storage on client
-    if (typeof window !== 'undefined') {
-      const storedToken = localStorage.getItem(this.storageKey);
-      if (storedToken) {
-        this.token = storedToken;
-      }
-    }
-  }
-
-  // Authentication methods
-  async login(identifier: string, password: string): Promise<{ user: User; token: string }> {
-    try {
-      const response = await this.client.post('/auth/local', {
-        identifier,
-        password,
-      });
-
-      const { jwt, user } = response.data;
-      this.setAuth(jwt);
-
-      return { user, token: jwt };
-    } catch (error: any) {
-      throw new Error(error.response?.data?.error?.message || 'Login failed');
-    }
-  }
-
-  async register(
-    username: string,
-    email: string,
-    password: string
-  ): Promise<{ user: User; token: string }> {
-    try {
-      const response = await this.client.post('/auth/local/register', {
-        username,
-        email,
-        password,
-      });
-
-      const { jwt, user } = response.data;
-      this.setAuth(jwt);
-
-      return { user, token: jwt };
-    } catch (error: any) {
-      throw new Error(error.response?.data?.error?.message || 'Registration failed');
-    }
-  }
-
-  async getMe(): Promise<User> {
-    try {
-      const response = await this.client.get('/users/me', {
-        params: {
-          populate: ['role', 'profile', 'profile.avatar'],
-        },
-      });
-      return response.data;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.error?.message || 'Failed to fetch user');
-    }
-  }
-
-  setAuth(token: string) {
-    this.token = token;
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(this.storageKey, token);
-    }
-  }
-
-  clearAuth() {
-    this.token = null;
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem(this.storageKey);
-    }
-  }
-
-  isAuthenticated(): boolean {
-    return !!this.token;
-  }
-
-  getToken(): string | null {
-    return this.token;
   }
 
   // Generic CRUD methods
@@ -189,8 +92,9 @@ export class StrapiClient {
         },
       });
       return response.data;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.error?.message || 'Upload failed');
+    } catch (error: unknown) {
+      const axiosErr = error as { response?: { data?: { error?: { message?: string } } } };
+      throw new Error(axiosErr.response?.data?.error?.message || 'Upload failed');
     }
   }
 

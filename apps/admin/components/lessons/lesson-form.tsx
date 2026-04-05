@@ -10,10 +10,20 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import type { Lesson, LessonType, QuizQuestion } from '@attaqwa/shared-types';
+type LessonType = 'video' | 'audio' | 'article' | 'quiz' | 'interactive';
+
+interface QuizQuestion {
+  id: string;
+  question: string;
+  type: string;
+  options: string[];
+  correctAnswer: string;
+  explanation?: string;
+  points: number;
+}
 
 export interface LessonFormProps {
-  initialData?: Partial<Lesson>;
+  initialData?: Record<string, unknown>;
   courseId: string;
   onSubmit: (data: LessonFormData) => Promise<void>;
   onCancel: () => void;
@@ -62,22 +72,30 @@ export function LessonForm({
   onCancel,
   isLoading = false,
 }: LessonFormProps) {
+  // Map Strapi field names to form field names
+  const mapLessonType = (t: unknown): LessonType => {
+    const typeMap: Record<string, LessonType> = { reading: 'article', video: 'video', quiz: 'quiz', interactive: 'interactive', practice: 'interactive' };
+    return typeMap[t as string] || 'article';
+  };
+
   const [formData, setFormData] = useState<LessonFormData>({
-    title: initialData?.title || '',
-    description: initialData?.description || '',
-    type: initialData?.type || 'article',
-    duration: initialData?.duration || 10,
-    order: initialData?.order || 1,
-    isRequired: initialData?.isRequired || false,
-    content: (typeof initialData?.content === 'string' ? {} : initialData?.content) || {},
+    title: (initialData?.title as string) || '',
+    description: (initialData?.description as string) || '',
+    type: (initialData?.lesson_type ? mapLessonType(initialData.lesson_type) : (initialData?.type as LessonType)) || 'article',
+    duration: (initialData?.duration_minutes as number) || (initialData?.duration as number) || 10,
+    order: (initialData?.lesson_order as number) || (initialData?.order as number) || 1,
+    isRequired: (initialData?.isRequired as boolean) || false,
+    content: (typeof initialData?.content === 'string'
+      ? { articleBody: initialData.content as string }
+      : (initialData?.content as LessonContent)) || {},
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof LessonFormData, string>>>({});
 
-  const lessonTypes: { value: LessonType; label: string; icon: any }[] = [
+  const lessonTypes: { value: LessonType; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
     { value: 'video', label: 'Video Lesson', icon: FileVideo },
     { value: 'audio', label: 'Audio Lesson', icon: Headphones },
-    { value: 'article', label: 'Article', icon: FileText },
+    { value: 'article', label: 'Reading / Article', icon: FileText },
     { value: 'quiz', label: 'Quiz', icon: HelpCircle },
     { value: 'interactive', label: 'Interactive', icon: Sparkles },
   ];

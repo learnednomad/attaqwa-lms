@@ -3,6 +3,8 @@
 # =============================================================================
 # Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 #
+# With AI: docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile ai up -d
+#
 # Adds: Caddy reverse proxy, Redis, network isolation, resource limits,
 #        log rotation, security hardening, graceful shutdown timeouts.
 # =============================================================================
@@ -81,7 +83,7 @@ services:
       retries: 5
 
   # ---------------------------------------------------------------------------
-  # PostgreSQL - Override with production hardening
+  # PostgreSQL - Production hardening
   # ---------------------------------------------------------------------------
   postgres:
     networks:
@@ -103,7 +105,19 @@ services:
       - no-new-privileges:true
 
   # ---------------------------------------------------------------------------
-  # API (Strapi) - Override with production settings
+  # Init — Production hardening (runs on database network)
+  # ---------------------------------------------------------------------------
+  init:
+    networks:
+      - database
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  # ---------------------------------------------------------------------------
+  # API (Strapi) - Production settings
   # ---------------------------------------------------------------------------
   api:
     environment:
@@ -117,8 +131,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      ollama:
-        condition: service_healthy
+      init:
+        condition: service_completed_successfully
       redis:
         condition: service_healthy
     deploy:
@@ -138,7 +152,7 @@ services:
       - no-new-privileges:true
 
   # ---------------------------------------------------------------------------
-  # Admin Portal - Override with production settings
+  # Admin Portal - Production settings
   # ---------------------------------------------------------------------------
   admin:
     ports: !override []  # Only accessible via Caddy
@@ -161,12 +175,14 @@ services:
       - no-new-privileges:true
 
   # ---------------------------------------------------------------------------
-  # Website - Override with production settings
+  # Website - Production settings (needs database + backend networks)
   # ---------------------------------------------------------------------------
   website:
     ports: !override []  # Only accessible via Caddy
     networks:
       - frontend
+      - backend    # Server-side BFF routes need to reach Strapi API
+      - database   # BetterAuth needs direct DB access
     deploy:
       resources:
         limits:
@@ -184,7 +200,7 @@ services:
       - no-new-privileges:true
 
   # ---------------------------------------------------------------------------
-  # Ollama - Override with production resource limits
+  # Ollama - Production resource limits (optional, --profile ai)
   # ---------------------------------------------------------------------------
   ollama:
     ports: !override []  # Internal only

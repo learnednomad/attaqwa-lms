@@ -28,15 +28,11 @@ const DIFFICULTY_COLORS: Record<string, string> = {
   advanced: 'bg-red-100 text-red-700',
 };
 
-interface RecommendationsProps {
-  token: string | null;
-}
-
-export function Recommendations({ token }: RecommendationsProps) {
-  const { data: recommendations, isLoading } = useRecommendations(token);
+export function Recommendations() {
+  const { data: recommendations, isLoading } = useRecommendations();
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
 
-  if (!token || isLoading) return null;
+  if (isLoading) return null;
 
   const visible = (recommendations || []).filter((r) => !dismissed.has(r.courseId));
   if (visible.length === 0) return null;

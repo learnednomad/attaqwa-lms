@@ -73,7 +73,8 @@ export default function IslamicCalendarPage() {
   const loadIslamicDate = async () => {
     setLoading(true);
     try {
-      const data = await fetchIslamicCalendar(currentDate ?? undefined);
+      const rawData = await fetchIslamicCalendar(currentDate ?? undefined);
+      const data = rawData as unknown as IslamicDate;
       setIslamicDate(data);
       if (data && data.month) {
         setSelectedMonth(data.month.number);

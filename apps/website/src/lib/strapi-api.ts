@@ -39,7 +39,7 @@ export interface Course extends StrapiEntity {
   age_tier: string;
   difficulty: string; // Changed from difficulty_level to match Strapi
   duration_weeks: number; // Changed from estimated_duration to match Strapi
-  thumbnail?: any; // Changed from thumbnail_url to match Strapi media object
+  thumbnail?: { url: string; formats?: Record<string, { url: string }> };
   prerequisites?: string[];
   learning_objectives?: string[];
   lessons?: Lesson[];
@@ -89,7 +89,7 @@ export interface Enrollment extends StrapiEntity {
   average_quiz_score?: number;
   total_time_spent_minutes: number;
   last_activity_date?: string;
-  user: any;
+  user: { id: string; email: string; username: string };
   course: Course;
 }
 
@@ -108,12 +108,12 @@ export interface LessonProgress extends StrapiEntity {
 // ============================================================================
 
 interface StrapiFilters {
-  [key: string]: any;
+  [key: string]: string | number | boolean | Record<string, unknown> | unknown[];
 }
 
 interface StrapiQueryParams {
   filters?: StrapiFilters;
-  populate?: string | string[] | Record<string, any>;
+  populate?: string | string[] | Record<string, unknown>;
   pagination?: {
     page?: number;
     pageSize?: number;
@@ -383,7 +383,16 @@ export const lessonsApi = {
 /**
  * Transform Strapi quiz questions to frontend format
  */
-function transformQuizQuestions(strapiQuestions: any[]): QuizQuestion[] {
+interface StrapiQuizQuestion {
+  question: string;
+  type?: string;
+  options?: string[];
+  correct_answer: string;
+  explanation?: string;
+  points?: number;
+}
+
+function transformQuizQuestions(strapiQuestions: StrapiQuizQuestion[]): QuizQuestion[] {
   return strapiQuestions.map((q, index) => ({
     id: `q-${index}`, // Generate ID using index
     question_text: q.question, // Map 'question' to 'question_text'
@@ -400,7 +409,7 @@ export const quizzesApi = {
    * Get quiz by ID
    */
   getById: async (id: string): Promise<Quiz> => {
-    const response = await fetchStrapi<any>(`/quizzes/${id}`, {
+    const response = await fetchStrapi<Quiz & { questions?: StrapiQuizQuestion[] }>(`/quizzes/${id}`, {
       populate: {
         lesson: {
           populate: ['course'],
@@ -421,7 +430,7 @@ export const quizzesApi = {
    * Get quiz for a lesson
    */
   getByLesson: async (lessonSlug: string): Promise<Quiz | null> => {
-    const response = await fetchStrapi<any[]>('/quizzes', {
+    const response = await fetchStrapi<(Quiz & { questions?: StrapiQuizQuestion[] })[]>('/quizzes', {
       filters: {
         lesson: {
           slug: { $eq: lessonSlug },

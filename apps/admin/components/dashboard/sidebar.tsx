@@ -8,6 +8,7 @@
 import {
   BarChart3,
   BookOpen,
+  Clock,
   GraduationCap,
   Home,
   Settings,
@@ -26,6 +27,7 @@ const navigation = [
   { name: 'Courses', href: '/courses', icon: BookOpen, roles: ['teacher', 'admin'] },
   { name: 'Students', href: '/students', icon: Users, roles: ['teacher', 'admin'] },
   { name: 'Analytics', href: '/analytics', icon: BarChart3, roles: ['teacher', 'admin'] },
+  { name: 'Prayer Times', href: '/prayer-times', icon: Clock, roles: ['admin'] },
   { name: 'Moderation', href: '/moderation', icon: Shield, roles: ['admin'] },
   // TODO: Implement achievements page
   // { name: 'Achievements', href: '/achievements', icon: Trophy, roles: ['admin'] },

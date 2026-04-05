@@ -66,7 +66,7 @@ export async function fetchAuthenticHadith(
     const data = await response.json();
     
     // Filter only Sahih (authentic) hadiths
-    return data.hadiths.filter((h: any) => 
+    return data.hadiths.filter((h: { grade?: string }) =>
       h.grade && (h.grade.includes('Sahih') || h.grade.includes('Authentic'))
     );
   } catch (error) {
@@ -108,8 +108,23 @@ export async function fetchAyahOfTheDay(): Promise<AyahData> {
   }
 }
 
+interface ContextGroup {
+  title: string;
+  ayahs: number[];
+  theme: string;
+}
+
+interface SurahContextData {
+  number: number;
+  name: string;
+  englishName: string;
+  ayahs: AyahData[];
+  translation: unknown;
+  contextGroups: ContextGroup[];
+}
+
 // Fetch Surah with grouped ayahs by context
-export async function fetchSurahWithContext(surahNumber: number): Promise<any> {
+export async function fetchSurahWithContext(surahNumber: number): Promise<SurahContextData | null> {
   try {
     const response = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}`);
     const translationResponse = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/en.sahih`);
@@ -160,8 +175,25 @@ export async function calculateQiblaDirection(latitude: number, longitude: numbe
   };
 }
 
+interface HijriDateInfo {
+  date: string;
+  format: string;
+  day: string;
+  month: {
+    number: number;
+    en: string;
+    ar: string;
+  };
+  year: string;
+  designation: {
+    abbreviated: string;
+    expanded: string;
+  };
+  holidays: string[];
+}
+
 // Islamic Calendar Data
-export async function fetchIslamicCalendar(date?: Date): Promise<any> {
+export async function fetchIslamicCalendar(date?: Date): Promise<HijriDateInfo> {
   try {
     const targetDate = date || new Date();
     const dateString = targetDate.toISOString().split('T')[0];
@@ -177,7 +209,7 @@ export async function fetchIslamicCalendar(date?: Date): Promise<any> {
 }
 
 // Helper function to group ayahs by context
-function getContextualGrouping(surahNumber: number, arabicAyahs: any[], translationAyahs: any[]): any[] {
+function getContextualGrouping(surahNumber: number, arabicAyahs: AyahData[], translationAyahs: AyahData[]): ContextGroup[] {
   // Example grouping for Al-Baqarah (Surah 2)
   if (surahNumber === 2) {
     return [
@@ -276,7 +308,7 @@ function getMockAyahData(): AyahData {
   };
 }
 
-function getMockCalendarData(): any {
+function getMockCalendarData(): HijriDateInfo {
   const today = new Date();
   return {
     date: '15-05-1445',

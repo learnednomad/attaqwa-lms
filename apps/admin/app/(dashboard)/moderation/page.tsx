@@ -11,13 +11,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ModerationTable } from '@/components/moderation/ModerationTable';
-import { useAuth } from '@/lib/hooks/use-auth';
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
 
 export default function ModerationPage() {
-  const { token } = useAuth();
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<Record<string, unknown>[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
   const [contentTypeFilter, setContentTypeFilter] = useState('all');
@@ -37,7 +34,7 @@ export default function ModerationPage() {
       }
 
       const res = await fetch(`${API_URL}/api/v1/moderation-queues?${params}`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        headers: { Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_TOKEN}` },
       });
 
       if (res.ok) {
@@ -49,7 +46,7 @@ export default function ModerationPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [token, statusFilter, contentTypeFilter]);
+  }, [statusFilter, contentTypeFilter]);
 
   useEffect(() => {
     fetchItems();

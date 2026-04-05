@@ -859,6 +859,77 @@ export interface ApiEventEvent extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiIqamahScheduleIqamahSchedule
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'iqamah_schedules';
+  info: {
+    description: 'Monthly iqamah times with date range support for Masjid At-Taqwa';
+    displayName: 'Iqamah Schedule';
+    pluralName: 'iqamah-schedules';
+    singularName: 'iqamah-schedule';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    asr: Schema.Attribute.String & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    dayRangeEnd: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 31;
+          min: 1;
+        },
+        number
+      >;
+    dayRangeStart: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 31;
+          min: 1;
+        },
+        number
+      >;
+    dhuhr: Schema.Attribute.String & Schema.Attribute.Required;
+    fajr: Schema.Attribute.String & Schema.Attribute.Required;
+    isActive: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    isDst: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
+    isha: Schema.Attribute.String & Schema.Attribute.Required;
+    jumuah1: Schema.Attribute.String;
+    jumuah2: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::iqamah-schedule.iqamah-schedule'
+    > &
+      Schema.Attribute.Private;
+    maghrib: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'+5'>;
+    month: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 12;
+          min: 1;
+        },
+        number
+      >;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiItikafRegistrationItikafRegistration
   extends Struct.CollectionTypeSchema {
   collectionName: 'itikaf_registrations';
@@ -2017,6 +2088,7 @@ declare module '@strapi/strapi' {
       'api::course-enrollment.course-enrollment': ApiCourseEnrollmentCourseEnrollment;
       'api::course.course': ApiCourseCourse;
       'api::event.event': ApiEventEvent;
+      'api::iqamah-schedule.iqamah-schedule': ApiIqamahScheduleIqamahSchedule;
       'api::itikaf-registration.itikaf-registration': ApiItikafRegistrationItikafRegistration;
       'api::leaderboard.leaderboard': ApiLeaderboardLeaderboard;
       'api::lesson.lesson': ApiLessonLesson;

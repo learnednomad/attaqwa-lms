@@ -1,5 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { verifyAuth } from '@/middleware/auth';
+
+const coursesGetQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).optional(),
+  pageSize: z.coerce.number().int().min(1).max(100).optional(),
+  age_tier: z.string().optional(),
+  subject: z.string().optional(),
+  difficulty: z.string().optional(),
+  search: z.string().max(200).optional(),
+  sort: z.string().optional(),
+  populate: z.string().optional(),
+});
+
+const coursesPostBodySchema = z.object({
+  title: z.string().min(1).max(255),
+  description: z.string().min(10),
+}).passthrough();
 
 const STRAPI_URL = process.env.STRAPI_URL || 'http://localhost:1337';
 
@@ -11,20 +28,43 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
 
+    // Validate query params
+    const rawParams: Record<string, string> = {};
+    for (const key of ['page', 'pageSize', 'age_tier', 'subject', 'difficulty', 'search', 'sort', 'populate']) {
+      const val = searchParams.get(key);
+      if (val !== null) rawParams[key] = val;
+    }
+    const validation = coursesGetQuerySchema.safeParse(rawParams);
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          error: {
+            status: 400,
+            name: 'ValidationError',
+            message: 'Invalid query parameters',
+            details: validation.error.flatten().fieldErrors,
+          },
+        },
+        { status: 400 }
+      );
+    }
+
+    const validated = validation.data;
+
     // Build Strapi query params
     const strapiParams = new URLSearchParams();
 
     // Pagination
-    const page = searchParams.get('page') || '1';
-    const pageSize = searchParams.get('pageSize') || '25';
+    const page = String(validated.page || 1);
+    const pageSize = String(validated.pageSize || 25);
     strapiParams.set('pagination[page]', page);
     strapiParams.set('pagination[pageSize]', pageSize);
 
     // Filters
-    const ageTier = searchParams.get('age_tier');
-    const subject = searchParams.get('subject');
-    const difficulty = searchParams.get('difficulty');
-    const search = searchParams.get('search');
+    const ageTier = validated.age_tier;
+    const subject = validated.subject;
+    const difficulty = validated.difficulty;
+    const search = validated.search;
 
     if (ageTier) strapiParams.set('filters[age_tier][$eq]', ageTier);
     if (subject) strapiParams.set('filters[subject][$eq]', subject);
@@ -35,11 +75,11 @@ export async function GET(request: NextRequest) {
     // No need to filter by publishedAt explicitly
 
     // Sorting
-    const sort = searchParams.get('sort') || 'createdAt:desc';
+    const sort = validated.sort || 'createdAt:desc';
     strapiParams.set('sort', sort);
 
     // Populate relations - Strapi v5 uses array syntax or * for all
-    const populate = searchParams.get('populate');
+    const populate = validated.populate;
     if (populate) {
       // Support both comma-separated and array format
       const fields = populate.split(',');
@@ -113,13 +153,26 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const authHeader = request.headers.get('authorization');
+    const bodyValidation = coursesPostBodySchema.safeParse(body);
+    if (!bodyValidation.success) {
+      return NextResponse.json(
+        {
+          error: {
+            status: 400,
+            name: 'ValidationError',
+            message: 'Invalid request body',
+            details: bodyValidation.error.flatten().fieldErrors,
+          },
+        },
+        { status: 400 }
+      );
+    }
 
     const response = await fetch(`${STRAPI_URL}/api/v1/courses`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(authHeader && { Authorization: authHeader }),
+        Authorization: `Bearer ${process.env.STRAPI_API_TOKEN}`,
       },
       body: JSON.stringify({ data: body }),
     });

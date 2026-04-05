@@ -33,8 +33,8 @@ export default function AdminLoginPage() {
     try {
       await login(email, password);
       router.push('/admin');
-    } catch (err: any) {
-      setError(err.message || 'Invalid credentials. Please try again.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Invalid credentials. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -94,15 +94,6 @@ export default function AdminLoginPage() {
             </Button>
           </form>
 
-          {process.env.NODE_ENV === 'development' && (
-            <div className="mt-6 p-4 bg-islamic-gold-50 border border-islamic-gold-200 rounded-lg">
-              <p className="text-sm text-islamic-gold-700 font-medium mb-2">Demo Credentials:</p>
-              <p className="text-xs text-islamic-gold-600">
-                Email: admin@attaqwa.test<br />
-                Password: Admin123!
-              </p>
-            </div>
-          )}
         </CardContent>
       </Card>
     </div>

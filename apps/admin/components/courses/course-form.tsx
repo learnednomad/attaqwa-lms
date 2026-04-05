@@ -11,10 +11,8 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import type { Course, CourseCategory, CourseDifficulty } from '@attaqwa/shared-types';
-
 export interface CourseFormProps {
-  initialData?: Partial<Course>;
+  initialData?: Record<string, unknown>;
   onSubmit: (data: CourseFormData) => Promise<void>;
   onCancel: () => void;
   isLoading?: boolean;
@@ -23,8 +21,8 @@ export interface CourseFormProps {
 export interface CourseFormData {
   title: string;
   description: string;
-  category: CourseCategory;
-  difficulty: CourseDifficulty;
+  category: string;
+  difficulty: string;
   ageTier: string;
   coverImage?: File | string;
   duration?: number;
@@ -38,28 +36,30 @@ export function CourseForm({
   isLoading = false,
 }: CourseFormProps) {
   const [formData, setFormData] = useState<CourseFormData>({
-    title: initialData?.title || '',
-    description: initialData?.description || '',
-    category: initialData?.category || 'general',
-    difficulty: initialData?.difficulty || 'beginner',
-    ageTier: initialData?.ageTier || 'all',
-    coverImage: initialData?.coverImage?.url || undefined,
-    duration: initialData?.estimatedDuration || 0,
-    isPublished: initialData?.isPublished || false,
+    title: (initialData?.title as string) || '',
+    description: (initialData?.description as string) || '',
+    category: (initialData?.subject as string) || (initialData?.category as string) || 'quran',
+    difficulty: (initialData?.difficulty as string) || 'beginner',
+    ageTier: (initialData?.age_tier as string) || (initialData?.ageTier as string) || 'all',
+    coverImage: (initialData?.coverImage as { url: string })?.url || undefined,
+    duration: (initialData?.duration_weeks as number) ? (initialData.duration_weeks as number) * 60 : (initialData?.estimatedDuration as number) || 0,
+    isPublished: (initialData?.publishedAt != null) || (initialData?.isPublished as boolean) || false,
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof CourseFormData, string>>>({});
   const [coverImagePreview, setCoverImagePreview] = useState<string | null>(
-    initialData?.coverImage?.url || null
+    (initialData?.coverImage as { url: string })?.url || null
   );
 
-  const categories: { value: CourseCategory; label: string }[] = [
+  const categories: { value: string; label: string }[] = [
     { value: 'quran', label: 'Quran Studies' },
+    { value: 'arabic', label: 'Arabic Language' },
+    { value: 'tajweed', label: 'Tajweed' },
     { value: 'hadith', label: 'Hadith Studies' },
     { value: 'fiqh', label: 'Islamic Jurisprudence (Fiqh)' },
     { value: 'seerah', label: 'Prophet\'s Biography (Seerah)' },
     { value: 'aqeedah', label: 'Islamic Creed (Aqeedah)' },
-    { value: 'general', label: 'General Islamic Studies' },
+    { value: 'akhlaq', label: 'Islamic Ethics (Akhlaq)' },
   ];
 
   const difficulties: { value: CourseDifficulty; label: string }[] = [
@@ -207,7 +207,7 @@ export function CourseForm({
               <select
                 value={formData.category}
                 onChange={(e) =>
-                  handleInputChange('category', e.target.value as CourseCategory)
+                  handleInputChange('category', e.target.value)
                 }
                 className={`w-full rounded-lg border px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${
                   errors.category
@@ -234,7 +234,7 @@ export function CourseForm({
               <select
                 value={formData.difficulty}
                 onChange={(e) =>
-                  handleInputChange('difficulty', e.target.value as CourseDifficulty)
+                  handleInputChange('difficulty', e.target.value)
                 }
                 className={`w-full rounded-lg border px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${
                   errors.difficulty

@@ -20,6 +20,8 @@ export const auth = betterAuth({
         return bcrypt.hash(password, 10);
       },
       verify: async ({ hash, password }) => {
+        // Reject whitespace-only passwords
+        if (!password.trim()) return false;
         // Handles both bcrypt (migrated from Strapi) and new registrations
         if (hash.startsWith("$2a$") || hash.startsWith("$2b$")) {
           return bcrypt.compare(password, hash);
@@ -36,8 +38,17 @@ export const auth = betterAuth({
   },
   trustedOrigins: [
     "AttaqwaMasjid://",
+    ...(process.env.BETTER_AUTH_BASE_URL
+      ? [process.env.BETTER_AUTH_BASE_URL]
+      : ["http://localhost:3003"]),
     ...(process.env.NODE_ENV === "development"
-      ? ["exp://", "exp://**", "exp://192.168.*.*:*/**"]
+      ? [
+          "http://localhost:3000",
+          "http://localhost:3003",
+          "exp://",
+          "exp://**",
+          "exp://192.168.*.*:*/**",
+        ]
       : []),
   ],
   plugins: [

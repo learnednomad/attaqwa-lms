@@ -171,3 +171,24 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
 
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["node", "apps/website/server.js"]
+
+# ===========================================================================
+# Init Container — Database migrations & setup (runs once per deploy)
+# ===========================================================================
+
+FROM source AS init
+
+RUN apk add --no-cache postgresql16-client
+
+WORKDIR /app
+
+# Pre-install the auth CLI so migrate doesn't download it at runtime
+RUN npx auth@latest --help > /dev/null 2>&1 || true
+
+# Copy init scripts
+COPY docker/init/entrypoint.sh /entrypoint.sh
+COPY scripts/seed-auth-users.sql /app/scripts/seed-auth-users.sql
+COPY scripts/migrate-users-to-betterauth.ts /app/scripts/migrate-users-to-betterauth.ts
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

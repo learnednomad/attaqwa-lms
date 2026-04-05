@@ -12,14 +12,12 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/lib/hooks/use-auth';
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
 
 interface AISuggestionsProps {
   content: string;
   title: string;
-  onAcceptField: (field: string, value: any) => void;
+  onAcceptField: (field: string, value: string | string[]) => void;
 }
 
 interface TagSuggestion {
@@ -30,7 +28,6 @@ interface TagSuggestion {
 }
 
 export function AISuggestions({ content, title, onAcceptField }: AISuggestionsProps) {
-  const { token } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<TagSuggestion | null>(null);
   const [summary, setSummary] = useState<string | null>(null);
@@ -48,7 +45,7 @@ export function AISuggestions({ content, title, onAcceptField }: AISuggestionsPr
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_TOKEN}`,
           },
           body: JSON.stringify({ content, title }),
         }),
@@ -56,7 +53,7 @@ export function AISuggestions({ content, title, onAcceptField }: AISuggestionsPr
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_TOKEN}`,
           },
           body: JSON.stringify({ content }),
         }),
@@ -71,14 +68,14 @@ export function AISuggestions({ content, title, onAcceptField }: AISuggestionsPr
         const json = await summaryRes.value.json();
         setSummary(json.data.summary);
       }
-    } catch (err: any) {
+    } catch {
       setError('AI service is unavailable. Please try again later.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const acceptField = (field: string, value: any) => {
+  const acceptField = (field: string, value: string | string[]) => {
     onAcceptField(field, value);
     setAcceptedFields((prev) => new Set(prev).add(field));
   };

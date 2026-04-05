@@ -33,17 +33,11 @@ export default function StudentLoginPage() {
         await loginWithStudentId(studentId, password);
       }
       // Context handles router.push('/student/dashboard')
-    } catch (err: any) {
-      setError(err.message || 'Invalid credentials. Please try again.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Invalid credentials. Please try again.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDemoLogin = (demoEmail: string, demoPassword: string) => {
-    setEmail(demoEmail);
-    setPassword(demoPassword);
-    setLoginMethod('email');
   };
 
   return (
@@ -175,34 +169,6 @@ export default function StudentLoginPage() {
               </Button>
             </form>
 
-            {/* Demo Accounts - development only */}
-            {process.env.NODE_ENV === 'development' && (
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <p className="text-sm text-gray-600 mb-3">Demo Student Accounts:</p>
-                <div className="space-y-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start"
-                    onClick={() => handleDemoLogin('student1@attaqwa.test', 'Student123!')}
-                  >
-                    <User className="mr-2 h-4 w-4" />
-                    Ahmed Abdullah (student1@attaqwa.test)
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start"
-                    onClick={() => handleDemoLogin('student2@attaqwa.test', 'Student123!')}
-                  >
-                    <User className="mr-2 h-4 w-4" />
-                    Fatima Hassan (student2@attaqwa.test)
-                  </Button>
-                </div>
-              </div>
-            )}
           </CardContent>
           <CardFooter className="flex flex-col space-y-2">
             <div className="text-sm text-gray-600 text-center">
@@ -216,7 +182,7 @@ export default function StudentLoginPage() {
 
         {/* Additional Information */}
         <div className="mt-8 text-center text-sm text-gray-600">
-          <p>© 2024 Masjid At-Taqwa. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Masjid At-Taqwa. All rights reserved.</p>
           <p className="mt-2">
             <Link href="/privacy" className="hover:text-islamic-green-600">Privacy Policy</Link>
             {' • '}

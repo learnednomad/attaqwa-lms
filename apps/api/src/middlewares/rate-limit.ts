@@ -35,10 +35,23 @@ setInterval(() => {
   }
 }, 5 * 60 * 1000);
 
-export default (config: Record<string, unknown>, { strapi }: { strapi: any }) => {
-  return async (ctx: any, next: () => Promise<void>) => {
+interface StrapiLogger {
+  log: { warn: (msg: string) => void };
+}
+
+interface KoaContext {
+  request: { ip: string; headers: Record<string, string | string[] | undefined> };
+  state?: { user?: { id?: string; role?: { type?: string } } };
+  status: number;
+  body: unknown;
+  set: (key: string, value: string) => void;
+}
+
+export default (_config: Record<string, unknown>, { strapi }: { strapi: StrapiLogger }) => {
+  return async (ctx: KoaContext, next: () => Promise<void>) => {
     // Get client identifier (IP address or user ID)
-    const clientIP = ctx.request.ip || ctx.request.headers['x-forwarded-for'] || 'unknown';
+    const forwardedFor = ctx.request.headers['x-forwarded-for'];
+    const clientIP = ctx.request.ip || (Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor) || 'unknown';
     const user = ctx.state?.user;
     const userId = user?.id;
 

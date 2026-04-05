@@ -1,0 +1,71 @@
+{
+  "kind": "collectionType",
+  "collectionName": "iqamah_schedules",
+  "info": {
+    "singularName": "iqamah-schedule",
+    "pluralName": "iqamah-schedules",
+    "displayName": "Iqamah Schedule",
+    "description": "Monthly iqamah times with date range support for Masjid At-Taqwa"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "month": {
+      "type": "integer",
+      "required": true,
+      "min": 1,
+      "max": 12
+    },
+    "dayRangeStart": {
+      "type": "integer",
+      "required": true,
+      "min": 1,
+      "max": 31
+    },
+    "dayRangeEnd": {
+      "type": "integer",
+      "required": true,
+      "min": 1,
+      "max": 31
+    },
+    "isDst": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    },
+    "fajr": {
+      "type": "string",
+      "required": true
+    },
+    "dhuhr": {
+      "type": "string",
+      "required": true
+    },
+    "asr": {
+      "type": "string",
+      "required": true
+    },
+    "maghrib": {
+      "type": "string",
+      "required": true,
+      "default": "+5"
+    },
+    "isha": {
+      "type": "string",
+      "required": true
+    },
+    "jumuah1": {
+      "type": "string"
+    },
+    "jumuah2": {
+      "type": "string"
+    },
+    "isActive": {
+      "type": "boolean",
+      "required": true,
+      "default": true
+    }
+  }
+}

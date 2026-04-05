@@ -11,6 +11,7 @@
 # TRANSFER_TOKEN_SALT=<random-32-char-string>
 # ENCRYPTION_KEY=<random-32-char-string>
 # JWT_SECRET=<random-32-char-string>
+# BETTER_AUTH_SECRET=<random-32-char-string>
 #
 # Generate secrets with: openssl rand -base64 32
 # ============================================================================
@@ -33,6 +34,25 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  # --------------------------------------------------------------------------
+  # Init Container — Runs migrations on every deploy (idempotent)
+  # Creates BetterAuth tables, migrates Strapi users if needed
+  # --------------------------------------------------------------------------
+  init:
+    build:
+      context: .
+      target: init
+    restart: "no"
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?required}@postgres:5432/attaqwa_lms # placeholder
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: postgres
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET is required}
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   # Strapi Backend API
   api:
@@ -57,12 +77,12 @@ services:
       ENCRYPTION_KEY: ${ENCRYPTION_KEY:?ENCRYPTION_KEY is required}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
       NODE_ENV: ${NODE_ENV:-production}
-      # Ollama AI configuration
+      # Ollama AI configuration (gracefully disabled when ollama service is absent)
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
       OLLAMA_MODEL: ${OLLAMA_MODEL:-mistral:7b-instruct-q4_K_M}
       OLLAMA_EMBED_MODEL: ${OLLAMA_EMBED_MODEL:-nomic-embed-text}
       OLLAMA_TIMEOUT_MS: ${OLLAMA_TIMEOUT_MS:-120000}
-      OLLAMA_ENABLED: ${OLLAMA_ENABLED:-true}
+      OLLAMA_ENABLED: ${OLLAMA_ENABLED:-false}
       OLLAMA_MAX_PARALLEL: ${OLLAMA_MAX_PARALLEL:-2}
       EMBEDDING_DIMENSION: ${EMBEDDING_DIMENSION:-768}
     ports:
@@ -70,8 +90,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      ollama:
-        condition: service_healthy
+      init:
+        condition: service_completed_successfully
     volumes:
       - api_uploads:/app/apps/api/public/uploads
 
@@ -103,16 +123,23 @@ services:
       PORT: 3001
       HOSTNAME: 0.0.0.0
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:1337}
+      STRAPI_URL: ${STRAPI_URL:-http://api:1337}
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?required}@postgres:5432/attaqwa_lms # placeholder
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET is required}
+      BETTER_AUTH_BASE_URL: ${BETTER_AUTH_BASE_URL:-http://localhost:3001}
     ports:
       - "3001:3001"
     depends_on:
+      init:
+        condition: service_completed_successfully
       api:
         condition: service_healthy
 
-  # Ollama - Local LLM Inference
+  # Ollama - Local LLM Inference (optional, use --profile ai)
   ollama:
     image: ollama/ollama
     restart: unless-stopped
+    profiles: ["ai"]
     ports:
       - "11434:11434"
     volumes:

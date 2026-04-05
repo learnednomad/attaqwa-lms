@@ -1,11 +1,43 @@
 // import type { Core } from '@strapi/strapi';
 import bootstrap from './bootstrap';
 
+interface StrapiInstance {
+  log: { info: (msg: string) => void; warn: (msg: string) => void };
+  entityService: {
+    create: (uid: string, params: { data: Record<string, unknown> }) => Promise<Record<string, unknown>>;
+    findMany: (uid: string, params: Record<string, unknown>) => Promise<Record<string, unknown>[]>;
+    update: (uid: string, id: unknown, params: { data: Record<string, unknown> }) => Promise<Record<string, unknown>>;
+  };
+  db: {
+    lifecycles: {
+      subscribe: (config: Record<string, unknown>) => void;
+    };
+  };
+}
+
+interface ContentResult {
+  id: string | number;
+  documentId?: string;
+  title?: string;
+  name?: string;
+  description?: string;
+  content?: string;
+  subject?: string;
+  difficulty?: string;
+  age_tier?: string;
+}
+
+interface LifecycleEvent {
+  model: { singularName: string };
+  result: ContentResult;
+  params?: { data?: Record<string, unknown> };
+}
+
 /**
  * Queue AI moderation for content after create/update.
  * Fails silently if Ollama is unavailable — content stays in manual review.
  */
-async function queueModeration(strapi: any, contentType: string, result: any) {
+async function queueModeration(strapi: StrapiInstance, contentType: string, result: ContentResult) {
   if (process.env.AI_AUTO_MODERATE_ON_CREATE === 'false') return;
   if (process.env.OLLAMA_ENABLED === 'false') return;
 
@@ -75,13 +107,13 @@ async function queueModeration(strapi: any, contentType: string, result: any) {
             );
           }
         }
-      } catch (pollError: any) {
+      } catch (pollError: unknown) {
         clearInterval(pollInterval);
-        strapi.log.warn(`Moderation poll error for ${contentType}:${contentId}: ${pollError.message}`);
+        strapi.log.warn(`Moderation poll error for ${contentType}:${contentId}: ${pollError instanceof Error ? pollError.message : 'Unknown error'}`);
       }
     }, 2000);
-  } catch (error: any) {
-    strapi.log.warn(`AI moderation queue failed for ${contentType}: ${error.message}`);
+  } catch (error: unknown) {
+    strapi.log.warn(`AI moderation queue failed for ${contentType}: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -101,7 +133,7 @@ export default {
    * This gives you an opportunity to set up your data model,
    * run jobs, or perform some special logic.
    */
-  async bootstrap({ strapi }: { strapi: any }) {
+  async bootstrap({ strapi }: { strapi: StrapiInstance }) {
     // Run the original bootstrap (seeding, permissions)
     await bootstrap({ strapi });
 
@@ -110,8 +142,8 @@ export default {
       try {
         const embeddingService = require('./api/ai/services/embedding-service');
         await embeddingService.runMigration(strapi);
-      } catch (error: any) {
-        strapi.log.warn(`Embeddings migration skipped: ${error.message}`);
+      } catch (error: unknown) {
+        strapi.log.warn(`Embeddings migration skipped: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     }
 
@@ -122,7 +154,7 @@ export default {
       strapi.db.lifecycles.subscribe({
         models: modelsToWatch,
 
-        async afterCreate(event: any) {
+        async afterCreate(event: LifecycleEvent) {
           const { model, result } = event;
           const contentType = model.singularName;
 
@@ -145,13 +177,13 @@ export default {
                   { subject: result.subject, difficulty: result.difficulty, age_tier: result.age_tier }
                 );
               }
-            } catch (err: any) {
-              strapi.log.warn(`Embedding indexing failed: ${err.message}`);
+            } catch (err: unknown) {
+              strapi.log.warn(`Embedding indexing failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
             }
           }
         },
 
-        async afterUpdate(event: any) {
+        async afterUpdate(event: LifecycleEvent) {
           const { model, result, params } = event;
           const contentFields = ['description', 'content', 'title'];
           const changedFields = Object.keys(params.data || {});
@@ -179,14 +211,14 @@ export default {
                     { subject: result.subject, difficulty: result.difficulty, age_tier: result.age_tier }
                   );
                 }
-              } catch (err: any) {
-                strapi.log.warn(`Embedding re-indexing failed: ${err.message}`);
+              } catch (err: unknown) {
+                strapi.log.warn(`Embedding re-indexing failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
               }
             }
           }
         },
 
-        async afterDelete(event: any) {
+        async afterDelete(event: LifecycleEvent) {
           const { model, result } = event;
           // Remove embeddings for deleted content
           if (process.env.AI_SEARCH_ENABLED !== 'false') {
@@ -197,8 +229,8 @@ export default {
                 model.singularName,
                 String(result.documentId || result.id)
               );
-            } catch (err: any) {
-              strapi.log.warn(`Embedding cleanup failed: ${err.message}`);
+            } catch (err: unknown) {
+              strapi.log.warn(`Embedding cleanup failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
             }
           }
         },

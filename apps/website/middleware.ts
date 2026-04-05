@@ -16,7 +16,6 @@ export function middleware(request: NextRequest) {
   const isPublicAuth = PUBLIC_AUTH_PAGES.includes(pathname);
 
   if (isProtected && !isPublicAuth) {
-    // Check for BetterAuth session cookie
     const sessionCookie =
       request.cookies.get("__Secure-better-auth.session_token") ??
       request.cookies.get("better-auth.session_token");
@@ -29,6 +28,14 @@ export function middleware(request: NextRequest) {
           : "/student/login";
       return NextResponse.redirect(new URL(loginPath, request.url));
     }
+
+    // Prevent bfcache from serving protected pages after logout
+    const response = NextResponse.next();
+    response.headers.set(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, max-age=0"
+    );
+    return response;
   }
 
   return NextResponse.next();

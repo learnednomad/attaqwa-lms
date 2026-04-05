@@ -11,45 +11,57 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { CourseForm, type CourseFormData } from '@/components/courses/course-form';
-import { strapiClient } from '@attaqwa/api-client';
 
 export default function CreateCoursePage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
+
   const handleSubmit = async (data: CourseFormData) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Prepare form data for Strapi
-      const formData = new FormData();
+      // Generate unique slug from title + short timestamp
+      const slug = data.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+        + '-' + Date.now().toString(36);
 
-      // Add course data
+      // Map age tier (form uses 'all' but schema doesn't have it)
+      const ageTier = data.ageTier === 'all' ? 'adults' : data.ageTier;
+
+      // Prepare course data for Strapi
       const courseData = {
-        title: data.title,
-        description: data.description,
-        category: data.category,
-        difficulty: data.difficulty,
-        ageTier: data.ageTier,
-        duration: data.duration,
-        isPublished: data.isPublished,
+        data: {
+          title: data.title,
+          slug,
+          description: data.description,
+          subject: data.category,
+          difficulty: data.difficulty,
+          age_tier: ageTier,
+          duration_weeks: data.duration ? Math.max(1, Math.ceil(data.duration / 60)) : 1,
+          schedule: 'Self-paced',
+          instructor: 'Attaqwa Masjid Education Team',
+          is_featured: false,
+        },
       };
 
-      formData.append('data', JSON.stringify(courseData));
-
-      // Add cover image if provided
-      if (data.coverImage instanceof File) {
-        formData.append('files.coverImage', data.coverImage);
-      }
-
-      // Create course via Strapi API
-      const response = await strapiClient.post('/courses', formData, {
+      const response = await fetch(`${API_URL}/api/v1/courses`, {
+        method: 'POST',
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify(courseData),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.error?.message || `Request failed with status code ${response.status}`);
+      }
 
       // Redirect to courses list on success
       router.push('/courses');

@@ -716,9 +716,9 @@ export default async ({ strapi }: { strapi: any }) => {
       // SECURITY: create/update permissions are only enabled in development
       const isDev = process.env.NODE_ENV !== 'production';
       const permissionsToEnable = [
-        { controller: 'course', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
-        { controller: 'lesson', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
-        { controller: 'quiz', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
+        { controller: 'course', actions: isDev ? ['find', 'findOne', 'create', 'update', 'delete'] : ['find', 'findOne'] },
+        { controller: 'lesson', actions: isDev ? ['find', 'findOne', 'create', 'update', 'delete'] : ['find', 'findOne'] },
+        { controller: 'quiz', actions: isDev ? ['find', 'findOne', 'create', 'update', 'delete'] : ['find', 'findOne'] },
         { controller: 'achievement', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
         { controller: 'course-enrollment', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
         { controller: 'user-progress', actions: isDev ? ['find', 'findOne', 'create', 'update'] : ['find', 'findOne'] },

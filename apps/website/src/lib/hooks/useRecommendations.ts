@@ -20,11 +20,10 @@ export interface Recommendation {
 }
 
 async function fetchRecommendations(
-  token: string,
   limit: number
 ): Promise<Recommendation[]> {
   const res = await fetch(`${API_URL}/api/v1/ai/recommend?limit=${limit}`, {
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: 'include',
   });
 
   if (!res.ok) return [];
@@ -33,11 +32,11 @@ async function fetchRecommendations(
   return json.data || [];
 }
 
-export function useRecommendations(token: string | null, limit: number = 5) {
+export function useRecommendations(limit: number = 5) {
   return useQuery({
     queryKey: ['ai-recommendations', limit],
-    queryFn: () => fetchRecommendations(token!, limit),
-    enabled: !!token,
+    queryFn: () => fetchRecommendations(limit),
+    enabled: true,
     staleTime: 15 * 60 * 1000, // 15 minutes
     retry: false,
   });

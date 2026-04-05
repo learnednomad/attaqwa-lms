@@ -499,7 +499,7 @@ export default function StudentDashboard() {
 
           {/* AI Course Recommendations */}
           <div className="mb-6">
-            <Recommendations token={typeof window !== 'undefined' ? localStorage.getItem('studentToken') : null} />
+            <Recommendations />
           </div>
 
           {/* Main Content Grid */}

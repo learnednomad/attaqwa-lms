@@ -18,6 +18,8 @@
     "seed:api": "tsx scripts/seed/seed-via-api.ts",
     "seed:comprehensive": "tsx scripts/seed/seed-comprehensive.ts",
     "seed:complete": "tsx scripts/seed/seed-complete.ts",
+    "seed:iqamah": "tsx scripts/seed/seed-iqamah.ts",
+    "seed:courses": "tsx scripts/seed/seed-courses.ts",
     "seed:users": "tsx scripts/seed/seed-users.ts",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -49,7 +51,7 @@
     "npm": ">=6.0.0"
   },
   "strapi": {
-    "uuid": "d73a8b54-c660-4e60-8472-f16b18551cd3",
+    "uuid": "d73a8b54-c660-4e60-8472-f16b18551cd3"
     "installId": "fa57f219e7a0a334c7a5e52f270525a4b16c3952d3c646eece4a335a5025049f"
   }
 }
