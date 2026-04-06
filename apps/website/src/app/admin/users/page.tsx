@@ -69,8 +69,8 @@ export default function AdminUsersPage() {
                 <p className="text-sm text-gray-500">Total Users</p>
                 <p className="text-2xl font-bold text-gray-900">{mockUsers.length}</p>
               </div>
-              <div className="p-3 bg-indigo-100 rounded-xl">
-                <Users className="h-6 w-6 text-indigo-600" />
+              <div className="p-3 bg-islamic-green-100 rounded-xl">
+                <Users className="h-6 w-6 text-islamic-green-600" />
               </div>
             </div>
           </CardContent>

@@ -166,7 +166,7 @@ export default function EditLessonPage() {
     return (
       <TeacherLayout title="Edit Lesson" subtitle="Loading...">
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-islamic-green-600" />
         </div>
       </TeacherLayout>
     );
@@ -343,7 +343,7 @@ export default function EditLessonPage() {
                   type="checkbox"
                   checked={isFree}
                   onChange={(e) => setIsFree(e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  className="h-4 w-4 rounded border-gray-300 text-islamic-green-600 focus:ring-islamic-green-500"
                 />
                 <span className="text-sm text-gray-700">Free Access</span>
               </label>
@@ -353,7 +353,7 @@ export default function EditLessonPage() {
                   type="checkbox"
                   checked={isPreview}
                   onChange={(e) => setIsPreview(e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  className="h-4 w-4 rounded border-gray-300 text-islamic-green-600 focus:ring-islamic-green-500"
                 />
                 <span className="text-sm text-gray-700">Available as Preview</span>
               </label>
@@ -411,7 +411,7 @@ export default function EditLessonPage() {
           </Link>
           <Button
             type="submit"
-            className="bg-indigo-600 hover:bg-indigo-700"
+            className="bg-islamic-green-600 hover:bg-islamic-green-700"
             disabled={saving}
           >
             {saving ? (

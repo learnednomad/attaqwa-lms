@@ -15,7 +15,14 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const response = await fetch(`${STRAPI_URL}/api/v1/lessons/${id}`, {
+    const populateParams = new URLSearchParams();
+    populateParams.set('populate[0]', 'course');
+    populateParams.set('populate[1]', 'quiz');
+    populateParams.set('populate[2]', 'video_file');
+    populateParams.set('populate[3]', 'audio_file');
+    populateParams.set('populate[4]', 'attachments');
+
+    const response = await fetch(`${STRAPI_URL}/api/v1/lessons/${id}?${populateParams.toString()}`, {
       headers: {
         'Content-Type': 'application/json',
       },

@@ -34,6 +34,17 @@ export interface Course {
   lessons?: Lesson[];
 }
 
+export interface StrapiMedia {
+  id: number;
+  url: string;
+  name: string;
+  mime: string;
+  size: number;
+  width?: number;
+  height?: number;
+  formats?: Record<string, { url: string; width: number; height: number }>;
+}
+
 export interface Lesson {
   id: number;
   documentId: string;
@@ -45,6 +56,9 @@ export interface Lesson {
   duration_minutes: number;
   content: string;
   video_url?: string;
+  video_file?: StrapiMedia;
+  audio_file?: StrapiMedia;
+  attachments?: StrapiMedia[];
   learning_objectives: string[];
   is_free: boolean;
   is_preview: boolean;

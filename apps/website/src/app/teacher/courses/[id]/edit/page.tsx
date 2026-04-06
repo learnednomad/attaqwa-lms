@@ -190,7 +190,7 @@ export default function EditCoursePage() {
     return (
       <TeacherLayout title="Edit Course" subtitle="Loading...">
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-islamic-green-600" />
         </div>
       </TeacherLayout>
     );
@@ -448,7 +448,7 @@ export default function EditCoursePage() {
           </Link>
           <Button
             type="submit"
-            className="bg-indigo-600 hover:bg-indigo-700"
+            className="bg-islamic-green-600 hover:bg-islamic-green-700"
             disabled={saving}
           >
             {saving ? (

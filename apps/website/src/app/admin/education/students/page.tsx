@@ -65,7 +65,7 @@ export default function AdminEducationStudentsPage() {
                 <p className="text-sm text-gray-500">Total Students</p>
                 <p className="text-2xl font-bold">{mockStudents.length}</p>
               </div>
-              <Users className="h-8 w-8 text-indigo-500" />
+              <Users className="h-8 w-8 text-islamic-green-500" />
             </div>
           </CardContent>
         </Card>

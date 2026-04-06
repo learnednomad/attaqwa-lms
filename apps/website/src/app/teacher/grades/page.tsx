@@ -61,67 +61,11 @@ interface QuizResultData {
   timeSpent: string;
 }
 
-const mockSubmissions: SubmissionData[] = [
-  {
-    id: 1, studentName: 'Ahmad Hassan', studentEmail: 'ahmad@email.com',
-    assignmentTitle: 'Wudu Practice Report', course: 'Fiqh of Worship',
-    submittedAt: '2 hours ago', status: 'pending'
-  },
-  {
-    id: 2, studentName: 'Fatima Ali', studentEmail: 'fatima@email.com',
-    assignmentTitle: 'Hadith Analysis - Hadith #5', course: 'Hadith Studies',
-    submittedAt: '4 hours ago', status: 'pending'
-  },
-  {
-    id: 3, studentName: 'Omar Ibrahim', studentEmail: 'omar@email.com',
-    assignmentTitle: 'Arabic Grammar Exercise 5', course: 'Arabic Grammar Level 2',
-    submittedAt: '1 day ago', status: 'pending'
-  },
-  {
-    id: 4, studentName: 'Aisha Mohamed', studentEmail: 'aisha@email.com',
-    assignmentTitle: 'Salah Steps Diagram', course: 'Fiqh of Worship',
-    submittedAt: '2 days ago', status: 'graded', grade: 95, feedback: 'Excellent work!'
-  },
-  {
-    id: 5, studentName: 'Yusuf Khan', studentEmail: 'yusuf@email.com',
-    assignmentTitle: 'Hadith Memorization Recording', course: 'Hadith Studies',
-    submittedAt: '3 days ago', status: 'graded', grade: 88, feedback: 'Good pronunciation, review tajweed on some words.'
-  },
-  {
-    id: 6, studentName: 'Maryam Zahra', studentEmail: 'maryam@email.com',
-    assignmentTitle: 'Noun Declension Worksheet', course: 'Arabic Grammar Level 2',
-    submittedAt: '3 days ago', status: 'returned', grade: 72, feedback: 'Please review the genitive case rules and resubmit.'
-  },
-];
-
-const mockQuizResults: QuizResultData[] = [
-  {
-    id: 1, studentName: 'Ahmad Hassan', studentEmail: 'ahmad@email.com',
-    quizTitle: 'Taharah Quiz 1', course: 'Fiqh of Worship',
-    completedAt: '1 hour ago', score: 92, totalQuestions: 10, correctAnswers: 9, timeSpent: '8 min'
-  },
-  {
-    id: 2, studentName: 'Fatima Ali', studentEmail: 'fatima@email.com',
-    quizTitle: 'Hadith #1-5 Review', course: 'Hadith Studies',
-    completedAt: '3 hours ago', score: 60, totalQuestions: 15, correctAnswers: 9, timeSpent: '12 min'
-  },
-  {
-    id: 3, studentName: 'Sara Hassan', studentEmail: 'sara@email.com',
-    quizTitle: 'Taharah Quiz 1', course: 'Fiqh of Worship',
-    completedAt: '5 hours ago', score: 85, totalQuestions: 10, correctAnswers: 8, timeSpent: '10 min'
-  },
-  {
-    id: 4, studentName: 'Ibrahim Ahmed', studentEmail: 'ibrahim@email.com',
-    quizTitle: 'Nahw Basics Test', course: 'Arabic Grammar Level 2',
-    completedAt: '1 day ago', score: 95, totalQuestions: 20, correctAnswers: 19, timeSpent: '15 min'
-  },
-];
 
 export default function TeacherGradesPage() {
   const [submissions, setSubmissions] = useState<SubmissionData[]>([]);
   const [quizResults, setQuizResults] = useState<QuizResultData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
   const [searchQuery, setSearchQuery] = useState('');
   const [courseFilter, setCourseFilter] = useState<string>('all');
   const [gradingDialogOpen, setGradingDialogOpen] = useState(false);
@@ -130,8 +74,9 @@ export default function TeacherGradesPage() {
   const [feedbackInput, setFeedbackInput] = useState('');
 
   useEffect(() => {
-    setSubmissions(mockSubmissions);
-    setQuizResults(mockQuizResults);
+    // Fetch real submissions when the grading API is available
+    setSubmissions([]);
+    setQuizResults([]);
     setLoading(false);
   }, []);
 
@@ -192,7 +137,7 @@ export default function TeacherGradesPage() {
     return (
       <TeacherLayout title="Grades & Assessment" subtitle="Review and grade student work">
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-islamic-green-600" />
         </div>
       </TeacherLayout>
     );
@@ -200,21 +145,6 @@ export default function TeacherGradesPage() {
 
   return (
     <TeacherLayout title="Grades & Assessment" subtitle="Review and grade student work">
-      {/* Data Source Badge */}
-      <div className="mb-4">
-        {dataSource === 'api' ? (
-          <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
-            <CheckCircle className="h-3 w-3 mr-1" />
-            Live Data from Strapi
-          </Badge>
-        ) : (
-          <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">
-            <AlertCircle className="h-3 w-3 mr-1" />
-            Demo Mode (Mock Data)
-          </Badge>
-        )}
-      </div>
-
       {/* Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Card>
@@ -248,8 +178,8 @@ export default function TeacherGradesPage() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-100 rounded-lg">
-                <FileText className="h-5 w-5 text-indigo-600" />
+              <div className="p-2 bg-islamic-green-100 rounded-lg">
+                <FileText className="h-5 w-5 text-islamic-green-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{quizResults.length}</p>
@@ -338,7 +268,7 @@ export default function TeacherGradesPage() {
                       <div className="flex items-start gap-4">
                         <Avatar className="h-10 w-10">
                           <AvatarImage src={submission.studentAvatar} />
-                          <AvatarFallback className="bg-indigo-100 text-indigo-700">
+                          <AvatarFallback className="bg-islamic-green-100 text-islamic-green-700">
                             {submission.studentName.split(' ').map(n => n[0]).join('')}
                           </AvatarFallback>
                         </Avatar>
@@ -359,7 +289,7 @@ export default function TeacherGradesPage() {
                         </Button>
                         <Button
                           size="sm"
-                          className="bg-indigo-600 hover:bg-indigo-700"
+                          className="bg-islamic-green-600 hover:bg-islamic-green-700"
                           onClick={() => handleOpenGrading(submission)}
                         >
                           <PenTool className="h-4 w-4 mr-1" /> Grade
@@ -390,7 +320,7 @@ export default function TeacherGradesPage() {
                       <div className="flex items-start gap-4">
                         <Avatar className="h-10 w-10">
                           <AvatarImage src={submission.studentAvatar} />
-                          <AvatarFallback className="bg-indigo-100 text-indigo-700">
+                          <AvatarFallback className="bg-islamic-green-100 text-islamic-green-700">
                             {submission.studentName.split(' ').map(n => n[0]).join('')}
                           </AvatarFallback>
                         </Avatar>
@@ -453,7 +383,7 @@ export default function TeacherGradesPage() {
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
                             <Avatar className="h-8 w-8">
-                              <AvatarFallback className="bg-indigo-100 text-indigo-700 text-xs">
+                              <AvatarFallback className="bg-islamic-green-100 text-islamic-green-700 text-xs">
                                 {quiz.studentName.split(' ').map(n => n[0]).join('')}
                               </AvatarFallback>
                             </Avatar>
@@ -538,7 +468,7 @@ export default function TeacherGradesPage() {
             <Button variant="outline" onClick={() => setGradingDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSubmitGrade} className="bg-indigo-600 hover:bg-indigo-700">
+            <Button onClick={handleSubmitGrade} className="bg-islamic-green-600 hover:bg-islamic-green-700">
               Submit Grade
             </Button>
           </DialogFooter>

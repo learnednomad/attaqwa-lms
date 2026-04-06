@@ -62,17 +62,17 @@ export default function TeacherCalendarPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-indigo-600" />
+                <Calendar className="h-5 w-5 text-islamic-green-600" />
                 Upcoming Events
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {upcomingEvents.map((event, index) => (
-                  <div key={index} className="flex items-start gap-4 p-4 border border-gray-200 rounded-xl hover:border-indigo-200 transition-colors">
+                  <div key={index} className="flex items-start gap-4 p-4 border border-gray-200 rounded-xl hover:border-islamic-green-200 transition-colors">
                     <div className="flex-shrink-0 w-14 text-center">
                       <p className="text-xs text-gray-500">{event.date.split(',')[0].split(' ')[0]}</p>
-                      <p className="text-2xl font-bold text-indigo-600">{event.date.split(' ')[1].replace(',', '')}</p>
+                      <p className="text-2xl font-bold text-islamic-green-600">{event.date.split(' ')[1].replace(',', '')}</p>
                     </div>
                     <div className="flex-1">
                       <h3 className="font-medium text-gray-900">{event.title}</h3>

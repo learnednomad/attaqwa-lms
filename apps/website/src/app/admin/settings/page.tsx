@@ -36,7 +36,7 @@ export default function AdminSettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                <Globe className="h-5 w-5 text-indigo-600" />
+                <Globe className="h-5 w-5 text-islamic-green-600" />
                 General Settings
               </CardTitle>
               <CardDescription>Configure the basic platform settings</CardDescription>
@@ -147,7 +147,7 @@ export default function AdminSettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                <Server className="h-5 w-5 text-indigo-600" />
+                <Server className="h-5 w-5 text-islamic-green-600" />
                 System Information
               </CardTitle>
             </CardHeader>

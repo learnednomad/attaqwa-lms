@@ -31,10 +31,14 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       // Fonts: self, Google Fonts
       "font-src 'self' https://fonts.gstatic.com data:",
-      // Images: self, data URIs, blob, CDN
-      "img-src 'self' data: https: blob:",
+      // Images: self, data URIs, blob, CDN, MinIO
+      "img-src 'self' data: https: blob:" + (process.env.NODE_ENV === 'development' ? " http://localhost:9000" : ''),
+      // Media: self, MinIO for video/audio uploads
+      "media-src 'self' https: blob:" + (process.env.NODE_ENV === 'development' ? " http://localhost:9000" : ''),
       // API connections
-      "connect-src 'self' https://api.aladhan.com https://cms.learnednomad.com https://hadithapi.com wss:" + (process.env.NODE_ENV === 'development' ? " http://localhost:1337" : ''),
+      "connect-src 'self' https://api.aladhan.com https://cms.learnednomad.com https://hadithapi.com wss:" + (process.env.NODE_ENV === 'development' ? " http://localhost:1337 http://localhost:9000" : ''),
+      // Frames: allow YouTube and Vimeo embeds for video lessons
+      "frame-src 'self' https://www.youtube.com https://youtube.com https://player.vimeo.com",
       // Frames: prevent clickjacking
       "frame-ancestors 'none'",
       // Forms: self only

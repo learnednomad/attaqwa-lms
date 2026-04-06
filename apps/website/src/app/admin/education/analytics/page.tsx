@@ -74,7 +74,7 @@ export default function AdminEducationAnalyticsPage() {
                 <p className="text-sm text-gray-500">Total Enrollments</p>
                 <p className="text-2xl font-bold">248</p>
               </div>
-              <Users className="h-8 w-8 text-indigo-500" />
+              <Users className="h-8 w-8 text-islamic-green-500" />
             </div>
             <p className="text-xs text-emerald-600 mt-2 flex items-center">
               <TrendingUp className="h-3 w-3 mr-1" /> +12% vs last month

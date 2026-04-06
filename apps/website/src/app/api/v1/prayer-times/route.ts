@@ -32,14 +32,15 @@ const DEFAULT_METHOD = 3; // Muslim World League - matches mosque's WordPress co
 const STRAPI_URL = process.env.STRAPI_URL || 'http://localhost:1337';
 
 // Fallback iqamah times if Strapi is unavailable
+// Fallback values must match src/data/iqamah-times.json
 const FALLBACK_IQAMAH = {
   fajr: '6:45 AM',
   dhuhr: '1:15 PM',
   asr: '4:15 PM',
   maghrib: '+5',
   isha: '8:45 PM',
-  jumuah1: '1:15 PM',
-  jumuah2: '2:15 PM',
+  jumuah1: '1:00 PM',
+  jumuah2: '2:00 PM',
 };
 
 interface IqamahSchedule {

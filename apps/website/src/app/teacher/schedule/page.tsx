@@ -1,27 +1,71 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { TeacherLayout } from '@/components/layout/teacher-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, Calendar, MapPin, Users, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Clock, Calendar, MapPin, Users, Plus, ChevronLeft, ChevronRight, BookOpen, Loader2 } from 'lucide-react';
+import { teacherApi } from '@/lib/teacher-api';
 
-const mockSchedule = [
-  { id: 1, day: 'Monday', time: '6:30 PM - 8:00 PM', course: 'Fiqh of Worship', room: 'A-101', students: 24 },
-  { id: 2, day: 'Tuesday', time: '7:00 PM - 8:30 PM', course: 'Hadith Studies - 40 Nawawi', room: 'B-203', students: 18 },
-  { id: 3, day: 'Wednesday', time: '5:00 PM - 6:30 PM', course: 'Arabic Grammar Level 2', room: 'C-105', students: 15 },
-  { id: 4, day: 'Thursday', time: '6:30 PM - 8:00 PM', course: 'Fiqh of Worship', room: 'A-101', students: 24 },
-  { id: 5, day: 'Friday', time: '8:00 PM - 9:00 PM', course: 'Office Hours', room: 'B-105', students: 0 },
-  { id: 6, day: 'Saturday', time: '10:00 AM - 12:00 PM', course: 'Hadith Studies - 40 Nawawi', room: 'B-203', students: 18 },
-];
-
-const todayClasses = [
-  { time: '6:30 PM', course: 'Fiqh of Worship', room: 'A-101', status: 'upcoming' },
-  { time: '8:00 PM', course: 'Office Hours', room: 'B-105', status: 'later' },
-];
+interface ScheduleItem {
+  id: number;
+  day: string;
+  time: string;
+  course: string;
+  room: string;
+  students: number;
+  type: string;
+}
 
 export default function TeacherSchedulePage() {
+  const [courses, setCourses] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const res = await teacherApi.courses.getMyCourses();
+        setCourses(res.data || []);
+      } catch (err) {
+        console.error('Failed to fetch courses:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourses();
+  }, []);
+
+  // Generate schedule items from courses
+  const schedule: ScheduleItem[] = courses.map((course, i) => ({
+    id: course.id,
+    day: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][i % 6],
+    time: course.schedule || 'TBD',
+    course: course.title,
+    room: 'TBD',
+    students: course.current_enrollments || 0,
+    type: 'Class',
+  }));
+
+  const weekLabel = (() => {
+    const now = new Date();
+    const start = new Date(now);
+    start.setDate(now.getDate() - now.getDay() + 1);
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+    return `${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+  })();
+
+  if (loading) {
+    return (
+      <TeacherLayout title="Class Schedule" subtitle="View and manage your teaching schedule">
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin text-islamic-green-600" />
+        </div>
+      </TeacherLayout>
+    );
+  }
+
   return (
     <TeacherLayout title="Class Schedule" subtitle="View and manage your teaching schedule">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -34,82 +78,79 @@ export default function TeacherSchedulePage() {
                 <Button variant="outline" size="icon">
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <span className="text-sm text-gray-600">Dec 9 - 15, 2024</span>
+                <span className="text-sm text-gray-600">{weekLabel}</span>
                 <Button variant="outline" size="icon">
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {mockSchedule.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-indigo-200 hover:bg-indigo-50/30 transition-colors"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-24 text-center">
-                        <p className="font-medium text-gray-900">{item.day}</p>
-                        <p className="text-sm text-gray-500">{item.time.split(' - ')[0]}</p>
-                      </div>
-                      <div className="h-12 w-px bg-gray-200" />
-                      <div>
-                        <h3 className="font-medium text-gray-900">{item.course}</h3>
-                        <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <MapPin className="h-4 w-4" /> {item.room}
-                          </span>
-                          {item.students > 0 && (
+              {schedule.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  <Calendar className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <p className="font-medium">No classes scheduled</p>
+                  <p className="text-sm mt-1">Your courses don&apos;t have schedule data yet. Add schedule information to your courses.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {schedule.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-islamic-green-200 hover:bg-islamic-green-50/30 transition-colors"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-24 text-center">
+                          <p className="font-medium text-gray-900">{item.day}</p>
+                          <p className="text-sm text-gray-500">{item.time}</p>
+                        </div>
+                        <div className="h-12 w-px bg-gray-200" />
+                        <div>
+                          <h3 className="font-medium text-gray-900">{item.course}</h3>
+                          <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
                             <span className="flex items-center gap-1">
-                              <Users className="h-4 w-4" /> {item.students} students
+                              <MapPin className="h-4 w-4" /> {item.room}
                             </span>
-                          )}
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" /> {item.time}
-                          </span>
+                            {item.students > 0 && (
+                              <span className="flex items-center gap-1">
+                                <Users className="h-4 w-4" /> {item.students} students
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
+                      <Badge variant="outline">{item.type}</Badge>
                     </div>
-                    <Badge variant="outline">{item.day === 'Friday' ? 'Office Hours' : 'Class'}</Badge>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
 
-        {/* Today's Classes */}
+        {/* Sidebar */}
         <div className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-indigo-500" />
-                Today&apos;s Classes
+                <BookOpen className="h-5 w-5 text-islamic-green-500" />
+                Your Courses
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {todayClasses.map((cls, index) => (
-                  <div
-                    key={index}
-                    className={`p-3 rounded-lg border ${
-                      cls.status === 'upcoming'
-                        ? 'bg-indigo-50 border-indigo-200'
-                        : 'bg-gray-50 border-gray-200'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium text-gray-900">{cls.course}</p>
-                        <p className="text-sm text-gray-500">{cls.time} | Room {cls.room}</p>
-                      </div>
-                      {cls.status === 'upcoming' && (
-                        <Badge className="bg-indigo-100 text-indigo-700">Next</Badge>
-                      )}
+              {courses.length === 0 ? (
+                <p className="text-sm text-gray-500 text-center py-4">No courses found.</p>
+              ) : (
+                <div className="space-y-3">
+                  {courses.map((course: any) => (
+                    <div key={course.id} className="p-3 bg-gray-50 rounded-lg">
+                      <p className="font-medium text-gray-900 text-sm">{course.title}</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {course.lessons?.length || 0} lessons | {course.current_enrollments || 0} students
+                      </p>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 

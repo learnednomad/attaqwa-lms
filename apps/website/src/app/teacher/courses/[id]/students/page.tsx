@@ -114,7 +114,7 @@ export default function CourseStudentsPage() {
 
   const getProgressColor = (progress: number) => {
     if (progress === 100) return 'text-emerald-600';
-    if (progress >= 50) return 'text-indigo-600';
+    if (progress >= 50) return 'text-islamic-green-600';
     if (progress > 0) return 'text-amber-600';
     return 'text-gray-400';
   };
@@ -124,7 +124,7 @@ export default function CourseStudentsPage() {
       return <Badge className="bg-emerald-100 text-emerald-700">Completed</Badge>;
     }
     if (progress >= 50) {
-      return <Badge className="bg-indigo-100 text-indigo-700">On Track</Badge>;
+      return <Badge className="bg-islamic-green-100 text-islamic-green-700">On Track</Badge>;
     }
     if (progress > 0) {
       return <Badge className="bg-amber-100 text-amber-700">In Progress</Badge>;
@@ -136,7 +136,7 @@ export default function CourseStudentsPage() {
     return (
       <TeacherLayout title="Manage Students" subtitle="Loading...">
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-islamic-green-600" />
         </div>
       </TeacherLayout>
     );
@@ -180,8 +180,8 @@ export default function CourseStudentsPage() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-100 rounded-lg">
-                <Users className="h-5 w-5 text-indigo-600" />
+              <div className="p-2 bg-islamic-green-100 rounded-lg">
+                <Users className="h-5 w-5 text-islamic-green-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{totalStudents}</p>
@@ -317,8 +317,8 @@ export default function CourseStudentsPage() {
                   >
                     {/* Student Info */}
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
-                        <User className="h-6 w-6 text-indigo-600" />
+                      <div className="w-12 h-12 bg-islamic-green-100 rounded-full flex items-center justify-center">
+                        <User className="h-6 w-6 text-islamic-green-600" />
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">{studentName}</p>

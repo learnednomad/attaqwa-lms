@@ -20,7 +20,7 @@ import {
 const classAttendance = [
   {
     className: 'Fiqh of Worship - Section A',
-    date: '2025-01-27',
+    date: new Date().toISOString().split('T')[0],
     total: 24,
     present: 21,
     absent: 2,
@@ -38,7 +38,7 @@ const classAttendance = [
   },
   {
     className: 'Hadith Studies - Section B',
-    date: '2025-01-27',
+    date: new Date().toISOString().split('T')[0],
     total: 18,
     present: 16,
     absent: 1,
@@ -107,8 +107,8 @@ export default function TeacherAttendancePage() {
                 <p className="text-sm text-gray-500">Total Students</p>
                 <p className="text-2xl font-bold text-gray-900">42</p>
               </div>
-              <div className="p-3 bg-indigo-100 rounded-xl">
-                <Users className="h-6 w-6 text-indigo-600" />
+              <div className="p-3 bg-islamic-green-100 rounded-xl">
+                <Users className="h-6 w-6 text-islamic-green-600" />
               </div>
             </div>
           </CardContent>
@@ -163,7 +163,7 @@ export default function TeacherAttendancePage() {
                 <div>
                   <CardTitle className="text-lg font-semibold">{cls.className}</CardTitle>
                   <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
-                    <Calendar className="h-4 w-4" /> {cls.date}
+                    <Calendar className="h-4 w-4" /> {new Date(cls.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">

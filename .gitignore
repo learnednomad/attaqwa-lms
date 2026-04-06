@@ -71,3 +71,4 @@ coverage/
 !apps/**/public/**/*.png
 backups/
 test-screenshots/
+apps/website/tsconfig.tsbuildinfo

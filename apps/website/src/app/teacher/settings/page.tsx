@@ -59,7 +59,7 @@ export default function TeacherSettingsPage() {
               <CardContent className="flex flex-col items-center">
                 <Avatar className="h-32 w-32 mb-4">
                   <AvatarImage src="/placeholder-avatar.jpg" />
-                  <AvatarFallback className="bg-indigo-100 text-indigo-700 text-3xl">SA</AvatarFallback>
+                  <AvatarFallback className="bg-islamic-green-100 text-islamic-green-700 text-3xl">SA</AvatarFallback>
                 </Avatar>
                 <Button variant="outline" className="w-full">
                   <Upload className="h-4 w-4 mr-2" /> Upload Photo
@@ -105,7 +105,7 @@ export default function TeacherSettingsPage() {
                     placeholder="Tell students about yourself..."
                   />
                 </div>
-                <Button className="bg-indigo-600 hover:bg-indigo-700">
+                <Button className="bg-islamic-green-600 hover:bg-islamic-green-700">
                   <Save className="h-4 w-4 mr-2" /> Save Changes
                 </Button>
               </CardContent>
@@ -186,7 +186,7 @@ export default function TeacherSettingsPage() {
                   <Label htmlFor="confirmPassword">Confirm New Password</Label>
                   <Input id="confirmPassword" type="password" />
                 </div>
-                <Button className="bg-indigo-600 hover:bg-indigo-700">
+                <Button className="bg-islamic-green-600 hover:bg-islamic-green-700">
                   Update Password
                 </Button>
               </CardContent>

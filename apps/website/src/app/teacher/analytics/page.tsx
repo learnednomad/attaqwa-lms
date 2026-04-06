@@ -81,8 +81,8 @@ export default function TeacherAnalyticsPage() {
                 <p className="text-sm text-gray-500">Avg Completion</p>
                 <p className="text-2xl font-bold text-gray-900">60%</p>
               </div>
-              <div className="p-3 bg-indigo-100 rounded-xl">
-                <Target className="h-6 w-6 text-indigo-600" />
+              <div className="p-3 bg-islamic-green-100 rounded-xl">
+                <Target className="h-6 w-6 text-islamic-green-600" />
               </div>
             </div>
             <p className="text-xs text-emerald-600 mt-2 flex items-center">
@@ -205,7 +205,7 @@ export default function TeacherAnalyticsPage() {
                     index === 0 ? 'bg-amber-100 text-amber-700' :
                     index === 1 ? 'bg-gray-100 text-gray-700' :
                     index === 2 ? 'bg-orange-100 text-orange-700' :
-                    'bg-indigo-100 text-indigo-700'
+                    'bg-islamic-green-100 text-islamic-green-700'
                   }`}>
                     {index + 1}
                   </div>

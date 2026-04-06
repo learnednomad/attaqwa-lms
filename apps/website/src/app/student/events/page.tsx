@@ -100,7 +100,7 @@ const typeColors: Record<string, string> = {
   social: 'bg-purple-100 text-purple-700',
   academic: 'bg-blue-100 text-blue-700',
   educational: 'bg-amber-100 text-amber-700',
-  professional: 'bg-indigo-100 text-indigo-700',
+  professional: 'bg-islamic-green-100 text-islamic-green-700',
   volunteer: 'bg-rose-100 text-rose-700',
 };
 
@@ -232,7 +232,7 @@ function EventCard({ event }: { event: typeof events[0] }) {
     social: 'bg-purple-100 text-purple-700',
     academic: 'bg-blue-100 text-blue-700',
     educational: 'bg-amber-100 text-amber-700',
-    professional: 'bg-indigo-100 text-indigo-700',
+    professional: 'bg-islamic-green-100 text-islamic-green-700',
     volunteer: 'bg-rose-100 text-rose-700',
   };
 

@@ -66,13 +66,52 @@ services:
         echo '=== Init complete ==='
       "
 
+  # MinIO - S3-compatible object storage (Development)
+  minio:
+    image: minio/minio:latest
+    container_name: attaqwa-minio-dev
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-attaqwa}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-dev-minio-password}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data_dev:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: attaqwa-minio-init-dev
+    restart: "no"
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      sh -c "
+        mc alias set attaqwa http://minio:9000 $${MINIO_ROOT_USER:-attaqwa} $${MINIO_ROOT_PASSWORD:-dev-minio-password} &&
+        mc mb --ignore-existing attaqwa/uploads-public &&
+        mc anonymous set download attaqwa/uploads-public &&
+        echo 'MinIO bucket ready'
+      "
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-attaqwa}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-dev-minio-password}
+
   # Strapi Backend API (Development with hot-reload)
   api:
     image: node:22-alpine
     container_name: attaqwa-api-dev
     restart: unless-stopped
     working_dir: /app
-    command: sh -c "npm install -g pnpm@10.12.3 && pnpm install && cd apps/api && pnpm develop"
+    command: sh -c "npm install -g pnpm@10.12.3 && pnpm install && cd apps/api && npm install --os=linux --libc=musl --cpu=arm64 sharp && pnpm develop"
     environment:
       HOST: 0.0.0.0
       PORT: 1337
@@ -97,12 +136,22 @@ services:
       OLLAMA_MAX_PARALLEL: ${OLLAMA_MAX_PARALLEL:-2}
       OLLAMA_EMBED_MODEL: ${OLLAMA_EMBED_MODEL:-nomic-embed-text}
       EMBEDDING_DIMENSION: ${EMBEDDING_DIMENSION:-768}
+      # MinIO / S3 upload configuration
+      UPLOAD_PROVIDER: aws-s3
+      S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-attaqwa}
+      S3_ACCESS_SECRET: ${MINIO_ROOT_PASSWORD:-dev-minio-password}
+      S3_ENDPOINT: http://minio:9000
+      S3_REGION: us-east-1
+      S3_BUCKET: uploads-public
+      S3_BASE_URL: http://localhost:9000/uploads-public
     ports:
       - "1337:1337"
     depends_on:
       postgres:
         condition: service_healthy
       init:
+        condition: service_completed_successfully
+      minio-init:
         condition: service_completed_successfully
     volumes:
       - .:/app
@@ -120,6 +169,8 @@ services:
       NODE_ENV: development
       PORT: 3000
       NEXT_PUBLIC_API_URL: http://localhost:1337
+      STRAPI_INTERNAL_URL: http://api:1337
+      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN:-}
     ports:
       - "3000:3000"
     depends_on:
@@ -197,6 +248,8 @@ volumes:
   postgres_data_dev:
     driver: local
   api_uploads_dev:
+    driver: local
+  minio_data_dev:
     driver: local
   ollama_data_dev:
     driver: local

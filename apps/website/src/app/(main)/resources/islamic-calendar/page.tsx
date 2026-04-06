@@ -128,7 +128,7 @@ export default function IslamicCalendarPage() {
       case 'important':
         return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
       case 'special':
-        return 'bg-indigo-50 text-indigo-700 border border-indigo-200';
+        return 'bg-islamic-green-50 text-islamic-green-700 border border-islamic-green-200';
       default:
         return 'bg-neutral-50 text-neutral-700 border border-neutral-200';
     }
@@ -141,7 +141,7 @@ export default function IslamicCalendarPage() {
       case 'important':
         return <Star className="w-4 h-4 text-emerald-600" />;
       case 'special':
-        return <Moon className="w-4 h-4 text-indigo-600" />;
+        return <Moon className="w-4 h-4 text-islamic-green-600" />;
       default:
         return <Calendar className="w-4 h-4 text-neutral-600" />;
     }

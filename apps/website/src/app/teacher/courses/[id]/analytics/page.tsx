@@ -107,7 +107,7 @@ export default function CourseAnalyticsPage() {
     return (
       <TeacherLayout title="Course Analytics" subtitle="Loading...">
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-islamic-green-600" />
         </div>
       </TeacherLayout>
     );
@@ -163,8 +163,8 @@ export default function CourseAnalyticsPage() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-100 rounded-lg">
-                <Users className="h-5 w-5 text-indigo-600" />
+              <div className="p-2 bg-islamic-green-100 rounded-lg">
+                <Users className="h-5 w-5 text-islamic-green-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{totalStudents}</p>
@@ -223,7 +223,7 @@ export default function CourseAnalyticsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-indigo-600" />
+              <BarChart3 className="h-5 w-5 text-islamic-green-600" />
               Progress Distribution
             </CardTitle>
           </CardHeader>
@@ -251,7 +251,7 @@ export default function CourseAnalyticsPage() {
                 </div>
                 <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-indigo-500 rounded-full"
+                    className="h-full bg-islamic-green-500 rounded-full"
                     style={{
                       width: `${totalStudents > 0
                         ? (enrollments.filter(e => { const p = e.progress || 0; return p > 0 && p < 100; }).length / totalStudents) * 100
@@ -342,7 +342,7 @@ export default function CourseAnalyticsPage() {
             <div className="space-y-4">
               {lessonCompletionData.map((lesson, index) => (
                 <div key={lesson.documentId} className="flex items-center gap-4">
-                  <span className="w-8 h-8 flex items-center justify-center bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
+                  <span className="w-8 h-8 flex items-center justify-center bg-islamic-green-100 text-islamic-green-700 rounded-full text-sm font-medium">
                     {index + 1}
                   </span>
                   <div className="flex-1">
@@ -359,7 +359,7 @@ export default function CourseAnalyticsPage() {
                             lesson.completionRate >= 75
                               ? 'bg-emerald-100 text-emerald-700'
                               : lesson.completionRate >= 50
-                                ? 'bg-indigo-100 text-indigo-700'
+                                ? 'bg-islamic-green-100 text-islamic-green-700'
                                 : 'bg-amber-100 text-amber-700'
                           }
                         >
@@ -408,8 +408,8 @@ export default function CourseAnalyticsPage() {
                   key={enrollment.id}
                   className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg"
                 >
-                  <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                    <span className="text-indigo-700 font-medium">
+                  <div className="w-10 h-10 bg-islamic-green-100 rounded-full flex items-center justify-center">
+                    <span className="text-islamic-green-700 font-medium">
                       {studentName[0]}
                     </span>
                   </div>

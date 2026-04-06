@@ -71,6 +71,34 @@ export default function CreateLessonPage() {
         interactive: 'interactive',
       };
 
+      // Upload media files to MinIO via Strapi
+      let videoFileId: number | undefined;
+      let audioFileId: number | undefined;
+
+      // Helper: upload a file through the admin proxy
+      const uploadFile = async (file: File): Promise<number> => {
+        const fd = new FormData();
+        fd.append('files', file);
+        const uploadRes = await fetch('/api/upload', {
+          method: 'POST',
+          body: fd,
+        });
+        if (!uploadRes.ok) {
+          const errData = await uploadRes.json().catch(() => ({}));
+          throw new Error(errData?.error || `Upload failed (${uploadRes.status})`);
+        }
+        const uploaded = await uploadRes.json();
+        return uploaded[0]?.id;
+      };
+
+      if (data.content.videoFile) {
+        videoFileId = await uploadFile(data.content.videoFile);
+      }
+
+      if (data.content.audioFile) {
+        audioFileId = await uploadFile(data.content.audioFile);
+      }
+
       // Build lesson data matching Strapi schema fields
       const lessonData: Record<string, unknown> = {
         title: data.title,
@@ -85,6 +113,12 @@ export default function CreateLessonPage() {
       // Map content fields to Strapi schema fields
       if (data.type === 'video' && data.content.videoUrl) {
         lessonData.video_url = data.content.videoUrl;
+      }
+      if (videoFileId) {
+        lessonData.video_file = videoFileId;
+      }
+      if (audioFileId) {
+        lessonData.audio_file = audioFileId;
       }
       if (data.type === 'article' && data.content.articleBody) {
         lessonData.content = data.content.articleBody;

@@ -34,7 +34,7 @@ const typeColors: Record<string, string> = {
   assignment: 'bg-purple-100 text-purple-700 border-purple-300',
   exam: 'bg-red-100 text-red-700 border-red-300',
   break: 'bg-cyan-100 text-cyan-700 border-cyan-300',
-  academic: 'bg-indigo-100 text-indigo-700 border-indigo-300',
+  academic: 'bg-islamic-green-100 text-islamic-green-700 border-islamic-green-300',
 };
 
 export default function CalendarPage() {

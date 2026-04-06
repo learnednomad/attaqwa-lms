@@ -74,7 +74,7 @@ export default function TeacherMaterialsPage() {
             </SelectContent>
           </Select>
         </div>
-        <Button className="bg-indigo-600 hover:bg-indigo-700 text-white">
+        <Button className="bg-islamic-green-600 hover:bg-islamic-green-700 text-white">
           <Upload className="h-4 w-4 mr-2" /> Upload Material
         </Button>
       </div>
@@ -88,8 +88,8 @@ export default function TeacherMaterialsPage() {
                 <p className="text-sm text-gray-500">Total Materials</p>
                 <p className="text-2xl font-bold text-gray-900">{materials.length}</p>
               </div>
-              <div className="p-3 bg-indigo-100 rounded-xl">
-                <FolderOpen className="h-6 w-6 text-indigo-600" />
+              <div className="p-3 bg-islamic-green-100 rounded-xl">
+                <FolderOpen className="h-6 w-6 text-islamic-green-600" />
               </div>
             </div>
           </CardContent>
@@ -139,7 +139,7 @@ export default function TeacherMaterialsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-indigo-600" />
+            <BookOpen className="h-5 w-5 text-islamic-green-600" />
             Course Materials
           </CardTitle>
         </CardHeader>
@@ -148,7 +148,7 @@ export default function TeacherMaterialsPage() {
             {materials.map((material, index) => {
               const Icon = typeIcons[material.type];
               return (
-                <div key={index} className="border border-gray-200 rounded-xl p-4 hover:border-indigo-300 hover:shadow-sm transition-all">
+                <div key={index} className="border border-gray-200 rounded-xl p-4 hover:border-islamic-green-300 hover:shadow-sm transition-all">
                   <div className="flex items-start gap-3">
                     <div className={`p-2 rounded-lg ${typeColors[material.type]}`}>
                       <Icon className="h-5 w-5" />
@@ -165,7 +165,7 @@ export default function TeacherMaterialsPage() {
                   </div>
                   <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
                     <span className="text-xs text-gray-400">Updated {material.updated}</span>
-                    <Button variant="ghost" size="sm" className="text-indigo-600 hover:text-indigo-700">
+                    <Button variant="ghost" size="sm" className="text-islamic-green-600 hover:text-islamic-green-700">
                       <Download className="h-4 w-4" />
                     </Button>
                   </div>
