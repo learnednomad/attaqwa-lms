@@ -1,6 +1,14 @@
 import { render, screen } from '@testing-library/react'
 import { PrayerTimeCard } from '@/components/features/prayer-times/PrayerTimeCard'
-import { mockPrayerTimes } from '../../../jest.setup'
+
+const mockPrayerTimes = {
+  fajr: '05:30',
+  sunrise: '07:15',
+  dhuhr: '12:45',
+  asr: '15:30',
+  maghrib: '18:00',
+  isha: '19:30',
+}
 
 // Mock the hooks
 jest.mock('@/lib/hooks/usePrayerTimes', () => ({
@@ -11,12 +19,13 @@ jest.mock('@/lib/hooks/usePrayerTimes', () => ({
   }),
 }))
 
+const defaultProps = {
+  prayerTimes: mockPrayerTimes,
+  showNextPrayer: true,
+  variant: 'default' as const,
+}
+
 describe('PrayerTimeCard', () => {
-  const defaultProps = {
-    prayerTimes: mockPrayerTimes,
-    showNextPrayer: true,
-    variant: 'default' as const,
-  }
 
   beforeEach(() => {
     // Mock current time to be between Fajr and Dhuhr
@@ -100,7 +109,7 @@ describe('PrayerTimeCard', () => {
   it('handles missing prayer times gracefully', () => {
     const incompletePrayerTimes = {
       ...mockPrayerTimes,
-      fajr: undefined,
+      fajr: '',
     }
 
     render(<PrayerTimeCard {...defaultProps} prayerTimes={incompletePrayerTimes} />)
@@ -126,20 +135,20 @@ describe('PrayerTimeCard', () => {
 
 describe('PrayerTimeCard Accessibility', () => {
   it('has proper ARIA labels', () => {
-    render(<PrayerTimeCard {...mockPrayerTimes} />)
+    render(<PrayerTimeCard {...defaultProps} />)
 
     expect(screen.getByRole('article')).toHaveAttribute('aria-label', expect.stringContaining('Prayer times'))
   })
 
   it('supports keyboard navigation', () => {
-    render(<PrayerTimeCard {...mockPrayerTimes} />)
+    render(<PrayerTimeCard {...defaultProps} />)
 
     const card = screen.getByRole('article')
     expect(card).toHaveAttribute('tabIndex', '0')
   })
 
   it('provides proper contrast for current/next prayer highlighting', () => {
-    render(<PrayerTimeCard {...mockPrayerTimes} />)
+    render(<PrayerTimeCard {...defaultProps} />)
 
     // This would need actual color contrast testing in a real implementation
     const highlightedElements = screen.getAllByTestId(/prayer-time-item/)

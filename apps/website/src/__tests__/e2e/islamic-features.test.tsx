@@ -9,7 +9,7 @@ import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { jest } from '@jest/globals'
+// jest is available globally in Jest environment
 
 // Mock Next.js router
 const mockPush = jest.fn()
@@ -69,7 +69,7 @@ describe('Islamic Features E2E Tests', () => {
       const user = userEvent.setup()
 
       // Mock successful geolocation
-      mockGeolocation.getCurrentPosition.mockImplementationOnce((success) => {
+      mockGeolocation.getCurrentPosition.mockImplementationOnce((success: any) => {
         success({
           coords: {
             latitude: 40.7128,
@@ -111,7 +111,7 @@ describe('Islamic Features E2E Tests', () => {
 
       // Mock component that uses prayer times
       const PrayerTimesPage = () => {
-        const [prayerTimes, setPrayerTimes] = React.useState(null)
+        const [prayerTimes, setPrayerTimes] = React.useState<any>(null)
         const [loading, setLoading] = React.useState(false)
 
         const fetchPrayerTimes = async () => {
@@ -195,7 +195,7 @@ describe('Islamic Features E2E Tests', () => {
       const user = userEvent.setup()
 
       // Mock geolocation error
-      mockGeolocation.getCurrentPosition.mockImplementationOnce((success, error) => {
+      mockGeolocation.getCurrentPosition.mockImplementationOnce((success: any, error: any) => {
         error({
           code: 1,
           message: 'User denied the request for Geolocation.',
@@ -301,7 +301,7 @@ describe('Islamic Features E2E Tests', () => {
       })
 
       const EducationPage = () => {
-        const [content, setContent] = React.useState([])
+        const [content, setContent] = React.useState<any[]>([])
         const [filters, setFilters] = React.useState({
           subject: '',
           ageTier: '',
@@ -443,9 +443,9 @@ describe('Islamic Features E2E Tests', () => {
         })
 
       const QuizPage = () => {
-        const [quiz, setQuiz] = React.useState(null)
-        const [answers, setAnswers] = React.useState({})
-        const [result, setResult] = React.useState(null)
+        const [quiz, setQuiz] = React.useState<any>(null)
+        const [answers, setAnswers] = React.useState<Record<string, string>>({})
+        const [result, setResult] = React.useState<any>(null)
         const [currentQuestion, setCurrentQuestion] = React.useState(0)
 
         React.useEffect(() => {
@@ -495,7 +495,7 @@ describe('Islamic Features E2E Tests', () => {
             
             <div data-testid={`question-${currentQuestion}`}>
               <h3>{question.question}</h3>
-              {question.options.map((option) => (
+              {question.options.map((option: string) => (
                 <label key={option}>
                   <input
                     type="radio"
@@ -614,7 +614,7 @@ describe('Islamic Features E2E Tests', () => {
       })
 
       const AnnouncementsPage = () => {
-        const [announcements, setAnnouncements] = React.useState([])
+        const [announcements, setAnnouncements] = React.useState<any[]>([])
 
         React.useEffect(() => {
           fetch('/api/announcements')

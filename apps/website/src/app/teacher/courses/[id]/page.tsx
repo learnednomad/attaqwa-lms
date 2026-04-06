@@ -124,7 +124,7 @@ export default function TeacherCourseDetailPage() {
     return (
       <TeacherLayout title="Course Details" subtitle="Loading...">
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-islamic-green-600" />
         </div>
       </TeacherLayout>
     );
@@ -156,7 +156,7 @@ export default function TeacherCourseDetailPage() {
       {/* Back Button */}
       <div className="mb-4">
         <Link href="/teacher/courses">
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" className="hover:bg-islamic-green-50 hover:text-islamic-green-700 transition-colors">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Courses
           </Button>
@@ -164,45 +164,52 @@ export default function TeacherCourseDetailPage() {
       </div>
 
       {/* Course Header */}
-      <Card className="mb-6">
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+      <div className="mb-6 bg-white rounded-xl shadow-sm border border-slate-200/60 overflow-hidden">
+        {/* Gradient accent bar */}
+        <div className="h-1.5 bg-gradient-to-r from-islamic-green-600 via-islamic-green-500 to-islamic-gold-500" />
+        <div className="p-6">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-5">
             {/* Course Info */}
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-2xl font-bold text-gray-900">{course.title}</h1>
-                <Badge className={isPublished
-                  ? 'bg-emerald-100 text-emerald-700'
-                  : 'bg-amber-100 text-amber-700'
-                }>
-                  {isPublished ? 'Published' : 'Draft'}
-                </Badge>
+            <div className="flex gap-4 flex-1">
+              <div className="hidden sm:flex flex-shrink-0 w-14 h-14 bg-gradient-to-br from-islamic-green-600 to-islamic-green-800 rounded-2xl items-center justify-center shadow-lg shadow-islamic-green-600/20">
+                <BookOpen className="h-7 w-7 text-white" />
               </div>
-              <p className="text-gray-600 mb-4">{course.description}</p>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-                <span className="flex items-center gap-1">
-                  <BookOpen className="h-4 w-4" />
-                  {course.subject}
-                </span>
-                <span className="flex items-center gap-1">
-                  <GraduationCap className="h-4 w-4" />
-                  {course.difficulty}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Users className="h-4 w-4" />
-                  {course.age_tier}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" />
-                  {course.duration_weeks} weeks
-                </span>
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <h1 className="text-2xl font-bold text-slate-900">{course.title}</h1>
+                  <Badge className={isPublished
+                    ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
+                    : 'bg-amber-100 text-amber-700 border border-amber-200'
+                  }>
+                    {isPublished ? 'Published' : 'Draft'}
+                  </Badge>
+                </div>
+                <p className="text-slate-600 text-sm leading-relaxed mb-4">{course.description}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 rounded-full px-3 py-1.5 text-xs font-medium">
+                    <BookOpen className="h-3.5 w-3.5 text-islamic-green-600" />
+                    {course.subject}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 rounded-full px-3 py-1.5 text-xs font-medium">
+                    <GraduationCap className="h-3.5 w-3.5 text-islamic-gold-600" />
+                    {course.difficulty}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 rounded-full px-3 py-1.5 text-xs font-medium">
+                    <Users className="h-3.5 w-3.5 text-islamic-navy-600" />
+                    {course.age_tier}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 rounded-full px-3 py-1.5 text-xs font-medium">
+                    <Clock className="h-3.5 w-3.5 text-purple-600" />
+                    {course.duration_weeks} weeks
+                  </span>
+                </div>
               </div>
             </div>
 
             {/* Action Buttons */}
             <div className="flex flex-wrap items-center gap-2">
               <Link href={`/teacher/courses/${courseId}/edit`}>
-                <Button variant="outline">
+                <Button variant="outline" className="border-islamic-green-200 text-islamic-green-700 hover:bg-islamic-green-50">
                   <Edit className="h-4 w-4 mr-2" />
                   Edit
                 </Button>
@@ -222,7 +229,7 @@ export default function TeacherCourseDetailPage() {
                 </Button>
               ) : (
                 <Button
-                  className="bg-indigo-600 hover:bg-indigo-700"
+                  className="bg-islamic-green-600 hover:bg-islamic-green-700 shadow-md shadow-islamic-green-600/20"
                   onClick={handlePublish}
                   disabled={publishing}
                 >
@@ -234,82 +241,85 @@ export default function TeacherCourseDetailPage() {
                   Publish
                 </Button>
               )}
+              <div className="w-px h-6 bg-slate-200 mx-1" />
               <Button
-                variant="outline"
-                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                variant="ghost"
+                size="icon"
+                className="text-slate-400 hover:text-red-600 hover:bg-red-50"
                 onClick={handleDelete}
                 disabled={deleting}
               >
                 {deleting ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <Trash2 className="h-4 w-4 mr-2" />
+                  <Trash2 className="h-4 w-4" />
                 )}
-                Delete
               </Button>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <Card className="relative overflow-hidden border-0 shadow-md hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-white" />
+          <CardContent className="relative p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2.5 bg-purple-100 rounded-xl">
                 <Users className="h-5 w-5 text-purple-600" />
               </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{totalStudents}</p>
-                <p className="text-sm text-gray-500">Enrolled Students</p>
-              </div>
             </div>
+            <p className="text-3xl font-bold text-slate-900 tracking-tight">{totalStudents}</p>
+            <p className="text-sm text-slate-500 mt-0.5">Enrolled Students</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-100 rounded-lg">
-                <FileText className="h-5 w-5 text-indigo-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{totalLessons}</p>
-                <p className="text-sm text-gray-500">Lessons</p>
+        <Card className="relative overflow-hidden border-0 shadow-md hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200">
+          <div className="absolute inset-0 bg-gradient-to-br from-islamic-green-50 to-white" />
+          <CardContent className="relative p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2.5 bg-islamic-green-100 rounded-xl">
+                <FileText className="h-5 w-5 text-islamic-green-600" />
               </div>
             </div>
+            <p className="text-3xl font-bold text-slate-900 tracking-tight">{totalLessons}</p>
+            <p className="text-sm text-slate-500 mt-0.5">Lessons</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-emerald-100 rounded-lg">
+        <Card className="relative overflow-hidden border-0 shadow-md hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200">
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-white" />
+          <CardContent className="relative p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2.5 bg-emerald-100 rounded-xl">
                 <TrendingUp className="h-5 w-5 text-emerald-600" />
               </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-900">
-                  {course.completion_rate || 0}%
-                </p>
-                <p className="text-sm text-gray-500">Completion Rate</p>
-              </div>
+            </div>
+            <p className="text-3xl font-bold text-slate-900 tracking-tight">
+              {course.completion_rate || 0}%
+            </p>
+            <p className="text-sm text-slate-500 mt-0.5">Completion Rate</p>
+            <div className="mt-3 h-1.5 bg-emerald-100 rounded-full overflow-hidden">
+              <div className="h-full bg-emerald-500 rounded-full transition-all duration-700" style={{ width: `${course.completion_rate || 0}%` }} />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-amber-100 rounded-lg">
+        <Card className="relative overflow-hidden border-0 shadow-md hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200">
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-50 to-white" />
+          <CardContent className="relative p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2.5 bg-amber-100 rounded-xl">
                 <Star className="h-5 w-5 text-amber-600" />
               </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-900">
-                  {course.average_progress || 0}%
-                </p>
-                <p className="text-sm text-gray-500">Avg Progress</p>
-              </div>
+            </div>
+            <p className="text-3xl font-bold text-slate-900 tracking-tight">
+              {course.average_progress || 0}%
+            </p>
+            <p className="text-sm text-slate-500 mt-0.5">Avg Progress</p>
+            <div className="mt-3 h-1.5 bg-amber-100 rounded-full overflow-hidden">
+              <div className="h-full bg-amber-500 rounded-full transition-all duration-700" style={{ width: `${course.average_progress || 0}%` }} />
             </div>
           </CardContent>
         </Card>
@@ -317,11 +327,11 @@ export default function TeacherCourseDetailPage() {
 
       {/* Tabs */}
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="lessons">Lessons ({totalLessons})</TabsTrigger>
-          <TabsTrigger value="students">Students ({totalStudents})</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+        <TabsList className="bg-white border border-slate-200 shadow-sm p-1 rounded-xl h-12">
+          <TabsTrigger value="overview" className="data-[state=active]:bg-islamic-green-600 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200">Overview</TabsTrigger>
+          <TabsTrigger value="lessons" className="data-[state=active]:bg-islamic-green-600 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200">Lessons ({totalLessons})</TabsTrigger>
+          <TabsTrigger value="students" className="data-[state=active]:bg-islamic-green-600 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200">Students ({totalStudents})</TabsTrigger>
+          <TabsTrigger value="analytics" className="data-[state=active]:bg-islamic-green-600 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200">Analytics</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
@@ -330,36 +340,69 @@ export default function TeacherCourseDetailPage() {
             {/* Course Details */}
             <Card>
               <CardHeader>
-                <CardTitle>Course Details</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <div className="w-1 h-5 bg-islamic-green-500 rounded-full" />
+                  Course Details
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-500">Subject</p>
-                    <p className="font-medium">{course.subject}</p>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+                    <div className="p-2 bg-white rounded-lg shadow-sm border border-slate-100">
+                      <BookOpen className="h-4 w-4 text-islamic-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Subject</p>
+                      <p className="text-sm font-semibold text-slate-800 mt-0.5">{course.subject}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Difficulty</p>
-                    <p className="font-medium capitalize">{course.difficulty}</p>
+                  <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+                    <div className="p-2 bg-white rounded-lg shadow-sm border border-slate-100">
+                      <GraduationCap className="h-4 w-4 text-islamic-gold-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Difficulty</p>
+                      <p className="text-sm font-semibold text-slate-800 mt-0.5 capitalize">{course.difficulty}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Age Group</p>
-                    <p className="font-medium capitalize">{course.age_tier}</p>
+                  <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+                    <div className="p-2 bg-white rounded-lg shadow-sm border border-slate-100">
+                      <Users className="h-4 w-4 text-islamic-navy-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Age Group</p>
+                      <p className="text-sm font-semibold text-slate-800 mt-0.5 capitalize">{course.age_tier}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Duration</p>
-                    <p className="font-medium">{course.duration_weeks} weeks</p>
+                  <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+                    <div className="p-2 bg-white rounded-lg shadow-sm border border-slate-100">
+                      <Clock className="h-4 w-4 text-purple-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Duration</p>
+                      <p className="text-sm font-semibold text-slate-800 mt-0.5">{course.duration_weeks} weeks</p>
+                    </div>
                   </div>
                   {course.schedule && (
-                    <div className="col-span-2">
-                      <p className="text-sm text-gray-500">Schedule</p>
-                      <p className="font-medium">{course.schedule}</p>
+                    <div className="col-span-2 flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+                      <div className="p-2 bg-white rounded-lg shadow-sm border border-slate-100">
+                        <Calendar className="h-4 w-4 text-islamic-green-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Schedule</p>
+                        <p className="text-sm font-semibold text-slate-800 mt-0.5">{course.schedule}</p>
+                      </div>
                     </div>
                   )}
                   {course.max_students && (
-                    <div>
-                      <p className="text-sm text-gray-500">Max Students</p>
-                      <p className="font-medium">{course.max_students}</p>
+                    <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+                      <div className="p-2 bg-white rounded-lg shadow-sm border border-slate-100">
+                        <Users className="h-4 w-4 text-emerald-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Max Students</p>
+                        <p className="text-sm font-semibold text-slate-800 mt-0.5">{course.max_students}</p>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -369,20 +412,29 @@ export default function TeacherCourseDetailPage() {
             {/* Learning Outcomes */}
             <Card>
               <CardHeader>
-                <CardTitle>Learning Outcomes</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <div className="w-1 h-5 bg-islamic-green-500 rounded-full" />
+                  Learning Outcomes
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 {course.learning_outcomes && course.learning_outcomes.length > 0 ? (
                   <ul className="space-y-2">
                     {course.learning_outcomes.map((outcome, index) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <CheckCircle className="h-5 w-5 text-emerald-500 mt-0.5 flex-shrink-0" />
-                        <span className="text-gray-700">{outcome}</span>
+                      <li key={index} className="flex items-start gap-3 p-3 bg-islamic-green-50/50 rounded-xl border border-islamic-green-100/50 hover:border-islamic-green-200 transition-colors">
+                        <span className="flex-shrink-0 w-7 h-7 bg-islamic-green-600 text-white rounded-lg flex items-center justify-center text-xs font-bold">
+                          {index + 1}
+                        </span>
+                        <span className="text-slate-700 text-sm leading-relaxed pt-0.5">{outcome}</span>
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-gray-500 italic">No learning outcomes defined</p>
+                  <div className="text-center py-8 border-2 border-dashed border-slate-200 rounded-xl">
+                    <GraduationCap className="h-10 w-10 text-slate-300 mx-auto mb-3" />
+                    <p className="text-slate-500 text-sm font-medium">No learning outcomes defined</p>
+                    <p className="text-slate-400 text-xs mt-1">Add outcomes to help students understand course goals</p>
+                  </div>
                 )}
               </CardContent>
             </Card>
@@ -390,32 +442,45 @@ export default function TeacherCourseDetailPage() {
             {/* Quick Actions */}
             <Card className="lg:col-span-2">
               <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <div className="w-1 h-5 bg-islamic-green-500 rounded-full" />
+                  Quick Actions
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <Link href={`/teacher/courses/${courseId}/edit`}>
-                    <Button variant="outline" className="w-full h-auto py-4 flex flex-col items-center gap-2">
-                      <Edit className="h-6 w-6" />
-                      <span>Edit Course</span>
-                    </Button>
+                  <Link href={`/teacher/courses/${courseId}/edit`} className="group">
+                    <div className="relative p-5 bg-white rounded-xl border border-slate-200 hover:border-islamic-green-300 hover:shadow-md transition-all duration-200 cursor-pointer flex flex-col items-center gap-3 text-center">
+                      <div className="p-3 bg-islamic-green-50 rounded-xl group-hover:bg-islamic-green-100 group-hover:scale-110 transition-all duration-200">
+                        <Edit className="h-5 w-5 text-islamic-green-600" />
+                      </div>
+                      <span className="text-sm font-medium text-slate-700 group-hover:text-islamic-green-700">Edit Course</span>
+                    </div>
                   </Link>
-                  <Link href={`/teacher/courses/${courseId}/students`}>
-                    <Button variant="outline" className="w-full h-auto py-4 flex flex-col items-center gap-2">
-                      <Users className="h-6 w-6" />
-                      <span>Manage Students</span>
-                    </Button>
+                  <Link href={`/teacher/courses/${courseId}/students`} className="group">
+                    <div className="relative p-5 bg-white rounded-xl border border-slate-200 hover:border-purple-300 hover:shadow-md transition-all duration-200 cursor-pointer flex flex-col items-center gap-3 text-center">
+                      <div className="p-3 bg-purple-50 rounded-xl group-hover:bg-purple-100 group-hover:scale-110 transition-all duration-200">
+                        <Users className="h-5 w-5 text-purple-600" />
+                      </div>
+                      <span className="text-sm font-medium text-slate-700 group-hover:text-purple-700">Manage Students</span>
+                    </div>
                   </Link>
-                  <Link href={`/teacher/courses/${courseId}/analytics`}>
-                    <Button variant="outline" className="w-full h-auto py-4 flex flex-col items-center gap-2">
-                      <BarChart3 className="h-6 w-6" />
-                      <span>View Analytics</span>
-                    </Button>
+                  <Link href={`/teacher/courses/${courseId}/analytics`} className="group">
+                    <div className="relative p-5 bg-white rounded-xl border border-slate-200 hover:border-islamic-navy-300 hover:shadow-md transition-all duration-200 cursor-pointer flex flex-col items-center gap-3 text-center">
+                      <div className="p-3 bg-islamic-navy-50 rounded-xl group-hover:bg-islamic-navy-100 group-hover:scale-110 transition-all duration-200">
+                        <BarChart3 className="h-5 w-5 text-islamic-navy-600" />
+                      </div>
+                      <span className="text-sm font-medium text-slate-700 group-hover:text-islamic-navy-700">View Analytics</span>
+                    </div>
                   </Link>
-                  <Button variant="outline" className="w-full h-auto py-4 flex flex-col items-center gap-2">
-                    <Calendar className="h-6 w-6" />
-                    <span>Schedule Class</span>
-                  </Button>
+                  <div className="group cursor-pointer">
+                    <div className="relative p-5 bg-white rounded-xl border border-slate-200 hover:border-islamic-gold-300 hover:shadow-md transition-all duration-200 flex flex-col items-center gap-3 text-center">
+                      <div className="p-3 bg-islamic-gold-50 rounded-xl group-hover:bg-islamic-gold-100 group-hover:scale-110 transition-all duration-200">
+                        <Calendar className="h-5 w-5 text-islamic-gold-600" />
+                      </div>
+                      <span className="text-sm font-medium text-slate-700 group-hover:text-islamic-gold-700">Schedule Class</span>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -426,34 +491,38 @@ export default function TeacherCourseDetailPage() {
         <TabsContent value="lessons">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Course Lessons</CardTitle>
-              <Button className="bg-indigo-600 hover:bg-indigo-700">
+              <CardTitle className="flex items-center gap-2">
+                <div className="w-1 h-5 bg-islamic-green-500 rounded-full" />
+                Course Lessons
+              </CardTitle>
+              <Button className="bg-islamic-green-600 hover:bg-islamic-green-700 shadow-md shadow-islamic-green-600/20">
                 Add Lesson
               </Button>
             </CardHeader>
             <CardContent>
               {course.lessons && course.lessons.length > 0 ? (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {course.lessons.sort((a, b) => a.order - b.order).map((lesson, index) => (
                     <div
                       key={lesson.documentId}
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                      className="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-100 hover:border-islamic-green-200 hover:shadow-sm transition-all duration-200 group"
                     >
                       <div className="flex items-center gap-4">
-                        <span className="flex items-center justify-center w-8 h-8 bg-indigo-100 text-indigo-700 rounded-full font-medium">
+                        <span className="flex items-center justify-center w-9 h-9 bg-gradient-to-br from-islamic-green-500 to-islamic-green-700 text-white rounded-xl font-semibold text-sm shadow-sm">
                           {index + 1}
                         </span>
                         <div>
-                          <p className="font-medium text-gray-900">{lesson.title}</p>
+                          <p className="font-medium text-slate-900 group-hover:text-islamic-green-700 transition-colors">{lesson.title}</p>
                           {lesson.duration_minutes && (
-                            <p className="text-sm text-gray-500">
-                              {lesson.duration_minutes} minutes
-                            </p>
+                            <div className="flex items-center gap-1 mt-0.5">
+                              <Clock className="h-3 w-3 text-slate-400" />
+                              <p className="text-xs text-slate-500">{lesson.duration_minutes} min</p>
+                            </div>
                           )}
                         </div>
                       </div>
                       <Link href={`/teacher/lessons/${lesson.documentId}/edit`}>
-                        <Button variant="ghost" size="sm">
+                        <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
                           <Edit className="h-4 w-4" />
                         </Button>
                       </Link>
@@ -461,10 +530,14 @@ export default function TeacherCourseDetailPage() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <FileText className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500 mb-4">No lessons yet</p>
-                  <Button className="bg-indigo-600 hover:bg-indigo-700">
+                <div className="text-center py-16">
+                  <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <FileText className="h-8 w-8 text-slate-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-slate-800 mb-1">No lessons yet</h3>
+                  <p className="text-sm text-slate-500 mb-6 max-w-sm mx-auto">Start building your course by creating the first lesson</p>
+                  <Button className="bg-islamic-green-600 hover:bg-islamic-green-700 shadow-md shadow-islamic-green-600/20">
+                    <FileText className="h-4 w-4 mr-2" />
                     Create First Lesson
                   </Button>
                 </div>
@@ -477,54 +550,65 @@ export default function TeacherCourseDetailPage() {
         <TabsContent value="students">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Enrolled Students</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <div className="w-1 h-5 bg-islamic-green-500 rounded-full" />
+                Enrolled Students
+              </CardTitle>
               <Link href={`/teacher/courses/${courseId}/students`}>
-                <Button variant="outline">
+                <Button variant="outline" className="border-islamic-green-200 text-islamic-green-700 hover:bg-islamic-green-50">
                   Manage All Students
                 </Button>
               </Link>
             </CardHeader>
             <CardContent>
               {course.enrollments && course.enrollments.length > 0 ? (
-                <div className="space-y-3">
-                  {course.enrollments.slice(0, 5).map((enrollment) => (
-                    <div
-                      key={enrollment.id}
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                          <span className="text-indigo-700 font-medium">
-                            {enrollment.student?.first_name?.[0] || enrollment.student?.username?.[0] || 'S'}
-                          </span>
+                <div className="space-y-2">
+                  {course.enrollments.slice(0, 5).map((enrollment) => {
+                    const progress = enrollment.progress ?? enrollment.overall_progress ?? 0;
+                    return (
+                      <div
+                        key={enrollment.id}
+                        className="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-100 hover:border-islamic-green-200 hover:shadow-sm transition-all duration-200"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-islamic-green-500 to-islamic-green-700 rounded-full flex items-center justify-center shadow-sm">
+                            <span className="text-white font-medium text-sm">
+                              {enrollment.student?.first_name?.[0] || enrollment.student?.username?.[0] || 'S'}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="font-medium text-slate-900">
+                              {enrollment.student?.first_name
+                                ? `${enrollment.student.first_name} ${enrollment.student.last_name || ''}`
+                                : enrollment.student?.username}
+                            </p>
+                            <p className="text-xs text-slate-500">{enrollment.student?.email}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            {enrollment.student?.first_name
-                              ? `${enrollment.student.first_name} ${enrollment.student.last_name || ''}`
-                              : enrollment.student?.username}
-                          </p>
-                          <p className="text-sm text-gray-500">{enrollment.student?.email}</p>
+                        <div className="text-right">
+                          <p className="font-semibold text-slate-900">{progress}%</p>
+                          <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden mt-1">
+                            <div className="h-full bg-islamic-green-500 rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
+                          </div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-medium text-gray-900">{enrollment.progress ?? enrollment.overall_progress ?? 0}%</p>
-                        <p className="text-sm text-gray-500">Progress</p>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                   {course.enrollments.length > 5 && (
                     <Link href={`/teacher/courses/${courseId}/students`}>
-                      <Button variant="ghost" className="w-full">
+                      <Button variant="ghost" className="w-full text-islamic-green-600 hover:text-islamic-green-700 hover:bg-islamic-green-50">
                         View all {course.enrollments.length} students
                       </Button>
                     </Link>
                   )}
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <Users className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500">No students enrolled yet</p>
+                <div className="text-center py-16">
+                  <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Users className="h-8 w-8 text-slate-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-slate-800 mb-1">No students enrolled yet</h3>
+                  <p className="text-sm text-slate-500 max-w-sm mx-auto">Students will appear here once they enroll in this course</p>
                 </div>
               )}
             </CardContent>
@@ -535,16 +619,23 @@ export default function TeacherCourseDetailPage() {
         <TabsContent value="analytics">
           <Card>
             <CardHeader>
-              <CardTitle>Course Analytics</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <div className="w-1 h-5 bg-islamic-green-500 rounded-full" />
+                Course Analytics
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8">
-                <BarChart3 className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 mb-4">
-                  Detailed analytics for this course
+              <div className="text-center py-16">
+                <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <BarChart3 className="h-8 w-8 text-slate-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-800 mb-1">Course Analytics</h3>
+                <p className="text-sm text-slate-500 mb-6 max-w-sm mx-auto">
+                  View detailed performance metrics and student engagement data
                 </p>
                 <Link href={`/teacher/courses/${courseId}/analytics`}>
-                  <Button className="bg-indigo-600 hover:bg-indigo-700">
+                  <Button className="bg-islamic-green-600 hover:bg-islamic-green-700 shadow-md shadow-islamic-green-600/20">
+                    <BarChart3 className="h-4 w-4 mr-2" />
                     View Full Analytics
                   </Button>
                 </Link>

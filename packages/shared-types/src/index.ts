@@ -71,7 +71,7 @@ export interface UserProfile {
   ageTier?: AgeTier;
 }
 
-export type AgeTier = 'children' | 'youth' | 'adults' | 'seniors';
+export type AgeTier = 'children' | 'youth' | 'adults' | 'seniors' | 'all';
 
 // Runtime const for AgeTier
 export const AgeTier = {
@@ -79,6 +79,7 @@ export const AgeTier = {
   YOUTH: 'youth' as const,
   ADULTS: 'adults' as const,
   SENIORS: 'seniors' as const,
+  ALL_AGES: 'all' as const,
 } as const;
 
 /**
@@ -127,17 +128,72 @@ export const CourseCategory = {
   GENERAL: 'general' as const,
 } as const;
 
-export type CourseDifficulty = 'beginner' | 'intermediate' | 'advanced';
+export type CourseDifficulty = 'beginner' | 'intermediate' | 'advanced' | 'scholar';
 
 // Runtime const for CourseDifficulty
 export const CourseDifficulty = {
   BEGINNER: 'beginner' as const,
   INTERMEDIATE: 'intermediate' as const,
   ADVANCED: 'advanced' as const,
+  SCHOLAR: 'scholar' as const,
 } as const;
 
 // Alias for backward compatibility
 export const DifficultyLevel = CourseDifficulty;
+
+// Islamic subject categories
+export type IslamicSubject =
+  | 'quran'
+  | 'hadith'
+  | 'fiqh'
+  | 'seerah'
+  | 'aqeedah'
+  | 'aqidah'
+  | 'worship'
+  | 'history'
+  | 'islamic_history'
+  | 'islamic_etiquette'
+  | 'comparative_religion'
+  | 'dua_dhikr'
+  | 'arabic'
+  | 'akhlaq'
+  | 'tajweed'
+  | 'general';
+
+export const IslamicSubject = {
+  QURAN: 'quran' as const,
+  HADITH: 'hadith' as const,
+  FIQH: 'fiqh' as const,
+  SEERAH: 'seerah' as const,
+  AQEEDAH: 'aqeedah' as const,
+  AQIDAH: 'aqidah' as const,
+  WORSHIP: 'worship' as const,
+  HISTORY: 'history' as const,
+  ISLAMIC_HISTORY: 'islamic_history' as const,
+  ISLAMIC_ETIQUETTE: 'islamic_etiquette' as const,
+  COMPARATIVE_RELIGION: 'comparative_religion' as const,
+  DUA_DHIKR: 'dua_dhikr' as const,
+  ARABIC: 'arabic' as const,
+  AKHLAQ: 'akhlaq' as const,
+  TAJWEED: 'tajweed' as const,
+  GENERAL: 'general' as const,
+} as const;
+
+// Education content types
+export type EducationContentType =
+  | 'LESSON'
+  | 'QUIZ'
+  | 'ARTICLE'
+  | 'VIDEO'
+  | 'INTERACTIVE';
+
+export const EducationContentType = {
+  LESSON: 'LESSON' as const,
+  QUIZ: 'QUIZ' as const,
+  ARTICLE: 'ARTICLE' as const,
+  VIDEO: 'VIDEO' as const,
+  INTERACTIVE: 'INTERACTIVE' as const,
+} as const;
 
 export interface Course {
   id: string;
@@ -219,13 +275,14 @@ export interface Quiz {
   updatedAt: string;
 }
 
-export type QuestionType = 'multiple_choice' | 'true_false' | 'fill_blank';
+export type QuestionType = 'multiple_choice' | 'true_false' | 'fill_blank' | 'short_answer';
 
 // Runtime const for QuestionType
 export const QuestionType = {
   MULTIPLE_CHOICE: 'multiple_choice' as const,
   TRUE_FALSE: 'true_false' as const,
   FILL_BLANK: 'fill_blank' as const,
+  SHORT_ANSWER: 'short_answer' as const,
 } as const;
 
 export interface QuizQuestion {

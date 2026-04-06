@@ -227,7 +227,7 @@ export default function EducationContentPage() {
       HADITH: 'bg-islamic-gold-100 text-islamic-gold-800',
       FIQH: 'bg-blue-100 text-blue-800',
       AQIDAH: 'bg-purple-100 text-purple-800',
-      SEERAH: 'bg-indigo-100 text-indigo-800',
+      SEERAH: 'bg-islamic-green-100 text-islamic-green-800',
       WORSHIP: 'bg-emerald-100 text-emerald-800',
       ARABIC_LANGUAGE: 'bg-orange-100 text-orange-800',
       ISLAMIC_HISTORY: 'bg-red-100 text-red-800'
@@ -239,7 +239,8 @@ export default function EducationContentPage() {
     const colors: Record<DifficultyLevel, string> = {
       beginner: 'bg-green-100 text-green-800',
       intermediate: 'bg-yellow-100 text-yellow-800',
-      advanced: 'bg-orange-100 text-orange-800'
+      advanced: 'bg-orange-100 text-orange-800',
+      scholar: 'bg-red-100 text-red-800',
     };
     return colors[level] || 'bg-gray-100 text-gray-800';
   };

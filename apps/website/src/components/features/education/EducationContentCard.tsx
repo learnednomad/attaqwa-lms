@@ -6,10 +6,10 @@ import { Badge } from '@/components/ui/badge';
 import { AgeTierBadge } from './AgeTierFilter';
 
 // Local type definitions matching Strapi schema
-type AgeTier = 'children' | 'youth' | 'adults' | 'all';
-type IslamicSubject = 'quran' | 'hadith' | 'fiqh' | 'aqeedah' | 'seerah' | 'arabic' | 'islamic_history' | 'akhlaq' | 'tajweed';
+type AgeTier = 'children' | 'youth' | 'adults' | 'seniors' | 'all';
+type IslamicSubject = string;
 type DifficultyLevel = 'beginner' | 'intermediate' | 'advanced';
-type EducationContentType = 'LESSON' | 'QUIZ' | 'VIDEO' | 'ARTICLE';
+type EducationContentType = string;
 
 interface EducationContent {
   id: string;
@@ -20,11 +20,11 @@ interface EducationContent {
   difficultyLevel: DifficultyLevel;
   contentType: EducationContentType;
   estimatedDuration: number;
-  thumbnailUrl?: string;
+  thumbnailUrl?: string | null;
   isPublished: boolean;
   tags?: string[];
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
   author?: {
     id: string;
     name: string;
@@ -41,6 +41,8 @@ interface EducationContent {
   };
   arabicContent?: string;
   transliteration?: string;
+  translation?: string;
+  [key: string]: any;
 }
 
 interface EducationContentCardProps {

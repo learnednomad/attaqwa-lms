@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 // Local type definition matching Strapi schema
-type AgeTier = 'children' | 'youth' | 'adults' | 'all';
+type AgeTier = 'children' | 'youth' | 'adults' | 'seniors' | 'all';
 
 interface AgeTierFilterProps {
   selectedTier?: AgeTier;
@@ -44,6 +44,13 @@ const AGE_TIER_CONFIG: Record<AgeTier, {
     icon: '👨',
     color: 'bg-purple-100 text-purple-800',
     borderColor: 'border-purple-200 hover:border-purple-300',
+  },
+  'seniors': {
+    label: 'Seniors',
+    description: 'Ages 60+',
+    icon: '👴',
+    color: 'bg-amber-100 text-amber-800',
+    borderColor: 'border-amber-200 hover:border-amber-300',
   },
   'all': {
     label: 'All Ages',

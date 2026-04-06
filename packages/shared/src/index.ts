@@ -265,6 +265,8 @@ export {
   CourseCategory,
   CourseDifficulty,
   DifficultyLevel,
+  IslamicSubject,
+  EducationContentType,
   LessonType,
   QuestionType,
 } from '@attaqwa/shared-types';

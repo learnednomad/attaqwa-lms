@@ -419,11 +419,12 @@ export const quizzesApi = {
 
     // Transform questions to match frontend interface
     const quiz = response.data;
-    if (quiz.questions) {
-      quiz.questions = transformQuizQuestions(quiz.questions);
-    }
+    const transformed: Quiz = {
+      ...quiz,
+      questions: quiz.questions ? transformQuizQuestions(quiz.questions) : quiz.questions,
+    };
 
-    return quiz as Quiz;
+    return transformed;
   },
 
   /**
@@ -445,11 +446,14 @@ export const quizzesApi = {
 
     // Transform questions to match frontend interface
     const quiz = response.data[0];
-    if (quiz && quiz.questions) {
-      quiz.questions = transformQuizQuestions(quiz.questions);
-    }
+    if (!quiz) return null;
 
-    return quiz as Quiz || null;
+    const transformed: Quiz = {
+      ...quiz,
+      questions: quiz.questions ? transformQuizQuestions(quiz.questions) : quiz.questions,
+    };
+
+    return transformed;
   },
 };
 
