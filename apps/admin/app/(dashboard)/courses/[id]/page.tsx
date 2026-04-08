@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface Course {
+  [key: string]: unknown;
   id: number;
   documentId?: string;
   title: string;
@@ -82,6 +83,13 @@ export default function EditCoursePage() {
           difficulty: data.difficulty,
           age_tier: ageTier,
           duration_weeks: data.duration ? Math.max(1, Math.ceil(data.duration / 60)) : 1,
+          schedule: data.schedule || undefined,
+          instructor: data.instructor || undefined,
+          prerequisites: data.prerequisites || undefined,
+          learning_outcomes: data.learningOutcomes?.filter(o => o.trim()) || undefined,
+          max_students: data.maxStudents || undefined,
+          start_date: data.startDate || undefined,
+          end_date: data.endDate || undefined,
         },
       };
 

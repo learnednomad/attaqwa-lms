@@ -44,9 +44,14 @@ export default function CreateCoursePage() {
           difficulty: data.difficulty,
           age_tier: ageTier,
           duration_weeks: data.duration ? Math.max(1, Math.ceil(data.duration / 60)) : 1,
-          schedule: 'Self-paced',
-          instructor: 'Attaqwa Masjid Education Team',
+          schedule: data.schedule || 'self-paced',
+          instructor: data.instructor || 'Attaqwa Masjid Education Team',
           is_featured: false,
+          prerequisites: data.prerequisites || undefined,
+          learning_outcomes: data.learningOutcomes?.filter(o => o.trim()) || undefined,
+          max_students: data.maxStudents || undefined,
+          start_date: data.startDate || undefined,
+          end_date: data.endDate || undefined,
         },
       };
 
