@@ -3,8 +3,6 @@
  * Connects student dashboard pages to Strapi backend via BFF endpoints
  */
 
-import { API_V1_ENDPOINTS } from '@attaqwa/shared';
-
 // Use BFF (Next.js API routes) instead of direct Strapi
 const BFF_BASE_URL = '/api/v1';
 
@@ -433,7 +431,7 @@ export const dashboardApi = {
    * Get aggregated dashboard data
    * Combines multiple API calls into a single dashboard response
    */
-  getData: async (): Promise<StudentDashboardData> => {
+  getData: async (user?: { id: string; name: string; email: string }): Promise<StudentDashboardData> => {
     try {
       // Parallel fetch all required data
       const [enrollmentsRes, progressRes, achievementsRes] = await Promise.all([
@@ -458,9 +456,13 @@ export const dashboardApi = {
         : 0;
       const totalTime = progress.reduce((sum, p) => sum + (p.time_spent_minutes || 0), 0);
 
-      // SECURITY: Student info should come from the API, not localStorage
-      // The API endpoints use httpOnly cookies for authentication
-      const studentData = { id: 0, name: 'Student', email: '', username: '' };
+      // Student info comes from the authenticated session, passed by the caller
+      const studentData = {
+        id: user?.id ? parseInt(user.id) : 0,
+        name: user?.name || 'Student',
+        email: user?.email || '',
+        username: user?.name || '',
+      };
 
       return {
         student: {

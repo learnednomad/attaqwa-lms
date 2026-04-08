@@ -7,6 +7,33 @@ const { GET: authGet, POST: authPost } = toNextJsHandler(auth);
 export { authGet as GET };
 
 // ---------------------------------------------------------------------------
+// CORS preflight handler for cross-origin requests (e.g. admin app)
+// ---------------------------------------------------------------------------
+const ALLOWED_ORIGINS = [
+  "http://localhost:3000",
+  "http://localhost:3003",
+  ...(process.env.BETTER_AUTH_BASE_URL ? [process.env.BETTER_AUTH_BASE_URL] : []),
+];
+
+function getCorsHeaders(request: NextRequest) {
+  const origin = request.headers.get("origin");
+  const headers: Record<string, string> = {
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Allow-Credentials": "true",
+    "Access-Control-Max-Age": "86400",
+  };
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    headers["Access-Control-Allow-Origin"] = origin;
+  }
+  return headers;
+}
+
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, { status: 204, headers: getCorsHeaders(request) });
+}
+
+// ---------------------------------------------------------------------------
 // In-memory rate limiter for sign-in attempts
 // ---------------------------------------------------------------------------
 const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
@@ -48,6 +75,19 @@ function getClientIp(request: NextRequest): string {
 // ---------------------------------------------------------------------------
 // POST handler with validation
 // ---------------------------------------------------------------------------
+function addCorsHeaders(response: NextResponse | Response, request: NextRequest): NextResponse {
+  const corsHeaders = getCorsHeaders(request);
+  const newResponse = new NextResponse(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers,
+  });
+  for (const [key, value] of Object.entries(corsHeaders)) {
+    newResponse.headers.set(key, value);
+  }
+  return newResponse;
+}
+
 export async function POST(request: NextRequest) {
   const url = new URL(request.url);
   const path = url.pathname;
@@ -58,15 +98,18 @@ export async function POST(request: NextRequest) {
     const { allowed, remaining } = rateLimit(ip);
 
     if (!allowed) {
-      return NextResponse.json(
-        {
-          code: "TOO_MANY_REQUESTS",
-          message: "Too many login attempts. Please try again later.",
-        },
-        {
-          status: 429,
-          headers: { "Retry-After": "900" },
-        }
+      return addCorsHeaders(
+        NextResponse.json(
+          {
+            code: "TOO_MANY_REQUESTS",
+            message: "Too many login attempts. Please try again later.",
+          },
+          {
+            status: 429,
+            headers: { "Retry-After": "900" },
+          }
+        ),
+        request
       );
     }
 
@@ -77,7 +120,7 @@ export async function POST(request: NextRequest) {
       attempts.delete(ip);
     }
 
-    return response;
+    return addCorsHeaders(response, request);
   }
 
   // --- Validate sign-up ---
@@ -121,5 +164,5 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  return authPost(request);
+  return addCorsHeaders(await authPost(request), request);
 }

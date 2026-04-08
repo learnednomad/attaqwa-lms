@@ -72,3 +72,4 @@ coverage/
 backups/
 test-screenshots/
 apps/website/tsconfig.tsbuildinfo
+docs/screenshots/

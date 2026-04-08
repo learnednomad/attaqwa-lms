@@ -6,18 +6,18 @@
 |-------|-------|
 | URL | http://localhost:1337/admin |
 | Email | admin@attaqwa.local |
-| Password | Admin1234! |
+| Password | See your team lead for development credentials. Never commit passwords to version control. |
 | Role | Super Admin |
 
 ## Test User Accounts
 
 | Username | Email | Password | Role | Learning Profile |
 |----------|-------|----------|------|-----------------|
-| ahmed_student | ahmed@attaqwa.test | Student123! | Student | Active learner, 5 courses, ~60% progress |
-| fatima_student | fatima@attaqwa.test | Student123! | Student | Top performer, 4 courses, ~85% progress |
-| omar_student | omar@attaqwa.test | Student123! | Student | Beginner, 3 courses, ~25% progress |
-| sheikh_instructor | instructor@attaqwa.test | Instructor123! | Instructor | Moderation reviewer |
-| admin_user | admin@attaqwa.test | Admin123! | Admin | System admin |
+| ahmed_student | ahmed@attaqwa.test | See your team lead for development credentials. Never commit passwords to version control. | Student | Active learner, 5 courses, ~60% progress |
+| fatima_student | fatima@attaqwa.test | See your team lead for development credentials. Never commit passwords to version control. | Student | Top performer, 4 courses, ~85% progress |
+| omar_student | omar@attaqwa.test | See your team lead for development credentials. Never commit passwords to version control. | Student | Beginner, 3 courses, ~25% progress |
+| sheikh_instructor | instructor@attaqwa.test | See your team lead for development credentials. Never commit passwords to version control. | Instructor | Moderation reviewer |
+| admin_user | admin@attaqwa.test | See your team lead for development credentials. Never commit passwords to version control. | Admin | System admin |
 
 ## Seeded Data Summary
 

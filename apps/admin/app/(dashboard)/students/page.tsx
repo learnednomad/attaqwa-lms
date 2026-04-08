@@ -1,13 +1,13 @@
 /**
  * Students Management Page
- * View and manage all enrolled students
+ * View and manage all registered users — real data from BetterAuth + Strapi
  */
 
 'use client';
 
-import { Award, BookOpen, Clock, Mail, MoreVertical, Search, TrendingUp, User } from 'lucide-react';
+import { Award, BookOpen, Clock, Loader2, Mail, MoreVertical, Search, TrendingUp, User } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,106 +21,87 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { formatDate } from '@/lib/utils/formatters';
+import { authClient } from '@/lib/auth-client';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
+
+interface AppUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  createdAt: string;
+  image?: string | null;
+}
 
 export default function StudentsPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('all');
-  const [selectedCourse, setSelectedCourse] = useState('all');
+  const [selectedRole, setSelectedRole] = useState('all');
+  const [users, setUsers] = useState<AppUser[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [enrollmentCounts, setEnrollmentCounts] = useState<Record<string, number>>({});
 
-  // TODO: Replace with real data from API
-  const students = [
-    {
-      id: '1',
-      name: 'Ahmed Hassan',
-      email: 'ahmed.hassan@example.com',
-      avatar: null,
-      enrolledCourses: 5,
-      completedCourses: 2,
-      averageProgress: 78,
-      totalPoints: 2450,
-      level: 12,
-      currentStreak: 15,
-      lastActive: '2025-01-15T14:30:00Z',
-      status: 'active',
-      joinedAt: '2024-06-15',
-    },
-    {
-      id: '2',
-      name: 'Fatima Ali',
-      email: 'fatima.ali@example.com',
-      avatar: null,
-      enrolledCourses: 8,
-      completedCourses: 5,
-      averageProgress: 92,
-      totalPoints: 4320,
-      level: 18,
-      currentStreak: 42,
-      lastActive: '2025-01-15T10:15:00Z',
-      status: 'active',
-      joinedAt: '2024-03-20',
-    },
-    {
-      id: '3',
-      name: 'Omar Ibrahim',
-      email: 'omar.ibrahim@example.com',
-      avatar: null,
-      enrolledCourses: 3,
-      completedCourses: 1,
-      averageProgress: 45,
-      totalPoints: 980,
-      level: 6,
-      currentStreak: 3,
-      lastActive: '2025-01-10T16:45:00Z',
-      status: 'inactive',
-      joinedAt: '2024-11-05',
-    },
-    {
-      id: '4',
-      name: 'Aisha Mohammed',
-      email: 'aisha.mohammed@example.com',
-      avatar: null,
-      enrolledCourses: 6,
-      completedCourses: 3,
-      averageProgress: 85,
-      totalPoints: 3210,
-      level: 15,
-      currentStreak: 28,
-      lastActive: '2025-01-15T09:20:00Z',
-      status: 'active',
-      joinedAt: '2024-05-12',
-    },
-    {
-      id: '5',
-      name: 'Yusuf Ahmad',
-      email: 'yusuf.ahmad@example.com',
-      avatar: null,
-      enrolledCourses: 4,
-      completedCourses: 0,
-      averageProgress: 23,
-      totalPoints: 450,
-      level: 3,
-      currentStreak: 0,
-      lastActive: '2024-12-28T11:30:00Z',
-      status: 'inactive',
-      joinedAt: '2024-12-01',
-    },
+  const fetchUsers = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      // Use BetterAuth admin API to list users
+      const res = await authClient.admin.listUsers({
+        query: {
+          limit: 100,
+          offset: 0,
+        },
+      });
+
+      if (res.data?.users) {
+        setUsers(res.data.users as AppUser[]);
+      }
+    } catch (err) {
+      console.error('Failed to fetch users:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const fetchEnrollments = useCallback(async () => {
+    try {
+      const res = await fetch(
+        `${API_URL}/api/v1/course-enrollments?pagination[pageSize]=100&populate[0]=user&populate[1]=course`
+      );
+      if (res.ok) {
+        const json = await res.json();
+        const counts: Record<string, number> = {};
+        for (const enrollment of json.data || []) {
+          const userId = enrollment.user?.id;
+          if (userId) {
+            counts[userId] = (counts[userId] || 0) + 1;
+          }
+        }
+        setEnrollmentCounts(counts);
+      }
+    } catch (err) {
+      console.error('Failed to fetch enrollments:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUsers();
+    fetchEnrollments();
+  }, [fetchUsers, fetchEnrollments]);
+
+  const roles = [
+    { value: 'all', label: 'All Users' },
+    { value: 'admin', label: 'Admins' },
+    { value: 'teacher', label: 'Teachers' },
+    { value: 'student', label: 'Students' },
   ];
 
-  const statuses = [
-    { value: 'all', label: 'All Students' },
-    { value: 'active', label: 'Active' },
-    { value: 'inactive', label: 'Inactive' },
-  ];
-
-  const courses = [
-    { value: 'all', label: 'All Courses' },
-    { value: 'quran', label: 'Quran Recitation Basics' },
-    { value: 'hadith', label: 'Hadith Studies' },
-    { value: 'seerah', label: 'Islamic History & Seerah' },
-  ];
-
-  const getStatusBadge = (status: string) => {
-    return status === 'active' ? 'success' : 'default';
+  const getRoleBadge = (role: string) => {
+    switch (role) {
+      case 'admin': return 'danger';
+      case 'teacher': return 'warning';
+      case 'student': return 'success';
+      default: return 'default';
+    }
   };
 
   const getInitials = (name: string) => {
@@ -131,30 +112,37 @@ export default function StudentsPage() {
       .toUpperCase();
   };
 
-  const getProgressColor = (progress: number) => {
-    if (progress >= 75) return 'text-green-600';
-    if (progress >= 50) return 'text-yellow-600';
-    return 'text-red-600';
-  };
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch =
+      !searchQuery ||
+      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesRole = selectedRole === 'all' || user.role === selectedRole;
+    return matchesSearch && matchesRole;
+  });
+
+  const studentCount = users.filter((u) => u.role === 'student').length;
+  const teacherCount = users.filter((u) => u.role === 'teacher').length;
+  const adminCount = users.filter((u) => u.role === 'admin').length;
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-charcoal-900">Students</h1>
+          <h1 className="text-3xl font-bold text-charcoal-900">Users</h1>
           <p className="mt-2 text-charcoal-600">
-            Manage student enrollments and track progress
+            Manage all registered users and their roles
           </p>
         </div>
         <div className="flex space-x-3">
           <Button variant="outline">
             <Mail className="mr-2 h-4 w-4" />
-            Message Students
+            Message Users
           </Button>
           <Button>
             <User className="mr-2 h-4 w-4" />
-            Add Student
+            Add User
           </Button>
         </div>
       </div>
@@ -164,12 +152,8 @@ export default function StudentsPage() {
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-charcoal-600">Total Students</p>
-              <p className="mt-2 text-3xl font-bold text-charcoal-900">1,247</p>
-              <div className="mt-2 flex items-center space-x-1 text-sm text-green-600">
-                <TrendingUp className="h-4 w-4" />
-                <span>+12% this month</span>
-              </div>
+              <p className="text-sm font-medium text-charcoal-600">Total Users</p>
+              <p className="mt-2 text-3xl font-bold text-charcoal-900">{users.length}</p>
             </div>
             <div className="rounded-lg bg-primary-100 p-3">
               <User className="h-6 w-6 text-primary-600" />
@@ -180,12 +164,8 @@ export default function StudentsPage() {
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-charcoal-600">Active Students</p>
-              <p className="mt-2 text-3xl font-bold text-charcoal-900">892</p>
-              <div className="mt-2 flex items-center space-x-1 text-sm text-green-600">
-                <TrendingUp className="h-4 w-4" />
-                <span>+8% this week</span>
-              </div>
+              <p className="text-sm font-medium text-charcoal-600">Students</p>
+              <p className="mt-2 text-3xl font-bold text-charcoal-900">{studentCount}</p>
             </div>
             <div className="rounded-lg bg-green-100 p-3">
               <TrendingUp className="h-6 w-6 text-green-600" />
@@ -196,12 +176,8 @@ export default function StudentsPage() {
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-charcoal-600">Avg. Completion</p>
-              <p className="mt-2 text-3xl font-bold text-charcoal-900">67%</p>
-              <div className="mt-2 flex items-center space-x-1 text-sm text-green-600">
-                <TrendingUp className="h-4 w-4" />
-                <span>+5% this month</span>
-              </div>
+              <p className="text-sm font-medium text-charcoal-600">Teachers</p>
+              <p className="mt-2 text-3xl font-bold text-charcoal-900">{teacherCount}</p>
             </div>
             <div className="rounded-lg bg-blue-100 p-3">
               <BookOpen className="h-6 w-6 text-blue-600" />
@@ -212,12 +188,8 @@ export default function StudentsPage() {
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-charcoal-600">Total Points</p>
-              <p className="mt-2 text-3xl font-bold text-charcoal-900">247K</p>
-              <div className="mt-2 flex items-center space-x-1 text-sm text-green-600">
-                <TrendingUp className="h-4 w-4" />
-                <span>+18% this month</span>
-              </div>
+              <p className="text-sm font-medium text-charcoal-600">Admins</p>
+              <p className="mt-2 text-3xl font-bold text-charcoal-900">{adminCount}</p>
             </div>
             <div className="rounded-lg bg-amber-100 p-3">
               <Award className="h-6 w-6 text-amber-600" />
@@ -229,40 +201,26 @@ export default function StudentsPage() {
       {/* Filters */}
       <Card className="p-4">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          {/* Search */}
           <div className="relative flex-1 md:max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-charcoal-400" />
             <input
               type="text"
-              placeholder="Search students..."
+              placeholder="Search users..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full rounded-lg border border-charcoal-300 py-2 pl-10 pr-4 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
             />
           </div>
 
-          {/* Filters */}
           <div className="flex gap-2">
             <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
+              value={selectedRole}
+              onChange={(e) => setSelectedRole(e.target.value)}
               className="rounded-lg border border-charcoal-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
             >
-              {statuses.map((status) => (
-                <option key={status.value} value={status.value}>
-                  {status.label}
-                </option>
-              ))}
-            </select>
-
-            <select
-              value={selectedCourse}
-              onChange={(e) => setSelectedCourse(e.target.value)}
-              className="rounded-lg border border-charcoal-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
-            >
-              {courses.map((course) => (
-                <option key={course.value} value={course.value}>
-                  {course.label}
+              {roles.map((role) => (
+                <option key={role.value} value={role.value}>
+                  {role.label}
                 </option>
               ))}
             </select>
@@ -272,127 +230,86 @@ export default function StudentsPage() {
 
       {/* Table */}
       <Card>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Student</TableHead>
-              <TableHead>Enrollments</TableHead>
-              <TableHead>Progress</TableHead>
-              <TableHead>Points</TableHead>
-              <TableHead>Level</TableHead>
-              <TableHead>Streak</TableHead>
-              <TableHead>Last Active</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {students.map((student) => (
-              <TableRow key={student.id}>
-                <TableCell>
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-700">
-                      {getInitials(student.name)}
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-6 w-6 animate-spin text-primary-500 mr-2" />
+            <span className="text-charcoal-500">Loading users...</span>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>User</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Enrollments</TableHead>
+                <TableHead>Joined</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredUsers.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell>
+                    <div className="flex items-center space-x-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-700">
+                        {getInitials(user.name)}
+                      </div>
+                      <div>
+                        <p className="font-medium text-charcoal-900">
+                          {user.name}
+                        </p>
+                        <p className="text-sm text-charcoal-500">
+                          {user.email}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-charcoal-900">
-                        {student.name}
-                      </p>
-                      <p className="text-sm text-charcoal-500">
-                        {student.email}
-                      </p>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={getRoleBadge(user.role) as any}>
+                      {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-charcoal-900">
+                      {enrollmentCounts[user.id] || 0}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-1 text-sm text-charcoal-600">
+                      <Clock className="h-4 w-4" />
+                      <span>{formatDate(user.createdAt)}</span>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="text-charcoal-900">
-                    <span className="font-medium">{student.enrolledCourses}</span>
-                    <span className="text-sm text-charcoal-500">
-                      {' '}
-                      ({student.completedCourses} completed)
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center space-x-2">
-                    <div className="h-2 w-24 overflow-hidden rounded-full bg-charcoal-200">
-                      <div
-                        className="h-full bg-primary-500"
-                        style={{ width: `${student.averageProgress}%` }}
-                      />
-                    </div>
-                    <span
-                      className={`text-sm font-medium ${getProgressColor(student.averageProgress)}`}
-                    >
-                      {student.averageProgress}%
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center space-x-1">
-                    <Award className="h-4 w-4 text-amber-600" />
-                    <span className="font-medium text-charcoal-900">
-                      {student.totalPoints.toLocaleString()}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="info">Level {student.level}</Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center space-x-1">
-                    {student.currentStreak > 0 ? (
-                      <>
-                        <span className="text-lg">🔥</span>
-                        <span className="font-medium text-orange-600">
-                          {student.currentStreak}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="text-sm text-charcoal-500">No streak</span>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center space-x-1 text-sm text-charcoal-600">
-                    <Clock className="h-4 w-4" />
-                    <span>{formatDate(student.lastActive)}</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={getStatusBadge(student.status) as any}>
-                    {student.status === 'active' ? 'Active' : 'Inactive'}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Link href={`/students/${student.id}`}>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Link href={`/students/${user.id}`}>
+                        <button
+                          className="rounded-lg p-2 text-charcoal-600 hover:bg-charcoal-50"
+                          aria-label="View user"
+                          title="View user details"
+                        >
+                          <User className="h-4 w-4" />
+                        </button>
+                      </Link>
                       <button
                         className="rounded-lg p-2 text-charcoal-600 hover:bg-charcoal-50"
-                        aria-label="View student"
-                        title="View student details"
+                        aria-label="More actions"
+                        title="More actions"
                       >
-                        <User className="h-4 w-4" />
+                        <MoreVertical className="h-4 w-4" />
                       </button>
-                    </Link>
-                    <button
-                      className="rounded-lg p-2 text-charcoal-600 hover:bg-charcoal-50"
-                      aria-label="More actions"
-                      title="More actions"
-                    >
-                      <MoreVertical className="h-4 w-4" />
-                    </button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
 
-        {students.length === 0 && (
+        {!isLoading && filteredUsers.length === 0 && (
           <div className="py-12 text-center">
             <User className="mx-auto h-12 w-12 text-charcoal-400" />
-            <p className="mt-4 text-charcoal-500">No students found</p>
+            <p className="mt-4 text-charcoal-500">No users found</p>
           </div>
         )}
       </Card>

@@ -16,10 +16,24 @@ import { ModerationReview } from '@/components/moderation/ModerationReview';
 import { ModerationStatusBadge, AIScoreBadge } from '@/components/moderation/ModerationBadge';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
 
+interface ModerationItem {
+  id: string;
+  content_type: string;
+  content_id: string;
+  content_title: string;
+  status: string;
+  ai_score: number | null;
+  ai_flags: Array<{ type: string; severity: string; description: string }>;
+  ai_reasoning: string | null;
+  reviewer_notes: string | null;
+  reviewed_at: string | null;
+  createdAt: string;
+}
+
 export default function ModerationDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const [item, setItem] = useState<Record<string, unknown> | null>(null);
+  const [item, setItem] = useState<ModerationItem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 

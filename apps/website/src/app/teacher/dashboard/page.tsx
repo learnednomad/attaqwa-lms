@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { TeacherLayout } from '@/components/layout/teacher-layout';
+import { authClient } from '@/lib/auth-client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -26,9 +27,11 @@ interface CourseData {
 }
 
 export default function TeacherDashboard() {
+  const { data: session } = authClient.useSession();
   const [courses, setCourses] = useState<CourseData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const userName = session?.user?.name?.split(' ')[0] || 'Teacher';
 
   const totalStudents = courses.reduce((sum, c) => sum + c.students, 0);
   const totalLessons = courses.reduce((sum, c) => sum + c.lessonsCount, 0);
@@ -90,7 +93,7 @@ export default function TeacherDashboard() {
   }
 
   return (
-    <TeacherLayout title="Dashboard" subtitle="Welcome back, Sheikh Abdullah">
+    <TeacherLayout title="Dashboard" subtitle={`Welcome back, ${userName}`}>
       {/* Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <Card>

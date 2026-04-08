@@ -13,8 +13,22 @@ import { Button } from '@/components/ui/button';
 import { ModerationTable } from '@/components/moderation/ModerationTable';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
 
+interface ModerationItem {
+  id: string;
+  content_type: string;
+  content_id: string;
+  content_title: string;
+  status: string;
+  ai_score: number | null;
+  ai_flags: Array<{ type: string; severity: string; description: string }>;
+  ai_reasoning: string | null;
+  reviewer_notes: string | null;
+  reviewed_at: string | null;
+  createdAt: string;
+}
+
 export default function ModerationPage() {
-  const [items, setItems] = useState<Record<string, unknown>[]>([]);
+  const [items, setItems] = useState<ModerationItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
   const [contentTypeFilter, setContentTypeFilter] = useState('all');

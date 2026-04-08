@@ -167,10 +167,10 @@ Run `scripts/seed-auth-users.sql` (done automatically by init container):
 
 | Role | Email | Password |
 |------|-------|----------|
-| Super Admin | `superadmin@attaqwa.org` | `SuperAdmin123!` |
-| Masjid Admin | `masjidadmin@attaqwa.org` | `MasjidAdmin123!` |
-| Teacher | `teacher@attaqwa.org` | `Teacher123!` |
-| Student | `student@attaqwa.org` | `Student123!` |
+| Super Admin | `superadmin@attaqwa.org` | See your team lead for development credentials. Never commit passwords to version control. |
+| Masjid Admin | `masjidadmin@attaqwa.org` | See your team lead for development credentials. Never commit passwords to version control. |
+| Teacher | `teacher@attaqwa.org` | See your team lead for development credentials. Never commit passwords to version control. |
+| Student | `student@attaqwa.org` | See your team lead for development credentials. Never commit passwords to version control. |
 
 **Change these passwords after first deployment.**
 

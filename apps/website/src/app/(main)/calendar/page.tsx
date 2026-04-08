@@ -1,13 +1,11 @@
 import { CalendarDownload } from '@/components/features/calendar/calendar-download';
 import {
   Calendar as CalendarIcon,
-  Download,
   FileText,
   Clock,
   Moon,
   MapPin,
   Users,
-  Archive,
   Smartphone,
   Printer,
   Check,
@@ -37,96 +35,11 @@ export const metadata: Metadata = generateSEOMetadata({
   type: "website"
 });
 
-const mockCalendars: Calendar[] = [
-  {
-    id: '1',
-    title: 'Ramadan Calendar 2025/1446',
-    description: 'Complete Ramadan schedule with daily Suhur and Iftar times, prayer times, and special programs. Includes community Iftar dates and Taraweh prayer schedules.',
-    fileUrl: '/calendars/ramadan-2025.pdf',
-    fileName: 'ramadan-calendar-2025.pdf',
-    fileSize: 2048576,
-    year: 2025,
-    isActive: true,
-    createdAt: new Date('2025-02-01'),
-    updatedAt: new Date('2025-02-15'),
-  },
-  {
-    id: '2',
-    title: 'Annual Prayer Times 2025',
-    description: 'Complete year-round prayer times for all five daily prayers including Fajr, Dhuhr, Asr, Maghrib, and Isha. Updated monthly for daylight saving adjustments.',
-    fileUrl: '/calendars/prayer-times-2025.pdf',
-    fileName: 'prayer-times-2025.pdf',
-    fileSize: 1536000,
-    year: 2025,
-    isActive: true,
-    createdAt: new Date('2025-01-01'),
-    updatedAt: new Date('2025-01-15'),
-  },
-  {
-    id: '3',
-    title: 'Islamic Holidays & Events 2025',
-    description: 'Important Islamic dates including Eid ul-Fitr, Eid ul-Adha, Mawlid an-Nabi, Ashura, and other significant occasions with community event details.',
-    fileUrl: '/calendars/islamic-holidays-2025.pdf',
-    fileName: 'islamic-holidays-2025.pdf',
-    fileSize: 1024000,
-    year: 2025,
-    isActive: true,
-    createdAt: new Date('2025-01-01'),
-    updatedAt: new Date('2025-01-10'),
-  },
-  {
-    id: '4',
-    title: 'Hajj Calendar & Guide 2025',
-    description: 'Comprehensive Hajj calendar with important dates, pilgrimage schedule, and preparation guide for community members planning to perform Hajj.',
-    fileUrl: '/calendars/hajj-guide-2025.pdf',
-    fileName: 'hajj-guide-2025.pdf',
-    fileSize: 3072000,
-    year: 2025,
-    isActive: true,
-    createdAt: new Date('2025-03-01'),
-    updatedAt: new Date('2025-03-10'),
-  },
-  {
-    id: '5',
-    title: 'Community Events Calendar Q2 2025',
-    description: 'Quarterly calendar featuring educational workshops, youth programs, family events, and special community gatherings from April to June 2025.',
-    fileUrl: '/calendars/community-events-q2-2025.pdf',
-    fileName: 'community-events-q2-2025.pdf',
-    fileSize: 1792000,
-    year: 2025,
-    isActive: true,
-    createdAt: new Date('2025-03-15'),
-    updatedAt: new Date('2025-03-20'),
-  },
-  {
-    id: '6',
-    title: 'Ramadan Calendar 2024/1445 (Archive)',
-    description: 'Previous year Ramadan calendar for reference. Includes actual Iftar times and community program records from Ramadan 1445.',
-    fileUrl: '/calendars/ramadan-2024.pdf',
-    fileName: 'ramadan-calendar-2024.pdf',
-    fileSize: 1920000,
-    year: 2024,
-    isActive: false,
-    createdAt: new Date('2024-02-01'),
-    updatedAt: new Date('2024-02-15'),
-  },
-];
-
-const currentCalendars = mockCalendars.filter(cal => cal.isActive && cal.year >= 2025);
-const archivedCalendars = mockCalendars.filter(cal => !cal.isActive || cal.year < 2025);
-
-const formatFileSize = (bytes: number): string => {
-  const mb = bytes / 1024 / 1024;
-  return `${mb.toFixed(1)} MB`;
-};
-
-const getTotalSize = (calendars: Calendar[]): number => {
-  return calendars.reduce((total, cal) => total + cal.fileSize, 0);
-};
+const currentCalendars: Calendar[] = [];
+const archivedCalendars: Calendar[] = [];
 
 const stats = [
   { label: 'Calendars', value: String(currentCalendars.length), icon: CalendarIcon },
-  { label: 'Total Size', value: formatFileSize(getTotalSize(currentCalendars)), icon: Download },
   { label: 'Format', value: 'PDF', icon: FileText },
   { label: 'Year', value: '2025', icon: Clock },
 ];
@@ -192,17 +105,27 @@ export default function CalendarPage() {
             <div className="flex-1 h-px bg-neutral-100" />
           </div>
 
-          {ramadanCalendar && (
-            <div className="mb-5">
-              <CalendarDownload calendar={ramadanCalendar} featured />
+          {currentCalendars.length === 0 ? (
+            <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-10 text-center">
+              <CalendarIcon className="h-8 w-8 text-neutral-300 mx-auto mb-3" />
+              <p className="text-sm font-medium text-neutral-600">No calendars available yet</p>
+              <p className="text-xs text-neutral-400 mt-1">Check back soon for updated Islamic calendars and schedules.</p>
             </div>
-          )}
+          ) : (
+            <>
+              {ramadanCalendar && (
+                <div className="mb-5">
+                  <CalendarDownload calendar={ramadanCalendar} featured />
+                </div>
+              )}
 
-          <div className="grid sm:grid-cols-3 gap-5">
-            {secondaryFeatured.map(calendar => (
-              <CalendarDownload key={calendar.id} calendar={calendar} featured />
-            ))}
-          </div>
+              <div className="grid sm:grid-cols-3 gap-5">
+                {secondaryFeatured.map(calendar => (
+                  <CalendarDownload key={calendar.id} calendar={calendar} featured />
+                ))}
+              </div>
+            </>
+          )}
         </section>
 
         {/* Categories */}
@@ -235,11 +158,17 @@ export default function CalendarPage() {
             <div className="flex-1 h-px bg-neutral-100" />
           </div>
 
-          <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden">
-            {currentCalendars.map((calendar, i) => (
-              <CalendarDownload key={calendar.id} calendar={calendar} compact index={i} />
-            ))}
-          </div>
+          {currentCalendars.length === 0 ? (
+            <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-8 text-center">
+              <p className="text-sm text-neutral-500">No calendars available for this year yet.</p>
+            </div>
+          ) : (
+            <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden">
+              {currentCalendars.map((calendar, i) => (
+                <CalendarDownload key={calendar.id} calendar={calendar} compact index={i} />
+              ))}
+            </div>
+          )}
         </section>
 
         {/* How to Use */}

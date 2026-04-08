@@ -12,6 +12,7 @@ interface HadithData {
   };
   grade: string;
   reference: string;
+  _fallback?: boolean;
 }
 
 interface AyahData {
@@ -28,6 +29,7 @@ interface AyahData {
   juz: number;
   page: number;
   audio?: string;
+  _fallback?: boolean;
 }
 
 interface QiblahData {
@@ -47,7 +49,7 @@ export async function fetchAuthenticHadith(
   try {
     // Using Sunnah.com API structure
     const apiUrl = `https://api.sunnah.com/v1/collections/${collection}/books/${bookNumber || 1}/hadiths`;
-    
+
     const apiKey = process.env.NEXT_PUBLIC_SUNNAH_API_KEY;
     if (!apiKey) {
       throw new Error('NEXT_PUBLIC_SUNNAH_API_KEY is not configured');
@@ -64,15 +66,15 @@ export async function fetchAuthenticHadith(
     }
 
     const data = await response.json();
-    
+
     // Filter only Sahih (authentic) hadiths
     return data.hadiths.filter((h: { grade?: string }) =>
       h.grade && (h.grade.includes('Sahih') || h.grade.includes('Authentic'))
     );
   } catch (error) {
     console.error('Error fetching hadith:', error);
-    // Return mock data for development
-    return getMockHadithData();
+    // Return mock data for development with fallback indicator
+    return getMockHadithData().map(h => ({ ...h, _fallback: true }));
   }
 }
 
@@ -104,7 +106,7 @@ export async function fetchAyahOfTheDay(): Promise<AyahData> {
     };
   } catch (error) {
     console.error('Error fetching ayah:', error);
-    return getMockAyahData();
+    return { ...getMockAyahData(), _fallback: true };
   }
 }
 
@@ -128,13 +130,13 @@ export async function fetchSurahWithContext(surahNumber: number): Promise<SurahC
   try {
     const response = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}`);
     const translationResponse = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/en.sahih`);
-    
+
     const arabic = await response.json();
     const translation = await translationResponse.json();
 
     // Group ayahs by context (example grouping for Al-Baqarah)
     const contextGroups = getContextualGrouping(surahNumber, arabic.data.ayahs, translation.data.ayahs);
-    
+
     return {
       ...arabic.data,
       translation: translation.data,
@@ -161,7 +163,7 @@ export async function calculateQiblaDirection(latitude: number, longitude: numbe
     Math.sin(lambdaK - lambda),
     Math.cos(phi) * Math.tan(phiK) - Math.sin(phi) * Math.cos(lambdaK - lambda)
   );
-  
+
   const direction = Math.round(psi);
   const compass = direction < 0 ? direction + 360 : direction;
 
@@ -197,10 +199,10 @@ export async function fetchIslamicCalendar(date?: Date): Promise<HijriDateInfo> 
   try {
     const targetDate = date || new Date();
     const dateString = targetDate.toISOString().split('T')[0];
-    
+
     const response = await fetch(`https://api.aladhan.com/v1/gToH?date=${dateString}`);
     const data = await response.json();
-    
+
     return data.data.hijri;
   } catch (error) {
     console.error('Error fetching Islamic calendar:', error);
@@ -251,7 +253,7 @@ function getContextualGrouping(surahNumber: number, arabicAyahs: AyahData[], tra
       // Add more contextual groups as needed
     ];
   }
-  
+
   // Default grouping for other surahs
   return [{
     title: "Complete Surah",

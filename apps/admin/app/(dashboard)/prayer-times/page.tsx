@@ -79,11 +79,14 @@ export default function PrayerTimesPage() {
       const res = await fetch(`${API_URL}/api/v1/iqamah-schedules?${params}`, { headers });
       if (res.ok) {
         const json = await res.json();
-        const data = (json.data || []).map((item: IqamahSchedule & { attributes?: IqamahSchedule }) => ({
-          id: item.id,
-          documentId: item.documentId,
-          ...(item.attributes || item),
-        }));
+        const data = (json.data || []).map((item: IqamahSchedule & { attributes?: IqamahSchedule }) => {
+          const { id: _id, documentId: _docId, ...rest } = (item.attributes || item) as IqamahSchedule;
+          return {
+            id: item.id,
+            documentId: item.documentId,
+            ...rest,
+          };
+        });
         setSchedules(data);
       }
     } catch (error) {

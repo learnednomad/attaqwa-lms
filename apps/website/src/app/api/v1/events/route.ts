@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAuth } from '@/middleware/auth';
 
+/**
+ * Events API v1
+ * GET /api/v1/events - Returns community events
+ * POST /api/v1/events - Create a new event (admin only)
+ *
+ * STUB: GET returns hardcoded placeholder data.
+ * Real Strapi/database integration is pending.
+ */
+
 // Mock events data - in production, this would come from Strapi
 const mockEvents = [
   {
@@ -98,6 +107,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       data: paginated,
+      _stub: true,
+      _message: 'This endpoint returns placeholder data. Real database integration pending.',
       meta: {
         pagination: {
           page: Math.floor(offset / limit) + 1,
@@ -157,6 +168,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         data: newEvent,
+        _stub: true,
+        _message: 'Event created in memory only. Real database persistence pending.',
         meta: {
           version: 'v1',
           timestamp: new Date().toISOString(),

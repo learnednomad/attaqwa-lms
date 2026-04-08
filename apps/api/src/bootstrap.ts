@@ -784,6 +784,12 @@ export default async ({ strapi }: { strapi: any }) => {
     console.log(`📚 Available content types: ${contentTypes.length}`);
     contentTypes.forEach(ct => console.log(`   - ${ct}`));
 
+
+    // SECURITY: Skip seed data in production to prevent test data contamination
+    if (process.env.NODE_ENV === 'production') {
+      strapi.log.info('Skipping seed data in production environment');
+    } else {
+
     // Check for comprehensive seed data JSON files
     const fs = await import('fs');
     const path = await import('path');
@@ -824,6 +830,7 @@ export default async ({ strapi }: { strapi: any }) => {
       // Seed quizzes for some lessons
       await seedQuizzesIfEmpty(strapi);
     }
+    } // end seed guard (non-production only)
 
     console.log('\n✅ Bootstrap complete\n');
   } catch (error) {

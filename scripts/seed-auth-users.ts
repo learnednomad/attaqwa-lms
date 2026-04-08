@@ -1,3 +1,4 @@
+// WARNING: These are development-only seed credentials. Change all passwords in production.
 /**
  * Seed default BetterAuth user accounts
  *
