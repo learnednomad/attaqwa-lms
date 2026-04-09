@@ -1,21 +1,8 @@
 -- =============================================================================
--- Seed default BetterAuth user accounts
+-- Seed default BetterAuth user accounts (DEVELOPMENT ONLY)
 -- Idempotent — skips users that already exist by email.
---
--- Accounts created:
---   superadmin@attaqwa.org  (admin)       SuperAdmin123!
---   masjidadmin@attaqwa.org (admin)       MasjidAdmin123!
---   teacher@attaqwa.org     (teacher)     Teacher123!
---   student@attaqwa.org     (student)     Student123!
---
--- Passwords are bcrypt hashes (cost 10).
+-- Passwords are hashed at runtime via pgcrypto crypt().
 -- =============================================================================
-
--- Pre-computed bcrypt hashes (cost 10):
---   SuperAdmin123!  -> $2a$10$LxRc9hXz8YOvKJqFp0eXKeGT7TzHK0B3mVbEiK3Q8wXa5mT3fWkSq
---   MasjidAdmin123! -> $2a$10$RxYp7eXz8YOvKJqFp0eXKeGT7TzHK0B3mVbEiK3Q8wXa5mT3fWkAb
---   Teacher123!     -> $2a$10$TxRc9hXz8YOvKJqFp0eXKeGT7TzHK0B3mVbEiK3Q8wXa5mT3fWkTr
---   Student123!     -> $2a$10$SxRc9hXz8YOvKJqFp0eXKeGT7TzHK0B3mVbEiK3Q8wXa5mT3fWkSt
 
 -- Enable pgcrypto for bcrypt password hashing
 CREATE EXTENSION IF NOT EXISTS pgcrypto;

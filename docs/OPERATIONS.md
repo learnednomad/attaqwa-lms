@@ -179,7 +179,14 @@ The admin panel uses human-friendly names; Strapi uses snake_case:
 | Teacher | `teacher@attaqwa.org` | `Teacher123!` | Website `/login` |
 | Student | `student@attaqwa.org` | `Student123!` | Website `/login` |
 
-**Change these passwords after first deployment.**
+**These accounts are seeded in development only. Change passwords after first use.**
+
+#### Production First Deploy
+
+In production (`NODE_ENV=production`), no default accounts are created. After first deploy:
+
+1. **Strapi Admin**: Navigate to `https://yourdomain.com/admin` — Strapi shows the registration form on first visit. Create your admin account there.
+2. **BetterAuth Users**: Create user accounts through the admin panel or directly in the database. The init container skips `seed-auth-users.sql` in production.
 
 ## Development Setup
 
