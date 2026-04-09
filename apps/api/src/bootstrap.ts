@@ -697,6 +697,56 @@ async function seedQuizzesIfEmpty(strapi: any) {
   }
 }
 
+// WARNING: These are development-only seed credentials. Change all passwords in production.
+const SEED_ADMIN = {
+  firstname: 'Super',
+  lastname: 'Admin',
+  email: 'superadmin@attaqwa.org',
+  password: 'SuperAdmin123!', // placeholder — development only, change in production
+};
+
+/**
+ * Seed the Strapi admin user if none exists (idempotent)
+ */
+async function seedStrapiAdmin(strapi: any) {
+  try {
+    const adminService = strapi.service('admin::user');
+    const existingAdmins = await adminService.findMany({ limit: 1 });
+
+    if (existingAdmins && existingAdmins.length > 0) {
+      console.log('👤 Strapi admin already exists, skipping seed');
+      return;
+    }
+
+    console.log('👤 No Strapi admin found, creating default admin...');
+
+    // Get the Super Admin role
+    const roleService = strapi.service('admin::role');
+    const superAdminRole = await roleService.getSuperAdmin();
+
+    if (!superAdminRole) {
+      console.error('   ✗ Super Admin role not found, cannot seed admin');
+      return;
+    }
+
+    const hashedPassword = await adminService.hashPassword(SEED_ADMIN.password);
+
+    await adminService.create({
+      ...SEED_ADMIN,
+      password: hashedPassword,
+      registrationToken: null,
+      isActive: true,
+      roles: [superAdminRole.id],
+    });
+
+    console.log(`✅ Strapi admin created: ${SEED_ADMIN.email}`);
+    console.log(`   Password: ${SEED_ADMIN.password}`);
+    console.log('   ⚠️  Change this password after first login!');
+  } catch (error: any) {
+    console.error('❌ Strapi admin seeding error:', error.message);
+  }
+}
+
 /**
  * Main bootstrap function
  */
@@ -704,6 +754,8 @@ export default async ({ strapi }: { strapi: any }) => {
   console.log('\n🔧 Running bootstrap configuration...');
 
   try {
+    // Seed Strapi admin user (idempotent — skips if admin exists)
+    await seedStrapiAdmin(strapi);
     // Configure public permissions for development
     const publicRole = await strapi
       .query('plugin::users-permissions.role')
