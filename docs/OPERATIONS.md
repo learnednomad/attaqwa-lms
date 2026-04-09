@@ -155,22 +155,29 @@ The admin panel uses human-friendly names; Strapi uses snake_case:
    - Website server-side connects to DB via `DATABASE_URL`
    - Client uses `authClient.signIn.email()` → `POST /api/auth/sign-in/email`
 
-2. **Strapi Users & Permissions** (API) — Admin panel content access
-   - Managed by Strapi's built-in auth
-   - Bootstrap script auto-configures public permissions on startup
+2. **Strapi Admin** (API `/admin`) — CMS content management
+   - Managed by Strapi's built-in admin auth
+   - Seeded automatically by `bootstrap.ts` on first boot (idempotent)
+   - Bootstrap script also auto-configures public API permissions on startup
    - Dev mode: `find`, `findOne`, `create`, `update`, `delete` for courses/lessons/quizzes
    - Prod mode: `find`, `findOne` only (write operations require Strapi admin token)
 
 ### Seed Users
 
-Run `scripts/seed-auth-users.sql` (done automatically by init container):
+#### Strapi Admin (seeded by `apps/api/src/bootstrap.ts` on first boot)
 
-| Role | Email | Password |
-|------|-------|----------|
-| Super Admin | `superadmin@attaqwa.org` | See your team lead for development credentials. Never commit passwords to version control. |
-| Masjid Admin | `masjidadmin@attaqwa.org` | See your team lead for development credentials. Never commit passwords to version control. |
-| Teacher | `teacher@attaqwa.org` | See your team lead for development credentials. Never commit passwords to version control. |
-| Student | `student@attaqwa.org` | See your team lead for development credentials. Never commit passwords to version control. |
+| Role | Email | Password | Login URL |
+|------|-------|----------|-----------|
+| Super Admin | `superadmin@attaqwa.org` | `SuperAdmin123!` | `/admin` |
+
+#### BetterAuth Users (seeded by init container via `scripts/seed-auth-users.sql`)
+
+| Role | Email | Password | Login URL |
+|------|-------|----------|-----------|
+| Admin | `superadmin@attaqwa.org` | `SuperAdmin123!` | Website `/login` |
+| Admin | `masjidadmin@attaqwa.org` | `MasjidAdmin123!` | Website `/login` |
+| Teacher | `teacher@attaqwa.org` | `Teacher123!` | Website `/login` |
+| Student | `student@attaqwa.org` | `Student123!` | Website `/login` |
 
 **Change these passwords after first deployment.**
 
