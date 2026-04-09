@@ -10,7 +10,7 @@ name: Docker Build & Push
 
 on:
   push:
-    branches: [main, dev]
+    branches: [main, dev, development]
     tags: ["v*"]
     paths:
       - ".github/workflows/docker.yml"
@@ -20,7 +20,7 @@ on:
       - "packages/**"
       - "pnpm-lock.yaml"
   pull_request:
-    branches: [main, dev]
+    branches: [main, dev, development]
     paths:
       - ".github/workflows/docker.yml"
       - "Dockerfile"
@@ -142,6 +142,22 @@ jobs:
         run: |
           curl -sSf -X GET \
             "${{ secrets.COOLIFY_URL }}/api/v1/services/${{ secrets.COOLIFY_DEV_SERVICE_UUID }}/restart" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
+            -H "Content-Type: application/json"
+
+  # ---------------------------------------------------------------------------
+  # Deploy to Coolify (development)
+  # ---------------------------------------------------------------------------
+  deploy-development:
+    needs: build
+    if: github.ref == 'refs/heads/development' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+      - name: Deploy to Coolify (development)
+        run: |
+          curl -sSf -X GET \
+            "${{ secrets.COOLIFY_URL }}/api/v1/services/${{ secrets.COOLIFY_DEV2_SERVICE_UUID }}/restart" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
             -H "Content-Type: application/json"
 
