@@ -6,15 +6,14 @@ import Link from 'next/link';
 import {
   BookOpen, Clock, Calendar, Award, Bell, TrendingUp,
   CheckCircle, Users, MessageSquare, FileText,
-  ChevronRight, ChevronDown, Home, User, LogOut, Menu, X,
+  ChevronRight, ChevronDown, Home, User, LogOut,
   GraduationCap, CreditCard, Building2, Heart, Search,
-  Settings, ExternalLink, MoreHorizontal, AlertCircle
+  ExternalLink, MoreHorizontal
 } from 'lucide-react';
 import { useCourses, useEnrollments, useProgress } from '@/hooks/use-student-data';
+import { useStudentAuth } from '@/contexts/StudentAuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import {
@@ -24,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { NotificationPanel, NotificationItem, generateMockNotifications } from '@/components/notifications/notification-panel';
+import { NotificationPanel, NotificationItem } from '@/components/notifications/notification-panel';
 import { Recommendations } from '@/components/education/Recommendations';
 
 interface StudentData {
@@ -58,14 +57,6 @@ interface Course {
   avatarUrl?: string;
 }
 
-interface PaymentRecord {
-  id: string;
-  paymentId: string;
-  category: string;
-  date: string;
-  status: 'completed' | 'on-verification' | 'pending';
-}
-
 interface SidebarSection {
   title: string;
   icon: React.ElementType;
@@ -79,13 +70,12 @@ interface SidebarSection {
 
 export default function StudentDashboard() {
   const router = useRouter();
+  const { user, logout } = useStudentAuth();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [scheduleView, setScheduleView] = useState<'daily' | 'weekly'>('daily');
-  const [semesterFilter, setSemesterFilter] = useState('all');
-
   // Notification state
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<NotificationItem[]>(generateMockNotifications());
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
   const handleMarkAllRead = () => {
@@ -148,76 +138,31 @@ export default function StudentDashboard() {
   };
 
   // TanStack Query hooks
-  const { data: apiCourses = [], isLoading: coursesLoading, isError: coursesError } = useCourses();
+  const { data: apiCourses = [], isLoading: coursesLoading } = useCourses();
   const { data: enrollmentsData } = useEnrollments();
   const { data: allProgress = [] } = useProgress();
 
   const enrollments = enrollmentsData?.enrollments || [];
   const loading = coursesLoading;
 
-  // Mock data constants
-  const mockStudent: StudentData = {
-    id: '1',
-    name: 'Ahmed Hassan',
-    email: 'student@attaqwa.org',
-    studentId: 'STU2024001',
-    ageTier: 'HIGH_SCHOOL',
-    enrolledCourses: 6,
-    completedCourses: 120,
-    totalCourses: 144,
-    averageGrade: 3.75,
-    maxGrade: 4.00,
-    activeClasses: 15,
-    totalClasses: 18,
-    attendanceRate: 92,
-  };
-
-  const mockCourses: Course[] = [
-    { id: '1', title: 'Quran Memorization - Juz 30', instructor: 'Imam Mohammad', instructorTitle: 'Hafiz', progress: 75, nextClass: 'Today', classTime: '08:30 AM - 09:30 AM', room: 'QUR-201', credits: 4, assignments: 2, grade: 88 },
-    { id: '2', title: 'Islamic Studies - Fiqh', instructor: 'Sheikh Abdullah', instructorTitle: 'Ph.D', progress: 60, nextClass: 'Today', classTime: '09:30 AM - 01:30 PM', room: 'ISL-303', credits: 4, assignments: 1, grade: 82 },
-    { id: '3', title: 'Arabic Language - Level 2', instructor: 'Ustadh Omar', instructorTitle: 'Ph.D', progress: 45, nextClass: 'Today', classTime: '01:30 PM - 03:30 PM', room: 'ARB-401', credits: 4, assignments: 3, grade: 90 },
-    { id: '4', title: 'Hadith Studies', instructor: 'Dr. Fatima Ali', instructorTitle: 'Ph.D', progress: 80, nextClass: 'Tomorrow', classTime: '04:30 PM - 06:00 PM', room: 'HAD-102', credits: 3, assignments: 0, grade: 86 },
-  ];
-
-  const mockPayments: PaymentRecord[] = [
-    { id: '1', paymentId: 'PID-331829', category: '6th Semester Tuition', date: '23 October 2024', status: 'on-verification' },
-    { id: '2', paymentId: 'PID-331828', category: 'Quran Program 2025', date: '24 August 2024', status: 'completed' },
-    { id: '3', paymentId: 'PID-331827', category: '5th Semester Tuition', date: '20 May 2024', status: 'completed' },
-    { id: '4', paymentId: 'PID-331826', category: '4th Semester Tuition', date: '22 October 2023', status: 'completed' },
-  ];
-
-  // Derive dashboard data from TQ results
-  const { student, courses, payments, dataSource } = useMemo(() => {
-    if (coursesError || apiCourses.length === 0) {
-      return {
-        student: mockStudent,
-        courses: mockCourses,
-        payments: mockPayments,
-        dataSource: 'mock' as const,
-      };
-    }
-
-    // Get student data from localStorage if available
-    const storedStudent = typeof window !== 'undefined'
-      ? JSON.parse(localStorage.getItem('studentData') || '{}')
-      : {};
-
+  // Derive dashboard data from API results — no mock fallbacks
+  const { student, courses } = useMemo(() => {
     // Calculate real lesson progress stats
     const lessonsCompleted = allProgress.filter(p => p.status === 'completed').length;
 
     // Transform API courses to match UI interface
-    const transformedCourses: Course[] = apiCourses.slice(0, 4).map((course, index) => {
+    const transformedCourses: Course[] = apiCourses.slice(0, 4).map((course) => {
       const enrollment = enrollments.find(e => e.course?.id === course.id);
       return {
         id: String(course.id),
         title: course.title,
         instructor: course.instructor,
-        instructorTitle: course.subject === 'quran' ? 'Hafiz' : 'Ph.D',
+        instructorTitle: (course as unknown as Record<string, unknown>).instructor_title as string || '',
         progress: enrollment?.overall_progress || 0,
-        nextClass: index < 3 ? 'Today' : 'Tomorrow',
-        classTime: ['08:30 AM - 09:30 AM', '09:30 AM - 01:30 PM', '01:30 PM - 03:30 PM', '04:30 PM - 06:00 PM'][index] || '08:00 AM',
-        room: `${course.subject.substring(0, 3).toUpperCase()}-${201 + index}`,
-        credits: course.duration_weeks > 20 ? 4 : 3,
+        nextClass: 'Not scheduled',
+        classTime: 'Not scheduled',
+        room: 'TBD',
+        credits: 0,
         assignments: 0,
         grade: enrollment?.average_quiz_score || 0,
       };
@@ -225,51 +170,33 @@ export default function StudentDashboard() {
 
     // Calculate stats from enrollments
     const activeEnrollments = enrollments.filter(e => e.enrollment_status === 'active');
-    const completedEnrollments = enrollments.filter(e => e.enrollment_status === 'completed');
 
     const derivedStudent: StudentData = {
-      id: storedStudent.id?.toString() || '1',
-      name: storedStudent.username || storedStudent.name || 'Student',
-      email: storedStudent.email || 'student@attaqwa.org',
-      studentId: `STU${new Date().getFullYear()}${String(storedStudent.id || 1).padStart(3, '0')}`,
-      ageTier: 'HIGH_SCHOOL',
+      id: user?.id || '',
+      name: user?.name || 'Student',
+      email: user?.email || '',
+      studentId: user?.id || '',
+      ageTier: '',
       enrolledCourses: apiCourses.length,
       completedCourses: lessonsCompleted,
       totalCourses: allProgress.length || apiCourses.length,
       averageGrade: enrollments.length > 0
         ? enrollments.reduce((sum, e) => sum + (e.average_quiz_score || 0), 0) / enrollments.length / 25
-        : 3.5,
+        : 0,
       maxGrade: 4.00,
       activeClasses: activeEnrollments.length || apiCourses.length,
-      totalClasses: apiCourses.length + 2,
-      attendanceRate: 92,
+      totalClasses: apiCourses.length,
+      attendanceRate: 0,
     };
 
     return {
       student: derivedStudent,
       courses: transformedCourses,
-      payments: mockPayments,
-      dataSource: 'api' as const,
     };
-  }, [apiCourses, enrollments, allProgress, coursesError]);
+  }, [apiCourses, enrollments, allProgress, user]);
 
   const handleLogout = () => {
-    localStorage.removeItem('studentToken');
-    localStorage.removeItem('studentData');
-    router.push('/student/login');
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'on-verification':
-        return <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">On-Verification</Badge>;
-      case 'completed':
-        return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Completed</Badge>;
-      case 'pending':
-        return <Badge className="bg-gray-100 text-gray-700 hover:bg-gray-100">Pending</Badge>;
-      default:
-        return <Badge>{status}</Badge>;
-    }
+    logout();
   };
 
   if (loading) {
@@ -369,15 +296,10 @@ export default function StudentDashboard() {
               <h1 className="text-2xl font-semibold text-gray-900">
                 Welcome Back, {student?.name}
               </h1>
-              {dataSource === 'api' ? (
+              {apiCourses.length > 0 && (
                 <Badge className="mt-1 bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
                   <CheckCircle className="h-3 w-3 mr-1" />
-                  Live Data from Strapi
-                </Badge>
-              ) : (
-                <Badge className="mt-1 bg-amber-100 text-amber-700 hover:bg-amber-100">
-                  <AlertCircle className="h-3 w-3 mr-1" />
-                  Demo Mode (Mock Data)
+                  Connected
                 </Badge>
               )}
             </div>
@@ -440,8 +362,7 @@ export default function StudentDashboard() {
                   <span className="text-lg text-gray-400">/{student?.totalCourses}</span>
                 </div>
                 <div className="flex items-center justify-between mt-3">
-                  <span className="text-sm text-gray-500">Compared To Last Semester</span>
-                  <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">+24 Courses</Badge>
+                  <span className="text-sm text-gray-500">Lessons completed</span>
                 </div>
               </CardContent>
             </Card>
@@ -465,8 +386,7 @@ export default function StudentDashboard() {
                   <span className="text-lg text-gray-400">/{student?.maxGrade.toFixed(2)}</span>
                 </div>
                 <div className="flex items-center justify-between mt-3">
-                  <span className="text-sm text-gray-500">Compared To Last Semester</span>
-                  <Badge className="bg-rose-100 text-rose-700 hover:bg-rose-100">-0.25 Points</Badge>
+                  <span className="text-sm text-gray-500">Current average</span>
                 </div>
               </CardContent>
             </Card>
@@ -490,8 +410,7 @@ export default function StudentDashboard() {
                   <span className="text-lg text-gray-400">/{student?.totalClasses}</span>
                 </div>
                 <div className="flex items-center justify-between mt-3">
-                  <span className="text-sm text-gray-500">Active Course This Semester</span>
-                  <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">+3 Active Course</Badge>
+                  <span className="text-sm text-gray-500">Currently enrolled</span>
                 </div>
               </CardContent>
             </Card>
@@ -499,148 +418,39 @@ export default function StudentDashboard() {
 
           {/* AI Course Recommendations */}
           <div className="mb-6">
-            <Recommendations token={typeof window !== 'undefined' ? localStorage.getItem('studentToken') : null} />
+            <Recommendations />
           </div>
 
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Left Column - Grade Chart + Payment Table */}
             <div className="lg:col-span-7 space-y-6">
-              {/* Grade Point Average Chart */}
+              {/* Grade Point Average Chart — Coming Soon */}
               <Card className="bg-white shadow-sm">
                 <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="text-lg font-semibold">Grade Point Average</CardTitle>
-                      <p className="text-sm text-gray-500 mt-1">Comparison between your GPA and Average Student GPA</p>
-                    </div>
-                    <Select value={semesterFilter} onValueChange={setSemesterFilter}>
-                      <SelectTrigger className="w-[140px]">
-                        <SelectValue placeholder="All Semesters" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Semesters</SelectItem>
-                        <SelectItem value="current">Current</SelectItem>
-                        <SelectItem value="previous">Previous</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <CardTitle className="text-lg font-semibold">Grade Point Average</CardTitle>
+                  <p className="text-sm text-gray-500 mt-1">GPA tracking over semesters</p>
                 </CardHeader>
                 <CardContent>
-                  {/* Simple Chart Placeholder - You can integrate a real chart library */}
-                  <div className="h-64 relative">
-                    {/* Y-axis labels */}
-                    <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-gray-400 py-4">
-                      <span>4.0</span>
-                      <span>3.5</span>
-                      <span>3.0</span>
-                      <span>2.5</span>
-                      <span>2.0</span>
-                      <span>1.5</span>
-                      <span>1.0</span>
-                    </div>
-
-                    {/* Chart Area */}
-                    <div className="ml-8 h-full border-l border-b border-gray-200 relative">
-                      {/* Grid lines */}
-                      <div className="absolute inset-0 flex flex-col justify-between">
-                        {[...Array(6)].map((_, i) => (
-                          <div key={i} className="border-t border-gray-100 w-full"></div>
-                        ))}
-                      </div>
-
-                      {/* Chart visualization - placeholder SVG */}
-                      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 600 200" preserveAspectRatio="none">
-                        {/* Your GPA line - purple dashed */}
-                        <path
-                          d="M 50 100 Q 150 90, 200 95 T 350 80 T 500 70"
-                          fill="none"
-                          stroke="#a855f7"
-                          strokeWidth="2"
-                          strokeDasharray="5,5"
-                        />
-                        {/* Average GPA line - emerald solid */}
-                        <path
-                          d="M 50 120 Q 150 115, 200 110 T 350 100 T 500 85"
-                          fill="none"
-                          stroke="#10b981"
-                          strokeWidth="2"
-                        />
-                        {/* Data points */}
-                        <circle cx="350" cy="80" r="4" fill="#a855f7" />
-                        <circle cx="350" cy="100" r="4" fill="#10b981" />
-                      </svg>
-
-                      {/* Legend tooltip */}
-                      <div className="absolute top-1/4 left-1/2 bg-white shadow-lg rounded-lg p-3 text-xs border">
-                        <p className="font-medium text-gray-700 mb-2">2nd Semester 2025</p>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="w-2 h-2 rounded-full bg-purple-500"></span>
-                          <span className="text-gray-600">Your GPA</span>
-                          <span className="font-semibold ml-auto">2.33</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                          <span className="text-gray-600">Average GPA</span>
-                          <span className="font-semibold ml-auto">2.49</span>
-                        </div>
-                      </div>
-
-                      {/* X-axis labels */}
-                      <div className="absolute bottom-0 left-0 right-0 translate-y-6 flex justify-between text-xs text-gray-400 px-4">
-                        <span>1st Sem</span>
-                        <span>2nd Sem</span>
-                        <span>3rd Sem</span>
-                        <span>4th Sem</span>
-                        <span>5th Sem</span>
-                        <span>6th Sem</span>
-                      </div>
-                    </div>
+                  <div className="h-64 flex flex-col items-center justify-center text-gray-400">
+                    <TrendingUp className="h-12 w-12 mb-3 opacity-40" />
+                    <p className="text-sm font-medium text-gray-500">GPA tracking coming soon</p>
+                    <p className="text-xs text-gray-400 mt-1">Grade history will appear here once available</p>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Payment & Tuition History */}
+              {/* Payment & Tuition History — Empty State */}
               <Card className="bg-white shadow-sm">
                 <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="text-lg font-semibold">Payment & Tuition History</CardTitle>
-                      <p className="text-sm text-gray-500 mt-1">Complete data about your payment and tuition history</p>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      View All Payment
-                    </Button>
-                  </div>
+                  <CardTitle className="text-lg font-semibold">Payment & Tuition History</CardTitle>
+                  <p className="text-sm text-gray-500 mt-1">Your payment and tuition records</p>
                 </CardHeader>
                 <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-gray-200">
-                          <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Payment ID</th>
-                          <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Payment Category</th>
-                          <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Date</th>
-                          <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Payment Status</th>
-                          <th className="py-3 px-4 text-sm font-medium text-gray-500">...</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {payments.map((payment) => (
-                          <tr key={payment.id} className="border-b border-gray-100 hover:bg-gray-50">
-                            <td className="py-3 px-4 text-sm text-gray-900">{payment.paymentId}</td>
-                            <td className="py-3 px-4 text-sm text-gray-900">{payment.category}</td>
-                            <td className="py-3 px-4 text-sm text-gray-600">{payment.date}</td>
-                            <td className="py-3 px-4">{getStatusBadge(payment.status)}</td>
-                            <td className="py-3 px-4">
-                              <button className="text-gray-400 hover:text-gray-600">
-                                <ExternalLink className="h-4 w-4" />
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                  <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+                    <CreditCard className="h-12 w-12 mb-3 opacity-40" />
+                    <p className="text-sm font-medium text-gray-500">No payment records found</p>
+                    <p className="text-xs text-gray-400 mt-1">Payment history will appear here when available</p>
                   </div>
                 </CardContent>
               </Card>
@@ -667,54 +477,58 @@ export default function StudentDashboard() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {courses.map((course) => {
-                    // Generate course code from title (e.g., "Stories of Prophets" -> "SFR")
-                    const getCourseCode = (title: string) => {
-                      const words = title.split(' ').filter(w => w.length > 2);
-                      if (words.length >= 2) {
-                        return words.slice(0, 3).map(w => w[0]).join('').toUpperCase();
-                      }
-                      return title.substring(0, 3).toUpperCase();
-                    };
-                    const courseCode = getCourseCode(course.title);
+                  {courses.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+                      <Calendar className="h-12 w-12 mb-3 opacity-40" />
+                      <p className="text-sm font-medium text-gray-500">No classes scheduled</p>
+                      <p className="text-xs text-gray-400 mt-1">Enroll in courses to see your schedule</p>
+                    </div>
+                  ) : (
+                    courses.map((course) => {
+                      const getCourseCode = (title: string) => {
+                        const words = title.split(' ').filter(w => w.length > 2);
+                        if (words.length >= 2) {
+                          return words.slice(0, 3).map(w => w[0]).join('').toUpperCase();
+                        }
+                        return title.substring(0, 3).toUpperCase();
+                      };
+                      const courseCode = getCourseCode(course.title);
 
-                    return (
-                      <div key={course.id} className="border border-gray-200 rounded-xl p-4 hover:border-gray-300 transition-colors">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-start gap-3">
-                            <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
-                              <span className="text-emerald-700 font-bold text-xs">{courseCode}</span>
+                      return (
+                        <div key={course.id} className="border border-gray-200 rounded-xl p-4 hover:border-gray-300 transition-colors">
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-start gap-3">
+                              <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                                <span className="text-emerald-700 font-bold text-xs">{courseCode}</span>
+                              </div>
+                              <div>
+                                <h4 className="font-semibold text-gray-900">{course.title}</h4>
+                                <p className="text-sm text-gray-500">{course.classTime}</p>
+                              </div>
                             </div>
-                            <div>
-                              <h4 className="font-semibold text-gray-900">{course.title}</h4>
-                              <p className="text-sm text-gray-500">{course.classTime}</p>
-                            </div>
+                            <button className="text-gray-400 hover:text-gray-600">
+                              <ExternalLink className="h-4 w-4" />
+                            </button>
                           </div>
-                          <button className="text-gray-400 hover:text-gray-600">
-                            <ExternalLink className="h-4 w-4" />
-                          </button>
-                        </div>
 
-                        <div className="mt-4 space-y-2 text-sm">
-                          <div className="flex items-center gap-2">
-                            <User className="h-4 w-4 text-gray-400" />
-                            <span className="text-gray-500">Instructor</span>
-                            <span className="ml-auto text-gray-900">{course.instructor}, {course.instructorTitle}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Building2 className="h-4 w-4 text-gray-400" />
-                            <span className="text-gray-500">Room</span>
-                            <span className="ml-auto text-gray-900">{course.room}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Award className="h-4 w-4 text-gray-400" />
-                            <span className="text-gray-500">Course Credits</span>
-                            <span className="ml-auto text-emerald-600 font-medium">{course.credits} Credits</span>
+                          <div className="mt-4 space-y-2 text-sm">
+                            <div className="flex items-center gap-2">
+                              <User className="h-4 w-4 text-gray-400" />
+                              <span className="text-gray-500">Instructor</span>
+                              <span className="ml-auto text-gray-900">
+                                {course.instructor}{course.instructorTitle ? `, ${course.instructorTitle}` : ''}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Building2 className="h-4 w-4 text-gray-400" />
+                              <span className="text-gray-500">Room</span>
+                              <span className="ml-auto text-gray-900">{course.room}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })
+                  )}
                 </CardContent>
               </Card>
             </div>

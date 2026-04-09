@@ -11,6 +11,7 @@
 # TRANSFER_TOKEN_SALT=<random-32-char-string>
 # ENCRYPTION_KEY=<random-32-char-string>
 # JWT_SECRET=<random-32-char-string>
+# BETTER_AUTH_SECRET=<random-32-char-string>
 #
 # Generate secrets with: openssl rand -base64 32
 # ============================================================================
@@ -33,6 +34,25 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  # --------------------------------------------------------------------------
+  # Init Container — Runs migrations on every deploy (idempotent)
+  # Creates BetterAuth tables, migrates Strapi users if needed
+  # --------------------------------------------------------------------------
+  init:
+    build:
+      context: .
+      target: init
+    restart: "no"
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?required}@postgres:5432/attaqwa_lms # placeholder
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: postgres
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET is required}
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   # Strapi Backend API
   api:
@@ -57,21 +77,31 @@ services:
       ENCRYPTION_KEY: ${ENCRYPTION_KEY:?ENCRYPTION_KEY is required}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
       NODE_ENV: ${NODE_ENV:-production}
-      # Ollama AI configuration
+      # Ollama AI configuration (gracefully disabled when ollama service is absent)
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
       OLLAMA_MODEL: ${OLLAMA_MODEL:-mistral:7b-instruct-q4_K_M}
       OLLAMA_EMBED_MODEL: ${OLLAMA_EMBED_MODEL:-nomic-embed-text}
       OLLAMA_TIMEOUT_MS: ${OLLAMA_TIMEOUT_MS:-120000}
-      OLLAMA_ENABLED: ${OLLAMA_ENABLED:-true}
+      OLLAMA_ENABLED: ${OLLAMA_ENABLED:-false}
       OLLAMA_MAX_PARALLEL: ${OLLAMA_MAX_PARALLEL:-2}
       EMBEDDING_DIMENSION: ${EMBEDDING_DIMENSION:-768}
+      # MinIO / S3 upload configuration
+      UPLOAD_PROVIDER: ${UPLOAD_PROVIDER:-aws-s3}
+      S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-attaqwa}
+      S3_ACCESS_SECRET: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD is required}
+      S3_ENDPOINT: http://minio:9000
+      S3_REGION: ${S3_REGION:-us-east-1}
+      S3_BUCKET: ${S3_BUCKET:-uploads-public}
+      S3_BASE_URL: ${S3_BASE_URL:-http://localhost:9000/uploads-public}
     ports:
       - "1337:1337"
     depends_on:
       postgres:
         condition: service_healthy
-      ollama:
-        condition: service_healthy
+      init:
+        condition: service_completed_successfully
+      minio-init:
+        condition: service_completed_successfully
     volumes:
       - api_uploads:/app/apps/api/public/uploads
 
@@ -86,6 +116,9 @@ services:
       PORT: 3000
       HOSTNAME: 0.0.0.0
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:1337}
+      NEXT_PUBLIC_AUTH_URL: ${NEXT_PUBLIC_AUTH_URL:-http://localhost:3001}
+      STRAPI_INTERNAL_URL: http://api:1337
+      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN:?STRAPI_API_TOKEN is required}
     ports:
       - "3000:3000"
     depends_on:
@@ -103,16 +136,64 @@ services:
       PORT: 3001
       HOSTNAME: 0.0.0.0
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:1337}
+      STRAPI_URL: ${STRAPI_URL:-http://api:1337}
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?required}@postgres:5432/attaqwa_lms # placeholder
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET is required}
+      BETTER_AUTH_BASE_URL: ${BETTER_AUTH_BASE_URL:-http://localhost:3001}
     ports:
       - "3001:3001"
     depends_on:
+      init:
+        condition: service_completed_successfully
       api:
         condition: service_healthy
 
-  # Ollama - Local LLM Inference
+  # ---------------------------------------------------------------------------
+  # MinIO - S3-compatible object storage for media uploads
+  # ---------------------------------------------------------------------------
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-attaqwa}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD is required}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # MinIO bucket init — creates the uploads bucket on first run
+  minio-init:
+    image: minio/mc:latest
+    restart: "no"
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      sh -c "
+        mc alias set attaqwa http://minio:9000 $${MINIO_ROOT_USER:-attaqwa} $${MINIO_ROOT_PASSWORD} &&
+        mc mb --ignore-existing attaqwa/$${S3_BUCKET:-uploads-public} &&
+        mc anonymous set download attaqwa/$${S3_BUCKET:-uploads-public} &&
+        echo 'MinIO bucket ready'
+      "
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-attaqwa}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD is required}
+      S3_BUCKET: ${S3_BUCKET:-uploads-public}
+
+  # Ollama - Local LLM Inference (optional, use --profile ai)
   ollama:
     image: ollama/ollama
     restart: unless-stopped
+    profiles: ["ai"]
     ports:
       - "11434:11434"
     volumes:
@@ -130,6 +211,8 @@ volumes:
   postgres_data:
     driver: local
   api_uploads:
+    driver: local
+  minio_data:
     driver: local
   ollama_data:
     driver: local

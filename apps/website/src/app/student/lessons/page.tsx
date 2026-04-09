@@ -29,7 +29,7 @@ const SUBJECT_COLORS: Record<string, { text: string; icon: string; gradient: str
   quran:           { text: 'text-emerald-600', icon: 'text-emerald-500', gradient: 'from-emerald-600 to-emerald-800' },
   hadith:          { text: 'text-blue-600',    icon: 'text-blue-500',    gradient: 'from-blue-600 to-blue-800' },
   fiqh:            { text: 'text-purple-600',  icon: 'text-purple-500',  gradient: 'from-purple-600 to-purple-800' },
-  aqeedah:         { text: 'text-indigo-600',  icon: 'text-indigo-500',  gradient: 'from-indigo-600 to-indigo-800' },
+  aqeedah:         { text: 'text-islamic-green-600',  icon: 'text-islamic-green-500',  gradient: 'from-islamic-green-600 to-islamic-green-800' },
   seerah:          { text: 'text-amber-600',   icon: 'text-amber-500',   gradient: 'from-amber-600 to-amber-800' },
   arabic:          { text: 'text-teal-600',    icon: 'text-teal-500',    gradient: 'from-teal-600 to-teal-800' },
   islamic_history: { text: 'text-orange-600',  icon: 'text-orange-500',  gradient: 'from-orange-600 to-orange-800' },
@@ -41,7 +41,7 @@ const SUBJECT_BG_COLORS: Record<string, { bg: string; ring: string }> = {
   quran:           { bg: 'bg-emerald-50', ring: 'text-emerald-600' },
   hadith:          { bg: 'bg-blue-50',    ring: 'text-blue-600' },
   fiqh:            { bg: 'bg-purple-50',  ring: 'text-purple-600' },
-  aqeedah:         { bg: 'bg-indigo-50',  ring: 'text-indigo-600' },
+  aqeedah:         { bg: 'bg-islamic-green-50',  ring: 'text-islamic-green-600' },
   seerah:          { bg: 'bg-amber-50',   ring: 'text-amber-600' },
   arabic:          { bg: 'bg-teal-50',    ring: 'text-teal-600' },
   islamic_history: { bg: 'bg-orange-50',  ring: 'text-orange-600' },
@@ -134,53 +134,6 @@ interface LessonWithProgress extends Lesson {
   subject: string;
 }
 
-// ── Mock data ────────────────────────────────────────────────────────────────
-
-const mockLessons: LessonWithProgress[] = [
-  {
-    id: 1, documentId: '1', title: 'Introduction to Tajweed Rules', slug: 'intro-tajweed',
-    description: 'Learn the fundamental rules of Quran recitation', lesson_order: 1,
-    lesson_type: 'video', duration_minutes: 45, content: '', learning_objectives: [],
-    is_free: true, is_preview: false, courseName: 'Quran Memorization - Juz 30', courseId: '1',
-    progress: null, status: 'completed', subject: 'quran',
-  },
-  {
-    id: 2, documentId: '2', title: 'Surah An-Naba - Verses 1-10', slug: 'naba-1-10',
-    description: 'Memorization and tafsir of the first ten verses', lesson_order: 2,
-    lesson_type: 'reading', duration_minutes: 60, content: '', learning_objectives: [],
-    is_free: false, is_preview: false, courseName: 'Quran Memorization - Juz 30', courseId: '1',
-    progress: null, status: 'completed', subject: 'quran',
-  },
-  {
-    id: 3, documentId: '3', title: 'Surah An-Naba - Verses 11-20', slug: 'naba-11-20',
-    description: 'Continue memorization with detailed explanation', lesson_order: 3,
-    lesson_type: 'reading', duration_minutes: 60, content: '', learning_objectives: [],
-    is_free: false, is_preview: false, courseName: 'Quran Memorization - Juz 30', courseId: '1',
-    progress: null, status: 'in_progress', subject: 'quran',
-  },
-  {
-    id: 4, documentId: '4', title: 'Pillars of Islam - Overview', slug: 'pillars-overview',
-    description: 'The five pillars and their significance', lesson_order: 1,
-    lesson_type: 'video', duration_minutes: 30, content: '', learning_objectives: [],
-    is_free: true, is_preview: false, courseName: 'Islamic Studies - Fiqh', courseId: '2',
-    progress: null, status: 'completed', subject: 'fiqh',
-  },
-  {
-    id: 5, documentId: '5', title: 'Rules of Wudu', slug: 'rules-wudu',
-    description: 'Detailed study of ablution rules and conditions', lesson_order: 2,
-    lesson_type: 'interactive', duration_minutes: 40, content: '', learning_objectives: [],
-    is_free: false, is_preview: false, courseName: 'Islamic Studies - Fiqh', courseId: '2',
-    progress: null, status: 'in_progress', subject: 'fiqh',
-  },
-  {
-    id: 6, documentId: '6', title: 'Arabic Alphabet - Part 1', slug: 'arabic-alphabet-1',
-    description: 'Letters, pronunciation, and basic forms', lesson_order: 1,
-    lesson_type: 'interactive', duration_minutes: 35, content: '', learning_objectives: [],
-    is_free: true, is_preview: false, courseName: 'Arabic Language - Level 2', courseId: '3',
-    progress: null, status: 'not_started', subject: 'arabic',
-  },
-];
-
 // ── Main component ───────────────────────────────────────────────────────────
 
 export default function StudentLessonsPage() {
@@ -227,12 +180,12 @@ export default function StudentLessonsPage() {
 
       return { lessons: transformed, dataSource: 'api' as const };
     }
-    return { lessons: mockLessons, dataSource: 'mock' as const };
+    return { lessons: [] as LessonWithProgress[], dataSource: 'empty' as const };
   }, [apiLessons, apiCourses, userProgress]);
 
-  // Use mock data on error
-  const effectiveLessons = lessonsError ? mockLessons : lessons;
-  const effectiveDataSource = lessonsError ? 'mock' : dataSource;
+  // Use empty array on error
+  const effectiveLessons = lessonsError ? [] as LessonWithProgress[] : lessons;
+  const effectiveDataSource = lessonsError ? 'empty' : dataSource;
 
   const courseNames = useMemo(() => {
     return [...new Map(effectiveLessons.map(l => [l.courseId, { id: l.courseId, name: l.courseName }])).values()];

@@ -98,7 +98,7 @@ export default function TeacherLessonsPage() {
       case 'video': return <Video className="h-4 w-4 text-purple-500" />;
       case 'quiz': return <FileQuestion className="h-4 w-4 text-amber-500" />;
       case 'interactive': return <BookOpen className="h-4 w-4 text-emerald-500" />;
-      default: return <FileText className="h-4 w-4 text-indigo-500" />;
+      default: return <FileText className="h-4 w-4 text-islamic-green-500" />;
     }
   };
 
@@ -106,7 +106,7 @@ export default function TeacherLessonsPage() {
     return (
       <TeacherLayout title="Lesson Content" subtitle="Create and manage your lesson materials">
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-islamic-green-600" />
         </div>
       </TeacherLayout>
     );
@@ -134,8 +134,8 @@ export default function TeacherLessonsPage() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-100 rounded-lg">
-                <FileText className="h-5 w-5 text-indigo-600" />
+              <div className="p-2 bg-islamic-green-100 rounded-lg">
+                <FileText className="h-5 w-5 text-islamic-green-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{lessons.length}</p>
@@ -226,7 +226,7 @@ export default function TeacherLessonsPage() {
           </Select>
         </div>
         <Link href="/teacher/lessons/new">
-          <Button className="bg-indigo-600 hover:bg-indigo-700">
+          <Button className="bg-islamic-green-600 hover:bg-islamic-green-700">
             <Plus className="h-4 w-4 mr-2" /> Create Lesson
           </Button>
         </Link>
@@ -300,7 +300,7 @@ export default function TeacherLessonsPage() {
                   : 'Create your first lesson to get started'}
               </p>
               <Link href="/teacher/lessons/new">
-                <Button className="bg-indigo-600 hover:bg-indigo-700">
+                <Button className="bg-islamic-green-600 hover:bg-islamic-green-700">
                   <Plus className="h-4 w-4 mr-2" /> Create Lesson
                 </Button>
               </Link>

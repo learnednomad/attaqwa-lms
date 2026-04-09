@@ -10,7 +10,7 @@ name: Docker Build & Push
 
 on:
   push:
-    branches: [main, dev]
+    branches: [main, dev, development]
     tags: ["v*"]
     paths:
       - ".github/workflows/docker.yml"
@@ -20,7 +20,7 @@ on:
       - "packages/**"
       - "pnpm-lock.yaml"
   pull_request:
-    branches: [main, dev]
+    branches: [main, dev, development]
     paths:
       - ".github/workflows/docker.yml"
       - "Dockerfile"
@@ -146,6 +146,22 @@ jobs:
             -H "Content-Type: application/json"
 
   # ---------------------------------------------------------------------------
+  # Deploy to Coolify (development)
+  # ---------------------------------------------------------------------------
+  deploy-development:
+    needs: build
+    if: github.ref == 'refs/heads/development' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+      - name: Deploy to Coolify (development)
+        run: |
+          curl -sSf -X GET \
+            "${{ secrets.COOLIFY_URL }}/api/v1/services/${{ secrets.COOLIFY_DEV2_SERVICE_UUID }}/restart" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
+            -H "Content-Type: application/json"
+
+  # ---------------------------------------------------------------------------
   # Deploy to Coolify (production)
   # ---------------------------------------------------------------------------
   deploy-prod:
@@ -180,6 +196,9 @@ jobs:
           TRANSFER_TOKEN_SALT: test
           ENCRYPTION_KEY: test
           JWT_SECRET: test
+          BETTER_AUTH_SECRET: test
+          MINIO_ROOT_PASSWORD: test
+          STRAPI_API_TOKEN: test
 
       - name: Validate production compose
         run: docker compose -f docker-compose.yml -f docker-compose.prod.yml config --quiet
@@ -191,6 +210,10 @@ jobs:
           TRANSFER_TOKEN_SALT: test
           ENCRYPTION_KEY: test
           JWT_SECRET: test
+          BETTER_AUTH_SECRET: test
+          MINIO_ROOT_PASSWORD: test
+          STRAPI_API_TOKEN: test
+          S3_BASE_URL: https://test.example.com
 
       - name: Validate monitoring compose
         run: docker compose -f docker-compose.monitoring.yml config --quiet

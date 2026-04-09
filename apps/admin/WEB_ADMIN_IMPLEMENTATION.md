@@ -525,11 +525,11 @@ npm run dev
 ```
 Teacher Account:
 Email: teacher@attaqwa.com
-Password: Teacher123!
+Password: See your team lead for development credentials
 
 Admin Account:
 Email: admin@attaqwa.com
-Password: Admin123!
+Password: See your team lead for development credentials
 ```
 
 ### Creating a Course

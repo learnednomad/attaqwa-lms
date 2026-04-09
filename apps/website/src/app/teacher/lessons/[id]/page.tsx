@@ -70,7 +70,7 @@ export default function LessonDetailPage() {
     switch (type) {
       case 'video': return <Video className="h-5 w-5 text-purple-600" />;
       case 'quiz': return <BookOpen className="h-5 w-5 text-amber-600" />;
-      default: return <FileText className="h-5 w-5 text-indigo-600" />;
+      default: return <FileText className="h-5 w-5 text-islamic-green-600" />;
     }
   };
 
@@ -78,7 +78,7 @@ export default function LessonDetailPage() {
     return (
       <TeacherLayout title="Lesson Detail" subtitle="Loading...">
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-islamic-green-600" />
         </div>
       </TeacherLayout>
     );
@@ -187,7 +187,7 @@ export default function LessonDetailPage() {
                   <FileText className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                   <p className="text-gray-500">No content added yet</p>
                   <Link href={`/teacher/lessons/${lessonId}/edit`}>
-                    <Button className="mt-4 bg-indigo-600 hover:bg-indigo-700">
+                    <Button className="mt-4 bg-islamic-green-600 hover:bg-islamic-green-700">
                       <Edit className="h-4 w-4 mr-2" /> Add Content
                     </Button>
                   </Link>

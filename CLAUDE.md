@@ -27,19 +27,17 @@ npm run typecheck    # TypeScript type checking
 
 ### 🐳 Docker Development (Recommended)
 ```bash
-# Complete brownfield development stack
-docker compose -f docker-compose.enhanced.yml up -d
+# Full development stack (postgres + init + api + admin + website)
+docker compose -f docker-compose.dev.yml up -d
 
-# Individual services
-docker compose -f docker-compose.enhanced.yml up postgres redis -d  # Database only
-docker compose -f docker-compose.enhanced.yml up api web -d         # Application only
+# With AI/Ollama features
+docker compose -f docker-compose.dev.yml --profile ai up -d
 
-# Production deployment
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-
-# Monitoring stack
-docker compose -f docker-compose.enhanced.yml --profile monitoring up -d
+# Production deployment (adds Caddy, Redis, network isolation)
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ```
+
+See [docs/OPERATIONS.md](docs/OPERATIONS.md) for the full wiring guide.
 
 ### 🔍 Islamic Services Management
 ```bash
@@ -301,15 +299,14 @@ mobile-app-repo/
 
 ### Docker Deployment (Recommended)
 ```bash
-# Production deployment with monitoring
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# Development (hot-reload, bind mounts)
+docker compose -f docker-compose.dev.yml up -d
 
-# Enhanced brownfield system (development/staging)
-docker compose -f docker-compose.enhanced.yml up -d
-
-# Scale API services for high load
-docker compose -f docker-compose.enhanced.yml up --scale api=3 -d
+# Production (Caddy reverse proxy, Redis cache, network isolation, auto-TLS)
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ```
+
+See [docs/OPERATIONS.md](docs/OPERATIONS.md) for complete deployment instructions.
 
 ### Environment Configuration
 - **Development**: `.env` with development credentials

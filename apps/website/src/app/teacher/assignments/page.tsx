@@ -35,28 +35,21 @@ interface AssignmentData {
   graded: number;
 }
 
-const mockAssignments: AssignmentData[] = [
-  { id: 1, title: 'Wudu Practice Report', course: 'Fiqh of Worship', dueDate: 'Dec 15, 2024', status: 'active', totalSubmissions: 18, totalStudents: 24, graded: 10 },
-  { id: 2, title: 'Salah Steps Diagram', course: 'Fiqh of Worship', dueDate: 'Dec 20, 2024', status: 'active', totalSubmissions: 12, totalStudents: 24, graded: 5 },
-  { id: 3, title: 'Hadith Analysis - Hadith #5', course: 'Hadith Studies', dueDate: 'Dec 18, 2024', status: 'active', totalSubmissions: 14, totalStudents: 18, graded: 8 },
-  { id: 4, title: 'Arabic Grammar Exercise 5', course: 'Arabic Grammar Level 2', dueDate: 'Dec 10, 2024', status: 'closed', totalSubmissions: 15, totalStudents: 15, graded: 15 },
-  { id: 5, title: 'Hadith Memorization Recording', course: 'Hadith Studies', dueDate: 'Dec 25, 2024', status: 'draft', totalSubmissions: 0, totalStudents: 18, graded: 0 },
-];
-
 export default function TeacherAssignmentsPage() {
+  const [assignments] = useState<AssignmentData[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [courseFilter, setCourseFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  const filteredAssignments = mockAssignments.filter(assignment => {
+  const filteredAssignments = assignments.filter(assignment => {
     const matchesSearch = assignment.title.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCourse = courseFilter === 'all' || assignment.course === courseFilter;
     const matchesStatus = statusFilter === 'all' || assignment.status === statusFilter;
     return matchesSearch && matchesCourse && matchesStatus;
   });
 
-  const uniqueCourses = [...new Set(mockAssignments.map(a => a.course))];
-  const pendingGrading = mockAssignments.reduce((sum, a) => sum + (a.totalSubmissions - a.graded), 0);
+  const uniqueCourses = [...new Set(assignments.map(a => a.course))];
+  const pendingGrading = assignments.reduce((sum, a) => sum + (a.totalSubmissions - a.graded), 0);
 
   return (
     <TeacherLayout title="Assignments" subtitle="Create and manage course assignments">
@@ -65,11 +58,11 @@ export default function TeacherAssignmentsPage() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-100 rounded-lg">
-                <ClipboardList className="h-5 w-5 text-indigo-600" />
+              <div className="p-2 bg-islamic-green-100 rounded-lg">
+                <ClipboardList className="h-5 w-5 text-islamic-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">{mockAssignments.length}</p>
+                <p className="text-2xl font-bold text-gray-900">{assignments.length}</p>
                 <p className="text-sm text-gray-500">Total Assignments</p>
               </div>
             </div>
@@ -84,7 +77,7 @@ export default function TeacherAssignmentsPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">
-                  {mockAssignments.filter(a => a.status === 'active').length}
+                  {assignments.filter(a => a.status === 'active').length}
                 </p>
                 <p className="text-sm text-gray-500">Active</p>
               </div>
@@ -114,7 +107,7 @@ export default function TeacherAssignmentsPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">
-                  {mockAssignments.reduce((sum, a) => sum + a.totalSubmissions, 0)}
+                  {assignments.reduce((sum, a) => sum + a.totalSubmissions, 0)}
                 </p>
                 <p className="text-sm text-gray-500">Total Submissions</p>
               </div>
@@ -158,7 +151,7 @@ export default function TeacherAssignmentsPage() {
             </SelectContent>
           </Select>
         </div>
-        <Button className="bg-indigo-600 hover:bg-indigo-700">
+        <Button className="bg-islamic-green-600 hover:bg-islamic-green-700">
           <Plus className="h-4 w-4 mr-2" /> Create Assignment
         </Button>
       </div>
@@ -207,7 +200,7 @@ export default function TeacherAssignmentsPage() {
                 </div>
                 <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-indigo-500 rounded-full"
+                    className="h-full bg-islamic-green-500 rounded-full"
                     style={{ width: `${(assignment.totalSubmissions / assignment.totalStudents) * 100}%` }}
                   />
                 </div>
@@ -232,7 +225,7 @@ export default function TeacherAssignmentsPage() {
           <ClipboardList className="h-12 w-12 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No assignments found</h3>
           <p className="text-gray-500 mb-4">Create your first assignment to get started</p>
-          <Button className="bg-indigo-600 hover:bg-indigo-700">
+          <Button className="bg-islamic-green-600 hover:bg-islamic-green-700">
             <Plus className="h-4 w-4 mr-2" /> Create Assignment
           </Button>
         </Card>

@@ -93,8 +93,8 @@ export default function TeacherEngagementPage() {
                       : metric.value}
                   </p>
                 </div>
-                <div className={`p-3 rounded-xl ${index === 0 ? 'bg-indigo-100' : index === 1 ? 'bg-emerald-100' : index === 2 ? 'bg-purple-100' : 'bg-amber-100'}`}>
-                  {index === 0 ? <Users className="h-6 w-6 text-indigo-600" /> :
+                <div className={`p-3 rounded-xl ${index === 0 ? 'bg-islamic-green-100' : index === 1 ? 'bg-emerald-100' : index === 2 ? 'bg-purple-100' : 'bg-amber-100'}`}>
+                  {index === 0 ? <Users className="h-6 w-6 text-islamic-green-600" /> :
                    index === 1 ? <Clock className="h-6 w-6 text-emerald-600" /> :
                    index === 2 ? <MessageSquare className="h-6 w-6 text-purple-600" /> :
                    <Eye className="h-6 w-6 text-amber-600" />}
@@ -117,7 +117,7 @@ export default function TeacherEngagementPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-indigo-600" />
+                <BookOpen className="h-5 w-5 text-islamic-green-600" />
                 Course Engagement Breakdown
               </CardTitle>
             </CardHeader>
@@ -174,7 +174,7 @@ export default function TeacherEngagementPage() {
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                       index === 0 ? 'bg-amber-100 text-amber-700' :
                       index === 1 ? 'bg-gray-100 text-gray-700' :
-                      'bg-indigo-100 text-indigo-700'
+                      'bg-islamic-green-100 text-islamic-green-700'
                     }`}>
                       {index + 1}
                     </div>

@@ -14,22 +14,33 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ModerationReview } from '@/components/moderation/ModerationReview';
 import { ModerationStatusBadge, AIScoreBadge } from '@/components/moderation/ModerationBadge';
-import { useAuth } from '@/lib/hooks/use-auth';
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
+
+interface ModerationItem {
+  id: string;
+  content_type: string;
+  content_id: string;
+  content_title: string;
+  status: string;
+  ai_score: number | null;
+  ai_flags: Array<{ type: string; severity: string; description: string }>;
+  ai_reasoning: string | null;
+  reviewer_notes: string | null;
+  reviewed_at: string | null;
+  createdAt: string;
+}
 
 export default function ModerationDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { token } = useAuth();
-  const [item, setItem] = useState<any>(null);
+  const [item, setItem] = useState<ModerationItem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchItem = useCallback(async () => {
     try {
       const res = await fetch(`${API_URL}/api/v1/moderation-queues/${id}?populate=reviewer`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        headers: { Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_TOKEN}` },
       });
 
       if (res.ok) {
@@ -41,7 +52,7 @@ export default function ModerationDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [id, token]);
+  }, [id]);
 
   useEffect(() => {
     fetchItem();
@@ -54,7 +65,7 @@ export default function ModerationDetailPage() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_TOKEN}`,
         },
         body: JSON.stringify({ action, notes }),
       });

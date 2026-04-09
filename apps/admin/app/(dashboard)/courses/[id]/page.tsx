@@ -13,8 +13,30 @@ import { useEffect, useState } from 'react';
 import { CourseForm, type CourseFormData } from '@/components/courses/course-form';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { strapiClient } from '@attaqwa/api-client';
-import type { Course, StrapiResponse } from '@attaqwa/shared-types';
+
+interface Course {
+  [key: string]: unknown;
+  id: number;
+  documentId?: string;
+  title: string;
+  slug: string;
+  description: string;
+  subject: string;
+  category?: string;
+  difficulty: string;
+  age_tier: string;
+  ageTier?: string;
+  duration_weeks: number;
+  estimatedDuration?: number;
+  schedule: string;
+  instructor: string;
+  is_featured: boolean;
+  isPublished?: boolean;
+  coverImage?: { url: string };
+  lessons?: { id: number; title: string; type: string; duration: number; isRequired: boolean }[];
+}
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
 
 export default function EditCoursePage() {
   const params = useParams();
@@ -31,8 +53,10 @@ export default function EditCoursePage() {
     const fetchCourse = async () => {
       try {
         setIsLoading(true);
-        const response = await strapiClient.get<StrapiResponse<Course>>(`/courses/${courseId}?populate=*`);
-        setCourse(response.data.data);
+        const res = await fetch(`${API_URL}/api/v1/courses/${courseId}?populate=*`);
+        if (!res.ok) throw new Error(`Failed to fetch course (${res.status})`);
+        const json = await res.json();
+        setCourse(json.data);
       } catch (err) {
         console.error('Failed to fetch course:', err);
         setError('Failed to load course. Please try again.');
@@ -49,33 +73,36 @@ export default function EditCoursePage() {
     setError(null);
 
     try {
-      // Prepare form data for Strapi
-      const formData = new FormData();
+      const ageTier = data.ageTier === 'all' ? 'adults' : data.ageTier;
 
-      // Add course data
       const courseData = {
-        title: data.title,
-        description: data.description,
-        category: data.category,
-        difficulty: data.difficulty,
-        ageTier: data.ageTier,
-        duration: data.duration,
-        isPublished: data.isPublished,
+        data: {
+          title: data.title,
+          description: data.description,
+          subject: data.category,
+          difficulty: data.difficulty,
+          age_tier: ageTier,
+          duration_weeks: data.duration ? Math.max(1, Math.ceil(data.duration / 60)) : 1,
+          schedule: data.schedule || undefined,
+          instructor: data.instructor || undefined,
+          prerequisites: data.prerequisites || undefined,
+          learning_outcomes: data.learningOutcomes?.filter(o => o.trim()) || undefined,
+          max_students: data.maxStudents || undefined,
+          start_date: data.startDate || undefined,
+          end_date: data.endDate || undefined,
+        },
       };
 
-      formData.append('data', JSON.stringify(courseData));
-
-      // Add cover image if new file uploaded
-      if (data.coverImage instanceof File) {
-        formData.append('files.coverImage', data.coverImage);
-      }
-
-      // Update course via Strapi API
-      await strapiClient.put(`/courses/${courseId}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      const res = await fetch(`${API_URL}/api/v1/courses/${courseId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(courseData),
       });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.error?.message || `Request failed with status code ${res.status}`);
+      }
 
       // Redirect to courses list on success
       router.push('/courses');
@@ -191,45 +218,39 @@ export default function EditCoursePage() {
         <CardContent>
           {course.lessons && course.lessons.length > 0 ? (
             <div className="space-y-3">
-              {course.lessons.map((lesson, index) => (
+              {(course.lessons as Array<Record<string, unknown>>).map((lesson, index) => (
                 <div
-                  key={lesson.id}
+                  key={lesson.id as string}
                   className="flex items-center justify-between rounded-lg border border-charcoal-200 p-4"
                 >
                   <div className="flex items-center space-x-4">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 text-sm font-semibold text-primary-700">
-                      {index + 1}
+                      {(lesson.lesson_order as number) || index + 1}
                     </div>
                     <div>
                       <p className="font-medium text-charcoal-900">
-                        {lesson.title}
+                        {lesson.title as string}
                       </p>
                       <div className="mt-1 flex items-center space-x-3 text-xs text-charcoal-500">
-                        <span className="capitalize">{lesson.type}</span>
+                        <span className="capitalize">{(lesson.lesson_type || lesson.type) as string}</span>
                         <span>•</span>
-                        <span>{lesson.duration} min</span>
-                        {lesson.isRequired && (
-                          <>
-                            <span>•</span>
-                            <span className="text-primary-600">Required</span>
-                          </>
-                        )}
+                        <span>{(lesson.duration_minutes || lesson.duration) as number} min</span>
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Link href={`/courses/${courseId}/lessons/${lesson.id}`}>
-                      <Button variant="ghost" size="sm">
-                        Edit
-                      </Button>
-                    </Link>
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => {
+                      onClick={async () => {
                         if (confirm('Are you sure you want to delete this lesson?')) {
-                          // TODO: Implement delete functionality
-                          console.log('Delete lesson:', lesson.id);
+                          try {
+                            const identifier = (lesson.documentId || lesson.id) as string;
+                            await fetch(`${API_URL}/api/v1/lessons/${identifier}`, { method: 'DELETE' });
+                            window.location.reload();
+                          } catch (err) {
+                            console.error('Failed to delete lesson:', err);
+                          }
                         }
                       }}
                     >

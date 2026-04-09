@@ -6,14 +6,24 @@
 'use client';
 
 import { FileText, FileVideo, Headphones, HelpCircle, Plus, Sparkles, Trash2, Upload, X } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import type { Lesson, LessonType, QuizQuestion } from '@attaqwa/shared-types';
+type LessonType = 'video' | 'audio' | 'article' | 'quiz' | 'interactive';
+
+interface QuizQuestion {
+  id: string;
+  question: string;
+  type: string;
+  options: string[];
+  correctAnswer: string;
+  explanation?: string;
+  points: number;
+}
 
 export interface LessonFormProps {
-  initialData?: Partial<Lesson>;
+  initialData?: Record<string, unknown>;
   courseId: string;
   onSubmit: (data: LessonFormData) => Promise<void>;
   onCancel: () => void;
@@ -62,24 +72,93 @@ export function LessonForm({
   onCancel,
   isLoading = false,
 }: LessonFormProps) {
+  // Map Strapi field names to form field names
+  const mapLessonType = (t: unknown): LessonType => {
+    const typeMap: Record<string, LessonType> = { reading: 'article', video: 'video', quiz: 'quiz', interactive: 'interactive', practice: 'interactive' };
+    return typeMap[t as string] || 'article';
+  };
+
   const [formData, setFormData] = useState<LessonFormData>({
-    title: initialData?.title || '',
-    description: initialData?.description || '',
-    type: initialData?.type || 'article',
-    duration: initialData?.duration || 10,
-    order: initialData?.order || 1,
-    isRequired: initialData?.isRequired || false,
-    content: (typeof initialData?.content === 'string' ? {} : initialData?.content) || {},
+    title: (initialData?.title as string) || '',
+    description: (initialData?.description as string) || '',
+    type: (initialData?.lesson_type ? mapLessonType(initialData.lesson_type) : (initialData?.type as LessonType)) || 'article',
+    duration: (initialData?.duration_minutes as number) || (initialData?.duration as number) || 10,
+    order: (initialData?.lesson_order as number) || (initialData?.order as number) || 1,
+    isRequired: (initialData?.isRequired as boolean) || false,
+    content: (typeof initialData?.content === 'string'
+      ? { articleBody: initialData.content as string }
+      : (initialData?.content as LessonContent)) || {},
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof LessonFormData, string>>>({});
+  const [isDirty, setIsDirty] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
+  const autosaveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const lessonTypes: { value: LessonType; label: string; icon: any }[] = [
-    { value: 'video', label: 'Video Lesson', icon: FileVideo },
-    { value: 'audio', label: 'Audio Lesson', icon: Headphones },
-    { value: 'article', label: 'Article', icon: FileText },
-    { value: 'quiz', label: 'Quiz', icon: HelpCircle },
-    { value: 'interactive', label: 'Interactive', icon: Sparkles },
+  const DRAFT_KEY = `lesson-draft-${courseId}`;
+
+  // Restore draft on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(DRAFT_KEY);
+      if (saved && !initialData) {
+        const parsed = JSON.parse(saved);
+        // Don't restore file objects (they can't be serialized)
+        if (parsed.content) {
+          delete parsed.content.videoFile;
+          delete parsed.content.audioFile;
+        }
+        setFormData(parsed);
+        setDraftRestored(true);
+        setTimeout(() => setDraftRestored(false), 5000);
+      }
+    } catch {
+      // Ignore parse errors
+    }
+  }, [courseId, DRAFT_KEY, initialData]);
+
+  // Autosave every 30 seconds when dirty
+  useEffect(() => {
+    if (!isDirty) return;
+    autosaveTimerRef.current = setInterval(() => {
+      try {
+        const toSave = { ...formData, content: { ...formData.content } };
+        // Strip File objects before serializing
+        delete toSave.content.videoFile;
+        delete toSave.content.audioFile;
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(toSave));
+      } catch {
+        // Ignore storage errors
+      }
+    }, 30_000);
+    return () => {
+      if (autosaveTimerRef.current) clearInterval(autosaveTimerRef.current);
+    };
+  }, [isDirty, formData, DRAFT_KEY]);
+
+  // Warn before leaving with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault();
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty]);
+
+  // Clear draft on successful submit
+  const clearDraft = useCallback(() => {
+    localStorage.removeItem(DRAFT_KEY);
+    setIsDirty(false);
+  }, [DRAFT_KEY]);
+
+  const lessonTypes: { value: LessonType; label: string; description: string; icon: React.ComponentType<{ className?: string }>; disabled?: boolean }[] = [
+    { value: 'video', label: 'Video Lesson', description: 'YouTube, Vimeo, or uploaded video', icon: FileVideo },
+    { value: 'audio', label: 'Audio Lesson', description: 'Podcast, recitation, or lecture audio', icon: Headphones },
+    { value: 'article', label: 'Reading / Article', description: 'Written content with rich formatting', icon: FileText },
+    { value: 'quiz', label: 'Quiz', description: 'Multiple choice assessment', icon: HelpCircle },
+    { value: 'interactive', label: 'Interactive', description: 'Coming soon', icon: Sparkles, disabled: true },
   ];
 
   const handleInputChange = (
@@ -87,6 +166,7 @@ export function LessonForm({
     value: string | boolean | number | LessonType | LessonContent
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    setIsDirty(true);
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
@@ -97,6 +177,7 @@ export function LessonForm({
       ...prev,
       content: { ...prev.content, [field]: value },
     }));
+    setIsDirty(true);
   };
 
   const validateForm = (): boolean => {
@@ -144,6 +225,7 @@ export function LessonForm({
       return;
     }
 
+    clearDraft();
     await onSubmit(formData);
   };
 
@@ -166,6 +248,35 @@ export function LessonForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Draft Restored Banner */}
+      {draftRestored && (
+        <div className="flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+          <p className="text-sm text-amber-800">
+            Draft restored from your last session.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              localStorage.removeItem(DRAFT_KEY);
+              setFormData({
+                title: '',
+                description: '',
+                type: 'article',
+                duration: 10,
+                order: 1,
+                isRequired: false,
+                content: {},
+              });
+              setDraftRestored(false);
+              setIsDirty(false);
+            }}
+            className="text-sm font-medium text-amber-700 hover:text-amber-900"
+          >
+            Discard draft
+          </button>
+        </div>
+      )}
+
       {/* Basic Information */}
       <div className="rounded-lg border border-charcoal-200 bg-white p-6">
         <h2 className="mb-4 text-xl font-semibold text-charcoal-900">
@@ -183,22 +294,31 @@ export function LessonForm({
           />
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-charcoal-700">
+            <label htmlFor="lesson-description" className="mb-1.5 block text-sm font-medium text-charcoal-700">
               Description
               <span className="text-red-500">*</span>
             </label>
             <textarea
+              id="lesson-description"
               placeholder="Brief description of what students will learn..."
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
               rows={3}
+              maxLength={500}
               className={`w-full rounded-lg border px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${
                 errors.description ? 'border-red-500' : 'border-charcoal-300'
               }`}
             />
-            {errors.description && (
-              <p className="mt-1 text-xs text-red-600">{errors.description}</p>
-            )}
+            <div className="mt-1 flex justify-between">
+              {errors.description ? (
+                <p className="text-xs text-red-600">{errors.description}</p>
+              ) : (
+                <p className="text-xs text-charcoal-500">Describe what students will learn in 2-3 sentences</p>
+              )}
+              <span className={`text-xs ${formData.description.length > 450 ? 'text-amber-600' : 'text-charcoal-400'}`}>
+                {formData.description.length}/500
+              </span>
+            </div>
           </div>
 
           <div className="grid gap-4 md:grid-cols-3">
@@ -223,17 +343,22 @@ export function LessonForm({
               helperText="Position in course sequence"
             />
 
-            <div className="flex items-end">
-              <label className="flex items-center space-x-2">
+            <div className="flex items-end pb-0.5">
+              <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-charcoal-200 px-3 py-2.5 transition-colors hover:bg-charcoal-50">
                 <input
                   type="checkbox"
                   checked={formData.isRequired}
                   onChange={(e) => handleInputChange('isRequired', e.target.checked)}
-                  className="h-4 w-4 rounded border-charcoal-300 text-primary-600 focus:ring-2 focus:ring-primary-500"
+                  className="h-[18px] w-[18px] rounded border-charcoal-300 text-primary-600 focus:ring-2 focus:ring-primary-500"
                 />
-                <span className="text-sm font-medium text-charcoal-900">
-                  Required Lesson
-                </span>
+                <div>
+                  <span className="block text-sm font-medium text-charcoal-900">
+                    Required Lesson
+                  </span>
+                  <span className="block text-xs text-charcoal-500">
+                    Must complete to progress
+                  </span>
+                </div>
               </label>
             </div>
           </div>
@@ -246,24 +371,31 @@ export function LessonForm({
           Lesson Type
         </h2>
 
-        <div className="grid gap-3 md:grid-cols-5">
+        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-5">
           {lessonTypes.map((type) => {
             const Icon = type.icon;
             const isSelected = formData.type === type.value;
+            const isDisabled = type.disabled;
 
             return (
               <button
                 key={type.value}
                 type="button"
-                onClick={() => handleInputChange('type', type.value)}
-                className={`flex flex-col items-center space-y-2 rounded-lg border-2 p-4 transition-all ${
-                  isSelected
-                    ? 'border-primary-500 bg-primary-50 text-primary-700'
-                    : 'border-charcoal-200 bg-white text-charcoal-600 hover:border-charcoal-300'
+                disabled={isDisabled}
+                onClick={() => !isDisabled && handleInputChange('type', type.value)}
+                className={`flex flex-col items-center space-y-1.5 rounded-lg border-2 p-4 transition-all ${
+                  isDisabled
+                    ? 'cursor-not-allowed border-charcoal-100 bg-charcoal-50 text-charcoal-400'
+                    : isSelected
+                      ? 'border-primary-500 bg-primary-50 text-primary-700 shadow-sm'
+                      : 'border-charcoal-200 bg-white text-charcoal-600 hover:border-charcoal-300 hover:shadow-sm'
                 }`}
               >
-                <Icon className="h-8 w-8" />
+                <Icon className="h-7 w-7" />
                 <span className="text-sm font-medium">{type.label}</span>
+                <span className={`text-[11px] leading-tight ${isDisabled ? 'text-charcoal-400' : 'text-charcoal-500'}`}>
+                  {type.description}
+                </span>
               </button>
             );
           })}
@@ -298,6 +430,104 @@ export function LessonForm({
   );
 }
 
+// Reusable File Dropzone Component
+function FileDropzone({
+  accept,
+  maxSizeMB,
+  fileTypes,
+  file,
+  onFileSelect,
+  onFileClear,
+}: {
+  accept: string;
+  maxSizeMB: number;
+  fileTypes: string;
+  file?: File;
+  onFileSelect: (file: File) => void;
+  onFileClear: () => void;
+}) {
+  const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+    const droppedFile = e.dataTransfer.files?.[0];
+    if (droppedFile) onFileSelect(droppedFile);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  };
+
+  if (file) {
+    return (
+      <div className="flex items-center justify-between rounded-lg border border-primary-200 bg-primary-50 p-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100">
+            <Upload className="h-5 w-5 text-primary-600" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-charcoal-900">{file.name}</p>
+            <p className="text-xs text-charcoal-500">
+              {(file.size / (1024 * 1024)).toFixed(1)} MB
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={onFileClear}
+          className="rounded-lg p-2 text-charcoal-500 hover:bg-charcoal-100 hover:text-charcoal-700"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onClick={() => fileInputRef.current?.click()}
+      className={`cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
+        isDragOver
+          ? 'border-primary-400 bg-primary-50/50'
+          : 'border-charcoal-300 hover:border-charcoal-400 hover:bg-charcoal-50/50'
+      }`}
+    >
+      <Upload className={`mx-auto h-12 w-12 ${isDragOver ? 'text-primary-500' : 'text-charcoal-400'}`} />
+      <p className="mt-2 text-sm text-charcoal-600">
+        Drag and drop or{' '}
+        <span className="font-medium text-primary-600">browse</span>
+      </p>
+      <p className="mt-1 text-xs text-charcoal-500">
+        {fileTypes} up to {maxSizeMB}MB
+      </p>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept={accept}
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) onFileSelect(f);
+        }}
+        className="hidden"
+      />
+    </div>
+  );
+}
+
 // Video Content Editor
 function VideoContentEditor({
   content,
@@ -308,13 +538,6 @@ function VideoContentEditor({
 }) {
   const [uploadMode, setUploadMode] = useState<'url' | 'file'>('url');
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      onChange('videoFile', file);
-    }
-  };
-
   return (
     <div className="space-y-4">
       {/* Upload mode toggle */}
@@ -322,10 +545,10 @@ function VideoContentEditor({
         <button
           type="button"
           onClick={() => setUploadMode('url')}
-          className={`rounded-lg px-4 py-2 text-sm font-medium ${
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             uploadMode === 'url'
               ? 'bg-primary-500 text-white'
-              : 'bg-charcoal-100 text-charcoal-700'
+              : 'bg-charcoal-100 text-charcoal-700 hover:bg-charcoal-200'
           }`}
         >
           Video URL
@@ -333,10 +556,10 @@ function VideoContentEditor({
         <button
           type="button"
           onClick={() => setUploadMode('file')}
-          className={`rounded-lg px-4 py-2 text-sm font-medium ${
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             uploadMode === 'file'
               ? 'bg-primary-500 text-white'
-              : 'bg-charcoal-100 text-charcoal-700'
+              : 'bg-charcoal-100 text-charcoal-700 hover:bg-charcoal-200'
           }`}
         >
           Upload File
@@ -352,22 +575,14 @@ function VideoContentEditor({
           helperText="Supports YouTube, Vimeo, or direct video URLs"
         />
       ) : (
-        <div className="rounded-lg border-2 border-dashed border-charcoal-300 p-8 text-center">
-          <Upload className="mx-auto h-12 w-12 text-charcoal-400" />
-          <p className="mt-2 text-sm text-charcoal-600">Upload video file</p>
-          <p className="mt-1 text-xs text-charcoal-500">MP4, WebM up to 500MB</p>
-          <input
-            type="file"
-            accept="video/*"
-            onChange={handleFileUpload}
-            className="mt-4"
-          />
-          {content.videoFile && (
-            <p className="mt-2 text-sm text-green-600">
-              Selected: {content.videoFile.name}
-            </p>
-          )}
-        </div>
+        <FileDropzone
+          accept="video/*"
+          maxSizeMB={500}
+          fileTypes="MP4, WebM"
+          file={content.videoFile}
+          onFileSelect={(file) => onChange('videoFile', file)}
+          onFileClear={() => onChange('videoFile', undefined)}
+        />
       )}
 
       <div>
@@ -396,23 +611,16 @@ function AudioContentEditor({
 }) {
   const [uploadMode, setUploadMode] = useState<'url' | 'file'>('url');
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      onChange('audioFile', file);
-    }
-  };
-
   return (
     <div className="space-y-4">
       <div className="flex space-x-2">
         <button
           type="button"
           onClick={() => setUploadMode('url')}
-          className={`rounded-lg px-4 py-2 text-sm font-medium ${
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             uploadMode === 'url'
               ? 'bg-primary-500 text-white'
-              : 'bg-charcoal-100 text-charcoal-700'
+              : 'bg-charcoal-100 text-charcoal-700 hover:bg-charcoal-200'
           }`}
         >
           Audio URL
@@ -420,10 +628,10 @@ function AudioContentEditor({
         <button
           type="button"
           onClick={() => setUploadMode('file')}
-          className={`rounded-lg px-4 py-2 text-sm font-medium ${
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             uploadMode === 'file'
               ? 'bg-primary-500 text-white'
-              : 'bg-charcoal-100 text-charcoal-700'
+              : 'bg-charcoal-100 text-charcoal-700 hover:bg-charcoal-200'
           }`}
         >
           Upload File
@@ -439,22 +647,14 @@ function AudioContentEditor({
           helperText="Direct link to audio file"
         />
       ) : (
-        <div className="rounded-lg border-2 border-dashed border-charcoal-300 p-8 text-center">
-          <Upload className="mx-auto h-12 w-12 text-charcoal-400" />
-          <p className="mt-2 text-sm text-charcoal-600">Upload audio file</p>
-          <p className="mt-1 text-xs text-charcoal-500">MP3, WAV, OGG up to 100MB</p>
-          <input
-            type="file"
-            accept="audio/*"
-            onChange={handleFileUpload}
-            className="mt-4"
-          />
-          {content.audioFile && (
-            <p className="mt-2 text-sm text-green-600">
-              Selected: {content.audioFile.name}
-            </p>
-          )}
-        </div>
+        <FileDropzone
+          accept="audio/*"
+          maxSizeMB={100}
+          fileTypes="MP3, WAV, OGG"
+          file={content.audioFile}
+          onFileSelect={(file) => onChange('audioFile', file)}
+          onFileClear={() => onChange('audioFile', undefined)}
+        />
       )}
 
       <div>
@@ -627,29 +827,68 @@ function QuizContentEditor({
                   onChange={(e) => updateQuestion(index, 'question', e.target.value)}
                 />
 
-                <div className="grid gap-3 md:grid-cols-2">
-                  {(Array.isArray(question.options) ? question.options : []).map((option, optIndex) => (
-                    <Input
-                      key={optIndex}
-                      label={`Option ${optIndex + 1}`}
-                      placeholder={`Answer option ${optIndex + 1}`}
-                      value={option}
-                      onChange={(e) => {
-                        const currentOptions = Array.isArray(question.options) ? question.options : [];
-                        const newOptions = [...currentOptions];
-                        newOptions[optIndex] = e.target.value;
-                        updateQuestion(index, 'options', newOptions);
-                      }}
-                    />
-                  ))}
+                <div>
+                  <p className="mb-2 text-sm font-medium text-charcoal-700">
+                    Answer Options
+                    <span className="ml-2 text-xs font-normal text-charcoal-500">
+                      Select the correct answer
+                    </span>
+                  </p>
+                  <div className="space-y-2">
+                    {(Array.isArray(question.options) ? question.options : []).map((option, optIndex) => {
+                      const isCorrect = question.correctAnswer === option && option !== '';
+                      return (
+                        <div
+                          key={optIndex}
+                          className={`flex items-center gap-3 rounded-lg border p-3 transition-colors ${
+                            isCorrect
+                              ? 'border-primary-500 bg-primary-50'
+                              : 'border-charcoal-200 hover:border-charcoal-300'
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => updateQuestion(index, 'correctAnswer', option)}
+                            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
+                              isCorrect
+                                ? 'border-primary-500 bg-primary-500'
+                                : 'border-charcoal-300 hover:border-primary-400'
+                            }`}
+                            title={`Mark option ${optIndex + 1} as correct`}
+                          >
+                            {isCorrect && (
+                              <div className="h-2 w-2 rounded-full bg-white" />
+                            )}
+                          </button>
+                          <input
+                            type="text"
+                            placeholder={`Answer option ${optIndex + 1}`}
+                            value={option}
+                            onChange={(e) => {
+                              const currentOptions = Array.isArray(question.options) ? question.options : [];
+                              const newOptions = [...currentOptions];
+                              const wasCorrect = question.correctAnswer === option;
+                              newOptions[optIndex] = e.target.value;
+                              updateQuestion(index, 'options', newOptions);
+                              if (wasCorrect) {
+                                updateQuestion(index, 'correctAnswer', e.target.value);
+                              }
+                            }}
+                            className="flex-1 bg-transparent text-sm text-charcoal-900 placeholder:text-charcoal-400 focus:outline-none"
+                          />
+                          <span className="shrink-0 text-xs text-charcoal-400">
+                            {String.fromCharCode(65 + optIndex)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {!question.correctAnswer && question.options.some(o => o.trim()) && (
+                    <p className="mt-2 text-xs text-amber-600">
+                      Please select one option as the correct answer
+                    </p>
+                  )}
                 </div>
-
-                <Input
-                  label="Correct Answer"
-                  placeholder="Enter the correct answer exactly as shown in options"
-                  value={question.correctAnswer}
-                  onChange={(e) => updateQuestion(index, 'correctAnswer', e.target.value)}
-                />
 
                 <Input
                   label="Explanation (Optional)"

@@ -24,7 +24,7 @@ const SUBJECT_COLORS: Record<string, { text: string; icon: string; gradient: str
   quran:           { text: 'text-emerald-600', icon: 'text-emerald-500', gradient: 'from-emerald-600 to-emerald-800', bg: 'bg-emerald-50' },
   hadith:          { text: 'text-blue-600',    icon: 'text-blue-500',    gradient: 'from-blue-600 to-blue-800',       bg: 'bg-blue-50' },
   fiqh:            { text: 'text-purple-600',  icon: 'text-purple-500',  gradient: 'from-purple-600 to-purple-800',   bg: 'bg-purple-50' },
-  aqeedah:         { text: 'text-indigo-600',  icon: 'text-indigo-500',  gradient: 'from-indigo-600 to-indigo-800',   bg: 'bg-indigo-50' },
+  aqeedah:         { text: 'text-islamic-green-600',  icon: 'text-islamic-green-500',  gradient: 'from-islamic-green-600 to-islamic-green-800',   bg: 'bg-islamic-green-50' },
   seerah:          { text: 'text-amber-600',   icon: 'text-amber-500',   gradient: 'from-amber-600 to-amber-800',     bg: 'bg-amber-50' },
   arabic:          { text: 'text-teal-600',    icon: 'text-teal-500',    gradient: 'from-teal-600 to-teal-800',       bg: 'bg-teal-50' },
   islamic_history: { text: 'text-orange-600',  icon: 'text-orange-500',  gradient: 'from-orange-600 to-orange-800',   bg: 'bg-orange-50' },
@@ -615,35 +615,88 @@ export default function StudentLessonDetailPage() {
         <div className="lg:col-span-2 space-y-6">
 
           {/* Video Player */}
-          {lesson.video_url && (
-            <Card className="overflow-hidden shadow-[var(--shadow-islamic)]">
-              <CardContent className="p-0">
-                <div className="aspect-video bg-gray-900 flex items-center justify-center">
-                  {lesson.video_url.includes('youtube') || lesson.video_url.includes('youtu.be') ? (
-                    <iframe
-                      src={lesson.video_url.replace('watch?v=', 'embed/')}
-                      className="w-full h-full"
-                      allowFullScreen
-                      title={lesson.title}
-                    />
-                  ) : (
-                    <div className="text-center text-white p-8">
-                      <Video className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                      <p className="text-lg font-medium mb-2">Video Lesson</p>
-                      <a
-                        href={lesson.video_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-emerald-400 hover:text-emerald-300 underline"
+          {(() => {
+            const videoUrl = lesson.video_url;
+            const videoFile = lesson.video_file;
+            const strapiBase = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
+
+            // Extract YouTube video ID from various URL formats
+            const getYouTubeId = (url: string): string | null => {
+              const patterns = [
+                /(?:youtube\.com\/watch\?v=|youtube\.com\/embed\/|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
+              ];
+              for (const pattern of patterns) {
+                const match = url.match(pattern);
+                if (match) return match[1];
+              }
+              return null;
+            };
+
+            // Extract Vimeo video ID
+            const getVimeoId = (url: string): string | null => {
+              const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+              return match ? match[1] : null;
+            };
+
+            // Determine what to render
+            const youtubeId = videoUrl ? getYouTubeId(videoUrl) : null;
+            const vimeoId = videoUrl ? getVimeoId(videoUrl) : null;
+            const isDirectVideo = videoUrl && /\.(mp4|webm|ogg)(\?|$)/i.test(videoUrl);
+            const fileUrl = videoFile?.url
+              ? (videoFile.url.startsWith('http') ? videoFile.url : `${strapiBase}${videoFile.url}`)
+              : null;
+
+            if (!youtubeId && !vimeoId && !isDirectVideo && !fileUrl && !videoUrl) return null;
+
+            return (
+              <Card className="overflow-hidden shadow-[var(--shadow-islamic)]">
+                <CardContent className="p-0">
+                  <div className="aspect-video bg-gray-900 flex items-center justify-center">
+                    {youtubeId ? (
+                      <iframe
+                        src={`https://www.youtube.com/embed/${youtubeId}`}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title={lesson.title}
+                      />
+                    ) : vimeoId ? (
+                      <iframe
+                        src={`https://player.vimeo.com/video/${vimeoId}`}
+                        className="w-full h-full"
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        allowFullScreen
+                        title={lesson.title}
+                      />
+                    ) : isDirectVideo || fileUrl ? (
+                      <video
+                        src={isDirectVideo ? videoUrl : fileUrl!}
+                        className="w-full h-full"
+                        controls
+                        controlsList="nodownload"
+                        preload="metadata"
                       >
-                        Open Video
-                      </a>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                        Your browser does not support the video element.
+                      </video>
+                    ) : videoUrl ? (
+                      <div className="text-center text-white p-8">
+                        <Video className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                        <p className="text-lg font-medium mb-2">Video Lesson</p>
+                        <a
+                          href={videoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-emerald-400 hover:text-emerald-300 underline"
+                        >
+                          Open Video
+                        </a>
+                      </div>
+                    ) : null}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })()}
 
           {/* Learning Objectives (moved above content for context) */}
           {lesson.learning_objectives && lesson.learning_objectives.length > 0 && (

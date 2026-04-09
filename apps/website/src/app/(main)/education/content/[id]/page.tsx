@@ -64,85 +64,7 @@ interface EducationContent {
   };
 }
 
-// Mock content data - would normally come from API
-const mockContent: Record<string, EducationContent> = {
-  '1': {
-    id: '1',
-    title: 'Introduction to Quran',
-    description: 'Learn the basics of Quranic reading and understanding with proper pronunciation and meaning.',
-    content: `# Introduction to the Holy Quran
-
-## Overview
-The Quran is the holy book of Islam, revealed to Prophet Muhammad (peace be upon him) over a period of 23 years. It contains 114 chapters (Surahs) and over 6,000 verses (Ayahs).
-
-## Learning Objectives
-By the end of this lesson, you will:
-- Understand the significance of the Quran in Islamic faith
-- Learn basic Arabic pronunciation rules
-- Practice reading simple Quranic verses
-- Appreciate the beauty of Quranic language
-
-## The Opening Chapter - Al-Fatiha
-
-The first chapter of the Quran is called Al-Fatiha (The Opening). It is recited in every unit of prayer.
-
-### Arabic Text
-بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ
-الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ
-الرَّحْمَنِ الرَّحِيمِ
-مَالِكِ يَوْمِ الدِّينِ
-
-### Transliteration
-Bismillah ar-Rahman ar-Raheem
-Al-hamdu lillahi rabbil alameen
-Ar-Rahman ar-Raheem
-Maliki yawm ad-deen
-
-### Translation
-In the name of Allah, the Most Gracious, the Most Merciful
-All praise is due to Allah, Lord of the worlds
-The Most Gracious, the Most Merciful
-Master of the Day of Judgment
-
-## Practice Exercise
-Try reading Al-Fatiha slowly, focusing on proper pronunciation. Listen to the audio pronunciation and repeat each verse.
-
-## Next Steps
-After completing this lesson, you can:
-1. Take the comprehension quiz
-2. Practice with additional Quranic verses
-3. Move to the next lesson on Tajweed rules`,
-    subject: 'QURAN' as IslamicSubject,
-    ageTier: 'CHILDREN' as AgeTier,
-    difficultyLevel: 'BEGINNER' as DifficultyLevel,
-    contentType: 'LESSON' as EducationContentType,
-    estimatedDuration: 30,
-    thumbnailUrl: '/images/quran-basics.jpg',
-    isPublished: true,
-    tags: ['basics', 'reading', 'pronunciation', 'al-fatiha'],
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-20'),
-    author: {
-      id: '1',
-      name: 'Imam Abdullah'
-    },
-    _count: {
-      userProgress: 24,
-      quizAttempts: 18
-    },
-    arabicContent: 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ',
-    transliteration: 'Bismillah ar-Rahman ar-Raheem',
-    translation: 'In the name of Allah, the Most Gracious, the Most Merciful',
-    mediaUrl: '/audio/al-fatiha-recitation.mp3',
-    userProgress: {
-      id: 'prog1',
-      progress: 65,
-      status: 'IN_PROGRESS',
-      lastAccessed: new Date(),
-      timeSpent: 18
-    }
-  }
-};
+// Content will be fetched from API when education feature is fully implemented
 
 export default function EducationContentPage() {
   // Feature flag protection
@@ -169,14 +91,9 @@ export default function EducationContentPage() {
   const [isCompleted, setIsCompleted] = useState(false);
 
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      const foundContent = mockContent[contentId];
-      setContent(foundContent || null);
-      setCurrentProgress(foundContent?.userProgress?.progress || 0);
-      setIsCompleted(foundContent?.userProgress?.status === 'COMPLETED');
-      setLoading(false);
-    }, 500);
+    // TODO: Fetch content from API when education feature is implemented
+    setContent(null);
+    setLoading(false);
   }, [contentId]);
 
   const handleMarkComplete = () => {
@@ -227,7 +144,7 @@ export default function EducationContentPage() {
       HADITH: 'bg-islamic-gold-100 text-islamic-gold-800',
       FIQH: 'bg-blue-100 text-blue-800',
       AQIDAH: 'bg-purple-100 text-purple-800',
-      SEERAH: 'bg-indigo-100 text-indigo-800',
+      SEERAH: 'bg-islamic-green-100 text-islamic-green-800',
       WORSHIP: 'bg-emerald-100 text-emerald-800',
       ARABIC_LANGUAGE: 'bg-orange-100 text-orange-800',
       ISLAMIC_HISTORY: 'bg-red-100 text-red-800'
@@ -239,7 +156,8 @@ export default function EducationContentPage() {
     const colors: Record<DifficultyLevel, string> = {
       beginner: 'bg-green-100 text-green-800',
       intermediate: 'bg-yellow-100 text-yellow-800',
-      advanced: 'bg-orange-100 text-orange-800'
+      advanced: 'bg-orange-100 text-orange-800',
+      scholar: 'bg-red-100 text-red-800',
     };
     return colors[level] || 'bg-gray-100 text-gray-800';
   };

@@ -232,14 +232,14 @@ export function NotificationPanel({
                   }}
                   className={cn(
                     "p-4 hover:bg-gray-50 cursor-pointer transition-colors",
-                    !notification.isRead && "bg-indigo-50/50"
+                    !notification.isRead && "bg-islamic-green-50/50"
                   )}
                 >
                   {/* Sender Info */}
                   <div className="flex items-start gap-3">
                     <Avatar className="h-10 w-10">
                       <AvatarImage src={notification.sender.avatar} />
-                      <AvatarFallback className="bg-indigo-100 text-indigo-700 text-sm">
+                      <AvatarFallback className="bg-islamic-green-100 text-islamic-green-700 text-sm">
                         {getInitials(notification.sender.name)}
                       </AvatarFallback>
                     </Avatar>
@@ -252,20 +252,20 @@ export function NotificationPanel({
                         {' '}
                         <span className="text-gray-500">{getActionLabel(notification.type)}</span>
                         {' '}
-                        <span className="font-medium text-indigo-600">{getActionTypeLabel(notification.type)}</span>
+                        <span className="font-medium text-islamic-green-600">{getActionTypeLabel(notification.type)}</span>
                       </p>
                       <p className="text-xs text-gray-400 mt-0.5">
                         {formatTimestamp(notification.timestamp)}
                       </p>
                     </div>
                     {!notification.isRead && (
-                      <div className="w-2 h-2 rounded-full bg-indigo-500 mt-2" />
+                      <div className="w-2 h-2 rounded-full bg-islamic-green-500 mt-2" />
                     )}
                   </div>
 
                   {/* Attachment Card */}
                   {notification.attachment && (
-                    <div className="mt-3 ml-13 flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-indigo-200 transition-colors">
+                    <div className="mt-3 ml-13 flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-islamic-green-200 transition-colors">
                       <div className={cn(
                         "p-2 rounded-lg",
                         getFileColor(notification.attachment.type)
@@ -311,7 +311,7 @@ export function NotificationPanel({
         {/* Footer */}
         {filteredNotifications.length > 0 && (
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white">
-            <Button variant="ghost" className="w-full text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50">
+            <Button variant="ghost" className="w-full text-islamic-green-600 hover:text-islamic-green-700 hover:bg-islamic-green-50">
               View More Notifications
             </Button>
           </div>
@@ -319,91 +319,4 @@ export function NotificationPanel({
       </div>
     </>
   );
-}
-
-// Export mock data generator for testing
-export function generateMockNotifications(): NotificationItem[] {
-  return [
-    {
-      id: '1',
-      type: 'resource',
-      title: 'Course Resource',
-      description: '',
-      sender: {
-        name: 'Sheikh Abdullah Al-Faqih',
-        role: 'Ph.D',
-        avatar: undefined,
-      },
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-      isRead: false,
-      attachment: {
-        name: 'Fiqh & Taharah 101',
-        type: 'PPT',
-        size: '11.5Mb',
-        url: '#',
-      },
-    },
-    {
-      id: '2',
-      type: 'assignment',
-      title: 'Weekly Assessment',
-      description: '',
-      sender: {
-        name: 'Ustadh Ahmad Hassan',
-        role: 'Ph.D',
-        avatar: undefined,
-      },
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
-      isRead: false,
-      attachment: {
-        name: 'Weekly Assessment 4',
-        type: 'Google Form',
-        url: '#',
-      },
-    },
-    {
-      id: '3',
-      type: 'resource',
-      title: 'Student Homework',
-      description: '',
-      sender: {
-        name: 'Sheikh Omar Ibrahim',
-        role: 'Ph.D',
-        avatar: undefined,
-      },
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48), // 2 days ago
-      isRead: true,
-      attachment: {
-        name: 'Homework - Arabic Grammar',
-        type: 'Docx',
-        size: '5.2Mb',
-        url: '#',
-      },
-    },
-    {
-      id: '4',
-      type: 'announcement',
-      title: 'Class Schedule Update',
-      description: 'Due to the upcoming Eid celebration, all classes will be cancelled from December 20-25. Please review the updated schedule.',
-      sender: {
-        name: 'Masjid Administration',
-        avatar: undefined,
-      },
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 72), // 3 days ago
-      isRead: true,
-    },
-    {
-      id: '5',
-      type: 'grade',
-      title: 'Grade Posted',
-      description: 'Your Hadith Studies midterm exam has been graded. Score: 92/100',
-      sender: {
-        name: 'Sheikh Abdullah Al-Faqih',
-        role: 'Ph.D',
-        avatar: undefined,
-      },
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 96), // 4 days ago
-      isRead: true,
-    },
-  ];
 }

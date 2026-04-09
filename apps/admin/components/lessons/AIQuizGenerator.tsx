@@ -12,8 +12,6 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/lib/hooks/use-auth';
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
 
 interface GeneratedQuestion {
@@ -40,7 +38,6 @@ export function AIQuizGenerator({
   onSave,
   onClose,
 }: AIQuizGeneratorProps) {
-  const { token } = useAuth();
   const [questions, setQuestions] = useState<GeneratedQuestion[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [questionCount, setQuestionCount] = useState(5);
@@ -56,7 +53,7 @@ export function AIQuizGenerator({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_TOKEN}`,
         },
         body: JSON.stringify({
           content: lessonContent,

@@ -378,7 +378,7 @@ export default function CreateCoursePage() {
           </Link>
           <Button
             type="submit"
-            className="bg-indigo-600 hover:bg-indigo-700"
+            className="bg-islamic-green-600 hover:bg-islamic-green-700"
             disabled={saving}
           >
             {saving ? (

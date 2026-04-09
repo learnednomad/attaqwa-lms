@@ -95,7 +95,7 @@ export default function Home() {
   }
 
   try {
-    eventsStructuredData = events.map(event => generateEventStructuredData(event));
+    eventsStructuredData = events.map((event: any) => generateEventStructuredData(event));
   } catch (error) {
     console.warn('Failed to generate events structured data:', error);
   }

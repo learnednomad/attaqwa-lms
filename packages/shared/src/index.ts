@@ -11,12 +11,6 @@ export const API_CONFIG = {
 // API ENDPOINTS - VERSIONED (v1) - RECOMMENDED
 // ============================================================================
 export const API_V1_ENDPOINTS = {
-  // Auth (Strapi standard - no version prefix needed)
-  LOGIN: '/api/auth/local',
-  REGISTER: '/api/auth/local/register',
-  ME: '/api/users/me',
-  LOGOUT: '/api/auth/logout',
-
   // LMS Core Resources
   COURSES: '/api/v1/courses',
   LESSONS: '/api/v1/lessons',
@@ -71,12 +65,6 @@ export const API_V1_ENDPOINTS = {
  * Migration guide: docs/api-migration-plan.md
  */
 export const API_ENDPOINTS = {
-  // Auth
-  LOGIN: '/api/auth/local',
-  REGISTER: '/api/auth/local/register',
-  ME: '/api/users/me',
-  LOGOUT: '/api/auth/logout',
-
   // Content
   ANNOUNCEMENTS: '/api/announcements',
   EVENTS: '/api/events',
@@ -277,6 +265,8 @@ export {
   CourseCategory,
   CourseDifficulty,
   DifficultyLevel,
+  IslamicSubject,
+  EducationContentType,
   LessonType,
   QuestionType,
 } from '@attaqwa/shared-types';

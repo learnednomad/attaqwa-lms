@@ -11,15 +11,21 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { LessonForm, type LessonFormData } from '@/components/lessons/lesson-form';
-import { strapiClient } from '@attaqwa/api-client';
-import type { Course, StrapiResponse } from '@attaqwa/shared-types';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
+
+interface CourseInfo {
+  id: number;
+  documentId: string;
+  title: string;
+}
 
 export default function CreateLessonPage() {
   const params = useParams();
   const router = useRouter();
   const courseId = params.id as string;
 
-  const [course, setCourse] = useState<Course | null>(null);
+  const [course, setCourse] = useState<CourseInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,8 +35,10 @@ export default function CreateLessonPage() {
     const fetchCourse = async () => {
       try {
         setIsLoading(true);
-        const response = await strapiClient.get<StrapiResponse<Course>>(`/courses/${courseId}`);
-        setCourse(response.data.data);
+        const res = await fetch(`${API_URL}/api/v1/courses/${courseId}`);
+        if (!res.ok) throw new Error(`Failed to fetch course (${res.status})`);
+        const json = await res.json();
+        setCourse(json.data);
       } catch (err) {
         console.error('Failed to fetch course:', err);
         setError('Failed to load course. Please try again.');
@@ -47,38 +55,119 @@ export default function CreateLessonPage() {
     setError(null);
 
     try {
-      // Prepare form data for Strapi
-      const formData = new FormData();
+      // Generate unique slug
+      const slug = data.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+        + '-' + Date.now().toString(36);
 
-      // Add lesson data
-      const lessonData = {
-        title: data.title,
-        description: data.description,
-        type: data.type,
-        duration: data.duration,
-        order: data.order,
-        isRequired: data.isRequired,
-        content: data.content,
-        course: courseId, // Link to parent course
+      // Map lesson type from form to Strapi enum
+      const lessonTypeMap: Record<string, string> = {
+        video: 'video',
+        audio: 'reading',  // Strapi has no 'audio' enum, map to reading
+        article: 'reading',
+        quiz: 'quiz',
+        interactive: 'interactive',
       };
 
-      formData.append('data', JSON.stringify(lessonData));
+      // Upload media files to MinIO via Strapi
+      let videoFileId: number | undefined;
+      let audioFileId: number | undefined;
 
-      // Add media files if provided
+      // Helper: upload a file through the admin proxy
+      const uploadFile = async (file: File): Promise<number> => {
+        const fd = new FormData();
+        fd.append('files', file);
+        const uploadRes = await fetch('/api/upload', {
+          method: 'POST',
+          body: fd,
+        });
+        if (!uploadRes.ok) {
+          const errData = await uploadRes.json().catch(() => ({}));
+          throw new Error(errData?.error || `Upload failed (${uploadRes.status})`);
+        }
+        const uploaded = await uploadRes.json();
+        return uploaded[0]?.id;
+      };
+
       if (data.content.videoFile) {
-        formData.append('files.video', data.content.videoFile);
+        videoFileId = await uploadFile(data.content.videoFile);
       }
 
       if (data.content.audioFile) {
-        formData.append('files.audio', data.content.audioFile);
+        audioFileId = await uploadFile(data.content.audioFile);
       }
 
-      // Create lesson via Strapi API
-      await strapiClient.post('/lessons', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      // Build lesson data matching Strapi schema fields
+      const lessonData: Record<string, unknown> = {
+        title: data.title,
+        slug,
+        description: data.description || undefined,
+        lesson_type: lessonTypeMap[data.type] || 'reading',
+        lesson_order: data.order || 1,
+        duration_minutes: data.duration || 10,
+        course: courseId,
+      };
+
+      // Map content fields to Strapi schema fields
+      if (data.type === 'video' && data.content.videoUrl) {
+        lessonData.video_url = data.content.videoUrl;
+      }
+      if (videoFileId) {
+        lessonData.video_file = videoFileId;
+      }
+      if (audioFileId) {
+        lessonData.audio_file = audioFileId;
+      }
+      if (data.type === 'article' && data.content.articleBody) {
+        lessonData.content = data.content.articleBody;
+      }
+      if (data.content.videoTranscript || data.content.audioTranscript) {
+        lessonData.content = data.content.videoTranscript || data.content.audioTranscript;
+      }
+
+      const response = await fetch(`${API_URL}/api/v1/lessons`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: lessonData }),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.error?.message || `Request failed with status code ${response.status}`);
+      }
+
+      const lessonResult = await response.json();
+
+      // If quiz type with questions, create a linked Quiz entity
+      if (data.type === 'quiz' && data.content.questions && data.content.questions.length > 0) {
+        const quizSlug = `quiz-${slug}`;
+        const totalPoints = data.content.questions.reduce((sum, q) => sum + (q.points || 10), 0);
+
+        const quizData = {
+          data: {
+            title: `Quiz: ${data.title}`,
+            slug: quizSlug,
+            quiz_type: 'practice',
+            passing_score: data.content.passingScore || 70,
+            time_limit_minutes: data.content.timeLimit || undefined,
+            questions: data.content.questions,
+            total_points: totalPoints,
+            lesson: lessonResult.data?.documentId || lessonResult.data?.id,
+          },
+        };
+
+        const quizRes = await fetch(`${API_URL}/api/v1/quizzes`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(quizData),
+        });
+
+        if (!quizRes.ok) {
+          console.warn('Quiz creation failed, but lesson was created successfully');
+        }
+      }
 
       // Redirect back to course edit page
       router.push(`/courses/${courseId}`);

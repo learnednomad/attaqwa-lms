@@ -60,7 +60,7 @@ export default function TeacherCertificatesPage() {
             </SelectContent>
           </Select>
         </div>
-        <Button className="bg-indigo-600 hover:bg-indigo-700 text-white">
+        <Button className="bg-islamic-green-600 hover:bg-islamic-green-700 text-white">
           <Award className="h-4 w-4 mr-2" /> Issue Certificate
         </Button>
       </div>
@@ -74,8 +74,8 @@ export default function TeacherCertificatesPage() {
                 <p className="text-sm text-gray-500">Total Certificates</p>
                 <p className="text-2xl font-bold text-gray-900">{certificates.length}</p>
               </div>
-              <div className="p-3 bg-indigo-100 rounded-xl">
-                <Award className="h-6 w-6 text-indigo-600" />
+              <div className="p-3 bg-islamic-green-100 rounded-xl">
+                <Award className="h-6 w-6 text-islamic-green-600" />
               </div>
             </div>
           </CardContent>
@@ -112,7 +112,7 @@ export default function TeacherCertificatesPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            <Award className="h-5 w-5 text-indigo-600" />
+            <Award className="h-5 w-5 text-islamic-green-600" />
             Certificate Records
           </CardTitle>
         </CardHeader>

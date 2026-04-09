@@ -506,7 +506,7 @@ describe('Cultural Sensitivity and Accessibility Test Suite', () => {
         const focusableElement = container.querySelector('[tabindex="0"]');
         
         if (focusableElement) {
-          focusableElement.focus();
+          (focusableElement as HTMLElement).focus();
           
           // Should have focus-related classes
           const classList = Array.from(focusableElement.classList);

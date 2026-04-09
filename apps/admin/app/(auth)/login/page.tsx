@@ -30,7 +30,12 @@ export default function LoginPage() {
     const result = await signIn(email, password);
 
     if (!result.success) {
-      setError(result.error || 'Login failed');
+      const errorMsg = result.error || 'Login failed';
+      setError(
+        errorMsg.includes('fetch') || errorMsg.includes('network')
+          ? 'Unable to connect to the server. Please try again later.'
+          : errorMsg
+      );
       setIsLoading(false);
     }
   };
@@ -227,7 +232,7 @@ export default function LoginPage() {
           </Card>
 
           <p className="mt-8 text-center text-sm text-charcoal-500">
-            © 2025 AttaqwaMasjid. All rights reserved.
+            © {new Date().getFullYear()} AttaqwaMasjid. All rights reserved.
           </p>
         </div>
       </div>

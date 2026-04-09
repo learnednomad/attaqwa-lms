@@ -716,9 +716,9 @@ export default async ({ strapi }: { strapi: any }) => {
       // SECURITY: create/update permissions are only enabled in development
       const isDev = process.env.NODE_ENV !== 'production';
       const permissionsToEnable = [
-        { controller: 'course', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
-        { controller: 'lesson', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
-        { controller: 'quiz', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
+        { controller: 'course', actions: isDev ? ['find', 'findOne', 'create', 'update', 'delete'] : ['find', 'findOne'] },
+        { controller: 'lesson', actions: isDev ? ['find', 'findOne', 'create', 'update', 'delete'] : ['find', 'findOne'] },
+        { controller: 'quiz', actions: isDev ? ['find', 'findOne', 'create', 'update', 'delete'] : ['find', 'findOne'] },
         { controller: 'achievement', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
         { controller: 'course-enrollment', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
         { controller: 'user-progress', actions: isDev ? ['find', 'findOne', 'create', 'update'] : ['find', 'findOne'] },
@@ -784,6 +784,12 @@ export default async ({ strapi }: { strapi: any }) => {
     console.log(`📚 Available content types: ${contentTypes.length}`);
     contentTypes.forEach(ct => console.log(`   - ${ct}`));
 
+
+    // SECURITY: Skip seed data in production to prevent test data contamination
+    if (process.env.NODE_ENV === 'production') {
+      strapi.log.info('Skipping seed data in production environment');
+    } else {
+
     // Check for comprehensive seed data JSON files
     const fs = await import('fs');
     const path = await import('path');
@@ -824,6 +830,7 @@ export default async ({ strapi }: { strapi: any }) => {
       // Seed quizzes for some lessons
       await seedQuizzesIfEmpty(strapi);
     }
+    } // end seed guard (non-production only)
 
     console.log('\n✅ Bootstrap complete\n');
   } catch (error) {

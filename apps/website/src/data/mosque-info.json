@@ -1,0 +1,132 @@
+{
+  "name": "Masjid At-Taqwa",
+  "address": "2674 Woodwin Rd, Doraville, GA 30360",
+  "phone": "678-896-9257",
+  "emails": {
+    "imam": "Mohammad30360@hotmail.com",
+    "school": "Attaqwa.du@gmail.com"
+  },
+  "social": {
+    "facebook": "https://www.facebook.com/MasjidAttaqwa2674WoodwinRd",
+    "youtube": "https://www.youtube.com/@MasjidAttaqwa2674"
+  },
+  "cemetery": {
+    "name": "Daarul Barzakh",
+    "address": "50 County Line Rd West, Covington, GA 30016",
+    "county": "Rockdale County",
+    "distanceFromMasjid": "~40 minutes",
+    "partnerFuneralHome": "Muslim Funeral Home of Norcross",
+    "contact": {
+      "name": "Mohammad Islam",
+      "phone": "(678) 896-9257"
+    }
+  },
+  "imams": [
+    {
+      "name": "Imam Mohammad Zahirul Islam",
+      "education": [
+        "MA in Islamic Studies",
+        "Completed Qur'an memorization, recited in full at Masjid An-Nabawi",
+        "Studied Alimiyyah program with Shaykh Abdul Ghaffar from Georgia Islamic Institute"
+      ],
+      "experience": [
+        "Former Imam and teacher at Masjid Darus-Salam in Georgia"
+      ],
+      "teachingRoles": [
+        "Tafseer class (English & Bengali)",
+        "Qur'an and Islamic Studies instruction for adults",
+        "Tahfeedhul Qur'an educator"
+      ],
+      "languages": ["Bengali", "English"]
+    },
+    {
+      "name": "Imam Abdullah Khan",
+      "education": [
+        "BA in Shari'ah, University of Madinah",
+        "MA in Qur'an, University of Madinah",
+        "Completed Qur'an memorization from Masjid Miqat; received Ijaazah from Masjid An-Nabawi"
+      ],
+      "experience": [
+        "Former Imam of Masjid Al-'Alawah in Madinah",
+        "Previous Imam at another Madinah masjid"
+      ],
+      "teachingRoles": [
+        "Tafseer class (Arabic)",
+        "Shari'ah & Aqeedah instruction (Arabic; online)",
+        "Tahfeedhul Qur'an teacher",
+        "Arabic language instruction"
+      ],
+      "languages": ["Bengali", "English", "Arabic"]
+    }
+  ],
+  "programs": {
+    "institute": [
+      {
+        "name": "Tahfeedhul Qur'an",
+        "description": "Full-time Qur'an memorization classes"
+      },
+      {
+        "name": "Weekend Classes",
+        "description": "Daily weekend instruction for public school students focusing on Qur'an & Islamic Studies"
+      },
+      {
+        "name": "Homeschooling",
+        "description": "Masjid homeschool program supporting Qur'an memorization (temporarily closed, plans to reopen)"
+      }
+    ],
+    "classes": [
+      {
+        "name": "Daily Tafseer (Bengali & English)",
+        "instructor": "Imam Mohammad Islam",
+        "schedule": "Before evening prayer"
+      },
+      {
+        "name": "Daily Tafseer (Arabic)",
+        "instructor": "Imam Abdullah Khan",
+        "schedule": "After evening prayer"
+      },
+      {
+        "name": "Adult Brothers - Qur'an & Islamic Studies",
+        "instructor": "Imam Mohammad Islam",
+        "schedule": "Sundays, 9:00-11:00 AM",
+        "language": "English"
+      },
+      {
+        "name": "Adult Brothers - Shari'ah & Aqeedah",
+        "instructor": "Imam Abdullah Khan",
+        "schedule": "Contact for details"
+      },
+      {
+        "name": "Adult Sisters - Qur'an & Islamic Studies",
+        "instructor": "Ustadha Salina",
+        "schedule": "Saturdays, between Maghrib-Isha prayers",
+        "language": "Bengali"
+      },
+      {
+        "name": "Adult Sisters - Qur'an and Tajweed",
+        "instructor": "Nowrin",
+        "schedule": "Contact for details",
+        "language": "Bengali with English accommodations"
+      },
+      {
+        "name": "Arts & Crafts for Kids",
+        "schedule": "First Sunday of each month"
+      }
+    ],
+    "services": [
+      "Marriage ceremonies (Nikah)",
+      "Funeral & burial services",
+      "Marriage, youth, and family counseling",
+      "Islamic religious rulings (Fatwa)"
+    ]
+  },
+  "navigation": [
+    "About Us",
+    "Programs & Activities",
+    "Institute",
+    "Funeral Service",
+    "Donate",
+    "Masjid Construction",
+    "Contact & Links"
+  ]
+}

@@ -5,6 +5,9 @@ import { NextRequest, NextResponse } from 'next/server';
  * GET /api/v1/hadiths
  *
  * Returns hadith data. Replaces /api/islamic/hadith with flattened structure.
+ *
+ * STUB: This endpoint returns hardcoded placeholder data.
+ * Real Sunnah.com API integration is pending.
  */
 
 const mockHadithData = [
@@ -72,6 +75,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       data: paginated,
+      _stub: true,
+      _message: 'This endpoint returns placeholder data. Real Sunnah.com API integration pending.',
       meta: {
         version: 'v1',
         pagination: {

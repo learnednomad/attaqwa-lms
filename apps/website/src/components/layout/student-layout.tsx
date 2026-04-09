@@ -12,7 +12,8 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { NotificationPanel, NotificationItem, generateMockNotifications } from '@/components/notifications/notification-panel';
+import { NotificationPanel, NotificationItem } from '@/components/notifications/notification-panel';
+import { useStudentAuth } from '@/contexts/StudentAuthContext';
 
 interface SidebarSection {
   title: string;
@@ -34,10 +35,11 @@ interface StudentLayoutProps {
 export function StudentLayout({ children, title, subtitle }: StudentLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const { user, logout } = useStudentAuth();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<NotificationItem[]>(generateMockNotifications());
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
@@ -101,12 +103,10 @@ export function StudentLayout({ children, title, subtitle }: StudentLayoutProps)
   };
 
   const handleLogout = async () => {
-    // Clear httpOnly cookie via API
-    await fetch('/api/student/auth/logout', { method: 'POST', credentials: 'include' });
-    router.push('/student/login');
+    await logout();
   };
 
-  const studentName = 'Ahmed Hassan';
+  const studentName = user?.name || 'Student';
 
   return (
     <div className="min-h-screen bg-gray-100 flex">

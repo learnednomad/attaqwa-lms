@@ -1,3 +1,4 @@
+// WARNING: These are development-only seed credentials. Change all passwords in production.
 /**
  * User Account Seeder
  * Creates test user accounts for all platforms

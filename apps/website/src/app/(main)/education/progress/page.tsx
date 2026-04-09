@@ -40,7 +40,7 @@ const subjectProgress = [
   { subject: 'Hadith', completed: 5, total: 8, progress: 63, color: 'bg-islamic-gold-500' },
   { subject: 'Fiqh', completed: 3, total: 6, progress: 50, color: 'bg-blue-500' },
   { subject: 'Aqidah', completed: 4, total: 4, progress: 100, color: 'bg-purple-500' },
-  { subject: 'Seerah', completed: 2, total: 5, progress: 40, color: 'bg-indigo-500' },
+  { subject: 'Seerah', completed: 2, total: 5, progress: 40, color: 'bg-islamic-green-500' },
   { subject: 'Worship', completed: 2, total: 3, progress: 67, color: 'bg-emerald-500' }
 ];
 

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
 
 const STRAPI_URL = process.env.STRAPI_URL || 'http://localhost:1337';
+const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN || '';
 
 /**
  * GET /api/v1/users/me/achievements
@@ -8,9 +11,11 @@ const STRAPI_URL = process.env.STRAPI_URL || 'http://localhost:1337';
  */
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
 
-    if (!authHeader) {
+    if (!session?.user) {
       return NextResponse.json(
         {
           error: {
@@ -30,30 +35,32 @@ export async function GET(request: NextRequest) {
     const strapiParams = new URLSearchParams();
     strapiParams.set('populate', 'achievement,achievement.badge_image');
     strapiParams.set('sort', 'earned_at:desc');
+    strapiParams.set('filters[user_email][$eq]', session.user.email);
 
     if (category) {
       strapiParams.set('filters[achievement][category][$eq]', category);
     }
 
-    // Fetch user achievements from Strapi
+    // Fetch user achievements from Strapi using service token
     const response = await fetch(`${STRAPI_URL}/api/v1/user-achievements?${strapiParams.toString()}`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: authHeader,
+        Authorization: `Bearer ${STRAPI_API_TOKEN}`,
       },
     });
 
     if (!response.ok) {
-      if (response.status === 401) {
+      if (response.status === 401 || response.status === 403) {
+        console.error('Strapi auth error - check STRAPI_API_TOKEN');
         return NextResponse.json(
           {
             error: {
-              status: 401,
-              name: 'UnauthorizedError',
-              message: 'Invalid or expired token',
+              status: 502,
+              name: 'UpstreamAuthError',
+              message: 'Backend authentication failed',
             },
           },
-          { status: 401 }
+          { status: 502 }
         );
       }
       throw new Error(`Strapi error: ${response.status}`);

@@ -36,6 +36,9 @@ export async function GET(request: NextRequest) {
     // Note: relation name is 'quiz' (singular) per lesson schema
     strapiParams.set('populate[0]', 'course');
     strapiParams.set('populate[1]', 'quiz');
+    strapiParams.set('populate[2]', 'video_file');
+    strapiParams.set('populate[3]', 'audio_file');
+    strapiParams.set('populate[4]', 'attachments');
 
     // Fetch from Strapi v1 endpoint
     const response = await fetch(`${STRAPI_URL}/api/v1/lessons?${strapiParams.toString()}`, {

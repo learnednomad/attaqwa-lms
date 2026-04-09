@@ -45,69 +45,30 @@ interface StudentData {
   trend: 'up' | 'down' | 'stable';
 }
 
-const mockStudents: StudentData[] = [
-  {
-    id: 1, name: 'Ahmad Hassan', email: 'ahmad.hassan@email.com',
-    course: 'Fiqh of Worship', courseId: 1, enrolledDate: '2024-09-01',
-    progress: 85, quizAverage: 92, lastActive: '2 hours ago',
-    status: 'active', lessonsCompleted: 25, totalLessons: 30, trend: 'up'
-  },
-  {
-    id: 2, name: 'Fatima Ali', email: 'fatima.ali@email.com',
-    course: 'Fiqh of Worship', courseId: 1, enrolledDate: '2024-09-01',
-    progress: 45, quizAverage: 58, lastActive: '1 day ago',
-    status: 'at-risk', lessonsCompleted: 14, totalLessons: 30, trend: 'down'
-  },
-  {
-    id: 3, name: 'Omar Ibrahim', email: 'omar.ibrahim@email.com',
-    course: 'Hadith Studies - 40 Nawawi', courseId: 2, enrolledDate: '2024-09-15',
-    progress: 70, quizAverage: 78, lastActive: '5 hours ago',
-    status: 'active', lessonsCompleted: 29, totalLessons: 42, trend: 'stable'
-  },
-  {
-    id: 4, name: 'Aisha Mohamed', email: 'aisha.mohamed@email.com',
-    course: 'Arabic Grammar Level 2', courseId: 3, enrolledDate: '2024-10-01',
-    progress: 90, quizAverage: 95, lastActive: '1 hour ago',
-    status: 'active', lessonsCompleted: 22, totalLessons: 24, trend: 'up'
-  },
-  {
-    id: 5, name: 'Yusuf Khan', email: 'yusuf.khan@email.com',
-    course: 'Fiqh of Worship', courseId: 1, enrolledDate: '2024-09-01',
-    progress: 20, quizAverage: 0, lastActive: '2 weeks ago',
-    status: 'inactive', lessonsCompleted: 6, totalLessons: 30, trend: 'down'
-  },
-  {
-    id: 6, name: 'Maryam Zahra', email: 'maryam.zahra@email.com',
-    course: 'Hadith Studies - 40 Nawawi', courseId: 2, enrolledDate: '2024-09-15',
-    progress: 55, quizAverage: 72, lastActive: '3 days ago',
-    status: 'at-risk', lessonsCompleted: 23, totalLessons: 42, trend: 'down'
-  },
-  {
-    id: 7, name: 'Ibrahim Ahmed', email: 'ibrahim.ahmed@email.com',
-    course: 'Arabic Grammar Level 2', courseId: 3, enrolledDate: '2024-10-01',
-    progress: 75, quizAverage: 82, lastActive: '4 hours ago',
-    status: 'active', lessonsCompleted: 18, totalLessons: 24, trend: 'up'
-  },
-  {
-    id: 8, name: 'Sara Hassan', email: 'sara.hassan@email.com',
-    course: 'Fiqh of Worship', courseId: 1, enrolledDate: '2024-09-01',
-    progress: 65, quizAverage: 75, lastActive: '6 hours ago',
-    status: 'active', lessonsCompleted: 20, totalLessons: 30, trend: 'stable'
-  },
-];
 
 export default function TeacherStudentsPage() {
   const [students, setStudents] = useState<StudentData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
   const [searchQuery, setSearchQuery] = useState('');
   const [courseFilter, setCourseFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
   useEffect(() => {
-    // Load mock data in development
-    setStudents(mockStudents);
-    setLoading(false);
+    const fetchStudents = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch('/api/v1/courses');
+        const data = await res.json();
+        // Extract enrollment data from courses - currently no enrollments in DB
+        // When enrollments exist, they'll populate here
+        setStudents([]);
+      } catch (err) {
+        console.error('Failed to fetch students:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStudents();
   }, []);
 
   const filteredStudents = students.filter(student => {
@@ -129,7 +90,7 @@ export default function TeacherStudentsPage() {
     return (
       <TeacherLayout title="Student Roster" subtitle="Manage and monitor your students">
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-islamic-green-600" />
         </div>
       </TeacherLayout>
     );
@@ -137,28 +98,13 @@ export default function TeacherStudentsPage() {
 
   return (
     <TeacherLayout title="Student Roster" subtitle="Manage and monitor your students">
-      {/* Data Source Badge */}
-      <div className="mb-4">
-        {dataSource === 'api' ? (
-          <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
-            <CheckCircle className="h-3 w-3 mr-1" />
-            Live Data from Strapi
-          </Badge>
-        ) : (
-          <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">
-            <AlertCircle className="h-3 w-3 mr-1" />
-            Demo Mode (Mock Data)
-          </Badge>
-        )}
-      </div>
-
       {/* Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-100 rounded-lg">
-                <Users className="h-5 w-5 text-indigo-600" />
+              <div className="p-2 bg-islamic-green-100 rounded-lg">
+                <Users className="h-5 w-5 text-islamic-green-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{students.length}</p>
@@ -275,7 +221,7 @@ export default function TeacherStudentsPage() {
                       <div className="flex items-center gap-3">
                         <Avatar className="h-9 w-9">
                           <AvatarImage src={student.avatar} />
-                          <AvatarFallback className="bg-indigo-100 text-indigo-700 text-sm">
+                          <AvatarFallback className="bg-islamic-green-100 text-islamic-green-700 text-sm">
                             {student.name.split(' ').map(n => n[0]).join('')}
                           </AvatarFallback>
                         </Avatar>

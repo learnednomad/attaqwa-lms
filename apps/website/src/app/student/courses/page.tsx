@@ -33,7 +33,7 @@ const SUBJECT_COLORS: Record<string, { text: string; icon: string; gradient: str
   quran:           { text: 'text-emerald-600', icon: 'text-emerald-500', gradient: 'from-emerald-600 to-emerald-800' },
   hadith:          { text: 'text-blue-600',    icon: 'text-blue-500',    gradient: 'from-blue-600 to-blue-800' },
   fiqh:            { text: 'text-purple-600',  icon: 'text-purple-500',  gradient: 'from-purple-600 to-purple-800' },
-  aqeedah:         { text: 'text-indigo-600',  icon: 'text-indigo-500',  gradient: 'from-indigo-600 to-indigo-800' },
+  aqeedah:         { text: 'text-islamic-green-600',  icon: 'text-islamic-green-500',  gradient: 'from-islamic-green-600 to-islamic-green-800' },
   seerah:          { text: 'text-amber-600',   icon: 'text-amber-500',   gradient: 'from-amber-600 to-amber-800' },
   arabic:          { text: 'text-teal-600',    icon: 'text-teal-500',    gradient: 'from-teal-600 to-teal-800' },
   islamic_history: { text: 'text-orange-600',  icon: 'text-orange-500',  gradient: 'from-orange-600 to-orange-800' },
@@ -201,46 +201,6 @@ function EnrolledCourseCard({
   );
 }
 
-// Mock data for fallback
-const mockCourses: CourseData[] = [
-  {
-    id: '1', title: 'Quran Memorization - Juz 30', subject: 'quran',
-    instructor: 'Imam Mohammad', instructorTitle: 'Hafiz',
-    progress: 75, lessons: 30, completedLessons: 22, students: 24,
-    nextLesson: 'Surah An-Naba - Verses 31-40', schedule: 'Mon, Wed, Fri - 4:00 PM', status: 'in_progress',
-  },
-  {
-    id: '2', title: 'Islamic Studies - Fiqh', subject: 'fiqh',
-    instructor: 'Sheikh Abdullah', instructorTitle: 'Ph.D',
-    progress: 60, lessons: 24, completedLessons: 14, students: 32,
-    nextLesson: 'Chapter 8: Fasting Rules', schedule: 'Tue, Thu - 3:00 PM', status: 'in_progress',
-  },
-  {
-    id: '3', title: 'Arabic Language - Level 2', subject: 'arabic',
-    instructor: 'Ustadh Omar', instructorTitle: 'Ph.D',
-    progress: 45, lessons: 40, completedLessons: 18, students: 28,
-    nextLesson: 'Lesson 19: Verb Conjugations', schedule: 'Mon, Wed - 5:00 PM', status: 'in_progress',
-  },
-  {
-    id: '4', title: 'Hadith Studies', subject: 'hadith',
-    instructor: 'Dr. Fatima Ali', instructorTitle: 'Ph.D',
-    progress: 80, lessons: 20, completedLessons: 16, students: 18,
-    nextLesson: 'Sahih Bukhari: Book of Prayer', schedule: 'Thu - 4:30 PM', status: 'in_progress',
-  },
-  {
-    id: '5', title: 'Tajweed Fundamentals', subject: 'tajweed',
-    instructor: 'Qari Ibrahim', instructorTitle: 'Certified Qari',
-    progress: 100, lessons: 15, completedLessons: 15, students: 20,
-    nextLesson: 'Course Completed', schedule: 'Completed', status: 'completed',
-  },
-  {
-    id: '6', title: 'Seerah of the Prophet', subject: 'seerah',
-    instructor: 'Sheikh Ahmed', instructorTitle: 'Islamic Studies',
-    progress: 100, lessons: 25, completedLessons: 25, students: 45,
-    nextLesson: 'Course Completed', schedule: 'Completed', status: 'completed',
-  },
-];
-
 export default function CoursesPage() {
   const router = useRouter();
 
@@ -300,12 +260,12 @@ export default function CoursesPage() {
         totalHours: hours || 0,
       };
     }
-    return { courses: mockCourses, dataSource: 'mock' as const, totalHours: 127 };
+    return { courses: [] as CourseData[], dataSource: 'empty' as const, totalHours: 0 };
   }, [apiCourses, enrollments, allProgress]);
 
-  // Use mock on error
-  const effectiveCourses = coursesError ? mockCourses : courses;
-  const effectiveDataSource = coursesError ? 'mock' : dataSource;
+  // Use empty array on error
+  const effectiveCourses = coursesError ? [] : courses;
+  const effectiveDataSource = coursesError ? 'empty' : dataSource;
   const loading = coursesLoading;
 
   const activeCourses = effectiveCourses.filter(c => c.status === 'in_progress');

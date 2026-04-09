@@ -7,6 +7,9 @@
  * - Added Zod input validation
  * - Sanitized error responses (no stack traces)
  * - Added authentication check for POST
+ *
+ * STUB: GET returns hardcoded placeholder data.
+ * Real Strapi/database integration is pending.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -84,6 +87,8 @@ export async function GET(request: NextRequest) {
     // Strapi v5 response format (flattened)
     return NextResponse.json({
       data: paginated,
+      _stub: true,
+      _message: 'This endpoint returns placeholder data. Real database integration pending.',
       meta: {
         version: 'v1',
         pagination: {
@@ -165,6 +170,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         data: newAnnouncement,
+        _stub: true,
+        _message: 'Announcement created in memory only. Real database persistence pending.',
         meta: {
           version: 'v1',
           message: 'Announcement created successfully',

@@ -66,8 +66,8 @@ export default function TeacherProgressPage() {
                 <p className="text-sm text-gray-500">Total Students</p>
                 <p className="text-2xl font-bold text-gray-900">57</p>
               </div>
-              <div className="p-3 bg-indigo-100 rounded-xl">
-                <Users className="h-6 w-6 text-indigo-600" />
+              <div className="p-3 bg-islamic-green-100 rounded-xl">
+                <Users className="h-6 w-6 text-islamic-green-600" />
               </div>
             </div>
           </CardContent>

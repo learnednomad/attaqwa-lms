@@ -98,7 +98,7 @@ export default function TeacherCoursesPage() {
     return (
       <TeacherLayout title="My Courses" subtitle="Manage your course content and students">
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-islamic-green-600" />
         </div>
       </TeacherLayout>
     );
@@ -126,8 +126,8 @@ export default function TeacherCoursesPage() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-100 rounded-lg">
-                <BookOpen className="h-5 w-5 text-indigo-600" />
+              <div className="p-2 bg-islamic-green-100 rounded-lg">
+                <BookOpen className="h-5 w-5 text-islamic-green-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{courses.length}</p>
@@ -199,7 +199,7 @@ export default function TeacherCoursesPage() {
                 variant={filter === status ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setFilter(status)}
-                className={filter === status ? 'bg-indigo-600 hover:bg-indigo-700' : ''}
+                className={filter === status ? 'bg-islamic-green-600 hover:bg-islamic-green-700' : ''}
               >
                 {status.charAt(0).toUpperCase() + status.slice(1)}
               </Button>
@@ -207,7 +207,7 @@ export default function TeacherCoursesPage() {
           </div>
         </div>
         <Link href="/teacher/courses/new">
-          <Button className="bg-indigo-600 hover:bg-indigo-700">
+          <Button className="bg-islamic-green-600 hover:bg-islamic-green-700">
             <Plus className="h-4 w-4 mr-2" />
             Create Course
           </Button>
@@ -227,15 +227,18 @@ export default function TeacherCoursesPage() {
           >
             {/* Course Header/Thumbnail */}
             <div className={`h-32 flex items-center justify-center ${
-              course.subject === 'Fiqh' ? 'bg-gradient-to-br from-emerald-500 to-emerald-700' :
-              course.subject === 'Hadith' ? 'bg-gradient-to-br from-amber-500 to-amber-700' :
-              course.subject === 'Arabic' ? 'bg-gradient-to-br from-indigo-500 to-indigo-700' :
-              course.subject === 'Tajweed' ? 'bg-gradient-to-br from-purple-500 to-purple-700' :
-              course.subject === 'Quran' ? 'bg-gradient-to-br from-teal-500 to-teal-700' :
-              course.subject === 'Seerah' ? 'bg-gradient-to-br from-rose-500 to-rose-700' :
-              course.subject === 'Aqeedah' ? 'bg-gradient-to-br from-blue-500 to-blue-700' :
-              course.subject === 'Akhlaq' ? 'bg-gradient-to-br from-cyan-500 to-cyan-700' :
-              'bg-gradient-to-br from-gray-500 to-gray-700'
+              (() => {
+                const s = course.subject.toLowerCase();
+                return s === 'fiqh' ? 'bg-gradient-to-br from-emerald-500 to-emerald-700' :
+                s === 'hadith' ? 'bg-gradient-to-br from-amber-500 to-amber-700' :
+                s === 'arabic' ? 'bg-gradient-to-br from-islamic-green-500 to-islamic-green-700' :
+                s === 'tajweed' ? 'bg-gradient-to-br from-purple-500 to-purple-700' :
+                s === 'quran' ? 'bg-gradient-to-br from-teal-500 to-teal-700' :
+                s === 'seerah' ? 'bg-gradient-to-br from-rose-500 to-rose-700' :
+                s === 'aqeedah' ? 'bg-gradient-to-br from-blue-500 to-blue-700' :
+                s === 'akhlaq' ? 'bg-gradient-to-br from-cyan-500 to-cyan-700' :
+                'bg-gradient-to-br from-gray-500 to-gray-700';
+              })()
             }`}>
               <BookOpen className="h-12 w-12 text-white/80" />
             </div>
@@ -335,7 +338,7 @@ export default function TeacherCoursesPage() {
 
               {/* Next Class */}
               {course.nextClass && (
-                <div className="flex items-center gap-2 text-sm text-indigo-600 bg-indigo-50 rounded-lg p-2">
+                <div className="flex items-center gap-2 text-sm text-islamic-green-600 bg-islamic-green-50 rounded-lg p-2">
                   <Calendar className="h-4 w-4" />
                   <span>Next: {course.nextClass}</span>
                 </div>
@@ -357,7 +360,7 @@ export default function TeacherCoursesPage() {
                   </Button>
                   <Button
                     size="sm"
-                    className="flex-1 bg-indigo-600 hover:bg-indigo-700"
+                    className="flex-1 bg-islamic-green-600 hover:bg-islamic-green-700"
                     onClick={(e) => {
                       e.stopPropagation();
                       // TODO: Implement publish functionality
@@ -382,7 +385,7 @@ export default function TeacherCoursesPage() {
             {searchQuery ? 'Try adjusting your search query' : 'Create your first course to get started'}
           </p>
           <Link href="/teacher/courses/new">
-            <Button className="bg-indigo-600 hover:bg-indigo-700">
+            <Button className="bg-islamic-green-600 hover:bg-islamic-green-700">
               <Plus className="h-4 w-4 mr-2" />
               Create Course
             </Button>

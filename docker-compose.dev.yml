@@ -3,6 +3,12 @@
 # ============================================================================
 # Hot-reload enabled for all services.
 # Uses bind mounts for live code changes.
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+#
+# With AI/Ollama:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml --profile ai up -d
 # ============================================================================
 
 services:
@@ -25,13 +31,87 @@ services:
       timeout: 5s
       retries: 5
 
+  # --------------------------------------------------------------------------
+  # Init Container — BetterAuth migrations + Strapi user migration
+  # --------------------------------------------------------------------------
+  init:
+    image: node:22-alpine
+    container_name: attaqwa-init-dev
+    restart: "no"
+    working_dir: /app
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-dev-password-change-me}@postgres:5432/attaqwa_lms # placeholder
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: postgres
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-dev-secret-change-me}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: >
+      sh -c "
+        npm install -g pnpm@10.12.3 &&
+        pnpm install &&
+        apk add --no-cache postgresql16-client &&
+        echo '=== [1/3] Running BetterAuth migrations ===' &&
+        cd apps/website && npx auth@latest migrate --yes &&
+        echo '=== [2/3] Seeding default user accounts ===' &&
+        cd /app && psql \"$$DATABASE_URL\" -f scripts/seed-auth-users.sql &&
+        echo '=== [3/3] Checking Strapi user migration ===' &&
+        STRAPI_EXISTS=$$(psql \"$$DATABASE_URL\" -tAc \"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'up_users');\" 2>/dev/null || echo f) &&
+        if [ \"$$STRAPI_EXISTS\" = 't' ]; then echo 'Strapi users found — run migrate-users-to-betterauth.ts manually'; else echo 'No Strapi users to migrate.'; fi &&
+        echo '=== Init complete ==='
+      "
+
+  # MinIO - S3-compatible object storage (Development)
+  minio:
+    image: minio/minio:latest
+    container_name: attaqwa-minio-dev
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-attaqwa}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-dev-minio-password}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data_dev:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: attaqwa-minio-init-dev
+    restart: "no"
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      sh -c "
+        mc alias set attaqwa http://minio:9000 $${MINIO_ROOT_USER:-attaqwa} $${MINIO_ROOT_PASSWORD:-dev-minio-password} &&
+        mc mb --ignore-existing attaqwa/uploads-public &&
+        mc anonymous set download attaqwa/uploads-public &&
+        echo 'MinIO bucket ready'
+      "
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-attaqwa}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-dev-minio-password}
+
   # Strapi Backend API (Development with hot-reload)
   api:
     image: node:22-alpine
     container_name: attaqwa-api-dev
     restart: unless-stopped
     working_dir: /app
-    command: sh -c "npm install -g pnpm@10.12.3 && pnpm install && cd apps/api && pnpm develop"
+    command: sh -c "npm install -g pnpm@10.12.3 && pnpm install && cd apps/api && npm install --os=linux --libc=musl --cpu=arm64 sharp && pnpm develop"
     environment:
       HOST: 0.0.0.0
       PORT: 1337
@@ -49,21 +129,30 @@ services:
       ENCRYPTION_KEY: ${ENCRYPTION_KEY:-dev-encryption-key}
       JWT_SECRET: ${JWT_SECRET:-dev-jwt-secret-change-me}
       NODE_ENV: development
-      # Ollama AI configuration
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
       OLLAMA_MODEL: ${OLLAMA_MODEL:-mistral:7b-instruct-q4_K_M}
       OLLAMA_TIMEOUT_MS: ${OLLAMA_TIMEOUT_MS:-120000}
-      OLLAMA_ENABLED: ${OLLAMA_ENABLED:-true}
+      OLLAMA_ENABLED: ${OLLAMA_ENABLED:-false}
       OLLAMA_MAX_PARALLEL: ${OLLAMA_MAX_PARALLEL:-2}
       OLLAMA_EMBED_MODEL: ${OLLAMA_EMBED_MODEL:-nomic-embed-text}
       EMBEDDING_DIMENSION: ${EMBEDDING_DIMENSION:-768}
+      # MinIO / S3 upload configuration
+      UPLOAD_PROVIDER: aws-s3
+      S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-attaqwa}
+      S3_ACCESS_SECRET: ${MINIO_ROOT_PASSWORD:-dev-minio-password}
+      S3_ENDPOINT: http://minio:9000
+      S3_REGION: us-east-1
+      S3_BUCKET: uploads-public
+      S3_BASE_URL: http://localhost:9000/uploads-public
     ports:
       - "1337:1337"
     depends_on:
       postgres:
         condition: service_healthy
-      ollama:
-        condition: service_healthy
+      init:
+        condition: service_completed_successfully
+      minio-init:
+        condition: service_completed_successfully
     volumes:
       - .:/app
       - /app/node_modules
@@ -80,6 +169,8 @@ services:
       NODE_ENV: development
       PORT: 3000
       NEXT_PUBLIC_API_URL: http://localhost:1337
+      STRAPI_INTERNAL_URL: http://api:1337
+      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN:-3755298105f19b3717d20d757397054dce981fa62a8acadeb4746ea2f60c0e98f7d3a26f15966e24114849d97e292764a1f6eb9c9615f413a122534ffb49b59c}
     ports:
       - "3000:3000"
     depends_on:
@@ -98,22 +189,30 @@ services:
     command: sh -c "npm install -g pnpm@10.12.3 && pnpm install && cd apps/website && pnpm dev"
     environment:
       NODE_ENV: development
-      PORT: 3001
+      PORT: 3003
       NEXT_PUBLIC_API_URL: http://localhost:1337
+      STRAPI_URL: http://api:1337
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-dev-password-change-me}@postgres:5432/attaqwa_lms # placeholder
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-dev-secret-change-me}
+      BETTER_AUTH_BASE_URL: http://localhost:3003
     ports:
-      - "3001:3003"
+      - "3003:3003"
     depends_on:
-      - api
+      init:
+        condition: service_completed_successfully
+      api:
+        condition: service_started
     volumes:
       - .:/app
       - /app/node_modules
       - /app/apps/website/.next
 
-  # Ollama - Local LLM Inference (Development)
+  # Ollama - Local LLM Inference (optional, use --profile ai)
   ollama:
     image: ollama/ollama
     container_name: attaqwa-ollama-dev
     restart: unless-stopped
+    profiles: ["ai"]
     ports:
       - "11434:11434"
     volumes:
@@ -131,6 +230,7 @@ services:
   ollama-setup:
     image: curlimages/curl:latest
     container_name: attaqwa-ollama-setup
+    profiles: ["ai"]
     depends_on:
       ollama:
         condition: service_healthy
@@ -148,6 +248,8 @@ volumes:
   postgres_data_dev:
     driver: local
   api_uploads_dev:
+    driver: local
+  minio_data_dev:
     driver: local
   ollama_data_dev:
     driver: local

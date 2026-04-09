@@ -5,6 +5,9 @@ import { NextRequest, NextResponse } from 'next/server';
  * GET /api/v1/ayahs
  *
  * Returns Quran ayahs. Replaces /api/islamic/ayah with flattened structure.
+ *
+ * STUB: This endpoint returns hardcoded placeholder data.
+ * Real Quran API integration (Al-Quran Cloud) is pending.
  */
 
 const getMockAyahData = () => ({
@@ -38,6 +41,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       data: ayahData,
+      _stub: true,
+      _message: 'This endpoint returns placeholder data. Real Quran API integration pending.',
       meta: {
         version: 'v1',
         edition,

@@ -251,7 +251,7 @@ export function generateMosqueStructuredData() {
 /**
  * Generate JSON-LD structured data for prayer times
  */
-export function generatePrayerTimesStructuredData(prayerTimes: any, date: string) {
+export function generatePrayerTimesStructuredData(prayerTimes: { fajr: string; dhuhr: string; asr: string; maghrib: string; isha: string }, date: string) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Schedule',
@@ -320,7 +320,17 @@ export function generatePrayerTimesStructuredData(prayerTimes: any, date: string
 /**
  * Generate JSON-LD structured data for Islamic events
  */
-export function generateEventStructuredData(event: any) {
+interface EventStructuredInput {
+  title: string;
+  description: string;
+  date: string | Date;
+  startTime: string;
+  endTime: string;
+  location?: string;
+  zakatInfo?: { amount: number; currency?: string; description: string };
+}
+
+export function generateEventStructuredData(event: EventStructuredInput) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Event',
@@ -362,7 +372,17 @@ export function generateEventStructuredData(event: any) {
 /**
  * Generate JSON-LD structured data for educational content
  */
-export function generateEducationStructuredData(content: any) {
+interface EducationStructuredInput {
+  id: string;
+  title: string;
+  description: string;
+  ageTier: string;
+  category: string;
+  objectives?: string[];
+  duration?: number;
+}
+
+export function generateEducationStructuredData(content: EducationStructuredInput) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Course',

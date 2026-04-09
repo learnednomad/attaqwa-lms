@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
 
 const STRAPI_URL = process.env.STRAPI_URL || 'http://localhost:1337';
+const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN || '';
 
 /**
  * GET /api/v1/users/me/progress
@@ -8,9 +11,11 @@ const STRAPI_URL = process.env.STRAPI_URL || 'http://localhost:1337';
  */
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
 
-    if (!authHeader) {
+    if (!session?.user) {
       return NextResponse.json(
         {
           error: {
@@ -24,12 +29,13 @@ export async function GET(request: NextRequest) {
     }
 
     const searchParams = request.nextUrl.searchParams;
-    const courseId = searchParams.get('course');
+    const courseId = searchParams.get('course') || searchParams.get('course_id');
     const lessonId = searchParams.get('lesson');
 
     // Build Strapi query params
     const strapiParams = new URLSearchParams();
     strapiParams.set('populate', 'lesson,lesson.course,quiz');
+    strapiParams.set('filters[user_email][$eq]', session.user.email);
 
     if (courseId) {
       strapiParams.set('filters[lesson][course][documentId][$eq]', courseId);
@@ -38,25 +44,26 @@ export async function GET(request: NextRequest) {
       strapiParams.set('filters[lesson][documentId][$eq]', lessonId);
     }
 
-    // Fetch user progress from Strapi
+    // Fetch user progress from Strapi using service token
     const response = await fetch(`${STRAPI_URL}/api/v1/user-progresses?${strapiParams.toString()}`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: authHeader,
+        Authorization: `Bearer ${STRAPI_API_TOKEN}`,
       },
     });
 
     if (!response.ok) {
-      if (response.status === 401) {
+      if (response.status === 401 || response.status === 403) {
+        console.error('Strapi auth error - check STRAPI_API_TOKEN');
         return NextResponse.json(
           {
             error: {
-              status: 401,
-              name: 'UnauthorizedError',
-              message: 'Invalid or expired token',
+              status: 502,
+              name: 'UpstreamAuthError',
+              message: 'Backend authentication failed',
             },
           },
-          { status: 401 }
+          { status: 502 }
         );
       }
       throw new Error(`Strapi error: ${response.status}`);
@@ -106,9 +113,11 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
 
-    if (!authHeader) {
+    if (!session?.user) {
       return NextResponse.json(
         {
           error: {
@@ -137,13 +146,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const progressData = {
+      ...body,
+      user_email: session.user.email,
+    };
+
     const response = await fetch(`${STRAPI_URL}/api/v1/user-progresses`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: authHeader,
+        Authorization: `Bearer ${STRAPI_API_TOKEN}`,
       },
-      body: JSON.stringify({ data: body }),
+      body: JSON.stringify({ data: progressData }),
     });
 
     if (!response.ok) {
