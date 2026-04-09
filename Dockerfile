@@ -101,6 +101,9 @@ CMD ["pnpm", "start"]
 
 FROM source AS admin-builder
 
+ARG NEXT_PUBLIC_AUTH_URL
+ENV NEXT_PUBLIC_AUTH_URL=${NEXT_PUBLIC_AUTH_URL}
+
 WORKDIR /app/apps/admin
 # Ensure public directory exists (may not exist in all setups)
 RUN mkdir -p public
