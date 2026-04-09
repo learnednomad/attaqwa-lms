@@ -197,6 +197,8 @@ jobs:
           ENCRYPTION_KEY: test
           JWT_SECRET: test
           BETTER_AUTH_SECRET: test
+          MINIO_ROOT_PASSWORD: test
+          STRAPI_API_TOKEN: test
 
       - name: Validate production compose
         run: docker compose -f docker-compose.yml -f docker-compose.prod.yml config --quiet
@@ -209,6 +211,8 @@ jobs:
           ENCRYPTION_KEY: test
           JWT_SECRET: test
           BETTER_AUTH_SECRET: test
+          MINIO_ROOT_PASSWORD: test
+          STRAPI_API_TOKEN: test
 
       - name: Validate monitoring compose
         run: docker compose -f docker-compose.monitoring.yml config --quiet
