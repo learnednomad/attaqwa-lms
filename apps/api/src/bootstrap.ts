@@ -740,8 +740,6 @@ async function seedStrapiAdmin(strapi: any) {
     });
 
     console.log(`✅ Strapi admin created: ${SEED_ADMIN.email}`);
-    console.log(`   Password: ${SEED_ADMIN.password}`);
-    console.log('   ⚠️  Change this password after first login!');
   } catch (error: any) {
     console.error('❌ Strapi admin seeding error:', error.message);
   }
@@ -754,8 +752,10 @@ export default async ({ strapi }: { strapi: any }) => {
   console.log('\n🔧 Running bootstrap configuration...');
 
   try {
-    // Seed Strapi admin user (idempotent — skips if admin exists)
-    await seedStrapiAdmin(strapi);
+    // Seed Strapi admin user in non-production only (idempotent — skips if admin exists)
+    if (process.env.NODE_ENV !== 'production') {
+      await seedStrapiAdmin(strapi);
+    }
     // Configure public permissions for development
     const publicRole = await strapi
       .query('plugin::users-permissions.role')

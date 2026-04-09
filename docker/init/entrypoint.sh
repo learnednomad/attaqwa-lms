@@ -45,13 +45,17 @@ npx auth@latest migrate --yes 2>&1
 echo "  BetterAuth migration complete."
 
 # ---------------------------------------------------------------------------
-# 3. Seed default user accounts (pure SQL, no Node deps needed)
+# 3. Seed default user accounts (development only)
 # ---------------------------------------------------------------------------
 echo ""
 echo "[3/4] Seeding default user accounts..."
 
-cd /app
-psql "$DATABASE_URL" -f scripts/seed-auth-users.sql 2>&1
+if [ "$NODE_ENV" = "production" ]; then
+  echo "  SKIP: Production environment — create accounts manually via admin UI."
+else
+  cd /app
+  psql "$DATABASE_URL" -f scripts/seed-auth-users.sql 2>&1
+fi
 
 # ---------------------------------------------------------------------------
 # 4. Migrate Strapi users to BetterAuth (one-time, idempotent)
