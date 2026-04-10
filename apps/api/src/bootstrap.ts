@@ -706,21 +706,12 @@ const SEED_ADMIN = {
 };
 
 /**
- * Seed the Strapi admin user if none exists (idempotent)
+ * Seed the Strapi admin user if none exists (idempotent).
+ * Also repairs corrupted admin rows that have no role linkage.
  */
 async function seedStrapiAdmin(strapi: any) {
   try {
     const adminService = strapi.service('admin::user');
-    const existingAdmins = await adminService.findMany({ limit: 1 });
-
-    if (existingAdmins && existingAdmins.length > 0) {
-      console.log('👤 Strapi admin already exists, skipping seed');
-      return;
-    }
-
-    console.log('👤 No Strapi admin found, creating default admin...');
-
-    // Get the Super Admin role
     const roleService = strapi.service('admin::role');
     const superAdminRole = await roleService.getSuperAdmin();
 
@@ -728,6 +719,28 @@ async function seedStrapiAdmin(strapi: any) {
       console.error('   ✗ Super Admin role not found, cannot seed admin');
       return;
     }
+
+    const existingAdmins = await adminService.findMany({ limit: 10 });
+
+    if (existingAdmins && existingAdmins.length > 0) {
+      // Check if any admin has proper role linkage
+      const healthyAdmin = existingAdmins.find(
+        (admin: any) => admin.roles && admin.roles.length > 0
+      );
+
+      if (healthyAdmin) {
+        console.log('👤 Strapi admin already exists, skipping seed');
+        return;
+      }
+
+      // Corrupted admin rows exist (no roles). Delete and recreate.
+      console.log('👤 Found corrupted admin rows (no role linkage), cleaning up...');
+      for (const admin of existingAdmins) {
+        await strapi.db.query('admin::user').delete({ where: { id: admin.id } });
+      }
+    }
+
+    console.log('👤 Creating default Strapi admin...');
 
     const hashedPassword = await adminService.hashPassword(SEED_ADMIN.password);
 
