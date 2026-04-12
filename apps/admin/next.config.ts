@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'cms.learnednomad.com' },
       { protocol: 'https', hostname: 'cdn.learnednomad.com' },
       { protocol: 'http', hostname: 'localhost', port: '1337', pathname: '/uploads/**' },
+      { protocol: 'http', hostname: 'localhost', port: '9000', pathname: '/uploads-public/**' },
     ],
   },
   experimental: {

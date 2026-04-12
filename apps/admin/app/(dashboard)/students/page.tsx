@@ -5,10 +5,12 @@
 
 'use client';
 
-import { Award, BookOpen, Clock, Loader2, Mail, MoreVertical, Search, TrendingUp, User } from 'lucide-react';
+import { Award, BookOpen, Clock, Loader2, Mail, MoreVertical, Search, TrendingUp, Upload, User } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
+import { AddUserDialog } from '@/components/users/add-user-dialog';
+import { ImportUsersDialog } from '@/components/users/import-users-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -22,8 +24,7 @@ import {
 } from '@/components/ui/table';
 import { formatDate } from '@/lib/utils/formatters';
 import { authClient } from '@/lib/auth-client';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
+import { strapiClient, adminApiEndpoints } from '@/lib/api/strapi-client';
 
 interface AppUser {
   id: string;
@@ -40,6 +41,8 @@ export default function StudentsPage() {
   const [users, setUsers] = useState<AppUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [enrollmentCounts, setEnrollmentCounts] = useState<Record<string, number>>({});
+  const [addOpen, setAddOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
 
   const fetchUsers = useCallback(async () => {
     setIsLoading(true);
@@ -64,20 +67,17 @@ export default function StudentsPage() {
 
   const fetchEnrollments = useCallback(async () => {
     try {
-      const res = await fetch(
-        `${API_URL}/api/v1/course-enrollments?pagination[pageSize]=100&populate[0]=user&populate[1]=course`
+      const json = await strapiClient.get(
+        adminApiEndpoints.courseEnrollments + '?pagination[pageSize]=100&populate[0]=user&populate[1]=course'
       );
-      if (res.ok) {
-        const json = await res.json();
-        const counts: Record<string, number> = {};
-        for (const enrollment of json.data || []) {
-          const userId = enrollment.user?.id;
-          if (userId) {
-            counts[userId] = (counts[userId] || 0) + 1;
-          }
+      const counts: Record<string, number> = {};
+      for (const enrollment of (json as any).data || []) {
+        const userId = enrollment.user?.id;
+        if (userId) {
+          counts[userId] = (counts[userId] || 0) + 1;
         }
-        setEnrollmentCounts(counts);
       }
+      setEnrollmentCounts(counts);
     } catch (err) {
       console.error('Failed to fetch enrollments:', err);
     }
@@ -140,7 +140,11 @@ export default function StudentsPage() {
             <Mail className="mr-2 h-4 w-4" />
             Message Users
           </Button>
-          <Button>
+          <Button variant="outline" onClick={() => setImportOpen(true)}>
+            <Upload className="mr-2 h-4 w-4" />
+            Import
+          </Button>
+          <Button onClick={() => setAddOpen(true)}>
             <User className="mr-2 h-4 w-4" />
             Add User
           </Button>
@@ -313,6 +317,29 @@ export default function StudentsPage() {
           </div>
         )}
       </Card>
+
+      <AddUserDialog
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        onCreated={() => {
+          fetchUsers();
+          fetchEnrollments();
+        }}
+        defaultRole={
+          selectedRole === 'teacher' || selectedRole === 'admin'
+            ? selectedRole
+            : 'student'
+        }
+      />
+
+      <ImportUsersDialog
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        onImported={() => {
+          fetchUsers();
+          fetchEnrollments();
+        }}
+      />
     </div>
   );
 }

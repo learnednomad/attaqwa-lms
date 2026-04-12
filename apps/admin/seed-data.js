@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Configuration
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337/api';
+const STRAPI_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337/api';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@attaqwa.com';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Test1234!';
 

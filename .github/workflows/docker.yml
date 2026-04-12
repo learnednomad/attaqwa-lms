@@ -44,7 +44,7 @@ jobs:
       security-events: write
     strategy:
       matrix:
-        target: [api, admin, website]
+        target: [api, admin, website, init]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -214,6 +214,7 @@ jobs:
           MINIO_ROOT_PASSWORD: test
           STRAPI_API_TOKEN: test
           S3_BASE_URL: https://test.example.com
+          REDIS_PASSWORD: test
 
       - name: Validate monitoring compose
         run: docker compose -f docker-compose.monitoring.yml config --quiet

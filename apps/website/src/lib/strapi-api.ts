@@ -4,7 +4,7 @@
  */
 
 // Strapi base URL
-const STRAPI_BASE = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
+const STRAPI_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
 const API_BASE = `${STRAPI_BASE}/api/v1`;
 
 // ============================================================================
@@ -497,27 +497,23 @@ export const enrollmentsApi = {
   },
 
   /**
-   * Create new enrollment
+   * Create new enrollment (uses session-verified server route)
    */
   create: async (userId: string, courseId: string): Promise<Enrollment> => {
-    const response = await fetch(`${API_BASE}/enrollments`, {
+    const response = await fetch(`/api/v1/users/me/enrollments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({
-        data: {
-          user: userId,
-          course: courseId,
-          enrollment_status: 'active',
-          overall_progress: 0,
-          enrollment_date: new Date().toISOString(),
-        },
+        course: courseId,
       }),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to create enrollment');
+      const err = await response.json().catch(() => ({ error: { message: 'Failed to create enrollment' } }));
+      throw new Error(err.error?.message || 'Failed to create enrollment');
     }
 
     const result = await response.json();
@@ -552,7 +548,7 @@ export const lessonProgressApi = {
   },
 
   /**
-   * Update lesson progress
+   * Update lesson progress (uses session-verified server route)
    */
   update: async (
     progressId: string,
@@ -563,21 +559,22 @@ export const lessonProgressApi = {
       quiz_attempts: number;
     }>
   ): Promise<LessonProgress> => {
-    const response = await fetch(`${API_BASE}/lesson-progresses/${progressId}`, {
-      method: 'PUT',
+    const response = await fetch(`/api/v1/users/me/progress`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({
-        data: {
-          ...updates,
-          last_accessed_at: new Date().toISOString(),
-        },
+        progressId,
+        ...updates,
+        last_accessed_at: new Date().toISOString(),
       }),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to update lesson progress');
+      const err = await response.json().catch(() => ({ error: { message: 'Failed to update lesson progress' } }));
+      throw new Error(err.error?.message || 'Failed to update lesson progress');
     }
 
     const result = await response.json();
@@ -585,28 +582,27 @@ export const lessonProgressApi = {
   },
 
   /**
-   * Create new lesson progress entry
+   * Create new lesson progress entry (uses session-verified server route)
    */
   create: async (enrollmentId: string, lessonId: string): Promise<LessonProgress> => {
-    const response = await fetch(`${API_BASE}/lesson-progresses`, {
+    const response = await fetch(`/api/v1/users/me/progress`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({
-        data: {
-          enrollment: enrollmentId,
-          lesson: lessonId,
-          completed: false,
-          time_spent_minutes: 0,
-          quiz_attempts: 0,
-          last_accessed_at: new Date().toISOString(),
-        },
+        lesson: lessonId,
+        enrollment: enrollmentId,
+        completed: false,
+        time_spent_minutes: 0,
+        quiz_attempts: 0,
       }),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to create lesson progress');
+      const err = await response.json().catch(() => ({ error: { message: 'Failed to create lesson progress' } }));
+      throw new Error(err.error?.message || 'Failed to create lesson progress');
     }
 
     const result = await response.json();

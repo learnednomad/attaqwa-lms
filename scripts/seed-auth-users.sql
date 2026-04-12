@@ -65,9 +65,5 @@ BEGIN
   END IF;
 
   RAISE NOTICE '';
-  RAISE NOTICE 'Default credentials:';
-  RAISE NOTICE '  admin      superadmin@attaqwa.org     SuperAdmin123!';
-  RAISE NOTICE '  admin      masjidadmin@attaqwa.org    MasjidAdmin123!';
-  RAISE NOTICE '  teacher    teacher@attaqwa.org        Teacher123!';
-  RAISE NOTICE '  student    student@attaqwa.org        Student123!';
+  RAISE NOTICE 'Seed accounts created. See .env.example for default credentials.';
 END $$;

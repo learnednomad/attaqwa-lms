@@ -40,6 +40,7 @@ services:
     restart: "no"
     working_dir: /app
     environment:
+      NODE_ENV: development
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-dev-password-change-me}@postgres:5432/attaqwa_lms # placeholder
       DATABASE_HOST: postgres
       DATABASE_PORT: 5432
@@ -68,7 +69,7 @@ services:
 
   # MinIO - S3-compatible object storage (Development)
   minio:
-    image: minio/minio:latest
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
     container_name: attaqwa-minio-dev
     restart: unless-stopped
     command: server /data --console-address ":9001"
@@ -81,14 +82,14 @@ services:
     volumes:
       - minio_data_dev:/data
     healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
 
   minio-init:
-    image: minio/mc:latest
+    image: minio/mc:RELEASE.2025-08-13T08-35-41Z
     container_name: attaqwa-minio-init-dev
     restart: "no"
     depends_on:
@@ -111,7 +112,7 @@ services:
     container_name: attaqwa-api-dev
     restart: unless-stopped
     working_dir: /app
-    command: sh -c "npm install -g pnpm@10.12.3 && pnpm install && cd apps/api && npm install --os=linux --libc=musl --cpu=arm64 sharp && pnpm develop"
+    command: sh -c "npm install -g pnpm@10.12.3 && pnpm install && cd apps/api && npm install --os=linux --libc=musl sharp && pnpm develop"
     environment:
       HOST: 0.0.0.0
       PORT: 1337
@@ -169,8 +170,10 @@ services:
       NODE_ENV: development
       PORT: 3000
       NEXT_PUBLIC_API_URL: http://localhost:1337
+      NEXT_PUBLIC_AUTH_URL: http://localhost:3003
+      AUTH_INTERNAL_URL: http://website:3003
       STRAPI_INTERNAL_URL: http://api:1337
-      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN:-3755298105f19b3717d20d757397054dce981fa62a8acadeb4746ea2f60c0e98f7d3a26f15966e24114849d97e292764a1f6eb9c9615f413a122534ffb49b59c}
+      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN:-}
     ports:
       - "3000:3000"
     depends_on:
@@ -192,9 +195,10 @@ services:
       PORT: 3003
       NEXT_PUBLIC_API_URL: http://localhost:1337
       STRAPI_URL: http://api:1337
-      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-dev-password-change-me}@postgres:5432/attaqwa_lms # placeholder
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-dev-password-change-me}@postgres:5432/attaqwa_lms
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-dev-secret-change-me}
       BETTER_AUTH_BASE_URL: http://localhost:3003
+      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN:-}
     ports:
       - "3003:3003"
     depends_on:
@@ -228,7 +232,7 @@ services:
 
   # Ollama Model Setup (init container - pulls required models)
   ollama-setup:
-    image: curlimages/curl:latest
+    image: curlimages/curl:8.7.1
     container_name: attaqwa-ollama-setup
     profiles: ["ai"]
     depends_on:

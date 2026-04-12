@@ -49,6 +49,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@better-auth/cli": "^1.4.21",
     "@eslint/eslintrc": "^3",
     "@playwright/test": "^1.55.0",
     "@tailwindcss/postcss": "^4",

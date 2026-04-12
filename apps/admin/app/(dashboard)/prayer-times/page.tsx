@@ -11,9 +11,7 @@ import { Clock, Plus, Pencil, Trash2, Save, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
-const API_TOKEN = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN || '';
+import { strapiClient, adminApiEndpoints } from '@/lib/api/strapi-client';
 
 const MONTH_NAMES = [
   '', 'January', 'February', 'March', 'April', 'May', 'June',
@@ -63,11 +61,6 @@ export default function PrayerTimesPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-  if (API_TOKEN) headers['Authorization'] = `Bearer ${API_TOKEN}`;
-
   const fetchSchedules = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -76,19 +69,16 @@ export default function PrayerTimesPage() {
         'sort': 'month:asc,dayRangeStart:asc',
       });
 
-      const res = await fetch(`${API_URL}/api/v1/iqamah-schedules?${params}`, { headers });
-      if (res.ok) {
-        const json = await res.json();
-        const data = (json.data || []).map((item: IqamahSchedule & { attributes?: IqamahSchedule }) => {
-          const { id: _id, documentId: _docId, ...rest } = (item.attributes || item) as IqamahSchedule;
-          return {
-            id: item.id,
-            documentId: item.documentId,
-            ...rest,
-          };
-        });
-        setSchedules(data);
-      }
+      const json = await strapiClient.get(adminApiEndpoints.iqamahSchedules + '?' + params);
+      const data = ((json as any).data || []).map((item: IqamahSchedule & { attributes?: IqamahSchedule }) => {
+        const { id: _id, documentId: _docId, ...rest } = (item.attributes || item) as IqamahSchedule;
+        return {
+          id: item.id,
+          documentId: item.documentId,
+          ...rest,
+        };
+      });
+      setSchedules(data);
     } catch (error) {
       console.error('Failed to fetch iqamah schedules:', error);
     } finally {
@@ -137,21 +127,11 @@ export default function PrayerTimesPage() {
     setSaving(true);
     try {
       if (isCreating) {
-        const res = await fetch(`${API_URL}/api/v1/iqamah-schedules`, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ data: editForm }),
-        });
-        if (!res.ok) throw new Error('Failed to create');
+        await strapiClient.post(adminApiEndpoints.iqamahSchedules, { data: editForm });
       } else if (editingId) {
         const schedule = schedules.find(s => s.id === editingId);
         const identifier = schedule?.documentId || editingId;
-        const res = await fetch(`${API_URL}/api/v1/iqamah-schedules/${identifier}`, {
-          method: 'PUT',
-          headers,
-          body: JSON.stringify({ data: editForm }),
-        });
-        if (!res.ok) throw new Error('Failed to update');
+        await strapiClient.put(adminApiEndpoints.iqamahSchedules + '/' + identifier, { data: editForm });
       }
       cancelEdit();
       await fetchSchedules();
@@ -167,11 +147,7 @@ export default function PrayerTimesPage() {
     if (!confirm(`Delete iqamah entry for ${MONTH_NAMES[schedule.month]} ${schedule.dayRangeStart}-${schedule.dayRangeEnd}?`)) return;
     try {
       const identifier = schedule.documentId || schedule.id;
-      const res = await fetch(`${API_URL}/api/v1/iqamah-schedules/${identifier}`, {
-        method: 'DELETE',
-        headers,
-      });
-      if (!res.ok) throw new Error('Failed to delete');
+      await strapiClient.delete(adminApiEndpoints.iqamahSchedules + '/' + identifier);
       await fetchSchedules();
     } catch (error) {
       console.error('Failed to delete:', error);

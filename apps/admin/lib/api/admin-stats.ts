@@ -3,8 +3,7 @@
  * Fetches real data from Strapi API for dashboard, students, and analytics pages
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
-const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || 'http://localhost:3003';
+import { strapiClient, adminApiEndpoints } from './strapi-client';
 
 interface PaginationMeta {
   page: number;
@@ -19,13 +18,10 @@ interface StrapiResponse<T> {
 }
 
 async function strapiGet<T>(endpoint: string, params?: Record<string, string>): Promise<StrapiResponse<T>> {
-  const url = new URL(`${API_URL}/api/v1/${endpoint}`);
-  if (params) {
-    Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
-  }
-  const res = await fetch(url.toString());
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
-  return res.json();
+  const query = params ? '?' + new URLSearchParams(params).toString() : '';
+  const response = await strapiClient.get<StrapiResponse<T>>(`/v1/${endpoint}${query}`);
+  // strapiClient.get returns axios body which is Strapi's { data, meta } shape
+  return response as unknown as StrapiResponse<T>;
 }
 
 export async function getResourceCount(resource: string): Promise<number> {
@@ -50,7 +46,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   // Get user count from BetterAuth admin API
   let totalUsers = 0;
   try {
-    const res = await fetch(`${AUTH_URL}/api/auth/admin/list-users`, {
+    const res = await fetch(`/api/auth/admin/list-users`, {
       credentials: 'include',
     });
     if (res.ok) {

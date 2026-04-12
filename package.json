@@ -41,6 +41,7 @@
   "author": "AttaqwaMasjid",
   "license": "UNLICENSED",
   "devDependencies": {
+    "baseline-browser-mapping": "^2.10.18",
     "shadcn": "^3.8.4"
   }
 }

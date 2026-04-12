@@ -12,7 +12,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
+import { strapiClient } from '@/lib/api/strapi-client';
 
 interface GeneratedQuestion {
   question: string;
@@ -49,33 +49,18 @@ export function AIQuizGenerator({
     setError(null);
 
     try {
-      const res = await fetch(`${API_URL}/api/v1/ai/generate-quiz`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_TOKEN}`,
-        },
-        body: JSON.stringify({
-          content: lessonContent,
-          questionCount,
-          difficulty,
-        }),
+      const json = await strapiClient.post('/v1/ai/generate-quiz', {
+        content: lessonContent,
+        questionCount,
+        difficulty,
       });
-
-      if (res.status === 503) {
+      setQuestions((json as any).data.questions || []);
+    } catch (err: any) {
+      if (err?.response?.status === 503) {
         setError('AI service is unavailable. Please try again later.');
-        return;
-      }
-
-      if (!res.ok) {
+      } else {
         setError('Failed to generate quiz. Please try again.');
-        return;
       }
-
-      const json = await res.json();
-      setQuestions(json.data.questions || []);
-    } catch (err) {
-      setError('Failed to connect to AI service.');
     } finally {
       setIsGenerating(false);
     }
