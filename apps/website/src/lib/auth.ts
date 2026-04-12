@@ -10,8 +10,24 @@ const pool = new Pool({
 });
 
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_BASE_URL || "http://localhost:3003",
+  baseURL: process.env.BETTER_AUTH_BASE_URL || "http://localhost:3001",
   database: pool,
+  /**
+   * Custom user fields. `requiresPasswordChange` is set to `true` when an
+   * admin bulk-imports users with a shared temp password. The student login
+   * flow reads this flag and forces a password change before granting
+   * access to the rest of the app.
+   */
+  user: {
+    additionalFields: {
+      requiresPasswordChange: {
+        type: "boolean",
+        required: false,
+        defaultValue: false,
+        input: false, // not accepted during public signup
+      },
+    },
+  },
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 8,
@@ -40,15 +56,13 @@ export const auth = betterAuth({
     "AttaqwaMasjid://",
     ...(process.env.BETTER_AUTH_BASE_URL
       ? [process.env.BETTER_AUTH_BASE_URL]
-      : ["http://localhost:3003"]),
+      : ["http://localhost:3001"]),
+    // Admin portal always needs access
+    ...(process.env.NEXT_PUBLIC_ADMIN_URL
+      ? [process.env.NEXT_PUBLIC_ADMIN_URL]
+      : ["http://localhost:3000"]),
     ...(process.env.NODE_ENV === "development"
-      ? [
-          "http://localhost:3000",
-          "http://localhost:3003",
-          "exp://",
-          "exp://**",
-          "exp://192.168.*.*:*/**",
-        ]
+      ? ["http://localhost:3003", "exp://", "exp://**", "exp://192.168.*.*:*/**"]
       : []),
   ],
   plugins: [

@@ -15,7 +15,6 @@
 		X-Content-Type-Options "nosniff"
 		X-Frame-Options "SAMEORIGIN"
 		Referrer-Policy "strict-origin-when-cross-origin"
-		X-XSS-Protection "1; mode=block"
 		Permissions-Policy "camera=(), microphone=(), geolocation=()"
 		-Server
 	}
@@ -56,7 +55,10 @@
 	}
 
 	# Admin portal (Next.js) -> admin service
-	handle /admin* {
+	handle /admin/* {
+		reverse_proxy admin:3000
+	}
+	handle /admin {
 		reverse_proxy admin:3000
 	}
 

@@ -7,7 +7,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-const API_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
 
 async function fetchSummary(content: string): Promise<string> {
   const res = await fetch(`${API_URL}/api/v1/ai/summarize`, {

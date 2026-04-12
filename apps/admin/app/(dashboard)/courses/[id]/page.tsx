@@ -1,282 +1,32 @@
 /**
- * Edit Course Page
- * Form for editing existing courses with lesson management
+ * /courses/[id] → redirects to /courses/[id]/lessons
+ * The course detail surface is a tabbed view: Lessons is the default
+ * (primary work surface), Settings holds the edit form. Any existing links
+ * that pointed at /courses/[id] (including deep-links to the lesson drawer
+ * like ?lesson=new or ?lesson=<id>) fall through to here and are forwarded
+ * with their query string intact.
  */
 
 'use client';
 
-import { ArrowLeft, BookOpen, Plus } from 'lucide-react';
-import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
 
-import { CourseForm, type CourseFormData } from '@/components/courses/course-form';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
-interface Course {
-  [key: string]: unknown;
-  id: number;
-  documentId?: string;
-  title: string;
-  slug: string;
-  description: string;
-  subject: string;
-  category?: string;
-  difficulty: string;
-  age_tier: string;
-  ageTier?: string;
-  duration_weeks: number;
-  estimatedDuration?: number;
-  schedule: string;
-  instructor: string;
-  is_featured: boolean;
-  isPublished?: boolean;
-  coverImage?: { url: string };
-  lessons?: { id: number; title: string; type: string; duration: number; isRequired: boolean }[];
-}
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
-
-export default function EditCoursePage() {
+export default function CourseRootRedirectPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const courseId = params.id as string;
 
-  const [course, setCourse] = useState<Course | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Fetch course data on mount
   useEffect(() => {
-    const fetchCourse = async () => {
-      try {
-        setIsLoading(true);
-        const res = await fetch(`${API_URL}/api/v1/courses/${courseId}?populate=*`);
-        if (!res.ok) throw new Error(`Failed to fetch course (${res.status})`);
-        const json = await res.json();
-        setCourse(json.data);
-      } catch (err) {
-        console.error('Failed to fetch course:', err);
-        setError('Failed to load course. Please try again.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCourse();
-  }, [courseId]);
-
-  const handleSubmit = async (data: CourseFormData) => {
-    setIsSaving(true);
-    setError(null);
-
-    try {
-      const ageTier = data.ageTier === 'all' ? 'adults' : data.ageTier;
-
-      const courseData = {
-        data: {
-          title: data.title,
-          description: data.description,
-          subject: data.category,
-          difficulty: data.difficulty,
-          age_tier: ageTier,
-          duration_weeks: data.duration ? Math.max(1, Math.ceil(data.duration / 60)) : 1,
-          schedule: data.schedule || undefined,
-          instructor: data.instructor || undefined,
-          prerequisites: data.prerequisites || undefined,
-          learning_outcomes: data.learningOutcomes?.filter(o => o.trim()) || undefined,
-          max_students: data.maxStudents || undefined,
-          start_date: data.startDate || undefined,
-          end_date: data.endDate || undefined,
-        },
-      };
-
-      const res = await fetch(`${API_URL}/api/v1/courses/${courseId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(courseData),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => null);
-        throw new Error(errorData?.error?.message || `Request failed with status code ${res.status}`);
-      }
-
-      // Redirect to courses list on success
-      router.push('/courses');
-    } catch (err) {
-      console.error('Failed to update course:', err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Failed to update course. Please try again.'
-      );
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleCancel = () => {
-    router.push('/courses');
-  };
-
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="text-center">
-          <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-primary-500 border-t-transparent" />
-          <p className="text-charcoal-600">Loading course...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Error state
-  if (!course) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center space-x-4">
-          <Link
-            href="/courses"
-            className="rounded-lg p-2 text-charcoal-600 transition-colors hover:bg-charcoal-50"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold text-charcoal-900">Course Not Found</h1>
-          </div>
-        </div>
-
-        <Card>
-          <CardContent className="py-12 text-center">
-            <p className="text-charcoal-600">
-              The course you're looking for doesn't exist or has been deleted.
-            </p>
-            <Link href="/courses">
-              <Button className="mt-4">Return to Courses</Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+    const qs = searchParams?.toString();
+    const target = qs ? `/courses/${courseId}/lessons?${qs}` : `/courses/${courseId}/lessons`;
+    router.replace(target);
+  }, [courseId, router, searchParams]);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center space-x-4">
-        <Link
-          href="/courses"
-          className="rounded-lg p-2 text-charcoal-600 transition-colors hover:bg-charcoal-50"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold text-charcoal-900">Edit Course</h1>
-          <p className="mt-2 text-charcoal-600">
-            Update course details and manage lessons
-          </p>
-        </div>
-      </div>
-
-      {/* Error Message */}
-      {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-          <p className="text-sm text-red-800">{error}</p>
-        </div>
-      )}
-
-      {/* Course Form */}
-      <CourseForm
-        initialData={course}
-        onSubmit={handleSubmit}
-        onCancel={handleCancel}
-        isLoading={isSaving}
-      />
-
-      {/* Lesson Management Section */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Course Lessons</CardTitle>
-              <CardDescription>
-                Manage lessons and learning materials for this course
-              </CardDescription>
-            </div>
-            <Link href={`/courses/${courseId}/lessons/new`}>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Lesson
-              </Button>
-            </Link>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {course.lessons && course.lessons.length > 0 ? (
-            <div className="space-y-3">
-              {(course.lessons as Array<Record<string, unknown>>).map((lesson, index) => (
-                <div
-                  key={lesson.id as string}
-                  className="flex items-center justify-between rounded-lg border border-charcoal-200 p-4"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 text-sm font-semibold text-primary-700">
-                      {(lesson.lesson_order as number) || index + 1}
-                    </div>
-                    <div>
-                      <p className="font-medium text-charcoal-900">
-                        {lesson.title as string}
-                      </p>
-                      <div className="mt-1 flex items-center space-x-3 text-xs text-charcoal-500">
-                        <span className="capitalize">{(lesson.lesson_type || lesson.type) as string}</span>
-                        <span>•</span>
-                        <span>{(lesson.duration_minutes || lesson.duration) as number} min</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={async () => {
-                        if (confirm('Are you sure you want to delete this lesson?')) {
-                          try {
-                            const identifier = (lesson.documentId || lesson.id) as string;
-                            await fetch(`${API_URL}/api/v1/lessons/${identifier}`, { method: 'DELETE' });
-                            window.location.reload();
-                          } catch (err) {
-                            console.error('Failed to delete lesson:', err);
-                          }
-                        }
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="py-12 text-center">
-              <BookOpen className="mx-auto h-12 w-12 text-charcoal-400" />
-              <p className="mt-4 text-charcoal-600">No lessons yet</p>
-              <p className="mt-1 text-sm text-charcoal-500">
-                Get started by adding your first lesson to this course
-              </p>
-              <Link href={`/courses/${courseId}/lessons/new`}>
-                <Button className="mt-4">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create First Lesson
-                </Button>
-              </Link>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+    <div className="flex min-h-[240px] items-center justify-center">
+      <div className="inline-block h-10 w-10 animate-spin rounded-full border-4 border-primary-500 border-t-transparent" />
     </div>
   );
 }

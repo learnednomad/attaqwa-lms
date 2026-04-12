@@ -69,11 +69,15 @@ COPY --from=dependencies /app/packages/shared-types/package.json ./packages/shar
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=dependencies /app/apps/api/node_modules ./apps/api/node_modules
 
-# Copy Strapi build output (dist includes compiled config, src, and admin)
+# Copy Strapi build output
+# dist/src/ contains compiled JS for api/, bootstrap, index — Strapi v5 reads from dist/
 COPY --from=api-builder /app/apps/api/dist ./apps/api/dist
+# Copy JSON schemas from src/api (Strapi reads these directly)
 COPY --from=source /app/apps/api/src ./apps/api/src
 # Use compiled JS config from dist (Strapi production can't load .ts files)
 COPY --from=api-builder /app/apps/api/dist/config ./apps/api/config
+# Copy tsconfig.json (Strapi v5 needs it to resolve dist/ structure)
+COPY --from=source /app/apps/api/tsconfig.json ./apps/api/tsconfig.json
 COPY --from=source /app/packages/shared-types ./packages/shared-types
 
 # Set ownership
@@ -182,6 +186,7 @@ CMD ["node", "apps/website/server.js"]
 FROM source AS init
 
 RUN apk add --no-cache postgresql16-client
+RUN addgroup -g 1001 -S nodejs && adduser -S init -u 1001
 
 WORKDIR /app
 
@@ -193,5 +198,7 @@ COPY docker/init/entrypoint.sh /entrypoint.sh
 COPY scripts/seed-auth-users.sql /app/scripts/seed-auth-users.sql
 COPY scripts/migrate-users-to-betterauth.ts /app/scripts/migrate-users-to-betterauth.ts
 RUN chmod +x /entrypoint.sh
+
+USER init
 
 ENTRYPOINT ["/entrypoint.sh"]

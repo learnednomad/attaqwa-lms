@@ -701,7 +701,7 @@ async function seedQuizzesIfEmpty(strapi: any) {
 const SEED_ADMIN = {
   firstname: 'Super',
   lastname: 'Admin',
-  email: 'superadmin@attaqwa.org',
+  email: 'texminer8@gmail.com',
   password: 'SuperAdmin123!', // placeholder — development only, change in production
 };
 
@@ -720,7 +720,7 @@ async function seedStrapiAdmin(strapi: any) {
       return;
     }
 
-    const existingAdmins = await adminService.findMany({ limit: 10 });
+    const existingAdmins = await strapi.db.query('admin::user').findMany({ limit: 10, populate: ['roles'] });
 
     if (existingAdmins && existingAdmins.length > 0) {
       // Check if any admin has proper role linkage
@@ -742,14 +742,16 @@ async function seedStrapiAdmin(strapi: any) {
 
     console.log('👤 Creating default Strapi admin...');
 
-    const hashedPassword = await adminService.hashPassword(SEED_ADMIN.password);
+    const hashedPassword = await strapi.service('admin::auth').hashPassword(SEED_ADMIN.password);
 
-    await adminService.create({
-      ...SEED_ADMIN,
-      password: hashedPassword,
-      registrationToken: null,
-      isActive: true,
-      roles: [superAdminRole.id],
+    await strapi.db.query('admin::user').create({
+      data: {
+        ...SEED_ADMIN,
+        password: hashedPassword,
+        registrationToken: null,
+        isActive: true,
+        roles: [superAdminRole.id],
+      },
     });
 
     console.log(`✅ Strapi admin created: ${SEED_ADMIN.email}`);
@@ -769,77 +771,136 @@ export default async ({ strapi }: { strapi: any }) => {
     if (process.env.NODE_ENV !== 'production') {
       await seedStrapiAdmin(strapi);
     }
-    // Configure public permissions for development
+    // Configure API permissions for public and authenticated roles
+    // Strapi v5: permissions are linked to roles via up_permissions_role_lnk
     const publicRole = await strapi
       .query('plugin::users-permissions.role')
       .findOne({ where: { type: 'public' } });
+    const authenticatedRole = await strapi
+      .query('plugin::users-permissions.role')
+      .findOne({ where: { type: 'authenticated' } });
 
     if (publicRole) {
-      console.log('📝 Configuring public API permissions...');
+      console.log('📝 Configuring API permissions...');
 
-      // Define permissions to enable
-      // SECURITY: create/update permissions are only enabled in development
-      const isDev = process.env.NODE_ENV !== 'production';
-      const permissionsToEnable = [
-        { controller: 'course', actions: isDev ? ['find', 'findOne', 'create', 'update', 'delete'] : ['find', 'findOne'] },
-        { controller: 'lesson', actions: isDev ? ['find', 'findOne', 'create', 'update', 'delete'] : ['find', 'findOne'] },
-        { controller: 'quiz', actions: isDev ? ['find', 'findOne', 'create', 'update', 'delete'] : ['find', 'findOne'] },
-        { controller: 'achievement', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
-        { controller: 'course-enrollment', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
-        { controller: 'user-progress', actions: isDev ? ['find', 'findOne', 'create', 'update'] : ['find', 'findOne'] },
-        { controller: 'user-achievement', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
-        { controller: 'streak', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
-        { controller: 'leaderboard', actions: isDev ? ['find', 'findOne', 'create'] : ['find', 'findOne'] },
-        { controller: 'moderation-queue', actions: isDev ? ['find', 'findOne', 'create'] : [] },
-        // Masjid admin portal content types
+      // Public role: read-only access for public-facing content ONLY
+      // User-specific data (enrollments, progress, achievements, streaks) is
+      // NOT public — it is accessed via session-verified server routes.
+      const publicPermissions = [
+        { controller: 'course', actions: ['find', 'findOne'] },
+        { controller: 'lesson', actions: ['find', 'findOne'] },
+        { controller: 'quiz', actions: ['find', 'findOne'] },
+        { controller: 'achievement', actions: ['find', 'findOne'] },
+        { controller: 'leaderboard', actions: ['find', 'findOne'] },
         { controller: 'announcement', actions: ['find', 'findOne'] },
         { controller: 'event', actions: ['find', 'findOne'] },
-        { controller: 'prayer-time-override', actions: isDev ? ['find', 'findOne', 'create'] : [] },
-        { controller: 'itikaf-registration', actions: ['find', 'findOne', 'create'] },
-        { controller: 'appeal', actions: ['find', 'findOne'] },
+        { controller: 'iqamah-schedule', actions: ['find', 'findOne'] },
       ];
 
-      for (const { controller, actions } of permissionsToEnable) {
-        for (const action of actions) {
-          try {
-            const actionName = `api::${controller}.${controller}.${action}`;
+      // Authenticated role: CRUD for admin operations via API token.
+      // DELETE is restricted to admin-managed content only. The admin app
+      // uses a full-access API token which bypasses these role permissions,
+      // so these mainly gate direct Strapi API access.
+      const authenticatedPermissions = [
+        { controller: 'course', actions: ['find', 'findOne', 'create', 'update'] },
+        { controller: 'lesson', actions: ['find', 'findOne', 'create', 'update'] },
+        { controller: 'quiz', actions: ['find', 'findOne', 'create', 'update'] },
+        { controller: 'achievement', actions: ['find', 'findOne', 'create', 'update'] },
+        { controller: 'course-enrollment', actions: ['find', 'findOne', 'create', 'update'] },
+        { controller: 'user-progress', actions: ['find', 'findOne', 'create', 'update'] },
+        { controller: 'user-achievement', actions: ['find', 'findOne', 'create'] },
+        { controller: 'streak', actions: ['find', 'findOne', 'create'] },
+        { controller: 'leaderboard', actions: ['find', 'findOne', 'create'] },
+        { controller: 'moderation-queue', actions: ['find', 'findOne', 'create', 'update'] },
+        { controller: 'announcement', actions: ['find', 'findOne', 'create', 'update'] },
+        { controller: 'event', actions: ['find', 'findOne', 'create', 'update'] },
+        { controller: 'iqamah-schedule', actions: ['find', 'findOne', 'create', 'update'] },
+        { controller: 'prayer-time-override', actions: ['find', 'findOne', 'create', 'update'] },
+        { controller: 'itikaf-registration', actions: ['find', 'findOne', 'create', 'update'] },
+        { controller: 'appeal', actions: ['find', 'findOne', 'update'] },
+      ];
 
-            // Find the permission
-            const permission = await strapi.query('plugin::users-permissions.permission').findOne({
-              where: {
-                role: publicRole.id,
-                action: actionName,
-              },
-            });
+      // Helper: ensure a permission exists and is linked to a role (Strapi v5 compatible)
+      async function ensurePermission(roleId: number, actionName: string) {
+        const knex = strapi.db.connection;
 
-            if (permission) {
-              // Update it if it exists
-              await strapi.query('plugin::users-permissions.permission').update({
-                where: { id: permission.id },
-                data: { enabled: true },
-              });
-            } else {
-              // Create it if it doesn't exist
-              await strapi.query('plugin::users-permissions.permission').create({
-                data: {
-                  action: actionName,
-                  role: publicRole.id,
-                  enabled: true,
-                },
-              });
-            }
-          } catch (error) {
-            console.error(`   ✗ Failed to configure ${controller}.${action}:`, error.message);
-          }
+        // Check if permission row exists
+        let permission = await knex('up_permissions')
+          .where({ action: actionName })
+          .first();
+
+        if (!permission) {
+          // Create the permission row
+          const [inserted] = await knex('up_permissions')
+            .insert({
+              action: actionName,
+              created_at: new Date(),
+              updated_at: new Date(),
+            })
+            .returning('id');
+          permission = { id: typeof inserted === 'object' ? inserted.id : inserted };
+        }
+
+        // Check if link to role exists
+        const link = await knex('up_permissions_role_lnk')
+          .where({ permission_id: permission.id, role_id: roleId })
+          .first();
+
+        if (!link) {
+          await knex('up_permissions_role_lnk').insert({
+            permission_id: permission.id,
+            role_id: roleId,
+          });
         }
       }
 
-      console.log('✅ Public permissions configured');
-      if (isDev) {
-        console.log('   Enabled: find, findOne, create for Course, Lesson, Quiz (development mode)');
-      } else {
-        console.log('   Enabled: find, findOne only (production mode — create/update disabled)');
+      // Apply public permissions
+      for (const { controller, actions } of publicPermissions) {
+        for (const action of actions) {
+          try {
+            await ensurePermission(publicRole.id, `api::${controller}.${controller}.${action}`);
+          } catch (error) {
+            console.error(`   ✗ Failed: public ${controller}.${action}:`, error.message);
+          }
+        }
       }
+      console.log('✅ Public permissions configured (read-only)');
+
+      // Apply authenticated permissions (for API token access from admin app)
+      if (authenticatedRole) {
+        for (const { controller, actions } of authenticatedPermissions) {
+          for (const action of actions) {
+            try {
+              await ensurePermission(authenticatedRole.id, `api::${controller}.${controller}.${action}`);
+            } catch (error) {
+              console.error(`   ✗ Failed: authenticated ${controller}.${action}:`, error.message);
+            }
+          }
+        }
+        console.log('✅ Authenticated permissions configured (full CRUD)');
+      }
+    }
+
+    // Ensure a full-access API token exists for admin app server-to-server calls
+    try {
+      const apiTokenService = strapi.service('admin::api-token');
+      const existingTokens = await apiTokenService.list();
+      const hasFullAccess = existingTokens.some((t: any) => t.type === 'full-access');
+
+      if (!hasFullAccess) {
+        const token = await apiTokenService.create({
+          name: 'Admin Full Access',
+          description: 'Full access token for admin app (auto-generated)',
+          type: 'full-access',
+          lifespan: null, // never expires
+        });
+        console.log(`🔑 API token created: ${token.accessKey}`);
+        console.log('   Set STRAPI_API_TOKEN in your .env to this value');
+      } else {
+        console.log('🔑 Full-access API token already exists');
+      }
+    } catch (error) {
+      console.error('   ✗ Failed to create API token:', error.message);
     }
 
     // Log available content types
@@ -847,7 +908,6 @@ export default async ({ strapi }: { strapi: any }) => {
       key.startsWith('api::')
     );
     console.log(`📚 Available content types: ${contentTypes.length}`);
-    contentTypes.forEach(ct => console.log(`   - ${ct}`));
 
 
     // SECURITY: Skip seed data in production to prevent test data contamination

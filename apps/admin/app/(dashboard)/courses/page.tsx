@@ -5,10 +5,11 @@
 
 'use client';
 
-import { Edit, Eye, Loader2, Plus, RefreshCw, Search, Trash2 } from 'lucide-react';
+import { Edit, Eye, LayoutGrid, List, Loader2, Plus, RefreshCw, Search, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
+import { CourseCard, type CourseCardData } from '@/components/courses/course-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -20,9 +21,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { cn } from '@/lib/utils/cn';
 import { formatCategoryLabel, formatDate, formatDuration } from '@/lib/utils/formatters';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
+import { strapiClient, adminApiEndpoints } from '@/lib/api/strapi-client';
 
 interface StrapiCourse {
   id: number;
@@ -42,8 +44,11 @@ interface StrapiCourse {
   publishedAt: string | null;
   createdAt: string;
   updatedAt: string;
-  lessons?: { id: number }[];
+  lessons?: { id: number; lesson_type?: string | null; duration_minutes?: number | null; updatedAt?: string | null }[];
+  thumbnail?: CourseCardData['thumbnail'];
 }
+
+type ViewMode = 'grid' | 'table';
 
 export default function CoursesPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -51,6 +56,25 @@ export default function CoursesPage() {
   const [selectedDifficulty, setSelectedDifficulty] = useState('all');
   const [courses, setCourses] = useState<StrapiCourse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [view, setView] = useState<ViewMode>('grid');
+
+  // Persist view preference per-user
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('courses-view-mode');
+      if (stored === 'grid' || stored === 'table') setView(stored);
+    } catch {
+      // ignore
+    }
+  }, []);
+  const changeView = (next: ViewMode) => {
+    setView(next);
+    try {
+      localStorage.setItem('courses-view-mode', next);
+    } catch {
+      // ignore
+    }
+  };
 
   const fetchCourses = useCallback(async () => {
     setIsLoading(true);
@@ -58,8 +82,10 @@ export default function CoursesPage() {
       const params = new URLSearchParams({
         'pagination[pageSize]': '100',
         'sort': 'createdAt:desc',
-        'populate[0]': 'lessons',
-        'populate[1]': 'thumbnail',
+        'populate[lessons][fields][0]': 'lesson_type',
+        'populate[lessons][fields][1]': 'duration_minutes',
+        'populate[lessons][fields][2]': 'updatedAt',
+        'populate[thumbnail]': 'true',
       });
 
       if (selectedCategory !== 'all') {
@@ -75,16 +101,10 @@ export default function CoursesPage() {
       // Fetch both published and draft - admin sees all
       params.set('publicationState', 'preview');
 
-      const res = await fetch(`${API_URL}/api/v1/courses?${params}`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (res.ok) {
-        const json = await res.json();
-        setCourses(json.data || []);
-      }
+      const { data } = await strapiClient.get<StrapiCourse[]>(
+        `${adminApiEndpoints.courses}?${params}`
+      );
+      setCourses((data as any)?.data || data || []);
     } catch (error) {
       console.error('Failed to fetch courses:', error);
     } finally {
@@ -101,12 +121,8 @@ export default function CoursesPage() {
     if (!confirm(`Delete "${course.title}"? This cannot be undone.`)) return;
     try {
       const identifier = course.documentId || course.id;
-      const res = await fetch(`${API_URL}/api/v1/courses/${identifier}`, {
-        method: 'DELETE',
-      });
-      if (res.ok) {
-        fetchCourses();
-      }
+      await strapiClient.delete(`${adminApiEndpoints.courses}/${identifier}`);
+      fetchCourses();
     } catch (error) {
       console.error('Failed to delete course:', error);
     }
@@ -150,7 +166,43 @@ export default function CoursesPage() {
             Manage your courses and learning content
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
+          <div
+            role="group"
+            aria-label="Toggle view"
+            className="inline-flex overflow-hidden rounded-lg border border-charcoal-300 bg-white"
+          >
+            <button
+              type="button"
+              onClick={() => changeView('grid')}
+              aria-pressed={view === 'grid'}
+              className={cn(
+                'inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium transition-colors',
+                view === 'grid'
+                  ? 'bg-primary-600 text-white'
+                  : 'text-charcoal-600 hover:bg-charcoal-50'
+              )}
+              title="Grid view"
+            >
+              <LayoutGrid className="h-3.5 w-3.5" />
+              Grid
+            </button>
+            <button
+              type="button"
+              onClick={() => changeView('table')}
+              aria-pressed={view === 'table'}
+              className={cn(
+                'inline-flex items-center gap-1 border-l border-charcoal-200 px-2.5 py-1.5 text-xs font-medium transition-colors',
+                view === 'table'
+                  ? 'bg-primary-600 text-white'
+                  : 'text-charcoal-600 hover:bg-charcoal-50'
+              )}
+              title="Table view"
+            >
+              <List className="h-3.5 w-3.5" />
+              Table
+            </button>
+          </div>
           <Button variant="outline" onClick={fetchCourses}>
             <RefreshCw className="mr-2 h-4 w-4" />
             Refresh
@@ -208,7 +260,38 @@ export default function CoursesPage() {
         </div>
       </Card>
 
-      {/* Table */}
+      {/* Content */}
+      {view === 'grid' ? (
+        isLoading ? (
+          <div className="flex items-center justify-center rounded-lg border border-charcoal-200 bg-white py-16">
+            <Loader2 className="mr-2 h-6 w-6 animate-spin text-primary-500" />
+            <span className="text-charcoal-500">Loading courses...</span>
+          </div>
+        ) : courses.length === 0 ? (
+          <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-charcoal-200 bg-white py-16 text-center">
+            <p className="text-sm font-medium text-charcoal-800">No courses found</p>
+            <p className="mt-1 text-xs text-charcoal-500">
+              Create your first course to get started with the virtual library.
+            </p>
+            <Link href="/courses/new">
+              <Button className="mt-4" size="sm">
+                <Plus className="mr-2 h-4 w-4" />
+                Create Course
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {courses.map((course) => (
+              <CourseCard
+                key={course.id}
+                course={course as unknown as CourseCardData}
+                onDelete={() => deleteCourse(course)}
+              />
+            ))}
+          </div>
+        )
+      ) : (
       <Card>
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
@@ -281,20 +364,20 @@ export default function CoursesPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Link href={`/courses/${identifier}`}>
+                        <Link href={`/courses/${identifier}/lessons`}>
                           <button
                             className="rounded-lg p-2 text-charcoal-600 hover:bg-charcoal-50"
-                            aria-label="View course"
-                            title="View course details"
+                            aria-label="View lessons"
+                            title="View lessons"
                           >
                             <Eye className="h-4 w-4" />
                           </button>
                         </Link>
-                        <Link href={`/courses/${identifier}`}>
+                        <Link href={`/courses/${identifier}/settings`}>
                           <button
                             className="rounded-lg p-2 text-charcoal-600 hover:bg-charcoal-50"
-                            aria-label="Edit course"
-                            title="Edit course"
+                            aria-label="Edit course settings"
+                            title="Edit course settings"
                           >
                             <Edit className="h-4 w-4" />
                           </button>
@@ -325,6 +408,7 @@ export default function CoursesPage() {
           </div>
         )}
       </Card>
+      )}
     </div>
   );
 }
