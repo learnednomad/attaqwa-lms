@@ -12,7 +12,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
+import { strapiClient } from '@/lib/api/strapi-client';
 
 interface AISuggestionsProps {
   content: string;
@@ -41,32 +41,16 @@ export function AISuggestions({ content, title, onAcceptField }: AISuggestionsPr
 
     try {
       const [tagsRes, summaryRes] = await Promise.allSettled([
-        fetch(`${API_URL}/api/v1/ai/generate-tags`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_TOKEN}`,
-          },
-          body: JSON.stringify({ content, title }),
-        }),
-        fetch(`${API_URL}/api/v1/ai/summarize`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_TOKEN}`,
-          },
-          body: JSON.stringify({ content }),
-        }),
+        strapiClient.post('/v1/ai/generate-tags', { content, title }),
+        strapiClient.post('/v1/ai/summarize', { content }),
       ]);
 
-      if (tagsRes.status === 'fulfilled' && tagsRes.value.ok) {
-        const json = await tagsRes.value.json();
-        setSuggestions(json.data);
+      if (tagsRes.status === 'fulfilled') {
+        setSuggestions((tagsRes.value as any).data);
       }
 
-      if (summaryRes.status === 'fulfilled' && summaryRes.value.ok) {
-        const json = await summaryRes.value.json();
-        setSummary(json.data.summary);
+      if (summaryRes.status === 'fulfilled') {
+        setSummary((summaryRes.value as any).data.summary);
       }
     } catch {
       setError('AI service is unavailable. Please try again later.');

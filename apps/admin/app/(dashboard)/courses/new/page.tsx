@@ -17,8 +17,6 @@ export default function CreateCoursePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
-
   const handleSubmit = async (data: CourseFormData) => {
     setIsLoading(true);
     setError(null);
@@ -55,18 +53,8 @@ export default function CreateCoursePage() {
         },
       };
 
-      const response = await fetch(`${API_URL}/api/v1/courses`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(courseData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.error?.message || `Request failed with status code ${response.status}`);
-      }
+      const { strapiClient, adminApiEndpoints } = await import('@/lib/api/strapi-client');
+      await strapiClient.post(adminApiEndpoints.courses, courseData);
 
       // Redirect to courses list on success
       router.push('/courses');

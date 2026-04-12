@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ModerationReview } from '@/components/moderation/ModerationReview';
 import { ModerationStatusBadge, AIScoreBadge } from '@/components/moderation/ModerationBadge';
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
+import { strapiClient, adminApiEndpoints } from '@/lib/api/strapi-client';
 
 interface ModerationItem {
   id: string;
@@ -39,14 +39,8 @@ export default function ModerationDetailPage() {
 
   const fetchItem = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/v1/moderation-queues/${id}?populate=reviewer`, {
-        headers: { Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_TOKEN}` },
-      });
-
-      if (res.ok) {
-        const json = await res.json();
-        setItem(json.data);
-      }
+      const json = await strapiClient.get(adminApiEndpoints.moderationQueues + '/' + id + '?populate=reviewer');
+      setItem((json as any).data);
     } catch (error) {
       console.error('Failed to fetch moderation item:', error);
     } finally {
@@ -61,18 +55,8 @@ export default function ModerationDetailPage() {
   const handleReview = async (action: string, notes: string) => {
     setIsSubmitting(true);
     try {
-      const res = await fetch(`${API_URL}/api/v1/moderation-queues/${id}/review`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_TOKEN}`,
-        },
-        body: JSON.stringify({ action, notes }),
-      });
-
-      if (res.ok) {
-        router.push('/moderation');
-      }
+      await strapiClient.put(adminApiEndpoints.moderationQueues + '/' + id + '/review', { action, notes });
+      router.push('/moderation');
     } catch (error) {
       console.error('Review failed:', error);
     } finally {

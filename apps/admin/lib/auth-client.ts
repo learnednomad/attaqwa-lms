@@ -3,7 +3,12 @@
 import { createAuthClient } from "better-auth/react";
 import { adminClient } from "better-auth/client/plugins";
 
+const getBaseURL = () => {
+  if (typeof window !== "undefined") return window.location.origin;
+  return process.env.AUTH_INTERNAL_URL || "http://localhost:3000";
+};
+
 export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_AUTH_URL || "http://localhost:3003",
+  baseURL: getBaseURL(),
   plugins: [adminClient()],
 });

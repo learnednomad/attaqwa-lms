@@ -59,7 +59,7 @@ services:
       --maxmemory ${REDIS_MAXMEMORY:-256mb}
       --maxmemory-policy allkeys-lru
       --appendonly yes
-      --requirepass ${REDIS_PASSWORD:-change-this-redis-password}
+      --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
     volumes:
       - redis_data:/data
     networks:
@@ -77,7 +77,7 @@ services:
         max-size: "10m"
         max-file: "3"
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-change-this-redis-password}", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:?REDIS_PASSWORD is required}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -154,7 +154,7 @@ services:
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-change-this-redis-password}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
       S3_BASE_URL: ${S3_BASE_URL:?S3_BASE_URL is required for production}
     ports: !override []  # Only accessible via Caddy
     networks:
@@ -192,6 +192,7 @@ services:
     ports: !override []  # Only accessible via Caddy
     networks:
       - frontend
+      - backend    # Needs to reach api:1337 (Strapi) and website:3001 (BetterAuth)
     deploy:
       resources:
         limits:

@@ -11,7 +11,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ModerationTable } from '@/components/moderation/ModerationTable';
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
+import { strapiClient, adminApiEndpoints } from '@/lib/api/strapi-client';
 
 interface ModerationItem {
   id: string;
@@ -47,14 +47,8 @@ export default function ModerationPage() {
         params.append('filters[content_type][$eq]', contentTypeFilter);
       }
 
-      const res = await fetch(`${API_URL}/api/v1/moderation-queues?${params}`, {
-        headers: { Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_TOKEN}` },
-      });
-
-      if (res.ok) {
-        const json = await res.json();
-        setItems(json.data || []);
-      }
+      const json = await strapiClient.get(adminApiEndpoints.moderationQueues + '?' + params);
+      setItems((json as any).data || []);
     } catch (error) {
       console.error('Failed to fetch moderation queue:', error);
     } finally {

@@ -7,9 +7,13 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios';
 import { API_V1_ENDPOINTS, API_CONFIG } from '@attaqwa/shared';
 
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337/api';
-const STRAPI_API_TOKEN = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
+const STRAPI_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
+
+// All API calls go through the admin's own proxy (/api/v1/* → Strapi)
+// This avoids cross-origin issues and handles auth server-side
+const API_URL = typeof window !== 'undefined'
+  ? '/api'
+  : `http://localhost:${process.env.PORT || '3000'}/api`;
 
 // API Version configuration
 const API_VERSION = API_CONFIG.CURRENT_VERSION; // 'v1'
@@ -25,23 +29,12 @@ class StrapiClient {
       },
     });
 
-    // Request interceptor to add API token
-    this.client.interceptors.request.use(
-      (config) => {
-        if (STRAPI_API_TOKEN) {
-          config.headers.Authorization = `Bearer ${STRAPI_API_TOKEN}`;
-        }
-        return config;
-      },
-      (error) => Promise.reject(error)
-    );
-
     // Response interceptor for error handling
     this.client.interceptors.response.use(
       (response) => response,
       async (error) => {
         if (error.response?.status === 401) {
-          console.error('[StrapiClient] Unauthorized — check STRAPI_API_TOKEN');
+          console.error('[StrapiClient] Unauthorized');
         }
         return Promise.reject(error);
       }
@@ -168,9 +161,205 @@ export const adminApiEndpoints = {
   leaderboards: `/${API_VERSION}/leaderboards`,
   streaks: `/${API_VERSION}/streaks`,
 
+  // Masjid admin content
+  announcements: `/${API_VERSION}/announcements`,
+  events: `/${API_VERSION}/events`,
+  iqamahSchedules: `/${API_VERSION}/iqamah-schedules`,
+  prayerTimeOverrides: `/${API_VERSION}/prayer-time-overrides`,
+  itikafRegistrations: `/${API_VERSION}/itikaf-registrations`,
+  appeals: `/${API_VERSION}/appeals`,
+  moderationQueues: `/${API_VERSION}/moderation-queues`,
+
   // File upload (standard Strapi)
   upload: '/upload',
 } as const;
 
 // Export shared endpoints for consistency
 export { API_V1_ENDPOINTS, API_CONFIG };
+
+// ---------------------------------------------------------------------------
+// Lesson helpers (Phase 1: global library, Phase 2: outline + drawer)
+// ---------------------------------------------------------------------------
+
+export interface AdminLessonCourse {
+  id: number;
+  documentId?: string;
+  title: string;
+  slug?: string;
+}
+
+export interface AdminLesson {
+  id: number;
+  documentId?: string;
+  title: string;
+  slug?: string;
+  description?: string;
+  lesson_order: number;
+  lesson_type: string;
+  duration_minutes: number;
+  content?: string | null;
+  video_url?: string | null;
+  is_free?: boolean;
+  is_preview?: boolean;
+  publishedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  course?: AdminLessonCourse | null;
+}
+
+export interface ListLessonsParams {
+  courseId?: string | number | null;
+  type?: string | null;
+  q?: string | null;
+  page?: number;
+  pageSize?: number;
+  sort?: string[];
+}
+
+export interface ListLessonsResult {
+  items: AdminLesson[];
+  pagination: { page: number; pageSize: number; pageCount: number; total: number };
+}
+
+function buildLessonListParams(params: ListLessonsParams): URLSearchParams {
+  const query = new URLSearchParams();
+  query.set('populate[course][fields][0]', 'title');
+  query.set('populate[course][fields][1]', 'slug');
+  query.set('publicationState', 'preview');
+
+  const sort = params.sort ?? ['course.title:asc', 'lesson_order:asc'];
+  sort.forEach((s, i) => query.set(`sort[${i}]`, s));
+
+  query.set('pagination[page]', String(params.page ?? 1));
+  query.set('pagination[pageSize]', String(params.pageSize ?? 25));
+
+  if (params.courseId) {
+    query.set('filters[course][id][$eq]', String(params.courseId));
+  }
+  if (params.type) {
+    query.set('filters[lesson_type][$eq]', params.type);
+  }
+  if (params.q) {
+    query.set('filters[title][$containsi]', params.q);
+  }
+
+  return query;
+}
+
+export async function listLessons(params: ListLessonsParams = {}): Promise<ListLessonsResult> {
+  const query = buildLessonListParams(params);
+  const response = await strapiClient.get<AdminLesson[]>(
+    `${adminApiEndpoints.lessons}?${query.toString()}`
+  );
+  // Strapi can return either { data: T[] } (wrapped once by axios) or
+  // { data: { data: T[], meta: {...} } } depending on proxy behaviour.
+  // Normalise both shapes here.
+  // @ts-expect-error runtime shape check
+  const body = response?.data?.data ? response.data : response;
+  const items = Array.isArray((body as any).data)
+    ? ((body as any).data as AdminLesson[])
+    : [];
+  const metaPagination = (body as any)?.meta?.pagination ?? {
+    page: params.page ?? 1,
+    pageSize: params.pageSize ?? items.length,
+    pageCount: 1,
+    total: items.length,
+  };
+  return { items, pagination: metaPagination };
+}
+
+export async function getLesson(id: string | number): Promise<AdminLesson | null> {
+  const query = new URLSearchParams();
+  query.set('populate[course][fields][0]', 'title');
+  query.set('populate[course][fields][1]', 'slug');
+  query.set('populate[quiz]', 'true');
+  query.set('publicationState', 'preview');
+  const response = await strapiClient.get<AdminLesson>(
+    `${adminApiEndpoints.lessons}/${id}?${query.toString()}`
+  );
+  return (response.data as any) ?? null;
+}
+
+export async function createLesson(payload: Partial<AdminLesson> & { course: number }) {
+  return strapiClient.post<AdminLesson>(adminApiEndpoints.lessons, { data: payload });
+}
+
+export async function updateLesson(id: string | number, payload: Partial<AdminLesson>) {
+  return strapiClient.put<AdminLesson>(`${adminApiEndpoints.lessons}/${id}`, { data: payload });
+}
+
+export async function deleteLessonById(id: string | number) {
+  return strapiClient.delete<AdminLesson>(`${adminApiEndpoints.lessons}/${id}`);
+}
+
+/**
+ * Duplicate a lesson into the same course. Copies the content fields,
+ * appends " (Copy)" to the title, and places the duplicate after the
+ * current highest lesson_order in that course.
+ */
+export async function duplicateLesson(id: string | number): Promise<AdminLesson | null> {
+  const source = await getLesson(id);
+  if (!source) return null;
+
+  const courseId = source.course?.id;
+  if (!courseId) {
+    throw new Error('Cannot duplicate a lesson without a course relation');
+  }
+
+  const siblings = await listLessons({ courseId, pageSize: 100 });
+  const nextOrder =
+    siblings.items.reduce((max, l) => Math.max(max, l.lesson_order ?? 0), 0) + 1;
+
+  const {
+    id: _id,
+    documentId: _doc,
+    createdAt: _c,
+    updatedAt: _u,
+    publishedAt: _p,
+    course: _course,
+    slug: _slug,
+    ...rest
+  } = source;
+
+  const payload = {
+    ...rest,
+    title: `${source.title} (Copy)`,
+    lesson_order: nextOrder,
+    course: courseId,
+  } as Partial<AdminLesson> & { course: number };
+
+  const created = await createLesson(payload);
+  return (created.data as any) ?? null;
+}
+
+export async function listCoursesForPicker(): Promise<AdminLessonCourse[]> {
+  const query = new URLSearchParams();
+  query.set('fields[0]', 'title');
+  query.set('fields[1]', 'slug');
+  query.set('sort[0]', 'title:asc');
+  query.set('pagination[pageSize]', '200');
+  query.set('publicationState', 'preview');
+  const response = await strapiClient.get<AdminLessonCourse[]>(
+    `${adminApiEndpoints.courses}?${query.toString()}`
+  );
+  // @ts-expect-error runtime shape check
+  const body = response?.data?.data ? response.data : response;
+  const items = Array.isArray((body as any).data) ? ((body as any).data as AdminLessonCourse[]) : [];
+  return items;
+}
+
+/**
+ * Persist a new lesson order across a set of lessons in one course.
+ * Strapi v5 has no bulk endpoint at this API, so we issue sequential PUTs.
+ * Caller owns optimistic UI; we return the first failure if any.
+ */
+export async function reorderLessons(
+  orderedIds: Array<string | number>
+): Promise<void> {
+  for (let i = 0; i < orderedIds.length; i += 1) {
+    const id = orderedIds[i];
+    // eslint-disable-next-line no-await-in-loop
+    await updateLesson(id, { lesson_order: i + 1 });
+  }
+}
+

@@ -522,7 +522,7 @@ function FileDropzone({
           const f = e.target.files?.[0];
           if (f) onFileSelect(f);
         }}
-        className="hidden"
+        className="sr-only"
       />
     </div>
   );

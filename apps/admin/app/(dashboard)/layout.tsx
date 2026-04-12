@@ -18,13 +18,13 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, checkRole } = useAuth();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (!isLoading && (!isAuthenticated || !checkRole(['admin']))) {
       router.push('/login');
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, checkRole, router]);
 
   if (isLoading) {
     return (
@@ -37,7 +37,7 @@ export default function DashboardLayout({
     );
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !checkRole(['admin'])) {
     return null;
   }
 

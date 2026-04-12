@@ -4,7 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 const { GET: authGet, POST: authPost } = toNextJsHandler(auth);
 
-export { authGet as GET };
+export async function GET(request: NextRequest) {
+  const response = await authGet(request);
+  return addCorsHeaders(response, request);
+}
 
 // ---------------------------------------------------------------------------
 // CORS preflight handler for cross-origin requests (e.g. admin app)
@@ -35,6 +38,9 @@ export async function OPTIONS(request: NextRequest) {
 
 // ---------------------------------------------------------------------------
 // In-memory rate limiter for sign-in attempts
+// TODO: Replace with Redis-backed rate limiter for multi-instance deployments.
+// In-memory Map resets on every redeploy and is per-instance only, meaning
+// distributed brute-force attacks across replicas bypass the limit.
 // ---------------------------------------------------------------------------
 const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
 const RATE_LIMIT_MAX = 10; // max attempts per window
@@ -131,12 +137,15 @@ export async function POST(request: NextRequest) {
 
       // Reject whitespace-only passwords
       if (typeof body.password === "string" && !body.password.trim()) {
-        return NextResponse.json(
-          {
-            code: "PASSWORD_TOO_SHORT",
-            message: "Password cannot be empty or whitespace only",
-          },
-          { status: 400 }
+        return addCorsHeaders(
+          NextResponse.json(
+            {
+              code: "PASSWORD_TOO_SHORT",
+              message: "Password cannot be empty or whitespace only",
+            },
+            { status: 400 }
+          ),
+          request
         );
       }
 
@@ -144,12 +153,15 @@ export async function POST(request: NextRequest) {
       if (typeof body.name === "string" && /<[^>]*>/.test(body.name)) {
         const sanitized = body.name.replace(/<[^>]*>/g, "").trim();
         if (!sanitized) {
-          return NextResponse.json(
-            {
-              code: "INVALID_NAME",
-              message: "Name contains invalid characters",
-            },
-            { status: 400 }
+          return addCorsHeaders(
+            NextResponse.json(
+              {
+                code: "INVALID_NAME",
+                message: "Name contains invalid characters",
+              },
+              { status: 400 }
+            ),
+            request
           );
         }
         const sanitizedRequest = new NextRequest(request.url, {
@@ -157,7 +169,7 @@ export async function POST(request: NextRequest) {
           headers: request.headers,
           body: JSON.stringify({ ...body, name: sanitized }),
         });
-        return authPost(sanitizedRequest);
+        return addCorsHeaders(await authPost(sanitizedRequest), request);
       }
     } catch {
       // JSON parse error — let better-auth handle it

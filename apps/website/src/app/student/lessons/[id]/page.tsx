@@ -618,7 +618,7 @@ export default function StudentLessonDetailPage() {
           {(() => {
             const videoUrl = lesson.video_url;
             const videoFile = lesson.video_file;
-            const strapiBase = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
+            const strapiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
 
             // Extract YouTube video ID from various URL formats
             const getYouTubeId = (url: string): string | null => {
