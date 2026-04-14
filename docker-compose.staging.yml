@@ -1,0 +1,85 @@
+# ============================================================================
+# Staging Docker Compose Override — AttaqwaMasjid LMS
+# ============================================================================
+# Layered on top of docker-compose.yml. Staging is a production-shaped
+# environment (Caddy, auto-migrations, network isolation) with relaxed
+# resource limits, verbose logging, and host port exposure for debugging.
+#
+# Usage:
+#   docker compose \
+#     -f docker-compose.yml \
+#     -f docker-compose.prod.yml \
+#     -f docker-compose.staging.yml \
+#     up -d --build
+#
+# Required env (also create .env.staging and pass via --env-file):
+#   POSTGRES_PASSWORD, APP_KEYS, API_TOKEN_SALT, ADMIN_JWT_SECRET,
+#   TRANSFER_TOKEN_SALT, ENCRYPTION_KEY, JWT_SECRET, BETTER_AUTH_SECRET,
+#   STRAPI_API_TOKEN, MINIO_ROOT_PASSWORD, REDIS_PASSWORD,
+#   DOMAIN (e.g. staging.attaqwa.org), S3_BASE_URL
+#
+# Database isolation: this compose file presumes a SEPARATE Postgres volume
+# and a SEPARATE DOMAIN from production. Never share state between envs.
+# ============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL — expose port for staging diagnostics
+  # ---------------------------------------------------------------------------
+  postgres:
+    ports: !override
+      - "5432:5432"
+
+  # ---------------------------------------------------------------------------
+  # Init — verbose logging (migrations must succeed before other services)
+  # ---------------------------------------------------------------------------
+  init:
+    environment:
+      NODE_ENV: staging
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  # ---------------------------------------------------------------------------
+  # API — staging resource profile
+  # ---------------------------------------------------------------------------
+  api:
+    environment:
+      NODE_ENV: staging
+      # Strapi sometimes needs to know it's not in prod for richer error bodies
+      STRAPI_TELEMETRY_DISABLED: "true"
+    ports: !override
+      - "1337:1337"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 1536M
+
+  # ---------------------------------------------------------------------------
+  # Admin — expose port for QA / exploratory testing
+  # ---------------------------------------------------------------------------
+  admin:
+    environment:
+      NODE_ENV: staging
+    ports: !override
+      - "3000:3000"
+
+  # ---------------------------------------------------------------------------
+  # Website — expose port for QA / exploratory testing
+  # ---------------------------------------------------------------------------
+  website:
+    environment:
+      NODE_ENV: staging
+    ports: !override
+      - "3001:3001"
+
+  # ---------------------------------------------------------------------------
+  # MinIO — expose console + API for staging debugging
+  # ---------------------------------------------------------------------------
+  minio:
+    ports: !override
+      - "9000:9000"
+      - "9001:9001"
