@@ -182,23 +182,31 @@ CMD ["node", "apps/website/server.js"]
 # ===========================================================================
 # Init Container — Database migrations & setup (runs once per deploy)
 # ===========================================================================
+# One-shot container that:
+#  - waits for Postgres
+#  - applies BetterAuth schema via the locally-installed @better-auth/cli
+#  - seeds default users in non-production environments
+#  - migrates legacy Strapi users into BetterAuth if needed
+#
+# Intentionally runs as root: it is short-lived, touches only the database,
+# and avoids pnpm cache / permission friction across monorepo packages.
+# ===========================================================================
 
 FROM source AS init
 
 RUN apk add --no-cache postgresql16-client
-RUN addgroup -g 1001 -S nodejs && adduser -S init -u 1001
 
 WORKDIR /app
 
-# Pre-install the auth CLI so migrate doesn't download it at runtime
-RUN npx auth@latest --help > /dev/null 2>&1 || true
-
-# Copy init scripts
+# Copy the init runtime assets. `scripts/` may contain additional TS helpers
+# referenced by the entrypoint (e.g. migrate-users-to-betterauth.ts).
 COPY docker/init/entrypoint.sh /entrypoint.sh
 COPY scripts/seed-auth-users.sql /app/scripts/seed-auth-users.sql
 COPY scripts/migrate-users-to-betterauth.ts /app/scripts/migrate-users-to-betterauth.ts
 RUN chmod +x /entrypoint.sh
 
-USER init
+# Smoke-check that the BetterAuth CLI is present in the baked image so a
+# misconfigured lockfile fails the build rather than the deploy.
+RUN pnpm --filter website exec better-auth --help > /dev/null
 
 ENTRYPOINT ["/entrypoint.sh"]
