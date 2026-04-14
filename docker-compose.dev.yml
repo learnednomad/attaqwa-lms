@@ -32,7 +32,8 @@ services:
       retries: 5
 
   # --------------------------------------------------------------------------
-  # Init Container — BetterAuth migrations + Strapi user migration
+  # Init Container — BetterAuth migrations + seed data
+  # Runs every time the dev stack comes up; each step is idempotent.
   # --------------------------------------------------------------------------
   init:
     image: node:22-alpine
@@ -41,11 +42,12 @@ services:
     working_dir: /app
     environment:
       NODE_ENV: development
-      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-dev-password-change-me}@postgres:5432/attaqwa_lms # placeholder
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-dev-password-change-me}@postgres:5432/attaqwa_lms
       DATABASE_HOST: postgres
       DATABASE_PORT: 5432
       DATABASE_USERNAME: postgres
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-dev-secret-change-me}
+      BETTER_AUTH_BASE_URL: ${BETTER_AUTH_BASE_URL:-http://localhost:3003}
     depends_on:
       postgres:
         condition: service_healthy
@@ -53,17 +55,28 @@ services:
       - .:/app
       - /app/node_modules
     command: >
-      sh -c "
-        npm install -g pnpm@10.12.3 &&
-        pnpm install &&
-        apk add --no-cache postgresql16-client &&
-        echo '=== [1/3] Running BetterAuth migrations ===' &&
-        cd apps/website && npx auth@latest migrate --yes &&
-        echo '=== [2/3] Seeding default user accounts ===' &&
-        cd /app && psql \"$$DATABASE_URL\" -f scripts/seed-auth-users.sql &&
-        echo '=== [3/3] Checking Strapi user migration ===' &&
-        STRAPI_EXISTS=$$(psql \"$$DATABASE_URL\" -tAc \"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'up_users');\" 2>/dev/null || echo f) &&
-        if [ \"$$STRAPI_EXISTS\" = 't' ]; then echo 'Strapi users found — run migrate-users-to-betterauth.ts manually'; else echo 'No Strapi users to migrate.'; fi &&
+      sh -eu -c "
+        apk add --no-cache postgresql16-client > /dev/null;
+        npm install -g pnpm@10.12.3 > /dev/null;
+        pnpm install --frozen-lockfile;
+        echo '=== [1/3] Running BetterAuth migrations ===';
+        cd apps/website && pnpm exec better-auth migrate --yes;
+        cd /app;
+        echo '=== [2/3] Seeding default user accounts ===';
+        psql \"$$DATABASE_URL\" -v ON_ERROR_STOP=1 -f scripts/seed-auth-users.sql;
+        echo '=== [3/3] Checking legacy Strapi user migration ===';
+        STRAPI_EXISTS=$$(psql \"$$DATABASE_URL\" -tAc \"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'up_users');\" 2>/dev/null || echo f);
+        if [ \"$$STRAPI_EXISTS\" = 't' ]; then
+          UNMIGRATED=$$(psql \"$$DATABASE_URL\" -tAc \"SELECT COUNT(*) FROM up_users u WHERE NOT EXISTS (SELECT 1 FROM \\\"user\\\" ba WHERE ba.email = u.email);\" 2>/dev/null || echo 0);
+          if [ \"$$UNMIGRATED\" -gt 0 ]; then
+            echo \"  Migrating $$UNMIGRATED legacy Strapi users...\";
+            node --import tsx scripts/migrate-users-to-betterauth.ts;
+          else
+            echo '  All Strapi users already migrated.';
+          fi;
+        else
+          echo '  No Strapi up_users table found — skipping.';
+        fi;
         echo '=== Init complete ==='
       "
 

@@ -2,19 +2,25 @@
 # =============================================================================
 # Init Container Entrypoint - AttaqwaMasjid LMS
 # =============================================================================
-# Runs all first-time setup tasks against the database:
-#   1. Wait for PostgreSQL to be ready
-#   2. Run BetterAuth migrations (create user/session/account/verification tables)
-#   3. Seed default user accounts (superadmin, masjid admin, teacher, student)
-#   4. Migrate Strapi users to BetterAuth (if up_users table exists)
+# Runs all first-time setup tasks against the database. Safe to run on every
+# deploy — each step is idempotent.
 #
-# Idempotent — safe to run on every deploy.
+#   1. Wait for PostgreSQL to be ready
+#   2. Run BetterAuth migrations (user / session / account / verification +
+#      any additionalFields like requiresPasswordChange)
+#   3. Seed default user accounts (development environments only)
+#   4. Migrate legacy Strapi `up_users` rows into BetterAuth, if present
+#
+# Strapi content-type tables (courses, lessons, enrollments, etc.) are
+# created by Strapi itself on boot — this container intentionally does
+# NOT touch them.
 # =============================================================================
 
 set -e
 
 echo "=== AttaqwaMasjid LMS Init ==="
 echo "Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+echo "Environment: ${NODE_ENV:-unknown}"
 
 # ---------------------------------------------------------------------------
 # 1. Wait for PostgreSQL
@@ -36,12 +42,15 @@ echo "  PostgreSQL is ready."
 
 # ---------------------------------------------------------------------------
 # 2. BetterAuth schema migration
+#    Uses the locally-installed @better-auth/cli (added as a dev dependency
+#    of apps/website). The CLI inspects apps/website/src/lib/auth.ts and
+#    applies any pending ALTER TABLEs via DATABASE_URL.
 # ---------------------------------------------------------------------------
 echo ""
 echo "[2/4] Running BetterAuth migrations..."
 
 cd /app/apps/website
-npx auth@latest migrate --yes 2>&1
+pnpm exec better-auth migrate --yes
 echo "  BetterAuth migration complete."
 
 # ---------------------------------------------------------------------------
@@ -51,17 +60,17 @@ echo ""
 echo "[3/4] Seeding default user accounts..."
 
 if [ "$NODE_ENV" = "production" ]; then
-  echo "  SKIP: Production environment — create accounts manually via admin UI."
+  echo "  SKIP: Production environment — create accounts via the admin UI."
 else
   cd /app
-  psql "$DATABASE_URL" -f scripts/seed-auth-users.sql 2>&1
+  psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f scripts/seed-auth-users.sql
 fi
 
 # ---------------------------------------------------------------------------
-# 4. Migrate Strapi users to BetterAuth (one-time, idempotent)
+# 4. Migrate Strapi users to BetterAuth (idempotent, no-op if already done)
 # ---------------------------------------------------------------------------
 echo ""
-echo "[4/4] Checking for Strapi user migration..."
+echo "[4/4] Checking for legacy Strapi user migration..."
 
 STRAPI_USERS=$(psql "$DATABASE_URL" -tAc \
   "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'up_users');" 2>/dev/null || echo "f")
@@ -72,7 +81,8 @@ if [ "$STRAPI_USERS" = "t" ]; then
 
   if [ "$UNMIGRATED" -gt 0 ]; then
     echo "  Found $UNMIGRATED unmigrated Strapi users. Migrating..."
-    node --import tsx scripts/migrate-users-to-betterauth.ts 2>&1
+    cd /app
+    node --import tsx scripts/migrate-users-to-betterauth.ts
     echo "  Strapi user migration complete."
   else
     echo "  All Strapi users already migrated. Skipping."
