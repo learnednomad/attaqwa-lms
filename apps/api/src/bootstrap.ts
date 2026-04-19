@@ -803,10 +803,11 @@ export default async ({ strapi }: { strapi: any }) => {
   console.log('\n🔧 Running bootstrap configuration...');
 
   try {
-    // Seed Strapi admin user in non-production only (idempotent — skips if admin exists)
-    if (process.env.NODE_ENV !== 'production') {
-      await seedStrapiAdmin(strapi);
-    }
+    // Seed Strapi admin user on every boot (idempotent — skips when a healthy
+    // admin exists). Production safety lives inside seedStrapiAdmin itself:
+    // it refuses to seed with defaults unless SEED_ADMIN_EMAIL +
+    // SEED_ADMIN_PASSWORD are explicitly provided.
+    await seedStrapiAdmin(strapi);
     // Configure API permissions for public and authenticated roles
     // Strapi v5: permissions are linked to roles via up_permissions_role_lnk
     const publicRole = await strapi
