@@ -54,16 +54,19 @@ pnpm exec better-auth migrate --yes
 echo "  BetterAuth migration complete."
 
 # ---------------------------------------------------------------------------
-# 3. Seed default user accounts (development only)
+# 3. Seed default user accounts
+#    Gated on SEED_USERS (explicit opt-in) rather than NODE_ENV, so staging
+#    and other non-prod deploys can run with NODE_ENV=production (correct
+#    runtime behavior) while still seeding demo accounts.
 # ---------------------------------------------------------------------------
 echo ""
 echo "[3/4] Seeding default user accounts..."
 
-if [ "$NODE_ENV" = "production" ]; then
-  echo "  SKIP: Production environment — create accounts via the admin UI."
-else
+if [ "${SEED_USERS:-false}" = "true" ]; then
   cd /app
   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f scripts/seed-auth-users.sql
+else
+  echo "  SKIP: SEED_USERS != true — create accounts via the admin UI."
 fi
 
 # ---------------------------------------------------------------------------

@@ -46,6 +46,10 @@ services:
     restart: "no"
     environment:
       NODE_ENV: ${NODE_ENV:-production}
+      # Explicit opt-in for the default-user seed (independent of NODE_ENV).
+      # Default false so production never seeds accidentally. Compose overlays
+      # (docker-compose.dev.yml, docker-compose.staging.yml) set this to true.
+      SEED_USERS: ${SEED_USERS:-false}
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?required}@postgres:5432/attaqwa_lms # placeholder
       DATABASE_HOST: postgres
       DATABASE_PORT: 5432

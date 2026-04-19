@@ -697,13 +697,49 @@ async function seedQuizzesIfEmpty(strapi: any) {
   }
 }
 
-// WARNING: These are development-only seed credentials. Change all passwords in production.
-const SEED_ADMIN = {
+type SeedAdminConfig = { firstname: string; lastname: string; email: string; password: string };
+
+const DEV_SEED_ADMIN_DEFAULTS: SeedAdminConfig = {
   firstname: 'Super',
   lastname: 'Admin',
-  email: 'texminer8@gmail.com',
-  password: 'SuperAdmin123!', // placeholder — development only, change in production
+  email: 'superadmin@attaqwa.org',
+  password: 'SuperAdmin123!',
 };
+
+/**
+ * Resolve seed admin credentials. In production, SEED_ADMIN_EMAIL and
+ * SEED_ADMIN_PASSWORD are required — we refuse to seed with hardcoded
+ * defaults. In dev/staging, env vars win; otherwise fall back to the
+ * documented dev defaults for local convenience.
+ */
+function resolveSeedAdminConfig(): SeedAdminConfig | null {
+  const envEmail = process.env.SEED_ADMIN_EMAIL?.trim();
+  const envPassword = process.env.SEED_ADMIN_PASSWORD;
+  const isProd = process.env.NODE_ENV === 'production';
+
+  if (envEmail && envPassword) {
+    return {
+      firstname: process.env.SEED_ADMIN_FIRSTNAME?.trim() || 'Super',
+      lastname: process.env.SEED_ADMIN_LASTNAME?.trim() || 'Admin',
+      email: envEmail,
+      password: envPassword,
+    };
+  }
+
+  if (isProd) {
+    console.error(
+      '❌ SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD are required in production. ' +
+        'Skipping admin seed — register via Strapi /admin on first visit instead.'
+    );
+    return null;
+  }
+
+  console.warn(
+    '⚠️  SEED_ADMIN_EMAIL/SEED_ADMIN_PASSWORD not set — using dev defaults. ' +
+      'Set these env vars for staging/prod deployments.'
+  );
+  return { ...DEV_SEED_ADMIN_DEFAULTS };
+}
 
 /**
  * Seed the Strapi admin user if none exists (idempotent).
@@ -711,7 +747,6 @@ const SEED_ADMIN = {
  */
 async function seedStrapiAdmin(strapi: any) {
   try {
-    const adminService = strapi.service('admin::user');
     const roleService = strapi.service('admin::role');
     const superAdminRole = await roleService.getSuperAdmin();
 
@@ -723,7 +758,6 @@ async function seedStrapiAdmin(strapi: any) {
     const existingAdmins = await strapi.db.query('admin::user').findMany({ limit: 10, populate: ['roles'] });
 
     if (existingAdmins && existingAdmins.length > 0) {
-      // Check if any admin has proper role linkage
       const healthyAdmin = existingAdmins.find(
         (admin: any) => admin.roles && admin.roles.length > 0
       );
@@ -733,20 +767,22 @@ async function seedStrapiAdmin(strapi: any) {
         return;
       }
 
-      // Corrupted admin rows exist (no roles). Delete and recreate.
       console.log('👤 Found corrupted admin rows (no role linkage), cleaning up...');
       for (const admin of existingAdmins) {
         await strapi.db.query('admin::user').delete({ where: { id: admin.id } });
       }
     }
 
-    console.log('👤 Creating default Strapi admin...');
+    const seedAdmin = resolveSeedAdminConfig();
+    if (!seedAdmin) return;
 
-    const hashedPassword = await strapi.service('admin::auth').hashPassword(SEED_ADMIN.password);
+    console.log('👤 Creating Strapi admin...');
+
+    const hashedPassword = await strapi.service('admin::auth').hashPassword(seedAdmin.password);
 
     await strapi.db.query('admin::user').create({
       data: {
-        ...SEED_ADMIN,
+        ...seedAdmin,
         password: hashedPassword,
         registrationToken: null,
         isActive: true,
@@ -754,7 +790,7 @@ async function seedStrapiAdmin(strapi: any) {
       },
     });
 
-    console.log(`✅ Strapi admin created: ${SEED_ADMIN.email}`);
+    console.log(`✅ Strapi admin created: ${seedAdmin.email}`);
   } catch (error: any) {
     console.error('❌ Strapi admin seeding error:', error.message);
   }
