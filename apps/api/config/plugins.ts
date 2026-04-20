@@ -14,9 +14,9 @@ export default ({ env }) => {
               endpoint: env('S3_ENDPOINT'), // e.g., http://minio:9000 (internal on Coolify)
               region: env('S3_REGION', 'us-east-1'),
               forcePathStyle: true, // Required for MinIO
-            },
-            params: {
-              Bucket: env('S3_BUCKET', 'uploads-public'),
+              params: {
+                Bucket: env('S3_BUCKET', 'uploads-public'),
+              },
             },
             baseUrl: env('S3_BASE_URL'), // e.g., https://cdn.learnednomad.com
             prefix: env('S3_PREFIX', ''),

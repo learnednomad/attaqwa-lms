@@ -36,6 +36,8 @@ services:
   init:
     environment:
       NODE_ENV: staging
+      # Staging seeds demo accounts so QA can log in out of the box.
+      SEED_USERS: "true"
     logging:
       driver: json-file
       options:

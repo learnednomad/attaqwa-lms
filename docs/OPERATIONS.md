@@ -166,11 +166,28 @@ The admin panel uses human-friendly names; Strapi uses snake_case:
 
 #### Strapi Admin (seeded by `apps/api/src/bootstrap.ts` on first boot)
 
-| Role | Email | Password | Login URL |
-|------|-------|----------|-----------|
-| Super Admin | `superadmin@attaqwa.org` | `SuperAdmin123!` | `/admin` |
+The seed is **env-driven**. `bootstrap.ts` reads these vars; in production both email and password are required or the seed is skipped (you'll register via `/admin` instead):
+
+| Env Var | Required | Default (dev only) |
+|---|---|---|
+| `SEED_ADMIN_EMAIL` | prod: yes | `superadmin@attaqwa.org` |
+| `SEED_ADMIN_PASSWORD` | prod: yes | `SuperAdmin123!` |
+| `SEED_ADMIN_FIRSTNAME` | no | `Super` |
+| `SEED_ADMIN_LASTNAME` | no | `Admin` |
+
+Precedence:
+- **Both env vars set** → seed uses them (any `NODE_ENV`)
+- **Missing in `NODE_ENV=production`** → seed is skipped; register via Strapi's built-in form at `/admin`
+- **Missing in dev/staging** → falls back to the dev defaults above (logged as a warning)
 
 #### BetterAuth Users (seeded by init container via `scripts/seed-auth-users.sql`)
+
+Gated on the `SEED_USERS` env var (explicit opt-in, decoupled from `NODE_ENV`):
+
+- `SEED_USERS=true` → the init container runs `scripts/seed-auth-users.sql` and inserts the demo accounts below.
+- `SEED_USERS=false` (default) or unset → seed is skipped; create accounts via the admin UI.
+
+Set via compose overlay: `docker-compose.dev.yml` runs the seed unconditionally; `docker-compose.staging.yml` sets `SEED_USERS=true`; `docker-compose.yml` defaults to `false` so production never seeds accidentally.
 
 | Role | Email | Password | Login URL |
 |------|-------|----------|-----------|
@@ -179,14 +196,16 @@ The admin panel uses human-friendly names; Strapi uses snake_case:
 | Teacher | `teacher@attaqwa.org` | `Teacher123!` | Website `/login` |
 | Student | `student@attaqwa.org` | `Student123!` | Website `/login` |
 
-**These accounts are seeded in development only. Change passwords after first use.**
+**Change passwords after first use.**
 
 #### Production First Deploy
 
-In production (`NODE_ENV=production`), no default accounts are created. After first deploy:
+In production (`NODE_ENV=production`):
 
-1. **Strapi Admin**: Navigate to `https://yourdomain.com/admin` — Strapi shows the registration form on first visit. Create your admin account there.
-2. **BetterAuth Users**: Create user accounts through the admin panel or directly in the database. The init container skips `seed-auth-users.sql` in production.
+1. **Strapi Admin**:
+   - With `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` set → account is created on first boot using those values.
+   - Without them set → seed is skipped; navigate to `https://yourdomain.com/admin` and use Strapi's native registration form.
+2. **BetterAuth Users**: Create accounts through the admin panel or directly in the database. `SEED_USERS` defaults to `false` in the base compose file, so the init container skips `seed-auth-users.sql` in production.
 
 ## Development Setup
 

@@ -46,6 +46,10 @@ services:
     restart: "no"
     environment:
       NODE_ENV: ${NODE_ENV:-production}
+      # Explicit opt-in for the default-user seed (independent of NODE_ENV).
+      # Default false so production never seeds accidentally. Compose overlays
+      # (docker-compose.dev.yml, docker-compose.staging.yml) set this to true.
+      SEED_USERS: ${SEED_USERS:-false}
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?required}@postgres:5432/attaqwa_lms # placeholder
       DATABASE_HOST: postgres
       DATABASE_PORT: 5432
@@ -78,6 +82,15 @@ services:
       ENCRYPTION_KEY: ${ENCRYPTION_KEY:?ENCRYPTION_KEY is required}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
       NODE_ENV: ${NODE_ENV:-production}
+      # Canonical public URL — Strapi uses this for absolute redirects (e.g.
+      # `/` → `/admin`) and to tell the admin SPA where the backend lives.
+      # Falls back to localhost for local dev; production must set the real
+      # HTTPS URL or visitors get redirected to http://localhost:1337.
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:1337}
+      # Trust X-Forwarded-* headers when running behind a reverse proxy
+      # (Traefik, Caddy, Nginx). Required in production for correct HTTPS
+      # detection, cookie Secure flags, and client IP logging.
+      STRAPI_PROXY: ${STRAPI_PROXY:-false}
       # Ollama AI configuration (gracefully disabled when ollama service is absent)
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
       OLLAMA_MODEL: ${OLLAMA_MODEL:-mistral:7b-instruct-q4_K_M}
