@@ -22,7 +22,7 @@
     "mcp:coolify": "node scripts/coolify-mcp.mjs"
   },
   "engines": {
-    "node": ">=20.9.0",
+    "node": ">=22",
     "pnpm": ">=10.0.0"
   },
   "pnpm": {
