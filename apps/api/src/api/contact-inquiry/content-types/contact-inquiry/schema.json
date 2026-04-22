@@ -1,0 +1,74 @@
+{
+  "kind": "collectionType",
+  "collectionName": "contact_inquiries",
+  "info": {
+    "singularName": "contact-inquiry",
+    "pluralName": "contact-inquiries",
+    "displayName": "Contact Inquiry",
+    "description": "Messages submitted through the public contact form"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "firstName": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "lastName": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "email": {
+      "type": "email",
+      "required": true
+    },
+    "phone": {
+      "type": "string",
+      "maxLength": 40
+    },
+    "subject": {
+      "type": "enumeration",
+      "enum": [
+        "general",
+        "prayer-times",
+        "education",
+        "nikah",
+        "funeral",
+        "counseling",
+        "donations",
+        "events",
+        "other"
+      ],
+      "required": true,
+      "default": "general"
+    },
+    "message": {
+      "type": "text",
+      "required": true,
+      "maxLength": 5000
+    },
+    "preferredContact": {
+      "type": "enumeration",
+      "enum": ["email", "phone", "either"],
+      "required": true,
+      "default": "email"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["new", "in-progress", "responded", "archived"],
+      "required": true,
+      "default": "new"
+    },
+    "submittedAt": {
+      "type": "datetime"
+    },
+    "notes": {
+      "type": "text",
+      "private": true
+    }
+  }
+}

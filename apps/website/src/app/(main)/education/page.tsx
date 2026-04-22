@@ -14,8 +14,9 @@ interface EducationalProgram {
   instructor: string;
   level: string;
   features: string[];
-  capacity?: number;
-  duration?: string;
+  language?: string;
+  tuition?: string;
+  format?: string;
   requirements?: string[];
 }
 
@@ -24,149 +25,159 @@ interface ClassSchedule {
   time: string;
   program: string;
   instructor: string;
-  ageGroup: string;
+  group: 'Brothers' | 'Sisters' | 'Both' | 'Brothers only';
 }
 
 const educationalPrograms: EducationalProgram[] = [
   {
     id: 'tahfeedh',
-    name: 'Tahfeedhul Qur\'an (Quran Memorization)',
-    description: 'Comprehensive Quran memorization program with proper Tajweed and understanding. Students progress through structured levels with individual attention.',
-    ageGroup: 'Ages 6-18',
-    schedule: 'Monday-Friday, 4:00-6:00 PM',
-    instructor: 'Imam Mohammad Zahirul Islam & Hafez Abdullah Khan',
-    level: 'Beginner to Advanced',
+    name: 'Tahfeedhul Qur\'an — Qur\'an Memorization (Full-time)',
+    description: 'Our full-time weekday Qur\'an memorization program for homeschool students. Classes go beyond memorization to build the morals and values of the Qur\'an alongside Islamic Studies including Arabic, Hadith, Du\'a memorization, Seerah, and Fiqh.',
+    ageGroup: 'Ages 6+',
+    schedule: 'Monday–Thursday, 7:30 AM – 12:00 PM (class hours vary by DST and between boys and girls)',
+    instructor: 'Imam Mohammad Zahirul Islam, Ustadh Abdullah Khan, Ustadha Siddiqa Islam, Ustadha Labibah Islam',
+    level: 'Assessment-based; beginner to advanced',
+    language: 'Arabic, English, Bengali',
+    tuition: '$100–$150 / month (depending on class)',
+    format: 'In-person at the masjid',
     features: [
-      'Individual assessment and personalized learning plan',
-      'Proper Tajweed instruction',
-      'Understanding of Quranic meanings',
-      'Regular progress evaluation',
-      'Annual Hifz graduation ceremony',
-      'Small class sizes for individual attention'
+      'Tajweed, Makhaarij, and Tilaawah standards',
+      'Regular progress reports and evaluations',
+      'Arabic, Hadith, Du\'a, Seerah, and Fiqh integrated',
+      'Annual graduation ceremony and certification upon completion',
+      'Separate schedules for brothers and sisters'
     ],
-    capacity: 25,
-    duration: '3-7 years (varies by student)',
-    requirements: ['Basic Arabic reading ability', 'Commitment to daily practice', 'Parental support']
+    requirements: ['Homeschool-compatible daytime availability', 'Commitment to daily practice', 'Parental support']
   },
   {
-    id: 'weekend-school',
-    name: 'Weekend Islamic School',
-    description: 'Comprehensive Islamic education covering Quran, Hadith, Fiqh, Islamic history, and Arabic language for children and teenagers.',
-    ageGroup: 'Ages 5-16',
-    schedule: 'Saturday & Sunday, 10:00 AM-1:00 PM',
-    instructor: 'Multiple qualified teachers',
-    level: 'Age-appropriate levels',
+    id: 'weekend',
+    name: 'Weekend Class (Qur\'an & Islamic Studies)',
+    description: 'A two-hour weekend program before Salatul Dhuhr designed to grow Muslim youth\'s knowledge of Islam and their identity as Muslims.',
+    ageGroup: 'Ages 6+',
+    schedule: 'Saturday & Sunday, 12:00 PM – 2:00 PM (time varies by DST)',
+    instructor: 'Ustadh Abdullah Khan (brothers), Ustadha Labibah Islam (sisters)',
+    level: 'Age-appropriate tiers',
+    language: 'English',
+    tuition: 'Quarterly — $150 first child · $125 second · $100 third+',
+    format: 'In-person at the masjid',
     features: [
-      'Age-graded curriculum',
-      'Quran recitation with Tajweed',
-      'Islamic studies and character development',
-      'Arabic language instruction',
-      'Islamic history and biography',
-      'Interactive learning activities'
+      'Qur\'an recitation and understanding',
+      'Islamic Studies curriculum',
+      'Separate classes for brothers and sisters',
+      'Quarterly reporting'
     ],
-    capacity: 80,
-    duration: 'Ongoing academic year program',
     requirements: ['Regular attendance', 'Homework completion', 'Respectful behavior']
   },
   {
-    id: 'adult-classes',
-    name: 'Adult Islamic Education',
-    description: 'Evening classes for adults covering various Islamic sciences, Quran study, and practical Islamic knowledge.',
-    ageGroup: 'Adults 18+',
-    schedule: 'Tuesday & Thursday, 7:30-9:00 PM',
+    id: 'adult-brothers',
+    name: 'Adult Brothers — Qur\'an & Islamic Studies',
+    description: 'Weekend morning class for adult brothers covering Qur\'an and Islamic Studies with Imam Mohammad Zahirul Islam.',
+    ageGroup: 'Adult brothers',
+    schedule: 'Saturday & Sunday, 9:00 AM – 11:00 AM',
     instructor: 'Imam Mohammad Zahirul Islam',
     level: 'All levels welcome',
+    language: 'Bengali & English',
+    format: 'In-person at the masjid',
     features: [
-      'Quran study with translation and tafseer',
-      'Hadith studies',
-      'Islamic jurisprudence (Fiqh)',
-      'Islamic history and civilization',
-      'Contemporary Islamic issues',
+      'Tafseer-integrated Qur\'an study',
+      'Islamic Studies across Fiqh, Hadith, and Seerah',
       'Discussion-based learning'
-    ],
-    capacity: 40,
-    duration: 'Ongoing with seasonal topics',
-    requirements: ['Interest in learning', 'Respectful participation']
+    ]
   },
   {
-    id: 'arabic-language',
-    name: 'Arabic Language Classes',
-    description: 'Structured Arabic language program from basic to advanced levels, focusing on reading, writing, and understanding.',
-    ageGroup: 'Ages 8+ and Adults',
-    schedule: 'Wednesday, 6:00-7:30 PM',
-    instructor: 'Hafez Abdullah Khan',
-    level: 'Beginner to Intermediate',
+    id: 'adult-sisters',
+    name: 'Adult Sisters — Qur\'an & Islamic Studies (Bengali)',
+    description: 'Weekend evening class for adult sisters, taught in Bengali between Maghrib and Isha.',
+    ageGroup: 'Adult sisters',
+    schedule: 'Saturday & Sunday, Maghrib – Isha (time varies by DST)',
+    instructor: 'Ustadha Salina Sultana',
+    level: 'All levels welcome',
+    language: 'Bengali',
+    format: 'In-person at the masjid',
     features: [
-      'Arabic alphabet and writing',
-      'Grammar and vocabulary',
-      'Reading comprehension',
-      'Speaking and pronunciation',
-      'Quranic Arabic focus',
-      'Interactive teaching methods'
-    ],
-    capacity: 20,
-    duration: '2-year program with levels',
-    requirements: ['Regular attendance', 'Practice homework', 'Textbook purchase']
+      'Qur\'an study and reflection',
+      'Islamic Studies with Bengali-speaking instructor',
+      'Sisters-only environment',
+      'Additional Arabic and English options — contact Ustadha Labibah Islam for details'
+    ]
   },
   {
-    id: 'youth-programs',
-    name: 'Youth Islamic Programs',
-    description: 'Engaging programs for teenagers focusing on Islamic identity, contemporary issues, and leadership development.',
-    ageGroup: 'Ages 13-18',
-    schedule: 'Friday, 7:00-8:30 PM (after Maghrib)',
-    instructor: 'Youth coordinators and guest speakers',
-    level: 'Teen-focused',
-    features: [
-      'Islamic identity and values',
-      'Contemporary Muslim issues',
-      'Leadership development',
-      'Community service projects',
-      'Peer discussions and mentoring',
-      'Special events and trips'
-    ],
-    capacity: 30,
-    duration: 'Ongoing with seasonal activities',
-    requirements: ['Commitment to program values', 'Parental permission for activities']
-  },
-  {
-    id: 'sisters-classes',
-    name: 'Sisters\' Study Circles',
-    description: 'Weekly study circles for Muslim women covering Quran, Islamic sciences, and contemporary women\'s issues in Islam.',
-    ageGroup: 'Adult Women',
-    schedule: 'Sunday, 11:00 AM-12:30 PM',
-    instructor: 'Qualified female instructors',
+    id: 'daily-tafseer',
+    name: 'Daily Qur\'anic Tafseer',
+    description: 'Daily short Tafseer sitting before Salatul Isha with Imam Mohammad Zahirul Islam.',
+    ageGroup: 'All ages',
+    schedule: 'Every day, 30 minutes before Isha (time varies by DST)',
+    instructor: 'Imam Mohammad Zahirul Islam',
     level: 'All levels',
-    features: [
-      'Women-only learning environment',
-      'Quran study and reflection',
-      'Islamic parenting guidance',
-      'Contemporary women\'s issues',
-      'Sisterhood and community building',
-      'Childcare provided during classes'
-    ],
-    capacity: 25,
-    duration: 'Ongoing weekly sessions',
-    requirements: ['Respectful participation', 'Islamic dress code']
+    language: 'Bengali & English',
+    format: 'In-person at the masjid',
+    features: ['Short daily dose of Qur\'an study', 'Connects prayer to study', 'Open to all community members']
+  },
+  {
+    id: 'daily-hadith',
+    name: 'Daily Hadith Reading',
+    description: 'Daily Hadith reading after Salatul Fajr with Ustadh Abdullah Khan.',
+    ageGroup: 'All ages',
+    schedule: 'Every day, after Fajr (time varies by DST)',
+    instructor: 'Ustadh Abdullah Khan',
+    level: 'All levels',
+    language: 'English',
+    format: 'In-person at the masjid',
+    features: ['Short daily Hadith sitting', 'Strengthens morning routine', 'Open to all community members']
+  },
+  {
+    id: 'after-school',
+    name: 'After-School Program — Aqwam Academy (Boys only)',
+    description: 'Online after-school Qur\'an studies for boys ages 7+ run by Aqwam Academy and taught by Ustadh Abdullah Khan via Zoom.',
+    ageGroup: 'Boys ages 7+',
+    schedule: 'Monday, Tuesday, and Thursday, 5:00 PM – 7:00 PM',
+    instructor: 'Ustadh Abdullah Khan',
+    level: 'All levels',
+    language: 'English',
+    format: 'Online via Zoom',
+    features: ['Qur\'an studies tailored for after-school hours', 'Small group instruction', 'Boys-only environment']
+  },
+  {
+    id: 'adult-quran-brothers',
+    name: 'Adult Qur\'an Class — Aqwam Academy (Brothers only)',
+    description: 'In-person adult Qur\'an class run by Aqwam Academy for brothers between Maghrib and Isha on Fridays and Saturdays.',
+    ageGroup: 'Adult brothers',
+    schedule: 'Friday & Saturday, Maghrib – Isha (refer to prayer schedule)',
+    instructor: 'Ustadh Abdullah Khan',
+    level: 'All levels',
+    language: 'English',
+    format: 'In-person at Masjid At-Taqwa',
+    features: ['Focused Qur\'an study for working adults', 'Brothers-only environment']
+  },
+  {
+    id: 'homeschooling',
+    name: 'Homeschooling Program',
+    description: 'Parents and guardians may pair our Tahfeedh program with any homeschool curriculum of their choice, provided it does not contradict or interfere with the student\'s Qur\'anic studies and schedule.',
+    ageGroup: 'Tahfeedh students',
+    schedule: 'Parent-directed',
+    instructor: 'Parent/Guardian',
+    level: 'Family-led',
+    format: 'At home, aligned with masjid program',
+    features: ['Flexibility for families', 'Designed to complement Tahfeedh schedule']
   }
 ];
 
 const weeklySchedule: ClassSchedule[] = [
-  { day: 'Monday', time: '4:00-6:00 PM', program: 'Tahfeedh Program', instructor: 'Imam Mohammad', ageGroup: '6-18' },
-  { day: 'Tuesday', time: '7:30-9:00 PM', program: 'Adult Islamic Studies', instructor: 'Imam Mohammad', ageGroup: 'Adults' },
-  { day: 'Wednesday', time: '6:00-7:30 PM', program: 'Arabic Language', instructor: 'Hafez Abdullah', ageGroup: '8+ & Adults' },
-  { day: 'Thursday', time: '7:30-9:00 PM', program: 'Adult Islamic Studies', instructor: 'Imam Mohammad', ageGroup: 'Adults' },
-  { day: 'Friday', time: '4:00-6:00 PM', program: 'Tahfeedh Program', instructor: 'Multiple Instructors', ageGroup: '6-18' },
-  { day: 'Friday', time: '7:00-8:30 PM', program: 'Youth Programs', instructor: 'Youth Coordinators', ageGroup: '13-18' },
-  { day: 'Saturday', time: '10:00 AM-1:00 PM', program: 'Weekend School', instructor: 'Multiple Teachers', ageGroup: '5-16' },
-  { day: 'Sunday', time: '10:00 AM-1:00 PM', program: 'Weekend School', instructor: 'Multiple Teachers', ageGroup: '5-16' },
-  { day: 'Sunday', time: '11:00 AM-12:30 PM', program: 'Sisters\' Study Circle', instructor: 'Female Instructors', ageGroup: 'Adult Women' },
+  { day: 'Mon–Thurs', time: '7:30 AM – 2:00 PM', program: 'Tahfeedhul Qur\'an Class', instructor: 'I. Mohammad Islam, U. Abdullah Khan, U. Siddiqa Islam, U. Labibah Islam', group: 'Both' },
+  { day: 'Sat–Sun', time: '12:00 PM – 2:00 PM', program: 'Weekend Class', instructor: 'U. Abdullah Khan, U. Labibah Islam', group: 'Both' },
+  { day: 'Sat–Sun', time: '9:00 AM – 11:00 AM', program: 'Brothers Adult Classes', instructor: 'I. Mohammad Islam', group: 'Brothers' },
+  { day: 'Sat–Sun', time: 'Maghrib – Isha', program: 'Sisters Adult Class (Bengali)', instructor: 'U. Salina Sultana', group: 'Sisters' },
+  { day: 'All week', time: '30 min before Isha', program: 'Daily Tafseer', instructor: 'I. Mohammad Islam', group: 'Both' },
+  { day: 'All week', time: 'After Fajr', program: 'Daily Hadith', instructor: 'U. Abdullah Khan', group: 'Both' },
+  { day: 'Mon, Tue, Thu', time: '5:00 PM – 7:00 PM', program: 'After-School Program (online)', instructor: 'U. Abdullah Khan', group: 'Brothers only' },
+  { day: 'Fri–Sat', time: 'Maghrib – Isha', program: 'Adults Qur\'an Class', instructor: 'U. Abdullah Khan', group: 'Brothers only' }
 ];
 
 const stats = [
-  { label: 'Programs', value: '6', icon: BookOpen },
-  { label: 'Students', value: '200+', icon: Users },
-  { label: 'Weekly Classes', value: '9', icon: Calendar },
-  { label: 'Instructors', value: '10+', icon: GraduationCap },
+  { label: 'Active Programs', value: '9', icon: BookOpen },
+  { label: 'Lead Instructors', value: '5', icon: GraduationCap },
+  { label: 'Weekly Classes', value: '8', icon: Calendar },
+  { label: 'Languages', value: 'Ar · En · Bn', icon: Users },
 ];
 
 export default function EducationPage() {
@@ -246,19 +257,19 @@ export default function EducationPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex items-center gap-2 text-xs text-neutral-600">
                     <Users className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                    <span>Ages 6-18</span>
+                    <span>Ages 6+</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-neutral-600">
                     <Clock className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                    <span>Mon-Fri, 4:00-6:00 PM</span>
+                    <span>Mon–Thurs, 7:30 AM – 12:00 PM</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-neutral-600">
                     <GraduationCap className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                    <span>Certified Instructors</span>
+                    <span>Tuition $100–$150/mo</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-neutral-600">
                     <BookOpen className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                    <span>Individual Assessment</span>
+                    <span>Arabic · English · Bengali</span>
                   </div>
                 </div>
               </div>
@@ -326,16 +337,22 @@ export default function EducationPage() {
                     <p className="text-[10px] font-medium text-neutral-400 uppercase tracking-wide">Instructor</p>
                     <p className="text-xs text-neutral-700">{program.instructor}</p>
                   </div>
-                  {program.capacity && (
+                  {program.language && (
                     <div>
-                      <p className="text-[10px] font-medium text-neutral-400 uppercase tracking-wide">Capacity</p>
-                      <p className="text-xs text-neutral-700">{program.capacity} students</p>
+                      <p className="text-[10px] font-medium text-neutral-400 uppercase tracking-wide">Language</p>
+                      <p className="text-xs text-neutral-700">{program.language}</p>
                     </div>
                   )}
-                  {program.duration && (
+                  {program.format && (
                     <div>
-                      <p className="text-[10px] font-medium text-neutral-400 uppercase tracking-wide">Duration</p>
-                      <p className="text-xs text-neutral-700">{program.duration}</p>
+                      <p className="text-[10px] font-medium text-neutral-400 uppercase tracking-wide">Format</p>
+                      <p className="text-xs text-neutral-700">{program.format}</p>
+                    </div>
+                  )}
+                  {program.tuition && (
+                    <div className="col-span-2">
+                      <p className="text-[10px] font-medium text-neutral-400 uppercase tracking-wide">Tuition</p>
+                      <p className="text-xs text-neutral-700">{program.tuition}</p>
                     </div>
                   )}
                 </div>
@@ -396,7 +413,7 @@ export default function EducationPage() {
                     <th className="text-left text-[10px] font-semibold text-neutral-500 uppercase tracking-wide px-4 py-3">Time</th>
                     <th className="text-left text-[10px] font-semibold text-neutral-500 uppercase tracking-wide px-4 py-3">Program</th>
                     <th className="text-left text-[10px] font-semibold text-neutral-500 uppercase tracking-wide px-4 py-3">Instructor</th>
-                    <th className="text-left text-[10px] font-semibold text-neutral-500 uppercase tracking-wide px-4 py-3">Age Group</th>
+                    <th className="text-left text-[10px] font-semibold text-neutral-500 uppercase tracking-wide px-4 py-3">Group</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -408,7 +425,7 @@ export default function EducationPage() {
                       <td className="px-4 py-3 text-xs text-neutral-500">{schedule.instructor}</td>
                       <td className="px-4 py-3">
                         <span className="text-[10px] font-medium text-emerald-700 border border-emerald-200 bg-emerald-50 rounded-full px-2 py-0.5">
-                          {schedule.ageGroup}
+                          {schedule.group}
                         </span>
                       </td>
                     </tr>
@@ -449,13 +466,16 @@ export default function EducationPage() {
               <div>
                 <h4 className="text-xs font-semibold text-neutral-900 uppercase tracking-wide mb-3">Contact Information</h4>
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-xs text-neutral-600">
-                    <Phone className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                    <a href="tel:4042449577" className="text-emerald-600">(404) 244-9577</a>
+                  <div className="flex items-start gap-2 text-xs text-neutral-600">
+                    <Phone className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                    <div>
+                      <a href="tel:4707311314" className="text-emerald-600 block">(470) 731-1314 — Brothers</a>
+                      <a href="tel:4049367123" className="text-emerald-600 block">(404) 936-7123 — Sisters</a>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-neutral-600">
                     <Mail className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                    <a href="mailto:info@masjidattaqwaatlanta.org" className="text-emerald-600">info@masjidattaqwaatlanta.org</a>
+                    <a href="mailto:Attaqwa.du@gmail.com" className="text-emerald-600">Attaqwa.du@gmail.com</a>
                   </div>
                   <div className="flex items-start gap-2 text-xs text-neutral-600">
                     <MapPin className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />

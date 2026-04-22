@@ -1,6 +1,7 @@
-import { MapPin, Phone, Mail, Clock, Users, Send, MessageSquare, Facebook, Youtube, AlertCircle, ChevronRight, GraduationCap, BookOpen, Globe } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Users, Facebook, Youtube, AlertCircle, ChevronRight, GraduationCap, BookOpen, Globe } from 'lucide-react';
 import { generateSEOMetadata } from '@/lib/seo';
 import type { Metadata } from 'next';
+import { ContactForm } from '@/components/features/contact/contact-form';
 
 export const metadata: Metadata = generateSEOMetadata({
   title: "Contact Masjid At-Taqwa - Islamic Community Center",
@@ -24,17 +25,20 @@ export const metadata: Metadata = generateSEOMetadata({
 const contactInfo = {
   address: "2674 Woodwin Rd, Doraville, GA 30360",
   phone: "(678) 896-9257",
-  email: "Mohammad30360@hotmail.com",
+  email: "almaad2674@gmail.com",
+  imamEmail: "Mohammad30360@hotmail.com",
   schoolEmail: "Attaqwa.du@gmail.com",
   hours: {
-    office: "Monday - Friday: 9:00 AM - 5:00 PM",
-    prayers: "Daily prayers open to all",
-    friday: "Jummah: 2:00 PM & 2:30 PM (Office closed 12:30-2:00 PM)",
+    office: "Daily after each prayer · Appointments welcome",
+    prayers: "Daily 5 prayers open to all",
+    friday: "Jumu'ah: two congregations (times follow the current Iqamah schedule)",
     weekend: "Saturday - Sunday: Limited office hours"
   },
   social: {
     facebook: "https://www.facebook.com/MasjidAttaqwa2674WoodwinRd",
-    youtube: "https://www.youtube.com/@MasjidAttaqwa2674"
+    youtube: "https://www.youtube.com/@MasjidAttaqwa2674",
+    whatsappGroup: "https://chat.whatsapp.com/GFJOW74TEmTGf41kv7AecY?mode=gi_t",
+    whatsappChannel: "https://whatsapp.com/channel/0029Vb7ZLYiFXUujmdTtii3M"
   }
 };
 
@@ -61,10 +65,10 @@ const staff = [
     responsibilities: ["Religious guidance", "Nikah ceremonies", "Janazah services", "Religious counseling", "Community leadership"]
   },
   {
-    name: "Imam Abdullah Khan",
+    name: "Ustadh Abdullah Khan",
     title: "Imam & Teacher",
-    email: "Mohammad30360@hotmail.com",
-    phone: "(678) 896-9257",
+    email: "faiysal_khan@icloud.com",
+    phone: "(470) 731-1314",
     education: [
       "BA in the Faculty of Shari'ah from University of Madinah",
       "MA in the Faculty of Qur'an from University of Madinah",
@@ -91,20 +95,6 @@ const staff = [
     phone: "(678) 896-9257",
     responsibilities: ["Islamic education programs", "Weekend classes", "Homeschooling coordination", "Student registration", "Educational resources"]
   }
-];
-
-const subjectOptions = [
-  'General Inquiry',
-  'Prayer Times',
-  'Islamic Education',
-  'Events & Programs',
-  'Donations & Zakat',
-  'Volunteer Opportunities',
-  'Facility Rental',
-  'Religious Counseling',
-  'Nikah (Marriage) Services',
-  'Janazah (Funeral) Services',
-  'Website Feedback',
 ];
 
 const faqs = [
@@ -192,126 +182,8 @@ export default function ContactPage() {
           </div>
 
           <div className="grid lg:grid-cols-3 gap-6">
-            {/* Form */}
-            <div className="lg:col-span-2 rounded-xl border border-neutral-200 bg-white p-6">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center">
-                  <MessageSquare className="h-5 w-5 text-emerald-600" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-neutral-900">Send Us a Message</h3>
-                  <p className="text-xs text-neutral-500">We&apos;ll get back to you as soon as possible</p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <label htmlFor="firstName" className="block text-xs font-medium text-neutral-700 mb-1.5">
-                      First Name *
-                    </label>
-                    <input
-                      id="firstName"
-                      type="text"
-                      placeholder="Your first name"
-                      className="w-full rounded-lg border border-neutral-200 bg-white px-3.5 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="lastName" className="block text-xs font-medium text-neutral-700 mb-1.5">
-                      Last Name *
-                    </label>
-                    <input
-                      id="lastName"
-                      type="text"
-                      placeholder="Your last name"
-                      className="w-full rounded-lg border border-neutral-200 bg-white px-3.5 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="email" className="block text-xs font-medium text-neutral-700 mb-1.5">
-                    Email Address *
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    placeholder="your.email@example.com"
-                    className="w-full rounded-lg border border-neutral-200 bg-white px-3.5 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="phone" className="block text-xs font-medium text-neutral-700 mb-1.5">
-                    Phone Number
-                  </label>
-                  <input
-                    id="phone"
-                    type="tel"
-                    placeholder="(555) 123-4567"
-                    className="w-full rounded-lg border border-neutral-200 bg-white px-3.5 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="subject" className="block text-xs font-medium text-neutral-700 mb-1.5">
-                    Subject *
-                  </label>
-                  <select
-                    id="subject"
-                    className="w-full rounded-lg border border-neutral-200 bg-white px-3.5 py-2.5 text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300"
-                    defaultValue=""
-                  >
-                    <option value="" disabled>Select a subject</option>
-                    {subjectOptions.map((opt) => (
-                      <option key={opt} value={opt.toLowerCase().replace(/\s+/g, '-')}>{opt}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="message" className="block text-xs font-medium text-neutral-700 mb-1.5">
-                    Message *
-                  </label>
-                  <textarea
-                    id="message"
-                    placeholder="Please describe your inquiry or provide any additional details..."
-                    rows={5}
-                    className="w-full rounded-lg border border-neutral-200 bg-white px-3.5 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300 resize-none"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="preferred-contact" className="block text-xs font-medium text-neutral-700 mb-1.5">
-                    Preferred Contact Method
-                  </label>
-                  <select
-                    id="preferred-contact"
-                    className="w-full rounded-lg border border-neutral-200 bg-white px-3.5 py-2.5 text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300"
-                    defaultValue=""
-                  >
-                    <option value="" disabled>How would you like us to respond?</option>
-                    <option value="email">Email</option>
-                    <option value="phone">Phone Call</option>
-                    <option value="both">Either Email or Phone</option>
-                  </select>
-                </div>
-
-                <button className="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white w-full sm:w-auto">
-                  <Send className="h-3.5 w-3.5" />
-                  Send Message
-                </button>
-
-                <p className="text-xs text-neutral-400">
-                  * Required fields. We typically respond within 24 hours during business days.
-                </p>
-              </div>
-            </div>
+            {/* Form (client component) */}
+            <ContactForm />
 
             {/* Sidebar */}
             <div className="space-y-5">

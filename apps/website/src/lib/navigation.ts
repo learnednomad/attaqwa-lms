@@ -25,6 +25,8 @@ export const navigation: NavItem[] = [
       { name: 'Hadith Collections', href: '/resources/hadith-collections' },
       { name: 'Qibla Direction', href: '/resources/qibla-direction' },
       { name: 'Islamic Calendar', href: '/resources/islamic-calendar' },
+      { name: 'Calendar Downloads', href: '/resources/calendar-downloads' },
+      { name: 'Library', href: '/resources/library' },
       { name: 'New Muslim Guide', href: '/resources/new-muslim' },
       { name: 'All Resources', href: '/resources' },
     ],
@@ -32,6 +34,7 @@ export const navigation: NavItem[] = [
   {
     name: 'Community',
     submenu: [
+      { name: 'Community Hub', href: '/community' },
       { name: 'Events', href: '/events' },
       { name: 'Announcements', href: '/announcements' },
       { name: 'Calendar', href: '/calendar' },

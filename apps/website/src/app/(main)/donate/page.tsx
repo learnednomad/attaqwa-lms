@@ -467,14 +467,14 @@ export default function DonatePage() {
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
-                href="tel:+1-000-000-0000"
+                href="tel:6788969257"
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 transition-colors"
               >
                 <Phone className="h-3.5 w-3.5" />
                 Call Us
               </Link>
               <Link
-                href="mailto:info@masjidattaqwa.org"
+                href="mailto:almaad2674@gmail.com"
                 className="inline-flex items-center justify-center gap-2 rounded-lg border border-emerald-200 bg-white px-5 py-2.5 text-sm font-medium text-emerald-700 hover:bg-emerald-50 transition-colors"
               >
                 <Mail className="h-3.5 w-3.5" />
