@@ -625,6 +625,82 @@ export interface ApiAppealAppeal extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiContactInquiryContactInquiry
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'contact_inquiries';
+  info: {
+    description: 'Messages submitted through the public contact form';
+    displayName: 'Contact Inquiry';
+    pluralName: 'contact-inquiries';
+    singularName: 'contact-inquiry';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email & Schema.Attribute.Required;
+    firstName: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+    lastName: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::contact-inquiry.contact-inquiry'
+    > &
+      Schema.Attribute.Private;
+    message: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 5000;
+      }>;
+    notes: Schema.Attribute.Text & Schema.Attribute.Private;
+    phone: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 40;
+      }>;
+    preferredContact: Schema.Attribute.Enumeration<
+      ['email', 'phone', 'either']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'email'>;
+    publishedAt: Schema.Attribute.DateTime;
+    status: Schema.Attribute.Enumeration<
+      ['new', 'in-progress', 'responded', 'archived']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'new'>;
+    subject: Schema.Attribute.Enumeration<
+      [
+        'general',
+        'prayer-times',
+        'education',
+        'nikah',
+        'funeral',
+        'counseling',
+        'donations',
+        'events',
+        'other',
+      ]
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'general'>;
+    submittedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiCourseEnrollmentCourseEnrollment
   extends Struct.CollectionTypeSchema {
   collectionName: 'course_enrollments';
@@ -1116,6 +1192,87 @@ export interface ApiLeaderboardLeaderboard extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiLegalInquiryLegalInquiry
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'legal_inquiries';
+  info: {
+    description: 'Ask-an-Imam questions on Islamic jurisprudence, rulings, and lifestyle matters';
+    displayName: 'Legal / Religious Inquiry';
+    pluralName: 'legal-inquiries';
+    singularName: 'legal-inquiry';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    answer: Schema.Attribute.Text;
+    answeredAt: Schema.Attribute.DateTime;
+    answeredBy: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+      }>;
+    audience: Schema.Attribute.Enumeration<['brothers', 'sisters', 'either']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'either'>;
+    category: Schema.Attribute.Enumeration<
+      [
+        'fiqh',
+        'halal-haram',
+        'family',
+        'business',
+        'ritual',
+        'aqeedah',
+        'other',
+      ]
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'fiqh'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email & Schema.Attribute.Required;
+    firstName: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+    language: Schema.Attribute.Enumeration<['english', 'bengali', 'arabic']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'english'>;
+    lastName: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::legal-inquiry.legal-inquiry'
+    > &
+      Schema.Attribute.Private;
+    notes: Schema.Attribute.Text & Schema.Attribute.Private;
+    phone: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 40;
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    question: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 5000;
+      }>;
+    status: Schema.Attribute.Enumeration<
+      ['new', 'in-progress', 'answered', 'archived']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'new'>;
+    submittedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiLessonLesson extends Struct.CollectionTypeSchema {
   collectionName: 'lessons';
   info: {
@@ -1187,6 +1344,75 @@ export interface ApiLessonLesson extends Struct.CollectionTypeSchema {
     >;
     video_file: Schema.Attribute.Media<'videos'>;
     video_url: Schema.Attribute.String;
+  };
+}
+
+export interface ApiLibraryResourceLibraryResource
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'library_resources';
+  info: {
+    description: 'Books, worksheets, calendar PDFs, and other downloadable Islamic resources issued by Masjid At-Taqwa';
+    displayName: 'Library Resource';
+    pluralName: 'library-resources';
+    singularName: 'library-resource';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    author: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+      }>;
+    category: Schema.Attribute.Enumeration<
+      [
+        'books',
+        'worksheets',
+        'calendars',
+        'ramadan',
+        'hajj',
+        'prayer-schedule',
+        'new-muslim',
+        'other',
+      ]
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'books'>;
+    coverImage: Schema.Attribute.Media<'images'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 2000;
+      }>;
+    displayOrder: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    file: Schema.Attribute.Media<'files'> & Schema.Attribute.Required;
+    isActive: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    language: Schema.Attribute.Enumeration<
+      ['english', 'bengali', 'arabic', 'multi']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'english'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::library-resource.library-resource'
+    > &
+      Schema.Attribute.Private;
+    publishDate: Schema.Attribute.Date;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
   };
 }
 
@@ -2085,13 +2311,16 @@ declare module '@strapi/strapi' {
       'api::achievement.achievement': ApiAchievementAchievement;
       'api::announcement.announcement': ApiAnnouncementAnnouncement;
       'api::appeal.appeal': ApiAppealAppeal;
+      'api::contact-inquiry.contact-inquiry': ApiContactInquiryContactInquiry;
       'api::course-enrollment.course-enrollment': ApiCourseEnrollmentCourseEnrollment;
       'api::course.course': ApiCourseCourse;
       'api::event.event': ApiEventEvent;
       'api::iqamah-schedule.iqamah-schedule': ApiIqamahScheduleIqamahSchedule;
       'api::itikaf-registration.itikaf-registration': ApiItikafRegistrationItikafRegistration;
       'api::leaderboard.leaderboard': ApiLeaderboardLeaderboard;
+      'api::legal-inquiry.legal-inquiry': ApiLegalInquiryLegalInquiry;
       'api::lesson.lesson': ApiLessonLesson;
+      'api::library-resource.library-resource': ApiLibraryResourceLibraryResource;
       'api::moderation-queue.moderation-queue': ApiModerationQueueModerationQueue;
       'api::prayer-time-override.prayer-time-override': ApiPrayerTimeOverridePrayerTimeOverride;
       'api::quiz.quiz': ApiQuizQuiz;

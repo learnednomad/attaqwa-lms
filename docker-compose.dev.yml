@@ -126,7 +126,14 @@ services:
     container_name: attaqwa-api-dev
     restart: unless-stopped
     working_dir: /app
-    command: sh -c "npm install -g pnpm@10.12.3 && pnpm install && cd apps/api && npm install --os=linux --libc=musl sharp && pnpm develop"
+    command: >
+      sh -c "
+        apk add --no-cache python3 make g++ vips-dev > /dev/null &&
+        npm install -g pnpm@10.12.3 > /dev/null &&
+        pnpm install --filter api... &&
+        cd apps/api &&
+        pnpm develop
+      "
     environment:
       HOST: 0.0.0.0
       PORT: 1337
@@ -179,7 +186,14 @@ services:
     container_name: attaqwa-admin-dev
     restart: unless-stopped
     working_dir: /app
-    command: sh -c "npm install -g pnpm@10.12.3 && pnpm install && cd apps/admin && pnpm dev"
+    command: >
+      sh -c "
+        apk add --no-cache python3 make g++ > /dev/null &&
+        npm install -g pnpm@10.12.3 > /dev/null &&
+        pnpm install --filter admin... &&
+        cd apps/admin &&
+        pnpm dev
+      "
     environment:
       NODE_ENV: development
       PORT: 3000
@@ -203,7 +217,14 @@ services:
     container_name: attaqwa-website-dev
     restart: unless-stopped
     working_dir: /app
-    command: sh -c "npm install -g pnpm@10.12.3 && pnpm install && cd apps/website && pnpm dev"
+    command: >
+      sh -c "
+        apk add --no-cache python3 make g++ > /dev/null &&
+        npm install -g pnpm@10.12.3 > /dev/null &&
+        pnpm install --filter website... &&
+        cd apps/website &&
+        pnpm dev
+      "
     environment:
       NODE_ENV: development
       PORT: 3001
