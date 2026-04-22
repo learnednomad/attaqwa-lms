@@ -109,6 +109,12 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'cms.learnednomad.com' },
       { protocol: 'https', hostname: 'cdn.learnednomad.com' },
+      // Dev: Strapi + MinIO serve uploads from localhost
+      { protocol: 'http', hostname: 'localhost' },
+      { protocol: 'http', hostname: '127.0.0.1' },
+      // Prod: masjidattaqwaatlanta.org and any subdomain (e.g. cdn.*)
+      { protocol: 'https', hostname: 'masjidattaqwaatlanta.org' },
+      { protocol: 'https', hostname: '**.masjidattaqwaatlanta.org' },
     ],
   },
   // Disable source maps in production for smaller builds and security
