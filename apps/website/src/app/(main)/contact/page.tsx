@@ -24,17 +24,20 @@ export const metadata: Metadata = generateSEOMetadata({
 const contactInfo = {
   address: "2674 Woodwin Rd, Doraville, GA 30360",
   phone: "(678) 896-9257",
-  email: "Mohammad30360@hotmail.com",
+  email: "almaad2674@gmail.com",
+  imamEmail: "Mohammad30360@hotmail.com",
   schoolEmail: "Attaqwa.du@gmail.com",
   hours: {
-    office: "Monday - Friday: 9:00 AM - 5:00 PM",
-    prayers: "Daily prayers open to all",
-    friday: "Jummah: 2:00 PM & 2:30 PM (Office closed 12:30-2:00 PM)",
+    office: "Daily after each prayer · Appointments welcome",
+    prayers: "Daily 5 prayers open to all",
+    friday: "Jumu'ah: two congregations (times follow the current Iqamah schedule)",
     weekend: "Saturday - Sunday: Limited office hours"
   },
   social: {
     facebook: "https://www.facebook.com/MasjidAttaqwa2674WoodwinRd",
-    youtube: "https://www.youtube.com/@MasjidAttaqwa2674"
+    youtube: "https://www.youtube.com/@MasjidAttaqwa2674",
+    whatsappGroup: "https://chat.whatsapp.com/GFJOW74TEmTGf41kv7AecY?mode=gi_t",
+    whatsappChannel: "https://whatsapp.com/channel/0029Vb7ZLYiFXUujmdTtii3M"
   }
 };
 
@@ -61,10 +64,10 @@ const staff = [
     responsibilities: ["Religious guidance", "Nikah ceremonies", "Janazah services", "Religious counseling", "Community leadership"]
   },
   {
-    name: "Imam Abdullah Khan",
+    name: "Ustadh Abdullah Khan",
     title: "Imam & Teacher",
-    email: "Mohammad30360@hotmail.com",
-    phone: "(678) 896-9257",
+    email: "faiysal_khan@icloud.com",
+    phone: "(470) 731-1314",
     education: [
       "BA in the Faculty of Shari'ah from University of Madinah",
       "MA in the Faculty of Qur'an from University of Madinah",

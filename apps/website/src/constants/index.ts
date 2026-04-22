@@ -5,13 +5,26 @@ export const MOSQUE_INFO = {
   province: 'GA',
   postalCode: '30360',
   phone: '(678) 896-9257',
-  email: 'Mohammad30360@hotmail.com',
+  adminPhone: '(678) 896-9257',
+  educationPhoneBrothers: '(470) 731-1314',
+  educationPhoneSisters: '(404) 936-7123',
+  primaryEmail: 'almaad2674@gmail.com',
+  email: 'almaad2674@gmail.com',
+  imamEmail: 'Mohammad30360@hotmail.com',
   schoolEmail: 'Attaqwa.du@gmail.com',
   website: 'https://masjidattaqwaatlanta.org',
   social: {
     facebook: 'https://www.facebook.com/MasjidAttaqwa2674WoodwinRd',
-    youtube: 'https://www.youtube.com/@MasjidAttaqwa2674'
+    youtube: 'https://www.youtube.com/@MasjidAttaqwa2674',
+    whatsappGroup: 'https://chat.whatsapp.com/GFJOW74TEmTGf41kv7AecY?mode=gi_t',
+    whatsappChannel: 'https://whatsapp.com/channel/0029Vb7ZLYiFXUujmdTtii3M'
   }
+} as const;
+
+export const JANAZA_PARTNER = {
+  name: 'Janazah Services of Georgia',
+  phone: '(678) 915-1881',
+  email: 'info@janazaga.com'
 } as const;
 
 export const PRAYER_NAMES = {

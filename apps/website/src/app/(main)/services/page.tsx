@@ -44,10 +44,10 @@ const services: Service[] = [
     details: [
       'Islamic funeral prayer (Salat al-Janazah) at masjid',
       'Body preparation coordination (Ghusl and Kafan)',
-      'Burial arrangements at Islamic cemetery',
+      'Burial at Daarul Barzakh, our community cemetery',
+      'In partnership with Janazah Services of Georgia for body preparation, medical requests, and transportation',
       'Family counseling and spiritual support',
       '24/7 emergency funeral services available',
-      'Transportation coordination for burial',
       'Memorial services and Quran recitation programs'
     ],
     contact: 'Imam Mohammad Zahirul Islam (24/7 Emergency)',
@@ -171,11 +171,11 @@ export default function ServicesPage() {
                 <div className="space-y-2">
                   <div className="flex items-center gap-2.5 text-sm">
                     <Phone className="h-3.5 w-3.5 text-neutral-400" />
-                    <span className="font-medium text-neutral-900">(404) 244-9577</span>
+                    <span className="font-medium text-neutral-900">(678) 896-9257</span>
                   </div>
                   <div className="flex items-center gap-2.5 text-sm">
                     <Mail className="h-3.5 w-3.5 text-neutral-400" />
-                    <span className="text-neutral-700">emergency@masjidattaqwaatlanta.org</span>
+                    <span className="text-neutral-700">almaad2674@gmail.com</span>
                   </div>
                 </div>
               </div>
@@ -256,7 +256,7 @@ export default function ServicesPage() {
 
                   {/* CTA */}
                   <a
-                    href="tel:4042449577"
+                    href="tel:6788969257"
                     className="mt-5 flex items-center justify-center gap-2 w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white"
                   >
                     <Phone className="h-3.5 w-3.5" />
@@ -396,11 +396,11 @@ export default function ServicesPage() {
               <div className="space-y-4 mb-6">
                 <div className="flex items-center gap-3 text-sm">
                   <Phone className="h-4 w-4 text-neutral-400" />
-                  <span className="font-medium text-neutral-900">(404) 244-9577</span>
+                  <span className="font-medium text-neutral-900">(678) 896-9257</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
                   <Mail className="h-4 w-4 text-neutral-400" />
-                  <span className="text-neutral-700">info@masjidattaqwaatlanta.org</span>
+                  <span className="text-neutral-700">almaad2674@gmail.com</span>
                 </div>
                 <div className="flex items-start gap-3 text-sm">
                   <MapPin className="h-4 w-4 text-neutral-400 mt-0.5" />

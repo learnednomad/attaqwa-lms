@@ -84,22 +84,40 @@ const values = [
 
 const leadership = [
   {
-    name: 'Imam Abdullah Rahman',
-    role: 'Lead Imam',
-    description: 'Over 15 years of Islamic scholarship and community leadership. Specializes in Quranic studies and Islamic jurisprudence.',
+    name: 'Imam Mohammad Zahirul Islam',
+    role: 'Founding Imam',
+    description: 'Founder of Masjid At-Taqwa and former Imam of Masjid Darus-Salam. Over 30 years teaching Qur\'anic and Islamic education in the Atlanta community. MA in Islamic Studies; completed Alimiyyah studies with Shaykh Abdul Ghaffar at Georgia Islamic Institute. Teaches in English and Bengali.',
     icon: Users,
   },
   {
-    name: 'Sister Aisha Mohamed',
-    role: 'Education Director',
-    description: 'Masters in Islamic Studies with expertise in women\'s and children\'s Islamic education programs.',
+    name: 'Ustadh Abdullah Khan',
+    role: 'Imam & Qur\'an Teacher',
+    description: 'Graduate of the University of Madinah — BA in Shari\'ah and MA in Qur\'an. Ijaazah from Masjid An-Nabawi. Former Imam of Masjid Al-\'Alawah in Madinah. Teaches Qur\'an memorization and Arabic language in Arabic, English, and Bengali.',
     icon: BookOpen,
   },
   {
-    name: 'Brother Omar Hassan',
-    role: 'Community Coordinator',
-    description: 'Manages community outreach, volunteer programs, and interfaith initiatives to strengthen community bonds.',
+    name: 'Ustadha Salina Sultana',
+    role: 'Head Manager of Sisters',
+    description: 'Leads the sisters\' programs and teaches adult Qur\'an and Islamic Studies in Bengali between Maghrib and Isha on Saturdays and Sundays.',
+    icon: Heart,
+  },
+  {
+    name: 'Ustadha Labibah Islam',
+    role: 'Management & Teacher',
+    description: 'Manages weekend classes and Tahfeedh for sisters. Primary point of contact for sisters\' education and Islamic counseling inquiries.',
     icon: Handshake,
+  },
+  {
+    name: 'Ustadha Siddiqa Islam',
+    role: 'Management & Teacher',
+    description: 'Tahfeedhul Qur\'an instructor for sisters and weekend class teacher.',
+    icon: BookOpen,
+  },
+  {
+    name: 'Ustadha Maryam Islam',
+    role: 'Management Administration',
+    description: 'Supports the administrative operations of the masjid\'s education programs.',
+    icon: Users,
   },
 ];
 
@@ -196,32 +214,25 @@ export default function AboutPage() {
               <h2 className="text-base font-semibold text-neutral-900 mb-6">Our History</h2>
               <div className="space-y-4 text-sm text-neutral-600 leading-relaxed">
                 <p>
-                  <span className="font-medium text-neutral-900">Masjid At-Taqwa was founded in 2005</span> through the efforts of a few dedicated brothers
-                  who were looking for a location to begin a masjid through which they would be able to spread
-                  the religion of Islam and nurture a community.
+                  <span className="font-medium text-neutral-900">Masjid At-Taqwa was founded in 2005</span> through the efforts of a few brothers
+                  who were looking for a location to begin a masjid through which they could spread the religion
+                  of Islam and nurture a community. It began as a residential home, slowly renovated and converted
+                  with the help of Allah and the dedication of many brothers and sisters. Daily salah, Friday
+                  Jumu&apos;ah, and Islamic classes for children and youth were established from the start.
                 </p>
                 <p>
-                  It began as a residential home which was slowly renovated and converted. With the help of Allah
-                  and the dedication of many brothers and sisters, the daily salah as well as a small school
-                  for the children and youth began to flourish.
+                  As the community grew, a second building was added to accommodate the sisters and to expand the
+                  school. Surrounding land was purchased to provide recreational space for the community.
                 </p>
                 <p>
-                  As the community grew, the demands and needs also expanded, which led to the slow development
-                  of the building and its amenities. The one building masjid was expanded with another building
-                  which transitioned the women&apos;s section therein to accommodate the growing number of attendees.
-                  This also allowed the expansion of the school and classes, as well as the purchasing of surrounding
-                  lands to allow recreational spaces.
+                  In the years that followed, the unexpected passing of a community member surfaced the need for
+                  proper burial facilities. By the grace of Allah, the second project of Masjid At-Taqwa was
+                  undertaken: <span className="font-medium text-neutral-900">a Muslim cemetery and funeral home — Daarul Barzakh</span>. The first burials
+                  have been facilitated and the site continues to develop.
                 </p>
                 <p>
-                  Due to the death of a community member, there were issues which arose demanding the need for
-                  further facilitations for the community. It was then, by the grace of Allah, that the second
-                  Project of Masjid At-Taqwa was undertaken: <span className="font-medium text-neutral-900">a cemetery and funeral home for the Muslims — Daarul Barzakh</span>.
-                </p>
-                <p>
-                  After the purchase, the burial of the first Muslims were facilitated and it is currently going
-                  through further development. Soon after, due to further growing demands of masjid and school space,
-                  the plans have been passed for a <span className="font-medium text-neutral-900">new masjid building</span> and it is currently going through
-                  the first initial phases for its completion.
+                  With the congregation and schools continuing to grow, plans are now underway for a{' '}
+                  <span className="font-medium text-neutral-900">new masjid building</span> to serve the community for years to come.
                 </p>
               </div>
             </div>
