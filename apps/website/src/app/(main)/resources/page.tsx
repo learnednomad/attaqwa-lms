@@ -92,6 +92,19 @@ const resources = [
       'Ramadan & Hajj guides',
       'Prayer schedule PDFs'
     ]
+  },
+  {
+    id: 'calendar-downloads',
+    title: 'Calendar Downloads',
+    description: 'Printable calendars including Ramadan schedules, Hajj guides, and prayer timetables',
+    href: '/resources/calendar-downloads',
+    icon: Calendar,
+    features: [
+      'Ramadan timetables',
+      'Hijri date calendars',
+      'Prayer schedule PDFs',
+      'Hajj guides'
+    ]
   }
 ];
 

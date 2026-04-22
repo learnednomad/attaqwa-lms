@@ -7,6 +7,7 @@ import {
   MessageCircle,
   ArrowRight,
   Users,
+  Download,
 } from 'lucide-react';
 import { EventCard } from '@/components/features/events/event-card';
 import { AnnouncementCard } from '@/components/features/announcements/announcement-card';
@@ -128,6 +129,30 @@ export default function CommunityPage() {
               <p className="text-sm text-neutral-600">No upcoming events right now.</p>
             </div>
           )}
+        </section>
+
+        {/* Islamic Calendar Downloads CTA */}
+        <section>
+          <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+              <Download className="h-5 w-5 text-emerald-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-neutral-900 mb-1">
+                Islamic Calendar Downloads
+              </h3>
+              <p className="text-xs text-neutral-500 leading-relaxed">
+                Printable prayer schedules, Ramadan timetables, and Hajj guides.
+              </p>
+            </div>
+            <Link
+              href="/resources/calendar-downloads"
+              className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-medium text-white hover:bg-emerald-700 transition-colors whitespace-nowrap"
+            >
+              Browse downloads
+              <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
         </section>
 
         {/* Announcements */}
