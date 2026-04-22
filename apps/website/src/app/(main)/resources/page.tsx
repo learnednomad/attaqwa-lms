@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { BookOpen, Book, Compass, Calendar, ChevronRight, GraduationCap, FileText, Headphones, Heart } from 'lucide-react';
+import { BookOpen, Book, Compass, Calendar, ChevronRight, GraduationCap, FileText, Headphones, Heart, Library } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Islamic Resources | Masjid At-Taqwa',
@@ -78,6 +78,32 @@ const resources = [
       'Prayer and Wudu guides',
       'Downloadable PDF resources',
       'Community integration support'
+    ]
+  },
+  {
+    id: 'library',
+    title: 'Library & Downloads',
+    description: 'Books, worksheets, calendars, and guides published by Masjid At-Taqwa — free to download',
+    href: '/resources/library',
+    icon: Library,
+    features: [
+      'Islamic books & references',
+      'Classroom worksheets',
+      'Ramadan & Hajj guides',
+      'Prayer schedule PDFs'
+    ]
+  },
+  {
+    id: 'calendar-downloads',
+    title: 'Calendar Downloads',
+    description: 'Printable calendars including Ramadan schedules, Hajj guides, and prayer timetables',
+    href: '/resources/calendar-downloads',
+    icon: Calendar,
+    features: [
+      'Ramadan timetables',
+      'Hijri date calendars',
+      'Prayer schedule PDFs',
+      'Hajj guides'
     ]
   }
 ];

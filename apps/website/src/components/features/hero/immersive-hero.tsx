@@ -36,6 +36,9 @@ export function ImmersiveHero({ className, prayerTimes }: ImmersiveHeroProps) {
       <div className="absolute inset-0 bg-[#0a0f1a]" />
 
       {/* Mosque Background Image */}
+      {/* TODO(hero): Labibah is sending a real Masjid At-Taqwa photo. When it
+          arrives, drop it in apps/website/public/masjid-hero.jpg and replace
+          the src below. The current file is a stock Unsplash photo. */}
       <div className="absolute inset-0">
         <Image
           src="/alexander-psiuk-u7yUvVU-q9Y-unsplash.jpg"

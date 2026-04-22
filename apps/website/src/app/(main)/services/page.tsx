@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { Heart, Users, BookOpen, Phone, Mail, Calendar, Clock, MapPin, ChevronRight, ArrowRight } from 'lucide-react';
+import { Heart, Users, BookOpen, Phone, Mail, Calendar, Clock, MapPin, ChevronRight, ArrowRight, HandHeart, MessageCircleQuestion } from 'lucide-react';
+import { JANAZA_PARTNER } from '@/constants';
 
 export const metadata = {
   title: 'Services | Masjid At-Taqwa',
@@ -44,10 +45,10 @@ const services: Service[] = [
     details: [
       'Islamic funeral prayer (Salat al-Janazah) at masjid',
       'Body preparation coordination (Ghusl and Kafan)',
-      'Burial arrangements at Islamic cemetery',
+      'Burial at Daarul Barzakh, our community cemetery',
+      'In partnership with Janazah Services of Georgia for body preparation, medical requests, and transportation',
       'Family counseling and spiritual support',
       '24/7 emergency funeral services available',
-      'Transportation coordination for burial',
       'Memorial services and Quran recitation programs'
     ],
     contact: 'Imam Mohammad Zahirul Islam (24/7 Emergency)',
@@ -171,11 +172,11 @@ export default function ServicesPage() {
                 <div className="space-y-2">
                   <div className="flex items-center gap-2.5 text-sm">
                     <Phone className="h-3.5 w-3.5 text-neutral-400" />
-                    <span className="font-medium text-neutral-900">(404) 244-9577</span>
+                    <span className="font-medium text-neutral-900">(678) 896-9257</span>
                   </div>
                   <div className="flex items-center gap-2.5 text-sm">
                     <Mail className="h-3.5 w-3.5 text-neutral-400" />
-                    <span className="text-neutral-700">emergency@masjidattaqwaatlanta.org</span>
+                    <span className="text-neutral-700">almaad2674@gmail.com</span>
                   </div>
                 </div>
               </div>
@@ -256,7 +257,7 @@ export default function ServicesPage() {
 
                   {/* CTA */}
                   <a
-                    href="tel:4042449577"
+                    href="tel:6788969257"
                     className="mt-5 flex items-center justify-center gap-2 w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white"
                   >
                     <Phone className="h-3.5 w-3.5" />
@@ -265,6 +266,73 @@ export default function ServicesPage() {
                 </div>
               );
             })}
+          </div>
+        </section>
+
+        {/* Janaza Services of Georgia partnership */}
+        <section className="pb-16">
+          <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-6 sm:p-8">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+                <HandHeart className="h-5 w-5 text-emerald-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-semibold tracking-wide uppercase text-emerald-700 mb-1">
+                  In partnership with
+                </p>
+                <h3 className="text-base font-semibold text-neutral-900 mb-2">
+                  {JANAZA_PARTNER.name}
+                </h3>
+                <p className="text-sm text-neutral-600 leading-relaxed mb-4">
+                  Our burial services cooperate with Janazah Services of Georgia for body preparation,
+                  medical requests, and transportation. Reach them directly for immediate janaza coordination.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 text-sm">
+                  <a
+                    href={`tel:${JANAZA_PARTNER.phone.replace(/\D/g, '')}`}
+                    className="flex items-center gap-2 text-emerald-700 hover:text-emerald-800"
+                  >
+                    <Phone className="h-3.5 w-3.5" />
+                    <span className="font-medium">{JANAZA_PARTNER.phone}</span>
+                  </a>
+                  <a
+                    href={`mailto:${JANAZA_PARTNER.email}`}
+                    className="flex items-center gap-2 text-emerald-700 hover:text-emerald-800"
+                  >
+                    <Mail className="h-3.5 w-3.5" />
+                    <span className="font-medium">{JANAZA_PARTNER.email}</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Ask an Imam CTA */}
+        <section className="pb-16">
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-6 sm:p-8">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+              <div className="w-10 h-10 rounded-lg bg-emerald-100 border border-emerald-200 flex items-center justify-center shrink-0">
+                <MessageCircleQuestion className="h-5 w-5 text-emerald-700" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-semibold text-neutral-900 mb-1">
+                  Have a specific Islamic question?
+                </h3>
+                <p className="text-sm text-neutral-600 leading-relaxed">
+                  Ask the imams directly on matters of Fiqh, Halal/Haram, family, worship, or Aqeedah.
+                  Available in English, Bengali, and Arabic. Sisters&apos; questions can be routed to
+                  Ustadha Labibah.
+                </p>
+              </div>
+              <Link
+                href="/services/ask-an-imam"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 transition-colors whitespace-nowrap"
+              >
+                Ask an Imam
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
           </div>
         </section>
 
@@ -396,11 +464,11 @@ export default function ServicesPage() {
               <div className="space-y-4 mb-6">
                 <div className="flex items-center gap-3 text-sm">
                   <Phone className="h-4 w-4 text-neutral-400" />
-                  <span className="font-medium text-neutral-900">(404) 244-9577</span>
+                  <span className="font-medium text-neutral-900">(678) 896-9257</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
                   <Mail className="h-4 w-4 text-neutral-400" />
-                  <span className="text-neutral-700">info@masjidattaqwaatlanta.org</span>
+                  <span className="text-neutral-700">almaad2674@gmail.com</span>
                 </div>
                 <div className="flex items-start gap-3 text-sm">
                   <MapPin className="h-4 w-4 text-neutral-400 mt-0.5" />

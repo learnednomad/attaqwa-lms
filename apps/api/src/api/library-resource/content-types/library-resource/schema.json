@@ -1,0 +1,78 @@
+{
+  "kind": "collectionType",
+  "collectionName": "library_resources",
+  "info": {
+    "singularName": "library-resource",
+    "pluralName": "library-resources",
+    "displayName": "Library Resource",
+    "description": "Books, worksheets, calendar PDFs, and other downloadable Islamic resources issued by Masjid At-Taqwa"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 255
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "maxLength": 2000
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": [
+        "books",
+        "worksheets",
+        "calendars",
+        "ramadan",
+        "hajj",
+        "prayer-schedule",
+        "new-muslim",
+        "other"
+      ],
+      "required": true,
+      "default": "books"
+    },
+    "language": {
+      "type": "enumeration",
+      "enum": ["english", "bengali", "arabic", "multi"],
+      "required": true,
+      "default": "english"
+    },
+    "file": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["files"]
+    },
+    "coverImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "author": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "publishDate": {
+      "type": "date"
+    },
+    "isActive": {
+      "type": "boolean",
+      "required": true,
+      "default": true
+    },
+    "displayOrder": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
-import { Heart, Phone, Users, Clock, MapPin } from 'lucide-react';
+import { Heart, Phone, Users, Clock, MapPin, Mail, HandHeart } from 'lucide-react';
+import { JANAZA_PARTNER } from '@/constants';
 
 export const metadata: Metadata = {
   title: 'Funeral Services | Masjid At-Taqwa',
@@ -205,6 +206,46 @@ export default function FuneralServicesPage() {
                 <div className="space-y-1">
                   <h4 className="text-sm font-medium text-neutral-900">Educational Workshops</h4>
                   <p className="text-sm text-neutral-500 leading-relaxed">Regular workshops on Islamic funeral rites and preparation</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Janaza Services of Georgia partnership */}
+        <section className="pb-16">
+          <div className="rounded-xl border border-neutral-200 bg-white p-6 sm:p-8">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+                <HandHeart className="h-5 w-5 text-emerald-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-semibold tracking-wide uppercase text-emerald-700 mb-1">
+                  In partnership with
+                </p>
+                <h3 className="text-base font-semibold text-neutral-900 mb-2">
+                  {JANAZA_PARTNER.name}
+                </h3>
+                <p className="text-sm text-neutral-600 leading-relaxed mb-4">
+                  Body preparation, medical requests, and transportation are coordinated with Janazah
+                  Services of Georgia. For immediate janaza support outside masjid hours, reach them
+                  directly.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 text-sm">
+                  <a
+                    href={`tel:${JANAZA_PARTNER.phone.replace(/\D/g, '')}`}
+                    className="flex items-center gap-2 text-emerald-700 hover:text-emerald-800"
+                  >
+                    <Phone className="h-3.5 w-3.5" />
+                    <span className="font-medium">{JANAZA_PARTNER.phone}</span>
+                  </a>
+                  <a
+                    href={`mailto:${JANAZA_PARTNER.email}`}
+                    className="flex items-center gap-2 text-emerald-700 hover:text-emerald-800"
+                  >
+                    <Mail className="h-3.5 w-3.5" />
+                    <span className="font-medium">{JANAZA_PARTNER.email}</span>
+                  </a>
                 </div>
               </div>
             </div>

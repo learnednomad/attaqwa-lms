@@ -245,22 +245,25 @@ export function PrayerTimesContent() {
                         khutbah (sermon) and congregational prayer.
                       </p>
                       <div className="flex gap-4 mb-3">
-                        <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-2 text-center">
-                          <p className="text-[10px] text-neutral-500 uppercase tracking-wide">
-                            First Jummah
-                          </p>
-                          <p className="text-sm font-bold text-neutral-900 font-mono">
-                            12:30 PM
-                          </p>
-                        </div>
-                        <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-2 text-center">
-                          <p className="text-[10px] text-neutral-500 uppercase tracking-wide">
-                            Second Jummah
-                          </p>
-                          <p className="text-sm font-bold text-neutral-900 font-mono">
-                            1:15 PM
-                          </p>
-                        </div>
+                        {(() => {
+                          const jummahLabels = ['First Jummah', 'Second Jummah'];
+                          const jummahTimes = prayerTimes?.jummah?.length
+                            ? prayerTimes.jummah
+                            : ['1:00 PM', '2:00 PM'];
+                          return jummahTimes.slice(0, 2).map((time, idx) => (
+                            <div
+                              key={idx}
+                              className="rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-2 text-center"
+                            >
+                              <p className="text-[10px] text-neutral-500 uppercase tracking-wide">
+                                {jummahLabels[idx]}
+                              </p>
+                              <p className="text-sm font-bold text-neutral-900 font-mono">
+                                {time}
+                              </p>
+                            </div>
+                          ));
+                        })()}
                       </div>
                       <p className="text-xs text-neutral-400">
                         Please arrive 15 minutes early. Parking available

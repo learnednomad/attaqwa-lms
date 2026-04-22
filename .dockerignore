@@ -49,6 +49,7 @@ apps/api/exports
 apps/api/.cache
 
 # Docker files (not needed inside container)
+Dockerfile
 docker-compose*.yml
 .dockerignore
 

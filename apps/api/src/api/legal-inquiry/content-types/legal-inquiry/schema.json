@@ -1,0 +1,88 @@
+{
+  "kind": "collectionType",
+  "collectionName": "legal_inquiries",
+  "info": {
+    "singularName": "legal-inquiry",
+    "pluralName": "legal-inquiries",
+    "displayName": "Legal / Religious Inquiry",
+    "description": "Ask-an-Imam questions on Islamic jurisprudence, rulings, and lifestyle matters"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "firstName": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "lastName": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "email": {
+      "type": "email",
+      "required": true
+    },
+    "phone": {
+      "type": "string",
+      "maxLength": 40
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": [
+        "fiqh",
+        "halal-haram",
+        "family",
+        "business",
+        "ritual",
+        "aqeedah",
+        "other"
+      ],
+      "required": true,
+      "default": "fiqh"
+    },
+    "audience": {
+      "type": "enumeration",
+      "enum": ["brothers", "sisters", "either"],
+      "required": true,
+      "default": "either"
+    },
+    "question": {
+      "type": "text",
+      "required": true,
+      "maxLength": 5000
+    },
+    "language": {
+      "type": "enumeration",
+      "enum": ["english", "bengali", "arabic"],
+      "required": true,
+      "default": "english"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["new", "in-progress", "answered", "archived"],
+      "required": true,
+      "default": "new"
+    },
+    "answer": {
+      "type": "text"
+    },
+    "answeredBy": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "answeredAt": {
+      "type": "datetime"
+    },
+    "submittedAt": {
+      "type": "datetime"
+    },
+    "notes": {
+      "type": "text",
+      "private": true
+    }
+  }
+}

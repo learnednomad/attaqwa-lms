@@ -5,10 +5,11 @@
 # Uses bind mounts for live code changes.
 #
 # Usage:
-#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+#   docker compose -f docker-compose.dev.yml up -d
+#   make dev
 #
 # With AI/Ollama:
-#   docker compose -f docker-compose.yml -f docker-compose.dev.yml --profile ai up -d
+#   docker compose -f docker-compose.dev.yml --profile ai up -d
 # ============================================================================
 
 services:
@@ -47,7 +48,7 @@ services:
       DATABASE_PORT: 5432
       DATABASE_USERNAME: postgres
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-dev-secret-change-me}
-      BETTER_AUTH_BASE_URL: ${BETTER_AUTH_BASE_URL:-http://localhost:3003}
+      BETTER_AUTH_BASE_URL: ${BETTER_AUTH_BASE_URL:-http://localhost:3001}
     depends_on:
       postgres:
         condition: service_healthy
@@ -125,7 +126,14 @@ services:
     container_name: attaqwa-api-dev
     restart: unless-stopped
     working_dir: /app
-    command: sh -c "npm install -g pnpm@10.12.3 && pnpm install && cd apps/api && npm install --os=linux --libc=musl sharp && pnpm develop"
+    command: >
+      sh -c "
+        apk add --no-cache python3 make g++ vips-dev > /dev/null &&
+        npm install -g pnpm@10.12.3 > /dev/null &&
+        pnpm install --filter api... &&
+        cd apps/api &&
+        pnpm develop
+      "
     environment:
       HOST: 0.0.0.0
       PORT: 1337
@@ -178,13 +186,20 @@ services:
     container_name: attaqwa-admin-dev
     restart: unless-stopped
     working_dir: /app
-    command: sh -c "npm install -g pnpm@10.12.3 && pnpm install && cd apps/admin && pnpm dev"
+    command: >
+      sh -c "
+        apk add --no-cache python3 make g++ > /dev/null &&
+        npm install -g pnpm@10.12.3 > /dev/null &&
+        pnpm install --filter admin... &&
+        cd apps/admin &&
+        pnpm dev
+      "
     environment:
       NODE_ENV: development
       PORT: 3000
       NEXT_PUBLIC_API_URL: http://localhost:1337
-      NEXT_PUBLIC_AUTH_URL: http://localhost:3003
-      AUTH_INTERNAL_URL: http://website:3003
+      NEXT_PUBLIC_AUTH_URL: http://localhost:3001
+      AUTH_INTERNAL_URL: http://website:3001
       STRAPI_INTERNAL_URL: http://api:1337
       STRAPI_API_TOKEN: ${STRAPI_API_TOKEN:-}
     ports:
@@ -202,18 +217,25 @@ services:
     container_name: attaqwa-website-dev
     restart: unless-stopped
     working_dir: /app
-    command: sh -c "npm install -g pnpm@10.12.3 && pnpm install && cd apps/website && pnpm dev"
+    command: >
+      sh -c "
+        apk add --no-cache python3 make g++ > /dev/null &&
+        npm install -g pnpm@10.12.3 > /dev/null &&
+        pnpm install --filter website... &&
+        cd apps/website &&
+        pnpm dev
+      "
     environment:
       NODE_ENV: development
-      PORT: 3003
+      PORT: 3001
       NEXT_PUBLIC_API_URL: http://localhost:1337
       STRAPI_URL: http://api:1337
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-dev-password-change-me}@postgres:5432/attaqwa_lms
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-dev-secret-change-me}
-      BETTER_AUTH_BASE_URL: http://localhost:3003
+      BETTER_AUTH_BASE_URL: http://localhost:3001
       STRAPI_API_TOKEN: ${STRAPI_API_TOKEN:-}
     ports:
-      - "3003:3003"
+      - "3001:3001"
     depends_on:
       init:
         condition: service_completed_successfully
