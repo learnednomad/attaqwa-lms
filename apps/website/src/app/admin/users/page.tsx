@@ -88,9 +88,9 @@ export default function AdminUsersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-start">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Users</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Users</h1>
           <p className="text-gray-600 mt-2 text-sm">
             BetterAuth user accounts. Read-only listing — manage individual
             accounts via the BetterAuth admin plugin or directly in the database.
@@ -100,7 +100,7 @@ export default function AdminUsersPage() {
           onClick={fetchUsers}
           disabled={loading}
           variant="outline"
-          className="gap-2"
+          className="gap-2 self-start sm:self-auto"
         >
           <RefreshCcw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh

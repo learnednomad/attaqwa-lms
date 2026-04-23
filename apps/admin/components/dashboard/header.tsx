@@ -5,27 +5,36 @@
 
 'use client';
 
-import { Bell, LogOut, Search, User } from 'lucide-react';
+import { Bell, LogOut, Menu, Search, User } from 'lucide-react';
 import { useState } from 'react';
 
-import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/hooks/use-auth';
-import { cn } from '@/lib/utils/cn';
 
-export function Header() {
+interface HeaderProps {
+  onOpenMobileSidebar?: () => void;
+}
+
+export function Header({ onOpenMobileSidebar }: HeaderProps) {
   const { user, signOut } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   return (
     <header className="sticky top-0 z-10 border-b border-charcoal-200 bg-white">
-      <div className="flex h-16 items-center justify-between px-6">
-        {/* Search Bar */}
-        <div className="flex flex-1 items-center">
-          <div className="relative w-96">
+      <div className="flex h-16 items-center justify-between gap-3 px-4 sm:px-6">
+        {/* Mobile hamburger + Search */}
+        <div className="flex flex-1 items-center gap-3">
+          <button
+            onClick={onOpenMobileSidebar}
+            className="rounded-md p-2 -ml-2 text-charcoal-600 hover:bg-charcoal-100 lg:hidden"
+            aria-label="Open sidebar"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+          <div className="relative w-full max-w-sm">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-charcoal-400" />
             <input
               type="text"
-              placeholder="Search courses, students..."
+              placeholder="Search courses, users…"
               className="w-full rounded-lg border border-charcoal-300 bg-white py-2 pl-10 pr-4 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
             />
           </div>

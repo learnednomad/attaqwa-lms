@@ -77,9 +77,9 @@ export default function AdminSettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">System Settings</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">System Settings</h1>
           <p className="text-sm text-gray-500 mt-1">
             Read-only diagnostics. Detailed configuration lives in the env file
             (Coolify in production) and the Strapi admin at{' '}
@@ -98,7 +98,7 @@ export default function AdminSettingsPage() {
           onClick={fetchInfo}
           disabled={loading}
           variant="outline"
-          className="gap-2"
+          className="gap-2 self-start sm:self-auto"
         >
           <RefreshCcw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh
