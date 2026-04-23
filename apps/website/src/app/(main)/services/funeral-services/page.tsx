@@ -40,7 +40,9 @@ export default function FuneralServicesPage() {
                 </div>
               </div>
               <div className="text-center md:text-right">
-                <p className="text-2xl font-bold text-red-600">(555) 123-4567</p>
+                <a href="tel:6788969257" className="text-2xl font-bold text-red-600 hover:text-red-700">
+                  (678) 896-9257
+                </a>
                 <p className="text-sm text-neutral-500">Available 24 hours a day</p>
               </div>
             </div>
