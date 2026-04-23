@@ -129,6 +129,41 @@ function buildStrapiQuery(params?: {
   return searchParams.toString();
 }
 
+/**
+ * Same-origin request helper for admin-only BFF routes.
+ *
+ * Admin pages run in the browser and can't carry STRAPI_API_TOKEN, so they
+ * must call our own /api/admin/* proxies (which run server-side with the
+ * token + a BetterAuth session check). The session cookie is sent
+ * automatically because we use `credentials: 'include'`.
+ */
+async function makeAdminRequest<T>(
+  path: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const response = await fetch(path, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    let errorMessage: string = ERROR_MESSAGES.SERVER_ERROR;
+    try {
+      const errorData: ErrorResponse = await response.json();
+      errorMessage = errorData.message || errorData.error;
+    } catch {
+      errorMessage = response.statusText || `HTTP ${response.status}`;
+    }
+    throw new ApiError(response.status, errorMessage);
+  }
+
+  return response.json();
+}
+
 // Announcements API (using v1 endpoints)
 export const announcementsApi = {
   getAll: async (params?: {
@@ -315,6 +350,12 @@ export const prayerTimeOverridesApi = {
 };
 
 // I'tikaf Registrations API (using v1 endpoints)
+// Itikaf + Appeals are admin-only resources. The browser cannot carry
+// STRAPI_API_TOKEN, so these route through /api/admin/* BFF proxies which
+// validate the BetterAuth session and forward server-side with the token.
+const ADMIN_BFF_ITIKAF = '/api/admin/itikaf-registrations';
+const ADMIN_BFF_APPEALS = '/api/admin/appeals';
+
 export const itikafRegistrationsApi = {
   getAll: async (params?: {
     page?: number;
@@ -325,38 +366,38 @@ export const itikafRegistrationsApi = {
     if (params?.status) filters.status = params.status;
 
     const query = buildStrapiQuery({ page: params?.page, limit: params?.limit, filters });
-    const endpoint = query ? `${API_V1_ENDPOINTS.ITIKAF_REGISTRATIONS}?${query}` : API_V1_ENDPOINTS.ITIKAF_REGISTRATIONS;
+    const endpoint = query ? `${ADMIN_BFF_ITIKAF}?${query}` : ADMIN_BFF_ITIKAF;
 
-    const raw = await makeRequest<StrapiPaginatedResponse<ItikafRegistration>>(endpoint);
+    const raw = await makeAdminRequest<StrapiPaginatedResponse<ItikafRegistration>>(endpoint);
     return transformPaginated(raw);
   },
 
   getById: async (id: string): Promise<ApiResponse<ItikafRegistration>> => {
-    return makeRequest<ApiResponse<ItikafRegistration>>(`${API_V1_ENDPOINTS.ITIKAF_REGISTRATIONS}/${id}`);
+    return makeAdminRequest<ApiResponse<ItikafRegistration>>(`${ADMIN_BFF_ITIKAF}/${id}`);
   },
 
   create: async (data: Omit<ItikafRegistration, 'id' | 'documentId' | 'status' | 'notes' | 'user' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<ItikafRegistration>> => {
-    return makeRequest<ApiResponse<ItikafRegistration>>(API_V1_ENDPOINTS.ITIKAF_REGISTRATIONS, {
+    return makeAdminRequest<ApiResponse<ItikafRegistration>>(ADMIN_BFF_ITIKAF, {
       method: 'POST',
       body: JSON.stringify({ data }),
     });
   },
 
   update: async (id: string, data: Partial<ItikafRegistration>): Promise<ApiResponse<ItikafRegistration>> => {
-    return makeRequest<ApiResponse<ItikafRegistration>>(`${API_V1_ENDPOINTS.ITIKAF_REGISTRATIONS}/${id}`, {
+    return makeAdminRequest<ApiResponse<ItikafRegistration>>(`${ADMIN_BFF_ITIKAF}/${id}`, {
       method: 'PUT',
       body: JSON.stringify({ data }),
     });
   },
 
   delete: async (id: string): Promise<ApiResponse<{ message: string }>> => {
-    return makeRequest<ApiResponse<{ message: string }>>(`${API_V1_ENDPOINTS.ITIKAF_REGISTRATIONS}/${id}`, {
+    return makeAdminRequest<ApiResponse<{ message: string }>>(`${ADMIN_BFF_ITIKAF}/${id}`, {
       method: 'DELETE',
     });
   },
 };
 
-// Appeals API (using v1 endpoints)
+// Appeals API (admin-only proxy)
 export const appealsApi = {
   getAll: async (params?: {
     page?: number;
@@ -369,32 +410,32 @@ export const appealsApi = {
     if (params?.category) filters.category = params.category;
 
     const query = buildStrapiQuery({ page: params?.page, limit: params?.limit, filters });
-    const endpoint = query ? `${API_V1_ENDPOINTS.APPEALS}?${query}` : API_V1_ENDPOINTS.APPEALS;
+    const endpoint = query ? `${ADMIN_BFF_APPEALS}?${query}` : ADMIN_BFF_APPEALS;
 
-    const raw = await makeRequest<StrapiPaginatedResponse<Appeal>>(endpoint);
+    const raw = await makeAdminRequest<StrapiPaginatedResponse<Appeal>>(endpoint);
     return transformPaginated(raw);
   },
 
   getById: async (id: string): Promise<ApiResponse<Appeal>> => {
-    return makeRequest<ApiResponse<Appeal>>(`${API_V1_ENDPOINTS.APPEALS}/${id}`);
+    return makeAdminRequest<ApiResponse<Appeal>>(`${ADMIN_BFF_APPEALS}/${id}`);
   },
 
   create: async (data: Omit<Appeal, 'id' | 'documentId' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Appeal>> => {
-    return makeRequest<ApiResponse<Appeal>>(API_V1_ENDPOINTS.APPEALS, {
+    return makeAdminRequest<ApiResponse<Appeal>>(ADMIN_BFF_APPEALS, {
       method: 'POST',
       body: JSON.stringify({ data }),
     });
   },
 
   update: async (id: string, data: Partial<Appeal>): Promise<ApiResponse<Appeal>> => {
-    return makeRequest<ApiResponse<Appeal>>(`${API_V1_ENDPOINTS.APPEALS}/${id}`, {
+    return makeAdminRequest<ApiResponse<Appeal>>(`${ADMIN_BFF_APPEALS}/${id}`, {
       method: 'PUT',
       body: JSON.stringify({ data }),
     });
   },
 
   delete: async (id: string): Promise<ApiResponse<{ message: string }>> => {
-    return makeRequest<ApiResponse<{ message: string }>>(`${API_V1_ENDPOINTS.APPEALS}/${id}`, {
+    return makeAdminRequest<ApiResponse<{ message: string }>>(`${ADMIN_BFF_APPEALS}/${id}`, {
       method: 'DELETE',
     });
   },

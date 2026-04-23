@@ -421,37 +421,43 @@ export default function ContactPage() {
                 <h3 className="text-sm font-semibold text-neutral-900 mb-3">Getting Here</h3>
                 <div className="space-y-3 text-sm text-neutral-500 leading-relaxed">
                   <p>
-                    <span className="font-medium text-neutral-700">By Car:</span> Take Exit 15 from Highway 101. Turn right on Main Street,
-                    then left on Islamic Center Drive. The mosque will be on your right.
+                    <span className="font-medium text-neutral-700">By Car:</span>{' '}
+                    From I-285 take Exit 32 (Chamblee-Tucker Rd). Head east on
+                    Chamblee-Tucker, then turn onto Woodwin Rd. The masjid is at
+                    2674 Woodwin Rd on your right.
                   </p>
                   <p>
-                    <span className="font-medium text-neutral-700">By Public Transit:</span> Take Bus Route 42 to the Islamic Center stop.
-                    The mosque is a 2-minute walk from the bus stop.
+                    <span className="font-medium text-neutral-700">Parking:</span>{' '}
+                    Free parking available on-site. Additional overflow parking
+                    is available on Jumu&apos;ah and during special events. Please
+                    follow the volunteers&apos; directions during peak times.
                   </p>
                   <p>
-                    <span className="font-medium text-neutral-700">Parking:</span> Free parking available in our main lot. Additional
-                    parking during Jummah and special events in the adjacent community center lot.
+                    <span className="font-medium text-neutral-700">By Transit:</span>{' '}
+                    Doraville MARTA station (Gold Line) is the nearest rail stop;
+                    rideshare from there is the most reliable option to the
+                    masjid.
                   </p>
                 </div>
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-neutral-900 mb-3">Nearby Landmarks</h3>
+                <h3 className="text-sm font-semibold text-neutral-900 mb-3">Quick Reference</h3>
                 <ul className="space-y-2 text-sm text-neutral-500">
-                  <li className="flex items-center gap-2">
-                    <div className="w-1 h-1 bg-neutral-400 rounded-full shrink-0" />
-                    Next to City Community Center
+                  <li className="flex items-start gap-2">
+                    <div className="w-1 h-1 bg-emerald-400 rounded-full shrink-0 mt-1.5" />
+                    <span>2674 Woodwin Rd, Doraville, GA 30360</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-1 h-1 bg-neutral-400 rounded-full shrink-0" />
-                    Across from Sunshine Elementary School
+                  <li className="flex items-start gap-2">
+                    <div className="w-1 h-1 bg-emerald-400 rounded-full shrink-0 mt-1.5" />
+                    <span>Open daily for the five prayers — see prayer times for current iqamah</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-1 h-1 bg-neutral-400 rounded-full shrink-0" />
-                    0.5 miles from Downtown Shopping District
+                  <li className="flex items-start gap-2">
+                    <div className="w-1 h-1 bg-emerald-400 rounded-full shrink-0 mt-1.5" />
+                    <span>Two Jumu&apos;ah congregations on Fridays (times follow the iqamah schedule)</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-1 h-1 bg-neutral-400 rounded-full shrink-0" />
-                    Near the intersection of Main St & Center Dr
+                  <li className="flex items-start gap-2">
+                    <div className="w-1 h-1 bg-emerald-400 rounded-full shrink-0 mt-1.5" />
+                    <span>Separate facilities for brothers and sisters; wudu areas in both buildings</span>
                   </li>
                 </ul>
 
@@ -459,7 +465,7 @@ export default function ContactPage() {
                   href={`https://maps.google.com/?q=${encodeURIComponent(contactInfo.address)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 mt-5 rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700"
+                  className="inline-flex items-center gap-2 mt-5 rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
                 >
                   <MapPin className="h-3.5 w-3.5" />
                   Open in Google Maps
@@ -467,13 +473,17 @@ export default function ContactPage() {
               </div>
             </div>
 
-            {/* Map placeholder */}
-            <div className="mt-6 h-56 rounded-lg border border-neutral-200 bg-neutral-50 flex items-center justify-center">
-              <div className="text-center">
-                <MapPin className="mx-auto mb-2 h-6 w-6 text-neutral-300" />
-                <p className="text-xs text-neutral-400">Interactive map will be displayed here</p>
-                <p className="text-xs text-neutral-500 font-medium mt-1">{contactInfo.address}</p>
-              </div>
+            {/* Embedded Google Map */}
+            <div className="mt-6 rounded-lg border border-neutral-200 overflow-hidden">
+              <iframe
+                title="Map of Masjid At-Taqwa"
+                src="https://www.google.com/maps?output=embed&q=2674+Woodwin+Rd%2C+Doraville%2C+GA+30360"
+                width="100%"
+                height="320"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                style={{ border: 0 }}
+              />
             </div>
           </div>
         </section>
