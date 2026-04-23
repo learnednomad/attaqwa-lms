@@ -8,7 +8,7 @@ import {
   CheckCircle, Users, MessageSquare, FileText,
   ChevronRight, ChevronDown, Home, User, LogOut,
   GraduationCap, CreditCard, Building2, Heart, Search,
-  ExternalLink, MoreHorizontal
+  ExternalLink, MoreHorizontal, Menu, X
 } from 'lucide-react';
 import { useCourses, useEnrollments, useProgress } from '@/hooks/use-student-data';
 import { useStudentAuth } from '@/contexts/StudentAuthContext';
@@ -72,6 +72,7 @@ export default function StudentDashboard() {
   const router = useRouter();
   const { user, logout } = useStudentAuth();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [scheduleView, setScheduleView] = useState<'daily' | 'weekly'>('daily');
   // Notification state
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -212,8 +213,17 @@ export default function StudentDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
+      {/* Mobile Sidebar Overlay */}
+      {mobileSidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          onClick={() => setMobileSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
       {/* Sidebar - Enlight Style */}
-      <aside className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'} lg:relative`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'} lg:relative ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         {/* Logo Header */}
         <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
           <div className="flex items-center gap-2">
@@ -290,21 +300,30 @@ export default function StudentDashboard() {
       {/* Main Content */}
       <div className="flex-1 min-w-0">
         {/* Top Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold text-gray-900">
-                Welcome Back, {student?.name}
-              </h1>
-              {apiCourses.length > 0 && (
-                <Badge className="mt-1 bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
-                  <CheckCircle className="h-3 w-3 mr-1" />
-                  Connected
-                </Badge>
-              )}
+        <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <button
+                onClick={() => setMobileSidebarOpen(true)}
+                className="p-2 -ml-2 text-gray-500 hover:text-gray-700 lg:hidden flex-shrink-0"
+                aria-label="Open menu"
+              >
+                <Menu className="h-5 w-5" />
+              </button>
+              <div className="min-w-0">
+                <h1 className="text-lg sm:text-2xl font-semibold text-gray-900 truncate">
+                  Welcome Back, {student?.name}
+                </h1>
+                {apiCourses.length > 0 && (
+                  <Badge className="mt-1 bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                    Connected
+                  </Badge>
+                )}
+              </div>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
               {/* Search */}
               <div className="relative hidden md:block">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -340,9 +359,9 @@ export default function StudentDashboard() {
         </header>
 
         {/* Dashboard Content */}
-        <main className="p-6">
+        <main className="p-4 sm:p-6">
           {/* Top Stats - 3 Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6">
             {/* Courses Completed */}
             <Card className="bg-white shadow-sm">
               <CardContent className="p-6">

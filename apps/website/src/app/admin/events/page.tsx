@@ -69,9 +69,9 @@ export default function EventsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Events</h1>
-        <Button asChild className="bg-islamic-green-600 hover:bg-islamic-green-700">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Events</h1>
+        <Button asChild className="bg-islamic-green-600 hover:bg-islamic-green-700 self-start sm:self-auto">
           <Link href="/admin/events/new">
             <Plus className="w-4 h-4 mr-2" />
             Create New
@@ -80,7 +80,7 @@ export default function EventsPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex space-x-2">
+      <div className="flex flex-wrap gap-2">
         <Button
           variant={filter === 'all' ? 'default' : 'outline'}
           size="sm"
@@ -129,12 +129,12 @@ export default function EventsPage() {
                 return (
                   <div
                     key={event.id}
-                    className="flex items-start justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
+                    className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
                   >
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center space-x-3">
+                    <div className="flex-1 space-y-2 min-w-0">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
                         <h3 className="font-semibold text-gray-900">{event.title}</h3>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           <Badge
                             variant={isUpcoming ? 'default' : 'secondary'}
                             className={
@@ -162,7 +162,7 @@ export default function EventsPage() {
                         {truncateText(event.description, 150)}
                       </p>
                       
-                      <div className="flex items-center space-x-4 text-xs text-gray-500">
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
                         <span className="flex items-center">
                           <Calendar className="w-3 h-3 mr-1" />
                           {formatDate(eventDate)}
@@ -199,7 +199,7 @@ export default function EventsPage() {
                       </div>
                     </div>
                     
-                    <div className="flex items-center space-x-2 ml-4">
+                    <div className="flex items-center space-x-2 sm:ml-4 flex-shrink-0">
                       <Button size="sm" variant="outline" asChild>
                         <Link href={`/admin/events/${event.id}/edit`}>
                           <Edit className="w-4 h-4" />

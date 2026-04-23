@@ -124,9 +124,9 @@ export default function AdminInquiriesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-start">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Inquiries</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Inquiries</h1>
           <p className="text-gray-600 mt-2 text-sm">
             Submissions from the public contact form and the Ask-an-Imam form.
             Status changes here also reflect in the Strapi admin.
@@ -136,7 +136,7 @@ export default function AdminInquiriesPage() {
           onClick={() => fetchInquiries(tab)}
           disabled={loading}
           variant="outline"
-          className="gap-2"
+          className="gap-2 self-start sm:self-auto"
         >
           <RefreshCcw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh

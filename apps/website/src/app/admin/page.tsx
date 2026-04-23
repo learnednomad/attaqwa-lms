@@ -197,22 +197,22 @@ export default function AdminDashboard() {
       {/* Next prayer hero */}
       {nextPrayer && (
         <Card className="border-emerald-200 bg-gradient-to-r from-emerald-50 via-white to-amber-50/40 overflow-hidden">
-          <CardContent className="py-4 px-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div className="flex items-center gap-4">
-              <div className="w-11 h-11 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-md">
+          <CardContent className="py-4 px-4 sm:px-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+              <div className="w-11 h-11 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-md flex-shrink-0">
                 <Clock className="w-5 h-5" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <div className="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold">Next prayer</div>
-                <div className="text-xl font-bold text-gray-900">
-                  {nextPrayer.label}
-                  <span className="text-gray-400 font-normal text-sm ml-2">
+                <div className="text-lg sm:text-xl font-bold text-gray-900 flex flex-wrap items-baseline gap-x-2">
+                  <span>{nextPrayer.label}</span>
+                  <span className="text-gray-400 font-normal text-xs sm:text-sm">
                     · {nextPrayer.usesIqama ? 'Iqama' : 'Time'} {formatTime((nextPrayer.iqama ?? nextPrayer.adhan) ?? '')}
                   </span>
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center justify-between sm:justify-end gap-4">
               <div className="text-right">
                 <div className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">In</div>
                 <div className="text-2xl font-bold text-emerald-700 font-mono tabular-nums">
@@ -248,20 +248,20 @@ export default function AdminDashboard() {
           <CardContent>
             {prayerTimes ? (
               <>
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
                   {prayers.filter((p) => !p.isSunrise).map((p) => {
                     const isNext = nextPrayer?.key === p.key;
                     return (
                       <div
                         key={p.key}
-                        className={`rounded-lg border p-3 text-center transition-all ${
+                        className={`rounded-lg border p-2 sm:p-3 text-center transition-all ${
                           isNext ? 'border-emerald-400 bg-emerald-50/60 ring-1 ring-emerald-200' : 'border-gray-200 bg-white'
                         }`}
                       >
                         <div className="text-[11px] font-semibold text-gray-900 mb-1">{p.label}</div>
                         {p.iqama ? (
                           <>
-                            <div className="text-base font-bold text-emerald-700 font-mono tabular-nums whitespace-nowrap">
+                            <div className="text-sm sm:text-base font-bold text-emerald-700 font-mono tabular-nums whitespace-nowrap">
                               {formatTime(p.iqama)}
                             </div>
                             <div className="text-[10px] text-gray-400 mt-0.5 font-mono tabular-nums whitespace-nowrap">
@@ -269,7 +269,7 @@ export default function AdminDashboard() {
                             </div>
                           </>
                         ) : (
-                          <div className="text-base font-bold text-gray-700 font-mono tabular-nums whitespace-nowrap">
+                          <div className="text-sm sm:text-base font-bold text-gray-700 font-mono tabular-nums whitespace-nowrap">
                             {p.adhan ? formatTime(p.adhan) : '—'}
                           </div>
                         )}

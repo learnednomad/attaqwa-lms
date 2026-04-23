@@ -77,7 +77,7 @@ export default function ItikafRegistrationsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">I&apos;tikaf Registrations</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">I&apos;tikaf Registrations</h1>
         <p className="text-gray-600 mt-2">
           Manage i&apos;tikaf registration requests from community members.
         </p>
@@ -118,10 +118,10 @@ export default function ItikafRegistrationsPage() {
               {filteredRegistrations.map((reg) => (
                 <div
                   key={reg.id}
-                  className="flex items-start justify-between p-4 border rounded-lg hover:bg-gray-50"
+                  className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 p-4 border rounded-lg hover:bg-gray-50"
                 >
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center space-x-3">
+                  <div className="flex-1 space-y-2 min-w-0">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
                       <h3 className="font-medium text-gray-900">{reg.fullName}</h3>
                       <Badge className={statusColors[reg.status]}>
                         {reg.status}
@@ -135,8 +135,8 @@ export default function ItikafRegistrationsPage() {
                       {new Date(reg.startDate).toLocaleDateString()} to {new Date(reg.endDate).toLocaleDateString()}
                     </div>
 
-                    <div className="flex items-center space-x-4 text-xs text-gray-500">
-                      <span>{reg.email}</span>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
+                      <span className="break-all">{reg.email}</span>
                       <span>{reg.phone}</span>
                       <span>Age: {reg.age}</span>
                     </div>
@@ -154,7 +154,7 @@ export default function ItikafRegistrationsPage() {
                     )}
                   </div>
 
-                  <div className="flex items-center space-x-2 ml-4">
+                  <div className="flex items-center space-x-2 sm:ml-4 flex-shrink-0">
                     <Button variant="outline" size="sm" asChild>
                       <Link href={`/admin/itikaf/${reg.id}`}>
                         <Eye className="w-4 h-4" />

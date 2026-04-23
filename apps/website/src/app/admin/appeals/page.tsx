@@ -86,14 +86,14 @@ export default function AppealsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Appeals &amp; Campaigns</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Appeals &amp; Campaigns</h1>
           <p className="text-gray-600 mt-2">
             Manage fundraising campaigns and community appeals.
           </p>
         </div>
-        <Button asChild>
+        <Button asChild className="self-start sm:self-auto">
           <Link href="/admin/appeals/new">
             <Plus className="w-4 h-4 mr-2" />
             New Appeal
@@ -143,10 +143,10 @@ export default function AppealsPage() {
             const progress = getProgressPercentage(appeal.currentAmount, appeal.goalAmount);
             return (
               <Card key={appeal.id}>
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 space-y-3">
-                      <div className="flex items-center space-x-3">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                    <div className="flex-1 space-y-3 min-w-0">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
                         <h3 className="text-lg font-semibold text-gray-900">{appeal.title}</h3>
                         <Badge className={categoryColors[appeal.category]}>
                           {categoryLabels[appeal.category]}
@@ -201,7 +201,7 @@ export default function AppealsPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-2 ml-4">
+                    <div className="flex items-center space-x-2 sm:ml-4 flex-shrink-0">
                       <Button variant="outline" size="sm" asChild>
                         <Link href={`/admin/appeals/${appeal.id}/edit`}>
                           <Edit className="w-4 h-4" />

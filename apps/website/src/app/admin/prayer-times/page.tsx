@@ -450,35 +450,37 @@ export default function PrayerTimesPage() {
       </div>
 
       {/* Tab bar */}
-      <div className="flex flex-wrap items-center gap-1 bg-gray-100 p-1 rounded-lg w-fit">
-        {tabs.map((t, i) => {
-          const active = view === t.key;
-          const prev = tabs[i - 1];
-          const showDivider = prev && prev.group !== t.group;
-          return (
-            <div key={t.key} className="flex items-center">
-              {showDivider && <div className="w-px h-5 bg-gray-300 mx-1" />}
-              <button
-                onClick={() => setView(t.key)}
-                className={`px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-1.5 transition-colors ${
-                  active
-                    ? 'bg-white text-emerald-700 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                {t.icon}
-                {t.label}
-                {t.badge && t.badge > 0 ? (
-                  <span className={`ml-0.5 text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
-                    active ? 'bg-amber-100 text-amber-700' : 'bg-amber-500 text-white'
-                  }`}>
-                    {t.badge}
-                  </span>
-                ) : null}
-              </button>
-            </div>
-          );
-        })}
+      <div className="overflow-x-auto -mx-1 px-1">
+        <div className="inline-flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
+          {tabs.map((t, i) => {
+            const active = view === t.key;
+            const prev = tabs[i - 1];
+            const showDivider = prev && prev.group !== t.group;
+            return (
+              <div key={t.key} className="flex items-center">
+                {showDivider && <div className="w-px h-5 bg-gray-300 mx-1" />}
+                <button
+                  onClick={() => setView(t.key)}
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-1.5 transition-colors whitespace-nowrap ${
+                    active
+                      ? 'bg-white text-emerald-700 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  {t.icon}
+                  {t.label}
+                  {t.badge && t.badge > 0 ? (
+                    <span className={`ml-0.5 text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
+                      active ? 'bg-amber-100 text-amber-700' : 'bg-amber-500 text-white'
+                    }`}>
+                      {t.badge}
+                    </span>
+                  ) : null}
+                </button>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {isLoading && view !== 'overrides' && view !== 'iqamah' && view !== 'tarawih' && (
@@ -493,24 +495,24 @@ export default function PrayerTimesPage() {
           {/* Next prayer hero */}
           {next && (
             <Card className="border-emerald-200 bg-gradient-to-r from-emerald-50 via-white to-amber-50/40 overflow-hidden relative">
-              <CardContent className="py-5 px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-md">
+              <CardContent className="py-5 px-4 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                  <div className="w-12 h-12 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-md flex-shrink-0">
                     <Clock className="w-5 h-5" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <div className="text-xs uppercase tracking-wider text-emerald-700 font-semibold">Next prayer</div>
-                    <div className="text-2xl font-bold text-gray-900 mt-0.5">
-                      {next.label}
-                      <span className="text-gray-400 font-normal text-base ml-2">
+                    <div className="text-xl sm:text-2xl font-bold text-gray-900 mt-0.5 flex flex-wrap items-baseline gap-x-2">
+                      <span>{next.label}</span>
+                      <span className="text-gray-400 font-normal text-sm sm:text-base">
                         {next.usesIqama ? '· Iqama' : '· Time'} {formatTime(prayers[next.idx].iqama ?? prayers[next.idx].adhan ?? '')}
                       </span>
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-left sm:text-right">
                   <div className="text-xs uppercase tracking-wider text-gray-500 font-semibold">In</div>
-                  <div className="text-3xl font-bold text-emerald-700 font-mono tabular-nums">
+                  <div className="text-2xl sm:text-3xl font-bold text-emerald-700 font-mono tabular-nums">
                     {formatCountdown(next.target.getTime() - now.getTime())}
                   </div>
                 </div>
