@@ -6,8 +6,8 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "jest",
@@ -51,6 +51,7 @@
   "devDependencies": {
     "@better-auth/cli": "^1.4.21",
     "@eslint/eslintrc": "^3",
+    "@next/eslint-plugin-next": "^16.2.4",
     "@playwright/test": "^1.55.0",
     "@tailwindcss/postcss": "^4",
     "@tanstack/react-query-devtools": "^5.83.0",
@@ -68,6 +69,8 @@
     "eslint": "^9",
     "eslint-config-next": "^16.1.4",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "jest": "^30.0.4",
     "jest-environment-jsdom": "^30.0.4",
     "playwright": "^1.55.0",
@@ -75,6 +78,7 @@
     "puppeteer": "^24.22.0",
     "tailwindcss": "^4",
     "tsx": "^4.20.6",
-    "typescript": "^5"
+    "typescript": "^5",
+    "typescript-eslint": "^8.59.0"
   }
 }
