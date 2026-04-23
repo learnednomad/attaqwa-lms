@@ -97,7 +97,13 @@ export const MOSQUE_INFO = {
   province: 'GA',
   postalCode: '30360',
   phone: '(678) 896-9257',
-  email: 'Mohammad30360@hotmail.com',
+  adminPhone: '(678) 896-9257',
+  educationPhoneBrothers: '(470) 731-1314',
+  educationPhoneSisters: '(404) 936-7123',
+  // Primary masjid inbox per content pack from Labibah Islam (April 2026).
+  email: 'almaad2674@gmail.com',
+  primaryEmail: 'almaad2674@gmail.com',
+  imamEmail: 'Mohammad30360@hotmail.com',
   schoolEmail: 'Attaqwa.du@gmail.com',
   website: 'https://masjidattaqwaatlanta.org',
   coordinates: {
@@ -105,9 +111,10 @@ export const MOSQUE_INFO = {
     lng: -84.2614,
   },
   socialMedia: {
-    facebook: 'https://facebook.com/attaqwamasjid',
-    twitter: 'https://twitter.com/attaqwamasjid',
-    instagram: 'https://instagram.com/attaqwamasjid',
+    facebook: 'https://www.facebook.com/MasjidAttaqwa2674WoodwinRd',
+    youtube: 'https://www.youtube.com/@MasjidAttaqwa2674',
+    whatsappGroup: 'https://chat.whatsapp.com/GFJOW74TEmTGf41kv7AecY?mode=gi_t',
+    whatsappChannel: 'https://whatsapp.com/channel/0029Vb7ZLYiFXUujmdTtii3M',
   },
 } as const;
 
