@@ -7,6 +7,77 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added - 2026-04-23
+
+#### Email notifications for inquiry forms (PR #11, #12)
+- `apps/api/config/plugins.ts` - Conditional Strapi nodemailer email provider, sourced from `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE` / `SMTP_USER` / `SMTP_PASS` env. Defaults `EMAIL_FROM` and `EMAIL_REPLY_TO` from env. If `SMTP_HOST` is unset, the email plugin is left unconfigured and inquiries persist to Strapi admin without firing — graceful degradation.
+- `contact-inquiry` controller - After persisting, fires fire-and-forget notification email to `CONTACT_INQUIRY_NOTIFY_TO` (or `EMAIL_NOTIFY_TO` fallback). Subject: `[Masjid Contact] {category} — {name}`. Reply-To set to inquirer's email so imam can hit reply directly.
+- `legal-inquiry` controller - Routes by `audience` field: sisters' questions go to `LEGAL_INQUIRY_SISTERS_NOTIFY_TO`, others to `LEGAL_INQUIRY_NOTIFY_TO`. Subject prefixed `[SISTERS]` / `[BROTHERS]` for visual triage.
+- `.env.example` - Documents SMTP config block with copy-paste examples for Resend / SendGrid / Postmark.
+
+### Added - 2026-04-22
+
+#### Content pack from Masjid leadership — Phase 2 features (PRs #7, #8)
+- **Five Pillars of Islam** + **Six Articles of Faith** + "About Our Faith: Islam" intro on `/about`
+- **WhatsApp Community Group** + **WhatsApp Announcements Channel** links surfaced on About + Contact + new Community page
+- **Janaza Services of Georgia** partner block on `/services` and `/services/funeral-services` (phone, email, partnership context)
+- Dynamic Jumu'ah times on `/prayer-times` — now reads `prayerTimes.jummah[]` from the Strapi iqamah-schedule API instead of hardcoded `12:30 PM` / `1:15 PM`
+
+#### New Strapi content types (PRs #7, #8)
+- `apps/api/src/api/contact-inquiry/` - Public POST `/api/v1/contact-inquiries`, admin-only reads/mutations. Fields: firstName, lastName, email, phone, subject (enum), message, preferredContact, status (default new), submittedAt
+- `apps/api/src/api/legal-inquiry/` - Public POST `/api/v1/legal-inquiries`. Fields include category (Fiqh / Halal-Haram / Family / Business / Ritual / Aqeedah / Other), audience (brothers / sisters / either), language (en / bn / ar), question, answer, answeredBy, answeredAt, status
+- `apps/api/src/api/library-resource/` - Public reads, admin-only writes. Fields: title, slug, description, category (Books / Worksheets / Calendars / Ramadan / Hajj / Prayer-schedule / New-muslim / Other), language, file (media), coverImage (media), author, publishDate, isActive, displayOrder. MinIO-backed via existing aws-s3 upload provider.
+
+#### New website routes (PRs #7, #8)
+- `apps/website/src/app/(main)/services/ask-an-imam/page.tsx` - Routing-explainer page + AskAnImamForm (react-hook-form + zod). Sisters' questions can route to Ustadha Labibah; general questions route to Imams.
+- `apps/website/src/app/(main)/resources/library/page.tsx` + `[slug]/page.tsx` - Library browser with category filter chips, MinIO-backed PDF downloads, individual resource detail pages
+- `apps/website/src/app/(main)/resources/calendar-downloads/page.tsx` - Filtered library view for calendars / Ramadan / Hajj / prayer-schedule categories, grouped by sub-category
+- `apps/website/src/app/(main)/community/page.tsx` - Merged Events + Announcements hub with prominent WhatsApp links. Existing `/events` and `/announcements` deep-links still work.
+
+#### Working contact form (PR #7)
+- `apps/website/src/components/features/contact/contact-form.tsx` - 'use client' react-hook-form + zod component replacing the previous static UI shell. Posts to `/api/v1/contact-inquiries`. Inline success / error states with retry affordance.
+
+### Changed - 2026-04-22
+
+#### Phase 1: corrections to placeholder content (PR #7)
+- `apps/website/src/app/(main)/about/page.tsx` - Replaced 3 fictional leadership names ("Imam Abdullah Rahman", "Sister Aisha Mohamed", "Brother Omar Hassan") with the 6 real team members: Imam Mohammad Zahirul Islam, Ustadh Abdullah Khan, Ustadha Salina Sultana, Ustadha Labibah Islam, Ustadha Siddiqa Islam, Ustadha Maryam Islam. Tightened history prose. Preserved existing accurate "Daarul Barzakh" cemetery name.
+- `apps/website/src/app/(main)/services/page.tsx` - Replaced wrong phone `(404) 244-9577` → `(678) 896-9257` and email `info@masjidattaqwaatlanta.org` → `almaad2674@gmail.com` (4 occurrences each). Added Janaza Services of Georgia to funeral service detail bullets.
+- `apps/website/src/app/(main)/education/page.tsx` - Rewrote `educationalPrograms[]` and `weeklySchedule[]` arrays with real schedule from PDF: Tahfeedh (Mon-Thurs 7:30 AM – 12:00 PM, $100-150), Weekend Class (Sat-Sun 12:00-2:00 PM, $150/$125/$100 quarterly), Adult Brothers (Sat-Sun 9-11 AM), Adult Sisters Bengali (Sat-Sun Maghrib-Isha), Daily Tafseer (30 min before Isha), Daily Hadith (after Fajr), After-school Aqwam Academy (Mon/Tue/Thu 5-7 PM online Zoom, boys 7+), Adult Qur'an Aqwam Academy (Fri-Sat Maghrib-Isha brothers in-person), Homeschooling. Real instructor names. Schedule registration phones updated to `(470) 731-1314` / `(404) 936-7123` and email to `Attaqwa.du@gmail.com`.
+- `apps/website/src/app/(main)/contact/page.tsx` - Updated primary email hierarchy. Ustadh Abdullah Khan's contact corrected to `faiysal_khan@icloud.com` / `(470) 731-1314`. WhatsApp links added to social block.
+- `apps/website/src/app/(main)/donate/page.tsx` - Fixed broken `tel:+1-000-000-0000` placeholder and stale `info@masjidattaqwa.org` reference.
+- `apps/website/src/constants/index.ts` - `MOSQUE_INFO` extended with `primaryEmail`, `adminPhone`, `educationPhoneBrothers`, `educationPhoneSisters`, `imamEmail`, `social.whatsappGroup`, `social.whatsappChannel`. New `JANAZA_PARTNER` export.
+- `apps/website/src/components/features/prayer-times/PrayerTimesContent.tsx` - Jumu'ah times now driven by `prayerTimes.jummah[]` array.
+- `apps/website/src/components/features/hero/immersive-hero.tsx` - Added `TODO(hero)` marker pending real masjid photograph from Labibah; Unsplash stock photo continues to render until then.
+- `apps/website/src/lib/navigation.ts` - Added Community Hub, Library, Calendar Downloads to header nav.
+
+### Fixed - 2026-04-22
+
+#### Production build inlining of NEXT_PUBLIC_* URLs (PRs #9, #10)
+- `Dockerfile` - Added `ARG` + `ENV` declarations for `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_AUTH_URL`, `NEXT_PUBLIC_ADMIN_URL`, `NEXT_PUBLIC_SUNNAH_API_KEY` in the website-builder stage. Without these, `pnpm build` saw the vars as undefined and the bundle baked in the `'http://localhost:1337'` fallback in 15+ client files (`apps/website/src/lib/strapi-api.ts:7`, `contact-form.tsx:44`, etc.) — causing the deployed prod site to POST to `https://localhost:1337/...` and fail with TLS errors.
+- `docker-compose.yml` - Added `build.args` block to website service. Extended admin's existing args block to include `NEXT_PUBLIC_API_URL`.
+- `.env.example` - Rewrote Public URLs section with explicit "INLINED into the Next.js bundle at BUILD time" warning and `attaqwa-*.learnednomad.com` examples for prod.
+
+### Changed - 2026-04-23
+
+#### LMS seed data (PR #13, #14)
+- `apps/api/src/bootstrap.ts` - Replaced 14 fictional instructor names ("Ustadh Omar Hassan", "Sister Fatima Rahman", "Imam Abdul-Rahman", "Qari Abdullah Khan", "Dr. Ahmad Khalil", "Sheikh Muhammad Ali", "Dr. Aisha Mahmoud", "Sheikh Abdullah Yousef", "Dr. Ibrahim Hassan", "Sister Zainab Ahmad", "Sheikh Hassan Malik", "Imam Ali Rahman", "Dr. Omar Abdullah", "Sheikh Yusuf Ibrahim") with the generic `"Masjid At-Taqwa Education Team"` so demo seed data doesn't make false claims about who teaches which course. Real instructors get attached to actual courses when those launch.
+
+#### ESLint 9 flat config (PR #13, #14)
+- `apps/website/eslint.config.mjs` + `apps/admin/eslint.config.mjs` - New flat configs. ESLint 9.37 was installed but the repo had no config file at all, so `pnpm lint` failed at config-load time.
+- Wires plugins (typescript-eslint, eslint-plugin-react, eslint-plugin-react-hooks, @next/eslint-plugin-next) directly against the flat-config API. Bypasses FlatCompat + eslint-config-next because Next 16's bundled config triggers a "Converting circular structure to JSON" error inside `@eslint/eslintrc` when normalised.
+- Lint scripts updated: dropped deprecated `--ext` flag (flat config infers extensions from config), replaced admin's `next lint` with `eslint .` for consistency.
+- Pragmatic rule config: bug-class rules stay enabled but downgraded to `'warn'` so the codebase passes lint while still surfacing the 316 + 111 pre-existing issues for follow-up cleanup. Promote `react-hooks/*` rules back to `'error'` as warnings are addressed.
+
+### Infrastructure - 2026-04-22
+
+#### Dev docker stack reliability (PR #7)
+- `docker-compose.dev.yml` - First-boot of the dev stack on Apple Silicon + alpine was failing because `node:22-alpine` ships without `python3` / `make` / `g++`, so `better-sqlite3` (Strapi optional dep), `sharp` (image processing), and `lightningcss` (Next CSS) couldn't build their native bindings.
+  - Added `apk add --no-cache python3 make g++` to admin + website startup commands; api also gets `vips-dev` for sharp/libvips
+  - Switched per-container `pnpm install` to `pnpm install --filter <app>...` to stop concurrent-install workspace races corrupting `apps/*/node_modules`
+  - Dropped api's `npm install --os=linux --libc=musl sharp` step (was triggering full native rebuild of better-sqlite3 inside alpine)
+- `apps/website/package.json` - Dropped hardcoded `--port 3003` from dev script so PORT env var works; container now correctly listens on 3001 matching the compose mapping.
+- `docker-compose.yml` - Added `NEXT_PUBLIC_ADMIN_URL` to website service env block.
+
 ### Security - 2026-01-30
 
 - **Comprehensive security headers** (`next.config.ts`) - Added 8 security headers applied to all routes:
