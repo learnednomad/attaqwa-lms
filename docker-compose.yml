@@ -125,6 +125,9 @@ services:
       context: .
       target: admin
       args:
+        # NEXT_PUBLIC_* must be passed as build args - they are inlined into the
+        # client bundle at build time, not read at runtime.
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:1337}
         NEXT_PUBLIC_AUTH_URL: ${NEXT_PUBLIC_AUTH_URL:-http://localhost:3001}
     restart: unless-stopped
     environment:
@@ -147,6 +150,14 @@ services:
     build:
       context: .
       target: website
+      args:
+        # NEXT_PUBLIC_* must be passed as build args - they are inlined into the
+        # client bundle at build time, not read at runtime. Without these the
+        # bundle bakes in the localhost:1337 fallback and prod fetches fail.
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:1337}
+        NEXT_PUBLIC_AUTH_URL: ${NEXT_PUBLIC_AUTH_URL:-http://localhost:3001}
+        NEXT_PUBLIC_ADMIN_URL: ${NEXT_PUBLIC_ADMIN_URL:-http://localhost:3000}
+        NEXT_PUBLIC_SUNNAH_API_KEY: ${NEXT_PUBLIC_SUNNAH_API_KEY:-}
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-production}
