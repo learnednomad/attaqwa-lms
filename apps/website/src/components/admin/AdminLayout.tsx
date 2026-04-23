@@ -15,6 +15,7 @@ import {
   LogOut,
   Moon,
   Heart,
+  Inbox,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -50,6 +51,11 @@ const adminNavItems = [
     title: 'Appeals',
     href: '/admin/appeals',
     icon: Heart,
+  },
+  {
+    title: 'Inquiries',
+    href: '/admin/inquiries',
+    icon: Inbox,
   },
   {
     title: 'Users',
