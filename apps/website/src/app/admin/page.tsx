@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAnnouncements } from '@/lib/hooks/useAnnouncements';
 import { useEvents } from '@/lib/hooks/useEvents';
 import { useTodayPrayerTimes } from '@/lib/hooks/usePrayerTimes';
@@ -97,8 +97,7 @@ export default function AdminDashboard() {
   const announcementsCount = announcements?.pagination?.total ?? 0;
   const eventsCount = upcomingEvents?.pagination?.total ?? 0;
 
-  const prayers = useMemo(() => {
-    if (!prayerTimes) return [];
+  const prayers = !prayerTimes ? [] : (() => {
     const iqama = (prayerTimes as unknown as { iqama?: Record<string, string> }).iqama ?? {};
     return PRAYER_ORDER.map((key: PrayerKey) => ({
       key,
@@ -107,18 +106,17 @@ export default function AdminDashboard() {
       iqama: key === 'sunrise' ? undefined : iqama[key],
       isSunrise: key === 'sunrise',
     }));
-  }, [prayerTimes]);
+  })();
 
-  const nextPrayer = useMemo(() => {
-    for (let i = 0; i < prayers.length; i++) {
-      const p = prayers[i];
+  const nextPrayer = (() => {
+    for (const p of prayers) {
       const t = parseTimeToToday(p.iqama ?? p.adhan);
       if (t && t.getTime() > now.getTime()) {
         return { ...p, target: t, usesIqama: !!p.iqama };
       }
     }
     return null;
-  }, [prayers, now]);
+  })();
 
   const hijri = getHijriFormatted(new Date());
   const gregorian = new Date().toLocaleDateString('en-US', {
