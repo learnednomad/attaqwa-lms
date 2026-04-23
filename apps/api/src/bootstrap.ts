@@ -29,7 +29,7 @@ async function seedCoursesIfEmpty(strapi: any) {
         difficulty: "beginner",
         duration_weeks: 12,
         schedule: "2 lessons per week, 10-15 minutes each",
-        instructor: "Attaqwa Masjid Education Team",
+        instructor: "Masjid At-Taqwa Education Team",
         is_featured: true,
         learning_outcomes: ["Memorize 30+ short Surahs", "Understand simple meanings", "Develop love for Quran"]
       },
@@ -42,7 +42,7 @@ async function seedCoursesIfEmpty(strapi: any) {
         difficulty: "beginner",
         duration_weeks: 8,
         schedule: "3 lessons per week, 20 minutes each",
-        instructor: "Ustadh Omar Hassan",
+        instructor: "Masjid At-Taqwa Education Team",
         is_featured: false,
         learning_outcomes: ["Master Arabic letters", "Read simple words", "Write basic Arabic"]
       },
@@ -55,7 +55,7 @@ async function seedCoursesIfEmpty(strapi: any) {
         difficulty: "beginner",
         duration_weeks: 16,
         schedule: "1 lesson per week, 25 minutes each",
-        instructor: "Sister Fatima Rahman",
+        instructor: "Masjid At-Taqwa Education Team",
         is_featured: true,
         learning_outcomes: ["Learn prophets' stories", "Understand moral lessons", "Build Islamic character"]
       },
@@ -68,7 +68,7 @@ async function seedCoursesIfEmpty(strapi: any) {
         difficulty: "beginner",
         duration_weeks: 52,
         schedule: "3 Surahs per week, 15-20 minutes each",
-        instructor: "Imam Abdul-Rahman",
+        instructor: "Masjid At-Taqwa Education Team",
         is_featured: true,
         learning_outcomes: ["Complete Quran reading", "Understand key themes", "Connect guidance to modern life"]
       },
@@ -81,7 +81,7 @@ async function seedCoursesIfEmpty(strapi: any) {
         difficulty: "intermediate",
         duration_weeks: 20,
         schedule: "2 lessons per week, 30 minutes each",
-        instructor: "Qari Abdullah Khan",
+        instructor: "Masjid At-Taqwa Education Team",
         is_featured: true,
         learning_outcomes: ["Master Tajweed rules", "Perfect pronunciation", "Beautiful recitation"]
       },
@@ -94,7 +94,7 @@ async function seedCoursesIfEmpty(strapi: any) {
         difficulty: "intermediate",
         duration_weeks: 24,
         schedule: "2 lessons per week, 40 minutes each",
-        instructor: "Dr. Ahmad Khalil",
+        instructor: "Masjid At-Taqwa Education Team",
         is_featured: false,
         learning_outcomes: ["Understand Arabic grammar", "Read Quranic Arabic", "Analyze Islamic texts"]
       },
@@ -107,7 +107,7 @@ async function seedCoursesIfEmpty(strapi: any) {
         difficulty: "intermediate",
         duration_weeks: 30,
         schedule: "2 lessons per week, 45 minutes each",
-        instructor: "Sheikh Muhammad Ali",
+        instructor: "Masjid At-Taqwa Education Team",
         is_featured: true,
         learning_outcomes: ["Master worship rulings", "Understand evidence", "Apply fiqh correctly"]
       },
@@ -120,7 +120,7 @@ async function seedCoursesIfEmpty(strapi: any) {
         difficulty: "intermediate",
         duration_weeks: 20,
         schedule: "2 hadiths per week, 30 minutes each",
-        instructor: "Dr. Aisha Mahmoud",
+        instructor: "Masjid At-Taqwa Education Team",
         is_featured: true,
         learning_outcomes: ["Memorize 40 hadith", "Understand prophetic wisdom", "Apply teachings daily"]
       },
@@ -133,7 +133,7 @@ async function seedCoursesIfEmpty(strapi: any) {
         difficulty: "advanced",
         duration_weeks: 26,
         schedule: "1 lesson per week, 60 minutes each",
-        instructor: "Sheikh Abdullah Yousef",
+        instructor: "Masjid At-Taqwa Education Team",
         is_featured: false,
         learning_outcomes: ["Master Islamic belief", "Understand pillars of faith", "Protect from innovations"]
       },
@@ -146,7 +146,7 @@ async function seedCoursesIfEmpty(strapi: any) {
         difficulty: "intermediate",
         duration_weeks: 36,
         schedule: "1 lesson per week, 50 minutes each",
-        instructor: "Dr. Ibrahim Hassan",
+        instructor: "Masjid At-Taqwa Education Team",
         is_featured: true,
         learning_outcomes: ["Know Prophet's life", "Learn from battles", "Apply lessons today"]
       },
@@ -159,7 +159,7 @@ async function seedCoursesIfEmpty(strapi: any) {
         difficulty: "beginner",
         duration_weeks: 16,
         schedule: "1 lesson per week, 35 minutes each",
-        instructor: "Sister Zainab Ahmad",
+        instructor: "Masjid At-Taqwa Education Team",
         is_featured: false,
         learning_outcomes: ["Develop good character", "Practice prophetic manners", "Build ethical life"]
       },
@@ -172,7 +172,7 @@ async function seedCoursesIfEmpty(strapi: any) {
         difficulty: "advanced",
         duration_weeks: 28,
         schedule: "2 lessons per week, 45 minutes each",
-        instructor: "Sheikh Hassan Malik",
+        instructor: "Masjid At-Taqwa Education Team",
         is_featured: true,
         learning_outcomes: ["Deep Quran understanding", "Historical context", "Practical application"]
       },
@@ -185,7 +185,7 @@ async function seedCoursesIfEmpty(strapi: any) {
         difficulty: "beginner",
         duration_weeks: 40,
         schedule: "2 lessons per week, 20 minutes each",
-        instructor: "Imam Ali Rahman",
+        instructor: "Masjid At-Taqwa Education Team",
         is_featured: true,
         learning_outcomes: ["Reflect on Quran", "Gentle memorization", "Spiritual connection"]
       },
@@ -198,7 +198,7 @@ async function seedCoursesIfEmpty(strapi: any) {
         difficulty: "beginner",
         duration_weeks: 32,
         schedule: "1 lesson per week, 40 minutes each",
-        instructor: "Dr. Omar Abdullah",
+        instructor: "Masjid At-Taqwa Education Team",
         is_featured: false,
         learning_outcomes: ["Know Islamic history", "Understand key events", "Learn from past"]
       },
@@ -211,7 +211,7 @@ async function seedCoursesIfEmpty(strapi: any) {
         difficulty: "beginner",
         duration_weeks: 18,
         schedule: "2 lessons per week, 30 minutes each",
-        instructor: "Sheikh Yusuf Ibrahim",
+        instructor: "Masjid At-Taqwa Education Team",
         is_featured: true,
         learning_outcomes: ["Apply fiqh daily", "Understand family rulings", "Navigate business Islamically"]
       }
