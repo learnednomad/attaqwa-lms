@@ -8,7 +8,7 @@ import * as React from 'react';
 import { cn } from '@/lib/utils/cn';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'success' | 'warning' | 'danger' | 'info';
+  variant?: 'default' | 'success' | 'warning' | 'danger' | 'info' | 'accent';
 }
 
 const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
@@ -19,6 +19,7 @@ const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
       warning: 'bg-yellow-100 text-yellow-700',
       danger: 'bg-red-100 text-red-700',
       info: 'bg-blue-100 text-blue-700',
+      accent: 'bg-indigo-100 text-indigo-700',
     };
 
     return (

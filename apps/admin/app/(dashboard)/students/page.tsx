@@ -1,17 +1,17 @@
 /**
- * Students Management Page
+ * Users Management Page
  * View and manage all registered users — real data from BetterAuth + Strapi
  */
 
 'use client';
 
-import { Award, BookOpen, Clock, Loader2, Mail, MoreVertical, Search, TrendingUp, Upload, User } from 'lucide-react';
+import { Calendar, Loader2, Mail, MoreVertical, Search, Upload, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
 import { AddUserDialog } from '@/components/users/add-user-dialog';
 import { ImportUsersDialog } from '@/components/users/import-users-dialog';
-import { Badge } from '@/components/ui/badge';
+import { Badge, type BadgeProps } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -25,6 +25,7 @@ import {
 import { formatDate } from '@/lib/utils/formatters';
 import { authClient } from '@/lib/auth-client';
 import { strapiClient, adminApiEndpoints } from '@/lib/api/strapi-client';
+import { cn } from '@/lib/utils/cn';
 
 interface AppUser {
   id: string;
@@ -35,9 +36,17 @@ interface AppUser {
   image?: string | null;
 }
 
+type RoleFilter = 'all' | 'admin' | 'teacher' | 'student';
+
+const ROLE_BADGE: Record<string, BadgeProps['variant']> = {
+  admin: 'accent',
+  teacher: 'warning',
+  student: 'success',
+};
+
 export default function StudentsPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedRole, setSelectedRole] = useState('all');
+  const [selectedRole, setSelectedRole] = useState<RoleFilter>('all');
   const [users, setUsers] = useState<AppUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [enrollmentCounts, setEnrollmentCounts] = useState<Record<string, number>>({});
@@ -47,14 +56,9 @@ export default function StudentsPage() {
   const fetchUsers = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Use BetterAuth admin API to list users
       const res = await authClient.admin.listUsers({
-        query: {
-          limit: 100,
-          offset: 0,
-        },
+        query: { limit: 100, offset: 0 },
       });
-
       if (res.data?.users) {
         setUsers(res.data.users as AppUser[]);
       }
@@ -88,30 +92,6 @@ export default function StudentsPage() {
     fetchEnrollments();
   }, [fetchUsers, fetchEnrollments]);
 
-  const roles = [
-    { value: 'all', label: 'All Users' },
-    { value: 'admin', label: 'Admins' },
-    { value: 'teacher', label: 'Teachers' },
-    { value: 'student', label: 'Students' },
-  ];
-
-  const getRoleBadge = (role: string) => {
-    switch (role) {
-      case 'admin': return 'danger';
-      case 'teacher': return 'warning';
-      case 'student': return 'success';
-      default: return 'default';
-    }
-  };
-
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase();
-  };
-
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       !searchQuery ||
@@ -125,195 +105,201 @@ export default function StudentsPage() {
   const teacherCount = users.filter((u) => u.role === 'teacher').length;
   const adminCount = users.filter((u) => u.role === 'admin').length;
 
+  const hasAnyEnrollments = Object.values(enrollmentCounts).some((n) => n > 0);
+
+  const roleChips: Array<{ value: RoleFilter; label: string; count: number }> = [
+    { value: 'all', label: 'All', count: users.length },
+    { value: 'student', label: 'Students', count: studentCount },
+    { value: 'teacher', label: 'Teachers', count: teacherCount },
+    { value: 'admin', label: 'Admins', count: adminCount },
+  ];
+
+  const getInitials = (name: string) =>
+    name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase();
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-charcoal-900">Users</h1>
-          <p className="mt-2 text-charcoal-600">
+          <h1 className="text-2xl sm:text-3xl font-bold text-charcoal-900">Users</h1>
+          <p className="mt-1.5 text-sm text-charcoal-600">
             Manage all registered users and their roles
           </p>
         </div>
-        <div className="flex space-x-3">
-          <Button variant="outline">
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" size="sm">
             <Mail className="mr-2 h-4 w-4" />
-            Message Users
+            Message
           </Button>
-          <Button variant="outline" onClick={() => setImportOpen(true)}>
+          <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
             <Upload className="mr-2 h-4 w-4" />
             Import
           </Button>
-          <Button onClick={() => setAddOpen(true)}>
-            <User className="mr-2 h-4 w-4" />
+          <Button size="sm" onClick={() => setAddOpen(true)}>
+            <UserPlus className="mr-2 h-4 w-4" />
             Add User
           </Button>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-6 md:grid-cols-4">
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-charcoal-600">Total Users</p>
-              <p className="mt-2 text-3xl font-bold text-charcoal-900">{users.length}</p>
-            </div>
-            <div className="rounded-lg bg-primary-100 p-3">
-              <User className="h-6 w-6 text-primary-600" />
-            </div>
-          </div>
-        </Card>
+      {/* Filter + Search Toolbar */}
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        {/* Role filter chips (replace stat cards + role dropdown) */}
+        <div
+          className="flex flex-wrap items-center gap-1.5 rounded-lg border border-charcoal-200 bg-white p-1"
+          role="tablist"
+          aria-label="Filter by role"
+        >
+          {roleChips.map((chip) => {
+            const isActive = selectedRole === chip.value;
+            return (
+              <button
+                key={chip.value}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setSelectedRole(chip.value)}
+                className={cn(
+                  'inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-primary-50 text-primary-700'
+                    : 'text-charcoal-600 hover:bg-charcoal-50 hover:text-charcoal-900'
+                )}
+              >
+                <span>{chip.label}</span>
+                <span
+                  className={cn(
+                    'inline-flex min-w-[1.5rem] justify-center rounded-full px-1.5 text-xs font-semibold tabular-nums',
+                    isActive
+                      ? 'bg-primary-100 text-primary-700'
+                      : 'bg-charcoal-100 text-charcoal-600'
+                  )}
+                >
+                  {chip.count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
 
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-charcoal-600">Students</p>
-              <p className="mt-2 text-3xl font-bold text-charcoal-900">{studentCount}</p>
-            </div>
-            <div className="rounded-lg bg-green-100 p-3">
-              <TrendingUp className="h-6 w-6 text-green-600" />
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-charcoal-600">Teachers</p>
-              <p className="mt-2 text-3xl font-bold text-charcoal-900">{teacherCount}</p>
-            </div>
-            <div className="rounded-lg bg-blue-100 p-3">
-              <BookOpen className="h-6 w-6 text-blue-600" />
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-charcoal-600">Admins</p>
-              <p className="mt-2 text-3xl font-bold text-charcoal-900">{adminCount}</p>
-            </div>
-            <div className="rounded-lg bg-amber-100 p-3">
-              <Award className="h-6 w-6 text-amber-600" />
-            </div>
-          </div>
-        </Card>
+        {/* Local search */}
+        <div className="relative w-full lg:w-80">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-charcoal-400" />
+          <input
+            type="search"
+            placeholder="Search by name or email…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full rounded-lg border border-charcoal-300 bg-white py-2 pl-10 pr-4 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+          />
+        </div>
       </div>
 
-      {/* Filters */}
-      <Card className="p-4">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="relative flex-1 md:max-w-md">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-charcoal-400" />
-            <input
-              type="text"
-              placeholder="Search users..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-lg border border-charcoal-300 py-2 pl-10 pr-4 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
-            />
-          </div>
-
-          <div className="flex gap-2">
-            <select
-              value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value)}
-              className="rounded-lg border border-charcoal-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
-            >
-              {roles.map((role) => (
-                <option key={role.value} value={role.value}>
-                  {role.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </Card>
-
       {/* Table */}
-      <Card>
+      <Card className="overflow-hidden">
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-primary-500 mr-2" />
-            <span className="text-charcoal-500">Loading users...</span>
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="mr-2 h-5 w-5 animate-spin text-primary-500" />
+            <span className="text-sm text-charcoal-500">Loading users…</span>
+          </div>
+        ) : filteredUsers.length === 0 ? (
+          <div className="py-16 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-charcoal-100">
+              <UserPlus className="h-6 w-6 text-charcoal-400" />
+            </div>
+            <p className="mt-4 text-sm font-medium text-charcoal-900">No users found</p>
+            <p className="mt-1 text-xs text-charcoal-500">
+              {searchQuery || selectedRole !== 'all'
+                ? 'Try adjusting your filters.'
+                : 'Get started by adding your first user.'}
+            </p>
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Enrollments</TableHead>
-                <TableHead>Joined</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUsers.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <div className="flex items-center space-x-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-700">
-                        {getInitials(user.name)}
-                      </div>
-                      <div>
-                        <p className="font-medium text-charcoal-900">
-                          {user.name}
-                        </p>
-                        <p className="text-sm text-charcoal-500">
-                          {user.email}
-                        </p>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={getRoleBadge(user.role) as any}>
-                      {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-charcoal-900">
-                      {enrollmentCounts[user.id] || 0}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-1 text-sm text-charcoal-600">
-                      <Clock className="h-4 w-4" />
-                      <span>{formatDate(user.createdAt)}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Link href={`/students/${user.id}`}>
-                        <button
-                          className="rounded-lg p-2 text-charcoal-600 hover:bg-charcoal-50"
-                          aria-label="View user"
-                          title="View user details"
-                        >
-                          <User className="h-4 w-4" />
-                        </button>
-                      </Link>
-                      <button
-                        className="rounded-lg p-2 text-charcoal-600 hover:bg-charcoal-50"
-                        aria-label="More actions"
-                        title="More actions"
-                      >
-                        <MoreVertical className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>User</TableHead>
+                  <TableHead>Role</TableHead>
+                  {hasAnyEnrollments && <TableHead>Enrollments</TableHead>}
+                  <TableHead>Joined</TableHead>
+                  <TableHead className="w-12 text-right">
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-
-        {!isLoading && filteredUsers.length === 0 && (
-          <div className="py-12 text-center">
-            <User className="mx-auto h-12 w-12 text-charcoal-400" />
-            <p className="mt-4 text-charcoal-500">No users found</p>
+              </TableHeader>
+              <TableBody>
+                {filteredUsers.map((user) => {
+                  const enrollments = enrollmentCounts[user.id] || 0;
+                  return (
+                    <TableRow
+                      key={user.id}
+                      className="group cursor-pointer transition-colors hover:bg-charcoal-50/60"
+                    >
+                      <TableCell>
+                        <Link
+                          href={`/students/${user.id}`}
+                          className="flex items-center space-x-3"
+                        >
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-700">
+                            {getInitials(user.name)}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="truncate font-medium text-charcoal-900 group-hover:text-primary-700">
+                              {user.name}
+                            </p>
+                            <p className="truncate text-sm text-charcoal-500">
+                              {user.email}
+                            </p>
+                          </div>
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={ROLE_BADGE[user.role] ?? 'default'}>
+                          {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                        </Badge>
+                      </TableCell>
+                      {hasAnyEnrollments && (
+                        <TableCell>
+                          <span
+                            className={cn(
+                              'tabular-nums',
+                              enrollments > 0
+                                ? 'font-medium text-charcoal-900'
+                                : 'text-charcoal-400'
+                            )}
+                          >
+                            {enrollments}
+                          </span>
+                        </TableCell>
+                      )}
+                      <TableCell>
+                        <div className="flex items-center gap-1.5 text-sm text-charcoal-600">
+                          <Calendar className="h-3.5 w-3.5 text-charcoal-400" />
+                          <span>{formatDate(user.createdAt)}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <button
+                          onClick={(e) => e.stopPropagation()}
+                          className="rounded-lg p-2 text-charcoal-400 opacity-0 hover:bg-charcoal-100 hover:text-charcoal-700 focus:opacity-100 group-hover:opacity-100"
+                          aria-label={`Actions for ${user.name}`}
+                          title="More actions"
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
           </div>
         )}
       </Card>
