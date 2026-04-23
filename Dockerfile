@@ -147,6 +147,18 @@ CMD ["node", "apps/admin/server.js"]
 
 FROM source AS website-builder
 
+# NEXT_PUBLIC_* env vars are inlined into the client bundle at build time.
+# Without these ARGs the build sees them as undefined and the client falls
+# back to the localhost defaults baked into apps/website/src/lib/*.
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_AUTH_URL
+ARG NEXT_PUBLIC_ADMIN_URL
+ARG NEXT_PUBLIC_SUNNAH_API_KEY
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+ENV NEXT_PUBLIC_AUTH_URL=${NEXT_PUBLIC_AUTH_URL}
+ENV NEXT_PUBLIC_ADMIN_URL=${NEXT_PUBLIC_ADMIN_URL}
+ENV NEXT_PUBLIC_SUNNAH_API_KEY=${NEXT_PUBLIC_SUNNAH_API_KEY}
+
 WORKDIR /app/apps/website
 RUN pnpm build
 
