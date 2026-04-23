@@ -117,7 +117,9 @@ function normalizeResource(raw: unknown): LibraryResource | null {
 function buildQuery(params: UseLibraryParams): string {
   const parts = [
     'filters[isActive][$eq]=true',
-    'populate=file,coverImage',
+    // Strapi 5 rejects the comma-separated shorthand — must enumerate keys.
+    'populate[0]=file',
+    'populate[1]=coverImage',
     'pagination[pageSize]=' + (params.limit ?? 100),
     'sort[0]=displayOrder:asc',
     'sort[1]=publishDate:desc',
