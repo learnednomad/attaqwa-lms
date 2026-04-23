@@ -121,6 +121,9 @@ importers:
       '@strapi/plugin-users-permissions':
         specifier: 5.27.0
         version: 5.27.0(28853d5b5d257a146e64e2605c41b16c)
+      '@strapi/provider-email-nodemailer':
+        specifier: ^5.43.0
+        version: 5.43.0
       '@strapi/provider-upload-aws-s3':
         specifier: ^5.41.1
         version: 5.41.1
@@ -3884,6 +3887,10 @@ packages:
       react-dom: ^17.0.0 || ^18.0.0
       react-router-dom: ^6.0.0
       styled-components: ^6.0.0
+
+  '@strapi/provider-email-nodemailer@5.43.0':
+    resolution: {integrity: sha512-JzDDNARp6NUKirrqYDr8Jy+G/j1ur15c2IkyRF4LGjjbli9q+ioEuhiMqDkXji42PZXs9V/SeyrtHbwdcC+o+w==}
+    engines: {node: '>=20.0.0 <=24.x.x', npm: '>=6.0.0'}
 
   '@strapi/provider-email-sendmail@5.27.0':
     resolution: {integrity: sha512-V10xdY7kcQqunEsHXTGed5X+4PmLMt0VoLoPO7n0kCJn1PhbmWWAndMfcousCUd+dJEmeHt+t6d0JUp7ZVtDUw==}
@@ -9019,6 +9026,10 @@ packages:
   nodemailer-shared@1.1.0:
     resolution: {integrity: sha512-68xW5LSyPWv8R0GLm6veAvm7E+XFXkVgvE3FW0FGxNMMZqMkPFeGDVALfR1DPdSfcoO36PnW7q5AAOgFImEZGg==}
 
+  nodemailer@8.0.5:
+    resolution: {integrity: sha512-0PF8Yb1yZuQfQbq+5/pZJrtF6WQcjTd5/S4JOHs9PGFxuTqoB/icwuB44pOdURHJbRKX1PPoJZtY7R4VUoCC8w==}
+    engines: {node: '>=6.0.0'}
+
   nodemon@3.0.2:
     resolution: {integrity: sha512-9qIN2LNTrEzpOPBaWHTm4Asy1LxXLSickZStAQ4IZe7zsoIpD/A7LWxhZV3t4Zu352uBcqVnRsDXSMR2Sc3lTA==}
     engines: {node: '>=10'}
@@ -13347,6 +13358,18 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
+  '@formatjs/intl@2.10.0(typescript@5.4.4)':
+    dependencies:
+      '@formatjs/ecma402-abstract': 1.18.2
+      '@formatjs/fast-memoize': 2.2.0
+      '@formatjs/icu-messageformat-parser': 2.7.6
+      '@formatjs/intl-displaynames': 6.6.6
+      '@formatjs/intl-listformat': 7.5.5
+      intl-messageformat: 10.5.11
+      tslib: 2.8.1
+    optionalDependencies:
+      typescript: 5.4.4
+
   '@formatjs/intl@2.10.0(typescript@5.9.3)':
     dependencies:
       '@formatjs/ecma402-abstract': 1.18.2
@@ -16288,6 +16311,10 @@ snapshots:
       - sequelize
       - supports-color
       - typescript
+
+  '@strapi/provider-email-nodemailer@5.43.0':
+    dependencies:
+      nodemailer: 8.0.5
 
   '@strapi/provider-email-sendmail@5.27.0':
     dependencies:
@@ -22736,6 +22763,8 @@ snapshots:
     dependencies:
       nodemailer-fetch: 1.6.0
 
+  nodemailer@8.0.5: {}
+
   nodemon@3.0.2:
     dependencies:
       chokidar: 3.6.0
@@ -23609,7 +23638,7 @@ snapshots:
     dependencies:
       '@formatjs/ecma402-abstract': 1.18.2
       '@formatjs/icu-messageformat-parser': 2.7.6
-      '@formatjs/intl': 2.10.0(typescript@5.9.3)
+      '@formatjs/intl': 2.10.0(typescript@5.4.4)
       '@formatjs/intl-displaynames': 6.6.6
       '@formatjs/intl-listformat': 7.5.5
       '@types/hoist-non-react-statics': 3.3.7(@types/react@19.2.9)

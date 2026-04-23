@@ -26,6 +26,34 @@ export default ({ env }) => {
           provider: 'local',
         };
 
+  // Email provider — nodemailer over SMTP. Works with any SMTP service:
+  // Resend (smtp.resend.com:465 user=resend pass=re_xxx), SendGrid, Postmark,
+  // Mailgun, SES SMTP, Gmail App Password, etc. If SMTP_HOST is unset the
+  // plugin falls back to sendmail which doesn't exist in alpine — so we no-op
+  // the email plugin in that case and let inquiries land in Strapi admin only.
+  const smtpHost = env('SMTP_HOST');
+  const emailConfig = smtpHost
+    ? {
+        provider: 'nodemailer',
+        providerOptions: {
+          host: smtpHost,
+          port: env.int('SMTP_PORT', 465),
+          secure: env.bool('SMTP_SECURE', true),
+          auth: {
+            user: env('SMTP_USER'),
+            pass: env('SMTP_PASS'),
+          },
+        },
+        settings: {
+          defaultFrom: env('EMAIL_FROM', 'noreply@masjidattaqwaatlanta.org'),
+          defaultReplyTo: env(
+            'EMAIL_REPLY_TO',
+            env('EMAIL_FROM', 'noreply@masjidattaqwaatlanta.org')
+          ),
+        },
+      }
+    : null;
+
   return {
     'users-permissions': {
       enabled: true,
@@ -36,5 +64,6 @@ export default ({ env }) => {
     upload: {
       config: uploadConfig,
     },
+    ...(emailConfig ? { email: { config: emailConfig } } : {}),
   };
 };
