@@ -22,9 +22,9 @@ jest.mock('next/navigation', () => ({
   usePathname: () => '/test-path',
 }))
 
-// Mock environment variables
-process.env.NEXT_PUBLIC_API_URL = 'http://localhost:3001'
-process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000'
+// Mock environment variables (unit tests don't hit the network, these are placeholders)
+process.env.NEXT_PUBLIC_API_URL = 'http://localhost:1337'
+process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3003'
 
 // Mock IntersectionObserver
 global.IntersectionObserver = jest.fn().mockImplementation((callback) => ({

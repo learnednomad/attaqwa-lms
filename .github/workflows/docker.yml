@@ -35,6 +35,9 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_PREFIX: ${{ github.repository }}
+  # Opt into Node 24 for docker/build-push-action + docker/metadata-action until
+  # they ship @v7. Avoids the "Node 20 deprecated" warning after 2026-06-02.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 jobs:
   # ---------------------------------------------------------------------------

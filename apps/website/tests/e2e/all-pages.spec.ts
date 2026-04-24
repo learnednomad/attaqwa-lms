@@ -1,5 +1,17 @@
 import { test, expect, Page, ConsoleMessage } from '@playwright/test';
 
+// This broad hydration / route sweep depends on seeded Strapi content (prayer times,
+// announcements, events, education data, admin routes under the admin app). In CI we
+// only provision Postgres + BetterAuth today — the data-dependent pages will 500.
+//
+// Set E2E_FULL_STACK=1 (and bring the full stack up via docker-compose.dev.yml) to run
+// this suite. Otherwise it auto-skips, and `critical-paths.spec.ts` carries the core
+// journeys via explicit per-test skip gates. See docs/ci-hardening-handoff.md.
+test.skip(
+  !!process.env.CI && !process.env.E2E_FULL_STACK,
+  'Full-stack E2E suite skipped in CI until Strapi + seeded content are provisioned (set E2E_FULL_STACK=1)',
+);
+
 // Track console errors across all tests
 let consoleErrors: string[] = [];
 

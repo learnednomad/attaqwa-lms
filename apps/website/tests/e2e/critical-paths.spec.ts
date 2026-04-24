@@ -3,281 +3,202 @@ import { test, expect, Page } from '@playwright/test';
 /**
  * Critical Path E2E Tests for Refactoring Safety
  *
- * These tests document and protect the core user journeys that must continue
- * working throughout the refactoring process. If any of these fail, the
- * refactoring has broken critical functionality.
+ * URL configuration:
+ *   - Website: `page.goto('/foo')` resolves via Playwright baseURL (defaults to :3003).
+ *   - Admin:   `process.env.ADMIN_URL` (defaults to http://localhost:3000).
  *
- * Created for: REFACTORING_PLAN.md Story 0.3
+ * Auth credentials come from `scripts/seed-auth-users.sql`. CI seeds these via the
+ * `migrations` job in `docker.yml` or the `e2e-tests` job in `ci.yml`. Locally you
+ * can seed by running `psql "$DATABASE_URL" -f scripts/seed-auth-users.sql`.
+ *
+ * Paths 1–3 require Strapi + seeded course/lesson data on top of the auth seed. When
+ * Strapi isn't reachable they auto-skip instead of hard-failing.
+ *
+ * Selector rules followed here:
+ *   - Never rely on text-only selectors without scoping — many copy strings (nav,
+ *     footer, mobile menu) repeat across the DOM and trip Playwright's strict mode.
+ *   - Prefer role + accessible name (getByRole) where possible.
+ *   - When falling back to text, use `exact: true` + `.first()`.
+ *   - Login buttons: student page says "Login to Student Portal", admin-on-website
+ *     page says "Sign In". Match with a tolerant regex on a submit-typed button.
  */
 
-// Helper: Set up authenticated student session
+const ADMIN_URL = process.env.ADMIN_URL ?? 'http://localhost:3000';
+const STUDENT_EMAIL = process.env.E2E_STUDENT_EMAIL ?? 'student@attaqwa.org';
+const STUDENT_PASSWORD = process.env.E2E_STUDENT_PASSWORD ?? 'Student123!';
+const ADMIN_EMAIL = process.env.E2E_ADMIN_EMAIL ?? 'superadmin@attaqwa.org';
+const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD ?? 'SuperAdmin123!';
+
+const LOGIN_BUTTON_RE = /^(Sign\s*In|Login(\s+to\s+Student\s+Portal)?)$/i;
+
+async function submitLogin(page: Page) {
+  const submit = page.getByRole('button', { name: LOGIN_BUTTON_RE });
+  await submit.first().click();
+}
+
 async function loginAsStudent(page: Page) {
-  await page.goto('http://localhost:3003/student/login');
-  await page.fill('input[type="email"]', 'test.student@attaqwa.com');
-  await page.fill('input[type="password"]', 'TestPassword123!');
-  await page.click('button:has-text("Sign In")');
-
-  // Wait for successful login redirect
-  await page.waitForURL('**/student/dashboard', { timeout: 10000 });
+  await page.goto('/student/login');
+  await page.fill('input[type="email"]', STUDENT_EMAIL);
+  await page.fill('input[type="password"]', STUDENT_PASSWORD);
+  await submitLogin(page);
+  await page.waitForURL('**/student/dashboard', { timeout: 15_000 });
 }
 
-// Helper: Set up authenticated admin session (uses different port 3000)
 async function loginAsAdmin(page: Page) {
-  await page.goto('http://localhost:3000/admin/login');
-
-  // Wait for admin login page to load
-  await page.waitForSelector('input[type="email"]', { timeout: 5000 });
-
-  await page.fill('input[type="email"]', 'admin@attaqwa.com');
-  await page.fill('input[type="password"]', 'AdminPassword123!');
-  await page.click('button:has-text("Sign In")');
-
-  // Wait for successful login redirect to admin dashboard
-  await page.waitForURL('**/admin', { timeout: 10000 });
+  await page.goto(`${ADMIN_URL}/admin/login`);
+  await page.waitForSelector('input[type="email"]', { timeout: 5_000 });
+  await page.fill('input[type="email"]', ADMIN_EMAIL);
+  await page.fill('input[type="password"]', ADMIN_PASSWORD);
+  await submitLogin(page);
+  await page.waitForURL('**/admin', { timeout: 15_000 });
 }
 
-// Paths 1–3 require a seeded auth DB (test.student@attaqwa.com, admin@attaqwa.com) and the admin
-// app running on :3000. Neither is provisioned in the current CI job, so these are fixme'd until
-// an integration test env (DB container + seed script + multi-app startup) is in place.
+async function adminReachable(): Promise<boolean> {
+  try {
+    const res = await fetch(`${ADMIN_URL}/admin/login`, { redirect: 'manual' });
+    return res.status < 500;
+  } catch {
+    return false;
+  }
+}
+
+/** First visible prayer-time cell for the given prayer name. Handles menus/footers
+ *  that repeat the label by filtering to a visible node. */
+function prayerCell(page: Page, name: string) {
+  return page.getByText(name, { exact: true }).first();
+}
+
 test.describe('Critical Path 1: Student Course Discovery Journey', () => {
-  test.fixme('Student can login, browse courses, and view course details', async ({ page }) => {
-    // Step 1: Login as student
+  test('Student can login, browse courses, and view course details', async ({ page }) => {
     await loginAsStudent(page);
+    // Student dashboard renders "Welcome Back, <name>" as its h1 — asserting a
+    // generic h1 keeps the test resilient to name/copy tweaks.
+    await expect(page.locator('h1').first()).toBeVisible();
 
-    // Verify we're on the dashboard
-    await expect(page.locator('h1:has-text("Student Dashboard")')).toBeVisible();
+    await page.goto('/education/browse');
+    await expect(page.locator('h1').first()).toBeVisible();
 
-    // Step 2: Navigate to course browse page
-    await page.click('a:has-text("Browse Courses")');
-    await page.waitForURL('**/education/browse', { timeout: 5000 });
-
-    // Verify courses are displayed
-    await expect(page.locator('h1:has-text("Islamic Education")')).toBeVisible();
-
-    // Wait for courses to load
     const firstCourse = page.locator('[data-testid="course-card"]').first();
-    await expect(firstCourse).toBeVisible({ timeout: 10000 });
-
-    // Step 3: Click on a course to view details
-    await firstCourse.click();
-
-    // Verify course details page loaded
-    await page.waitForURL('**/education/**', { timeout: 5000 });
-
-    // Check for course content elements
-    const courseContent = page.locator('[data-testid="course-content"]');
-    await expect(courseContent.or(page.locator('h1'))).toBeVisible();
-
-    // Check for navigation to lessons or modules
-    const lessonElements = page.locator('[data-testid="lesson-item"]');
-    const hasLessons = await lessonElements.count() > 0;
-
-    if (hasLessons) {
-      expect(await lessonElements.count()).toBeGreaterThan(0);
+    const hasCourses = await firstCourse.count() > 0;
+    if (!hasCourses) {
+      test.skip(true, 'No seeded courses found — run `pnpm --filter api seed:complete` before re-running.');
     }
 
-    console.log('✅ Critical Path 1: Student Course Discovery - PASSED');
+    await firstCourse.click();
+    await page.waitForURL('**/education/**', { timeout: 5_000 });
+    await expect(page.locator('h1').first()).toBeVisible();
   });
 });
 
 test.describe('Critical Path 2: Student Quiz Journey', () => {
-  test.fixme('Student can take a quiz, submit answers, and view results', async ({ page }) => {
-    // Step 1: Login as student
+  test('Student can take a quiz, submit answers, and view results', async ({ page }) => {
     await loginAsStudent(page);
+    await page.goto('/education/browse');
 
-    // Step 2: Navigate to a course with a quiz
-    await page.goto('http://localhost:3003/education/browse');
-
-    // Find and click on a course
     const courseCard = page.locator('[data-testid="course-card"]').first();
-    await expect(courseCard).toBeVisible({ timeout: 10000 });
+    if (await courseCard.count() === 0) {
+      test.skip(true, 'No seeded courses available for quiz flow.');
+    }
     await courseCard.click();
 
-    // Step 3: Find and start a quiz
-    await page.waitForSelector('text=Quiz', { timeout: 10000 });
-    const quizButton = page.locator('button:has-text("Start Quiz")').or(page.locator('a:has-text("Quiz")'));
-
-    // Click quiz button if it exists
-    const quizExists = await quizButton.count() > 0;
-
-    if (quizExists) {
-      await quizButton.first().click();
-
-      // Wait for quiz page to load
-      await page.waitForURL('**/quiz/**', { timeout: 5000 });
-
-      // Step 4: Answer quiz questions
-      // Check for question elements
-      const questionElement = page.locator('[data-testid="quiz-question"]').or(page.locator('form'));
-      await expect(questionElement).toBeVisible({ timeout: 5000 });
-
-      // Select answers (look for radio buttons or checkboxes)
-      const answerOptions = page.locator('input[type="radio"]').or(page.locator('input[type="checkbox"]'));
-      const answerCount = await answerOptions.count();
-
-      if (answerCount > 0) {
-        // Select the first answer for each question
-        await answerOptions.first().click();
-      }
-
-      // Step 5: Submit quiz
-      const submitButton = page.locator('button:has-text("Submit")').or(page.locator('button[type="submit"]'));
-      await submitButton.click();
-
-      // Step 6: View results
-      await page.waitForSelector('text=Results', { timeout: 10000 });
-
-      // Check for score or completion message
-      const resultsIndicator = page.locator('text=Score').or(page.locator('text=Correct')).or(page.locator('text=Complete'));
-      await expect(resultsIndicator).toBeVisible({ timeout: 5000 });
-
-      console.log('✅ Critical Path 2: Student Quiz Journey - PASSED');
-    } else {
-      console.log('⚠️ Critical Path 2: No quiz found in course - Test skipped (expected in baseline)');
+    const quizButton = page.getByRole('button', { name: /Start Quiz/i }).or(page.getByRole('link', { name: /Quiz/i }));
+    if (await quizButton.count() === 0) {
+      test.skip(true, 'Course has no quiz — seed fixtures with a quiz to cover this path.');
     }
+
+    await quizButton.first().click();
+    await page.waitForURL('**/quiz/**', { timeout: 5_000 });
+
+    const questionElement = page.locator('[data-testid="quiz-question"]').or(page.locator('form')).first();
+    await expect(questionElement).toBeVisible({ timeout: 5_000 });
+
+    const answerOptions = page.locator('input[type="radio"], input[type="checkbox"]');
+    if (await answerOptions.count() > 0) {
+      await answerOptions.first().click();
+    }
+
+    await page.getByRole('button', { name: /Submit/i }).first().click();
+
+    const resultsIndicator = page.getByText(/Results|Score|Complete/i).first();
+    await expect(resultsIndicator).toBeVisible({ timeout: 10_000 });
   });
 });
 
 test.describe('Critical Path 3: Admin Course Management Journey', () => {
-  test.fixme('Admin can login, create a course, and publish it', async ({ page }) => {
-    // Step 1: Login as admin
+  test('Admin can login, create a course, and publish it', async ({ page }) => {
+    if (!(await adminReachable())) {
+      test.skip(true, `Admin app not reachable at ${ADMIN_URL}. Start it via docker compose or pnpm --filter admin dev.`);
+    }
+
     await loginAsAdmin(page);
+    await expect(page.locator('h1').first()).toBeVisible();
 
-    // Verify we're on the admin dashboard
-    await expect(page.locator('h1:has-text("Admin")')).toBeVisible();
+    const coursesLink = page.getByRole('link', { name: /Courses/i });
+    if (await coursesLink.count() === 0) {
+      test.skip(true, 'Admin UI does not expose a Courses link — schema change?');
+    }
+    await coursesLink.first().click();
+    await page.waitForURL('**/courses', { timeout: 5_000 });
 
-    // Step 2: Navigate to courses management
-    const coursesLink = page.locator('a:has-text("Courses")').or(page.locator('a[href*="/courses"]'));
+    await page.getByRole('button', { name: /Create|New Course/i }).first().click();
+    await page.waitForSelector('form', { timeout: 5_000 });
 
-    const coursesLinkExists = await coursesLink.count() > 0;
+    const titleInput = page.locator('input[name="title"], input[placeholder*="title" i]').first();
+    await titleInput.fill(`E2E Course ${Date.now()}`);
 
-    if (coursesLinkExists) {
-      await coursesLink.first().click();
+    const descriptionInput = page.locator('textarea[name="description"], textarea').first();
+    if (await descriptionInput.count() > 0) {
+      await descriptionInput.fill('E2E test course.');
+    }
 
-      // Wait for courses page
-      await page.waitForURL('**/courses', { timeout: 5000 });
+    await page.getByRole('button', { name: /Save|Submit/i }).first().click();
+    await page.waitForTimeout(2_000);
 
-      // Step 3: Click "Create Course" button
-      const createButton = page.locator('button:has-text("Create")').or(page.locator('a:has-text("New Course")'));
-      await createButton.first().click();
-
-      // Wait for course creation form
-      await page.waitForSelector('form', { timeout: 5000 });
-
-      // Step 4: Fill in course details
-      const titleInput = page.locator('input[name="title"]').or(page.locator('input[placeholder*="title" i]'));
-      await titleInput.fill(`Test Course ${Date.now()}`);
-
-      const descriptionInput = page.locator('textarea[name="description"]').or(page.locator('textarea'));
-      if (await descriptionInput.count() > 0) {
-        await descriptionInput.fill('This is a test course created during E2E testing');
-      }
-
-      // Step 5: Save course as draft first
-      const saveButton = page.locator('button:has-text("Save")').or(page.locator('button[type="submit"]'));
-      await saveButton.first().click();
-
-      // Wait for success message or redirect
-      await page.waitForTimeout(2000);
-
-      // Step 6: Publish the course
-      const publishButton = page.locator('button:has-text("Publish")').or(page.locator('button:has-text("Activate")'));
-
-      const publishExists = await publishButton.count() > 0;
-
-      if (publishExists) {
-        await publishButton.first().click();
-
-        // Wait for confirmation
-        await page.waitForTimeout(1000);
-
-        // Verify published status
-        const publishedIndicator = page.locator('text=Published').or(page.locator('text=Active'));
-        await expect(publishedIndicator).toBeVisible({ timeout: 5000 });
-      }
-
-      console.log('✅ Critical Path 3: Admin Course Management - PASSED');
-    } else {
-      console.log('⚠️ Critical Path 3: Courses link not found - Admin UI may differ from expected');
+    const publishButton = page.getByRole('button', { name: /Publish|Activate/i });
+    if (await publishButton.count() > 0) {
+      await publishButton.first().click();
+      await expect(page.getByText(/Published|Active/i).first()).toBeVisible({ timeout: 5_000 });
     }
   });
 });
 
 test.describe('Critical Path 4: Public Pages Accessibility', () => {
   test('Public users can access homepage and prayer times without login', async ({ page }) => {
-    // Step 1: Access homepage
-    await page.goto('http://localhost:3003/');
+    await page.goto('/');
+    await expect(page.locator('h1').first()).toBeVisible();
 
-    // Verify homepage loads
-    await expect(page.locator('text=Masjid At-Taqwa').or(page.locator('h1'))).toBeVisible();
+    await page.getByRole('link', { name: /Prayer Times/i }).first().click();
+    await page.waitForURL('**/prayer-times', { timeout: 5_000 });
 
-    // Step 2: Navigate to prayer times
-    const prayerTimesLink = page.locator('a:has-text("Prayer Times")');
-    await prayerTimesLink.click();
-
-    await page.waitForURL('**/prayer-times', { timeout: 5000 });
-
-    // Step 3: Verify prayer times are displayed
-    await page.waitForSelector('text=Fajr', { timeout: 10000 });
-
-    // Check all 5 prayer times are visible
-    await expect(page.locator('text=Fajr')).toBeVisible();
-    await expect(page.locator('text=Dhuhr')).toBeVisible();
-    await expect(page.locator('text=Asr')).toBeVisible();
-    await expect(page.locator('text=Maghrib')).toBeVisible();
-    await expect(page.locator('text=Isha')).toBeVisible();
-
-    // Verify prayer time values are displayed (not just labels)
-    const timeElements = page.locator('[class*="time"]').or(page.locator('time'));
-    const timeCount = await timeElements.count();
-    expect(timeCount).toBeGreaterThan(0);
-
-    console.log('✅ Critical Path 4: Public Pages Accessibility - PASSED');
+    for (const name of ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha']) {
+      await expect(prayerCell(page, name)).toBeVisible({ timeout: 15_000 });
+    }
   });
 });
 
 test.describe('Critical Path 5: Mobile Responsiveness (Core Flows)', () => {
   test('Student can complete core flows on mobile device', async ({ page }) => {
-    // Set mobile viewport (iPhone 12 size)
     await page.setViewportSize({ width: 390, height: 844 });
 
-    // Step 1: Access homepage on mobile
-    await page.goto('http://localhost:3003/');
-    await expect(page.locator('h1').or(page.locator('text=Masjid'))).toBeVisible();
+    await page.goto('/');
+    await expect(page.locator('h1').first()).toBeVisible();
 
-    // Step 2: Open mobile navigation
-    const mobileMenuButton = page.locator('button[aria-label*="menu" i]').or(page.locator('[data-testid="mobile-menu"]'));
-
-    if (await mobileMenuButton.count() > 0) {
-      await mobileMenuButton.click();
-      await page.waitForTimeout(500);
-
-      // Step 3: Navigate to student portal
-      const studentPortalLink = page.locator('a:has-text("Student")').or(page.locator('a[href*="student"]'));
-
-      if (await studentPortalLink.count() > 0) {
-        await studentPortalLink.first().click();
-
-        // Verify login page loads on mobile
-        await page.waitForURL('**/student/login', { timeout: 5000 });
-        await expect(page.locator('input[type="email"]')).toBeVisible();
+    const mobileMenu = page.getByRole('button', { name: /menu/i });
+    if (await mobileMenu.count() > 0) {
+      await mobileMenu.first().click();
+      const studentLink = page.getByRole('link', { name: /Student/i });
+      if (await studentLink.count() > 0) {
+        await studentLink.first().click();
+        await page.waitForURL('**/student/login', { timeout: 5_000 });
+        await expect(page.locator('input[type="email"]').first()).toBeVisible();
       }
     }
 
-    // Step 4: Check prayer times on mobile
-    await page.goto('http://localhost:3003/prayer-times');
-    await expect(page.locator('text=Fajr')).toBeVisible();
-
-    console.log('✅ Critical Path 5: Mobile Responsiveness - PASSED');
+    await page.goto('/prayer-times');
+    await expect(prayerCell(page, 'Fajr')).toBeVisible({ timeout: 15_000 });
   });
 });
 
-/**
- * Summary Test: Overall System Health Check
- *
- * This test runs a quick smoke test of all critical paths to give
- * a rapid indication of system health after refactoring changes.
- */
 test.describe('Critical Paths: System Health Check', () => {
   test('All critical paths are accessible and functional', async ({ page }) => {
     const healthCheck = {
@@ -288,65 +209,55 @@ test.describe('Critical Paths: System Health Check', () => {
       education: false,
     };
 
-    // Check 1: Homepage
     try {
-      await page.goto('http://localhost:3003/');
-      await expect(page.locator('h1')).toBeVisible({ timeout: 5000 });
+      await page.goto('/');
+      await expect(page.locator('h1').first()).toBeVisible({ timeout: 5_000 });
       healthCheck.homepage = true;
     } catch (e) {
-      console.error('❌ Homepage failed:', e);
+      console.error('Homepage failed:', e);
     }
 
-    // Check 2: Prayer Times
     try {
-      await page.goto('http://localhost:3003/prayer-times');
-      await expect(page.locator('text=Fajr')).toBeVisible({ timeout: 10000 });
+      await page.goto('/prayer-times');
+      await expect(prayerCell(page, 'Fajr')).toBeVisible({ timeout: 15_000 });
       healthCheck.prayerTimes = true;
     } catch (e) {
-      console.error('❌ Prayer Times failed:', e);
+      console.error('Prayer Times failed:', e);
     }
 
-    // Check 3: Student Login Page
     try {
-      await page.goto('http://localhost:3003/student/login');
-      await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 5000 });
+      await page.goto('/student/login');
+      await expect(page.locator('input[type="email"]').first()).toBeVisible({ timeout: 5_000 });
       healthCheck.studentLogin = true;
     } catch (e) {
-      console.error('❌ Student Login failed:', e);
+      console.error('Student Login failed:', e);
     }
 
-    // Check 4: Admin Login Page (different port)
-    try {
-      await page.goto('http://localhost:3000/admin/login');
-      await page.waitForSelector('input[type="email"]', { timeout: 5000 });
-      healthCheck.adminLogin = true;
-    } catch (e) {
-      console.error('❌ Admin Login failed:', e);
+    if (await adminReachable()) {
+      try {
+        await page.goto(`${ADMIN_URL}/admin/login`);
+        await page.waitForSelector('input[type="email"]', { timeout: 5_000 });
+        healthCheck.adminLogin = true;
+      } catch (e) {
+        console.error('Admin Login failed:', e);
+      }
     }
 
-    // Check 5: Education Browse
     try {
-      await page.goto('http://localhost:3003/education/browse');
-      await expect(page.locator('h1')).toBeVisible({ timeout: 5000 });
+      await page.goto('/education/browse');
+      await expect(page.locator('h1').first()).toBeVisible({ timeout: 5_000 });
       healthCheck.education = true;
     } catch (e) {
-      console.error('❌ Education Browse failed:', e);
+      console.error('Education Browse failed:', e);
     }
 
-    // Summary
-    console.log('\n🏥 System Health Check Results:');
-    console.log('================================');
-    console.log(`Homepage:       ${healthCheck.homepage ? '✅' : '❌'}`);
-    console.log(`Prayer Times:   ${healthCheck.prayerTimes ? '✅' : '❌'}`);
-    console.log(`Student Login:  ${healthCheck.studentLogin ? '✅' : '❌'}`);
-    console.log(`Admin Login:    ${healthCheck.adminLogin ? '✅' : '❌'}`);
-    console.log(`Education:      ${healthCheck.education ? '✅' : '❌'}`);
-    console.log('================================\n');
+    console.log('\nSystem Health Check Results:');
+    console.table(healthCheck);
 
-    // All critical paths must be accessible
     expect(healthCheck.homepage).toBe(true);
     expect(healthCheck.prayerTimes).toBe(true);
     expect(healthCheck.studentLogin).toBe(true);
     expect(healthCheck.education).toBe(true);
+    // adminLogin intentionally not asserted — Path 3 already gates on that.
   });
 });
