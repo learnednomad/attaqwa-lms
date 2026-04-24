@@ -45,7 +45,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Homepage loads without errors', async ({ page }) => {
       const errors = await checkForHydrationErrors(page, 'Homepage');
       
-      await page.goto('http://localhost:3000/');
+      await page.goto('/');
       await expect(page).toHaveTitle(/Masjid At-Taqwa/);
       
       // Check for key elements
@@ -63,7 +63,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Prayer Times page loads without errors', async ({ page }) => {
       const errors = await checkForHydrationErrors(page, 'Prayer Times');
       
-      await page.goto('http://localhost:3000/prayer-times');
+      await page.goto('/prayer-times');
       
       // Wait for prayer times to load
       await page.waitForSelector('text=Fajr', { timeout: 10000 });
@@ -85,7 +85,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Announcements page loads without errors', async ({ page }) => {
       const errors = await checkForHydrationErrors(page, 'Announcements');
       
-      await page.goto('http://localhost:3000/announcements');
+      await page.goto('/announcements');
       await expect(page.locator('h1:has-text("Announcements")')).toBeVisible();
       
       // Check for announcement cards
@@ -98,7 +98,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Events page loads without errors', async ({ page }) => {
       const errors = await checkForHydrationErrors(page, 'Events');
       
-      await page.goto('http://localhost:3000/events');
+      await page.goto('/events');
       await expect(page.locator('h1:has-text("Events")')).toBeVisible();
       
       expect(errors.filter(e => e.includes('Hydration'))).toHaveLength(0);
@@ -107,7 +107,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Calendar page loads without errors', async ({ page }) => {
       const errors = await checkForHydrationErrors(page, 'Calendar');
       
-      await page.goto('http://localhost:3000/calendar');
+      await page.goto('/calendar');
       await expect(page.locator('text=Calendar Downloads')).toBeVisible();
       
       // Check for calendar cards
@@ -119,7 +119,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Dashboard page loads without errors', async ({ page }) => {
       const errors = await checkForHydrationErrors(page, 'Dashboard');
       
-      await page.goto('http://localhost:3000/dashboard');
+      await page.goto('/dashboard');
       
       // Check for dashboard elements
       await expect(page.locator('text=Islamic Dashboard')).toBeVisible();
@@ -133,7 +133,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('About page loads without errors', async ({ page }) => {
       const errors = await checkForHydrationErrors(page, 'About');
       
-      await page.goto('http://localhost:3000/about');
+      await page.goto('/about');
       await expect(page.locator('h1:has-text("About")')).toBeVisible();
       
       expect(errors.filter(e => e.includes('Hydration'))).toHaveLength(0);
@@ -142,7 +142,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Services page loads without errors', async ({ page }) => {
       const errors = await checkForHydrationErrors(page, 'Services');
       
-      await page.goto('http://localhost:3000/services');
+      await page.goto('/services');
       await expect(page.locator('h1:has-text("Services")')).toBeVisible();
       
       expect(errors.filter(e => e.includes('Hydration'))).toHaveLength(0);
@@ -151,7 +151,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Contact page loads without errors', async ({ page }) => {
       const errors = await checkForHydrationErrors(page, 'Contact');
       
-      await page.goto('http://localhost:3000/contact');
+      await page.goto('/contact');
       await expect(page.locator('h1:has-text("Contact")')).toBeVisible();
       
       expect(errors.filter(e => e.includes('Hydration'))).toHaveLength(0);
@@ -162,7 +162,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Islamic Calendar page loads without errors', async ({ page }) => {
       const errors = await checkForHydrationErrors(page, 'Islamic Calendar');
       
-      await page.goto('http://localhost:3000/resources/islamic-calendar');
+      await page.goto('/resources/islamic-calendar');
       
       // Wait for Islamic calendar to load
       await expect(page.locator('text=Islamic Calendar')).toBeVisible();
@@ -180,7 +180,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Quran Study page loads without errors', async ({ page }) => {
       const errors = await checkForHydrationErrors(page, 'Quran Study');
       
-      await page.goto('http://localhost:3000/resources/quran-study');
+      await page.goto('/resources/quran-study');
       await expect(page.locator('h1:has-text("Quran Study")')).toBeVisible();
       
       expect(errors.filter(e => e.includes('Hydration'))).toHaveLength(0);
@@ -189,7 +189,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Hadith Collections page loads without errors', async ({ page }) => {
       const errors = await checkForHydrationErrors(page, 'Hadith Collections');
       
-      await page.goto('http://localhost:3000/resources/hadith-collections');
+      await page.goto('/resources/hadith-collections');
       await expect(page.locator('h1:has-text("Hadith Collections")')).toBeVisible();
       
       expect(errors.filter(e => e.includes('Hydration'))).toHaveLength(0);
@@ -200,7 +200,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Education Browse page loads without errors', async ({ page }) => {
       const errors = await checkForHydrationErrors(page, 'Education Browse');
       
-      await page.goto('http://localhost:3000/education/browse');
+      await page.goto('/education/browse');
       await expect(page.locator('h1:has-text("Islamic Education")')).toBeVisible();
       
       expect(errors.filter(e => e.includes('Hydration'))).toHaveLength(0);
@@ -210,7 +210,7 @@ test.describe('All Pages Comprehensive Test', () => {
       const errors = await checkForHydrationErrors(page, 'Seerah Modules');
       
       // Test a specific Seerah module
-      await page.goto('http://localhost:3000/education/seerah/early-life');
+      await page.goto('/education/seerah/early-life');
       await expect(page.locator('text=Early Life')).toBeVisible();
       
       // Check for quiz elements
@@ -224,7 +224,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Student Login page loads without errors', async ({ page }) => {
       const errors = await checkForHydrationErrors(page, 'Student Login');
       
-      await page.goto('http://localhost:3000/student/login');
+      await page.goto('/student/login');
       await expect(page.locator('h1:has-text("Student Portal")')).toBeVisible();
       
       // Check for login form elements
@@ -238,7 +238,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Student Dashboard redirects when not logged in', async ({ page }) => {
       const errors = await checkForHydrationErrors(page, 'Student Dashboard');
       
-      await page.goto('http://localhost:3000/student/dashboard');
+      await page.goto('/student/dashboard');
       
       // Should redirect to login
       await page.waitForURL('**/student/login', { timeout: 5000 });
@@ -249,7 +249,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Student login flow works', async ({ page }) => {
       const errors = await checkForHydrationErrors(page, 'Student Login Flow');
       
-      await page.goto('http://localhost:3000/student/login');
+      await page.goto('/student/login');
       
       // Fill in login form
       await page.fill('input[type="email"]', 'test@example.com');
@@ -270,7 +270,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Admin Dashboard page loads without errors', async ({ page }) => {
       const errors = await checkForHydrationErrors(page, 'Admin Dashboard');
       
-      await page.goto('http://localhost:3000/admin');
+      await page.goto('/admin');
       await expect(page.locator('h1:has-text("Admin Dashboard")')).toBeVisible();
       
       expect(errors.filter(e => e.includes('Hydration'))).toHaveLength(0);
@@ -279,7 +279,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Admin Prayer Times page loads without errors', async ({ page }) => {
       const errors = await checkForHydrationErrors(page, 'Admin Prayer Times');
       
-      await page.goto('http://localhost:3000/admin/prayer-times');
+      await page.goto('/admin/prayer-times');
       await expect(page.locator('h1:has-text("Prayer Times Management")')).toBeVisible();
       
       // Check for prayer time management elements
@@ -291,7 +291,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Admin Announcements page loads without errors', async ({ page }) => {
       const errors = await checkForHydrationErrors(page, 'Admin Announcements');
       
-      await page.goto('http://localhost:3000/admin/announcements');
+      await page.goto('/admin/announcements');
       await expect(page.locator('h1:has-text("Announcement Management")')).toBeVisible();
       
       // Check for create button
@@ -303,7 +303,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Admin Events page loads without errors', async ({ page }) => {
       const errors = await checkForHydrationErrors(page, 'Admin Events');
       
-      await page.goto('http://localhost:3000/admin/events');
+      await page.goto('/admin/events');
       await expect(page.locator('h1:has-text("Event Management")')).toBeVisible();
       
       // Check for create button
@@ -317,7 +317,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Homepage is responsive on mobile', async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 667 }); // iPhone SE size
       
-      await page.goto('http://localhost:3000/');
+      await page.goto('/');
       
       // Check mobile menu button is visible
       const mobileMenuButton = page.locator('button[aria-label*="menu"]');
@@ -333,7 +333,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Prayer Times page is responsive on mobile', async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 667 });
       
-      await page.goto('http://localhost:3000/prayer-times');
+      await page.goto('/prayer-times');
       
       // Prayer times should still be visible
       await expect(page.locator('text=Fajr')).toBeVisible();
@@ -345,7 +345,7 @@ test.describe('All Pages Comprehensive Test', () => {
     test('Homepage loads within acceptable time', async ({ page }) => {
       const startTime = Date.now();
       
-      await page.goto('http://localhost:3000/');
+      await page.goto('/');
       await page.waitForLoadState('networkidle');
       
       const loadTime = Date.now() - startTime;
@@ -357,7 +357,7 @@ test.describe('All Pages Comprehensive Test', () => {
     });
 
     test('Prayer Times API responds quickly', async ({ page }) => {
-      const response = await page.request.get('http://localhost:3000/api/prayer-times');
+      const response = await page.request.get('/api/prayer-times');
       
       expect(response.status()).toBe(200);
       
@@ -370,7 +370,7 @@ test.describe('All Pages Comprehensive Test', () => {
 
   test.describe('Accessibility Tests', () => {
     test('Homepage has proper ARIA labels', async ({ page }) => {
-      await page.goto('http://localhost:3000/');
+      await page.goto('/');
       
       // Check for main navigation
       const nav = page.locator('nav[aria-label]');
@@ -386,7 +386,7 @@ test.describe('All Pages Comprehensive Test', () => {
     });
 
     test('Forms have proper labels', async ({ page }) => {
-      await page.goto('http://localhost:3000/student/login');
+      await page.goto('/student/login');
       
       // Check email input has label
       const emailLabel = page.locator('label:has-text("Email")');
@@ -424,7 +424,7 @@ test.describe('Hydration Error Detection', () => {
     ];
 
     for (const url of pagesWithDates) {
-      await page.goto(`http://localhost:3000${url}`);
+      await page.goto(`${url}`);
       await page.waitForLoadState('networkidle');
       
       // Wait a bit for any hydration errors to appear

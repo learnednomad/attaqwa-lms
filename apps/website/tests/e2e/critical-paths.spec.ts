@@ -36,8 +36,11 @@ async function loginAsAdmin(page: Page) {
   await page.waitForURL('**/admin', { timeout: 10000 });
 }
 
+// Paths 1–3 require a seeded auth DB (test.student@attaqwa.com, admin@attaqwa.com) and the admin
+// app running on :3000. Neither is provisioned in the current CI job, so these are fixme'd until
+// an integration test env (DB container + seed script + multi-app startup) is in place.
 test.describe('Critical Path 1: Student Course Discovery Journey', () => {
-  test('Student can login, browse courses, and view course details', async ({ page }) => {
+  test.fixme('Student can login, browse courses, and view course details', async ({ page }) => {
     // Step 1: Login as student
     await loginAsStudent(page);
 
@@ -78,7 +81,7 @@ test.describe('Critical Path 1: Student Course Discovery Journey', () => {
 });
 
 test.describe('Critical Path 2: Student Quiz Journey', () => {
-  test('Student can take a quiz, submit answers, and view results', async ({ page }) => {
+  test.fixme('Student can take a quiz, submit answers, and view results', async ({ page }) => {
     // Step 1: Login as student
     await loginAsStudent(page);
 
@@ -136,7 +139,7 @@ test.describe('Critical Path 2: Student Quiz Journey', () => {
 });
 
 test.describe('Critical Path 3: Admin Course Management Journey', () => {
-  test('Admin can login, create a course, and publish it', async ({ page }) => {
+  test.fixme('Admin can login, create a course, and publish it', async ({ page }) => {
     // Step 1: Login as admin
     await loginAsAdmin(page);
 
