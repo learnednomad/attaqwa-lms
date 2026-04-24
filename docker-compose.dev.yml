@@ -48,7 +48,7 @@ services:
       DATABASE_PORT: 5432
       DATABASE_USERNAME: postgres
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-dev-secret-change-me}
-      BETTER_AUTH_BASE_URL: ${BETTER_AUTH_BASE_URL:-http://localhost:3001}
+      BETTER_AUTH_BASE_URL: ${BETTER_AUTH_BASE_URL:-http://localhost:3003}
     depends_on:
       postgres:
         condition: service_healthy
@@ -198,8 +198,8 @@ services:
       NODE_ENV: development
       PORT: 3000
       NEXT_PUBLIC_API_URL: http://localhost:1337
-      NEXT_PUBLIC_AUTH_URL: http://localhost:3001
-      AUTH_INTERNAL_URL: http://website:3001
+      NEXT_PUBLIC_AUTH_URL: http://localhost:3003
+      AUTH_INTERNAL_URL: http://website:3003
       STRAPI_INTERNAL_URL: http://api:1337
       STRAPI_API_TOKEN: ${STRAPI_API_TOKEN:-}
     ports:
@@ -227,15 +227,15 @@ services:
       "
     environment:
       NODE_ENV: development
-      PORT: 3001
+      PORT: 3003
       NEXT_PUBLIC_API_URL: http://localhost:1337
       STRAPI_URL: http://api:1337
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-dev-password-change-me}@postgres:5432/attaqwa_lms
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-dev-secret-change-me}
-      BETTER_AUTH_BASE_URL: http://localhost:3001
+      BETTER_AUTH_BASE_URL: http://localhost:3003
       STRAPI_API_TOKEN: ${STRAPI_API_TOKEN:-}
     ports:
-      - "3001:3001"
+      - "3003:3003"
     depends_on:
       init:
         condition: service_completed_successfully

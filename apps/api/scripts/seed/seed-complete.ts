@@ -1098,7 +1098,7 @@ async function main() {
   }
   console.log('  └──────────────────┴──────────────────────────┴─────────────────┘');
   console.log('\n  Strapi Admin: admin@attaqwa.local / Admin1234!');
-  console.log('\n  Website:  http://localhost:3001');
+  console.log('\n  Website:  http://localhost:3003');
   console.log('  Admin:    http://localhost:3000');
   console.log('  Strapi:   http://localhost:1337/admin\n');
 }
