@@ -2,9 +2,9 @@ name: Bundle Size Tracking
 
 on:
   pull_request:
-    branches: [main, develop]
+    branches: [main, develop, development]
   push:
-    branches: [main, develop]
+    branches: [main, develop, development]
 
 permissions:
   contents: read

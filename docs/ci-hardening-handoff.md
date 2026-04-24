@@ -2,7 +2,39 @@
 
 **Branch:** `fix/ci-hardening` (off `development` @ `8bb29c0`)
 **Snapshot tags:** `pre-ci-hardening-main` → main@74649d7, `pre-ci-hardening-development` → development@8bb29c0
+**PR:** [#24](https://github.com/learnednomad/attaqwa-lms/pull/24)
 **Written:** 2026-04-24. Supersedes sections 1–3 of `docs/ci-followup-plan.md` for items A, B, and C.
+
+### CI result on this branch
+
+All 9 PR-blocking checks passing after three fix iterations:
+
+| Check                      | Result       | Duration |
+| -------------------------- | ------------ | -------- |
+| Code Quality & Type Safety | ✅ pass       | 58s      |
+| Build Validation           | ✅ pass       | 2m33s    |
+| E2E Tests                  | ✅ pass       | 2m57s    |
+| migrations                 | ✅ pass       | 54s      |
+| validate (compose)         | ✅ pass       | 9s       |
+| build (init)               | ✅ pass       | 3m17s    |
+| build (website)            | ✅ pass       | 4m6s     |
+| build (admin)              | ✅ pass       | 4m59s    |
+| build (api)                | ✅ pass       | 6m33s    |
+
+**E2E breakdown:** 3 Critical Paths passing (Public Pages, Mobile, System Health Check),
+3 auto-skipping (CP1, CP2 need Strapi course data; CP3 needs admin app on :3000), and
+the entire legacy `all-pages.spec.ts` sweep (28 tests) auto-skipped pending Strapi-in-CI.
+Total: 3 passed / 31 skipped / 0 failed in 16.5s.
+
+Iteration log:
+1. **Run 1** — E2E failed: website startup OK but (a) student login button reads
+   "Login to Student Portal" not "Sign In", (b) `text=Fajr` resolved to 3 nodes
+   (nav / mobile menu / prayer table), (c) `.or()` chains produced strict-mode
+   violations in CP4/CP5/Health.
+2. **Run 2** — E2E failed only on CP1: the h1 on `/student/dashboard` reads
+   "Welcome Back, {name}" and the h1 on `/education/browse` reads "Browse Courses",
+   not the "Student Dashboard" / "Islamic Education" strings I had asserted.
+3. **Run 3** — All green.
 
 This document is what you need when you sit back down at this branch. It describes
 (1) exactly what was changed, (2) what's still incomplete, (3) commands to verify, and
