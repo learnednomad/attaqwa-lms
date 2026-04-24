@@ -122,11 +122,13 @@ async function restUpdate(endpoint: string, documentId: string, data: Record<str
 async function ensureStrapiAdmin(): Promise<string> {
   console.log('\n--- Phase 0: Strapi Admin ---');
 
+  // Defaults align with apps/api/src/bootstrap.ts:DEV_SEED_ADMIN_DEFAULTS so
+  // we reuse the admin Strapi already seeds on boot. Env vars override in CI.
   const adminCreds = {
-    email: 'admin@attaqwa.local',
-    password: 'Admin1234!',
-    firstname: 'Admin',
-    lastname: 'AttaqwaLMS',
+    email: process.env.STRAPI_ADMIN_EMAIL || process.env.SEED_ADMIN_EMAIL || 'superadmin@attaqwa.org',
+    password: process.env.STRAPI_ADMIN_PASSWORD || process.env.SEED_ADMIN_PASSWORD || 'SuperAdmin123!',
+    firstname: process.env.SEED_ADMIN_FIRSTNAME || 'Super',
+    lastname: process.env.SEED_ADMIN_LASTNAME || 'Admin',
   };
 
   // Try registering first admin

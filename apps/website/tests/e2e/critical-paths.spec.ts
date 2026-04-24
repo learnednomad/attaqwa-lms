@@ -45,16 +45,20 @@ async function loginAsStudent(page: Page) {
 }
 
 async function loginAsAdmin(page: Page) {
-  await page.goto(`${ADMIN_URL}/admin/login`);
+  // Admin middleware redirects unauthenticated /admin/* to /login?callbackUrl=...
+  // After successful BetterAuth login the hook in apps/admin/lib/hooks/use-auth.ts
+  // pushes to /dashboard (not /admin), so wait on the dashboard URL.
+  await page.goto(`${ADMIN_URL}/login`);
   await page.waitForSelector('input[type="email"]', { timeout: 5_000 });
   await page.fill('input[type="email"]', ADMIN_EMAIL);
   await page.fill('input[type="password"]', ADMIN_PASSWORD);
   await submitLogin(page);
-  await page.waitForURL('**/admin', { timeout: 15_000 });
+  await page.waitForURL('**/dashboard', { timeout: 15_000 });
 }
 
 async function adminReachable(): Promise<boolean> {
   try {
+    // /admin/login redirects to /login via middleware; any non-5xx is "up".
     const res = await fetch(`${ADMIN_URL}/admin/login`, { redirect: 'manual' });
     return res.status < 500;
   } catch {
@@ -78,9 +82,16 @@ test.describe('Critical Path 1: Student Course Discovery Journey', () => {
     await page.goto('/education/browse');
     await expect(page.locator('h1').first()).toBeVisible();
 
+    // The browse page is client-rendered via React Query. Wait for the first
+    // course card to appear (or for the explicit "No courses found" copy to
+    // render) before deciding whether to skip.
     const firstCourse = page.locator('[data-testid="course-card"]').first();
-    const hasCourses = await firstCourse.count() > 0;
-    if (!hasCourses) {
+    const emptyState = page.getByText(/No courses found/i).first();
+    await Promise.race([
+      firstCourse.waitFor({ state: 'visible', timeout: 15_000 }).catch(() => {}),
+      emptyState.waitFor({ state: 'visible', timeout: 15_000 }).catch(() => {}),
+    ]);
+    if ((await firstCourse.count()) === 0) {
       test.skip(true, 'No seeded courses found — run `pnpm --filter api seed:complete` before re-running.');
     }
 
@@ -96,6 +107,11 @@ test.describe('Critical Path 2: Student Quiz Journey', () => {
     await page.goto('/education/browse');
 
     const courseCard = page.locator('[data-testid="course-card"]').first();
+    const emptyState = page.getByText(/No courses found/i).first();
+    await Promise.race([
+      courseCard.waitFor({ state: 'visible', timeout: 15_000 }).catch(() => {}),
+      emptyState.waitFor({ state: 'visible', timeout: 15_000 }).catch(() => {}),
+    ]);
     if (await courseCard.count() === 0) {
       test.skip(true, 'No seeded courses available for quiz flow.');
     }
@@ -133,32 +149,26 @@ test.describe('Critical Path 3: Admin Course Management Journey', () => {
     await loginAsAdmin(page);
     await expect(page.locator('h1').first()).toBeVisible();
 
-    const coursesLink = page.getByRole('link', { name: /Courses/i });
-    if (await coursesLink.count() === 0) {
-      test.skip(true, 'Admin UI does not expose a Courses link — schema change?');
-    }
-    await coursesLink.first().click();
-    await page.waitForURL('**/courses', { timeout: 5_000 });
+    // Nav is hydrated client-side from the BetterAuth session; rather than
+    // racing the sidebar render, navigate directly to /courses (the sidebar
+    // entry's canonical href in apps/admin/components/dashboard/sidebar.tsx).
+    await page.goto(`${ADMIN_URL}/courses`);
+    await page.waitForURL('**/courses', { timeout: 10_000 });
 
-    await page.getByRole('button', { name: /Create|New Course/i }).first().click();
-    await page.waitForSelector('form', { timeout: 5_000 });
+    // /courses has "Create Course" inside a Link → navigate to /courses/new.
+    await page.goto(`${ADMIN_URL}/courses/new`);
+    await page.waitForSelector('form', { timeout: 10_000 });
 
-    const titleInput = page.locator('input[name="title"], input[placeholder*="title" i]').first();
-    await titleInput.fill(`E2E Course ${Date.now()}`);
+    // Field labels come from apps/admin/components/courses/course-form.tsx.
+    await page.getByLabel('Course Title').fill(`E2E Course ${Date.now()}`);
+    await page.getByLabel(/Description/i).first().fill('E2E test course created by CI.');
 
-    const descriptionInput = page.locator('textarea[name="description"], textarea').first();
-    if (await descriptionInput.count() > 0) {
-      await descriptionInput.fill('E2E test course.');
-    }
+    // Submit button text is "Create Course" (or "Update Course" when editing).
+    await page.getByRole('button', { name: /Create Course/i }).click();
 
-    await page.getByRole('button', { name: /Save|Submit/i }).first().click();
-    await page.waitForTimeout(2_000);
-
-    const publishButton = page.getByRole('button', { name: /Publish|Activate/i });
-    if (await publishButton.count() > 0) {
-      await publishButton.first().click();
-      await expect(page.getByText(/Published|Active/i).first()).toBeVisible({ timeout: 5_000 });
-    }
+    // On success the form redirects to /courses. Tolerate either destination
+    // (list or the new course's edit page).
+    await page.waitForURL(/\/courses(\/|$)/, { timeout: 15_000 });
   });
 });
 

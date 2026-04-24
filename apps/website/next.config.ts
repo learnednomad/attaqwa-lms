@@ -35,8 +35,20 @@ const securityHeaders = [
       "img-src 'self' data: https: blob:" + (process.env.NODE_ENV === 'development' ? " http://localhost:9000" : ''),
       // Media: self, MinIO for video/audio uploads
       "media-src 'self' https: blob:" + (process.env.NODE_ENV === 'development' ? " http://localhost:9000" : ''),
-      // API connections
-      "connect-src 'self' https://api.aladhan.com https://cms.learnednomad.com https://hadithapi.com wss:" + (process.env.NODE_ENV === 'development' ? " http://localhost:1337 http://localhost:9000" : ''),
+      // API connections. Allow the configured Strapi/S3 origins when they
+      // point at localhost (CI, local dev) — prod uses HTTPS-only wildcards.
+      (() => {
+        const base = "connect-src 'self' https://api.aladhan.com https://cms.learnednomad.com https://hadithapi.com wss:";
+        const extra: string[] = [];
+        if (process.env.NODE_ENV === 'development') {
+          extra.push('http://localhost:1337', 'http://localhost:9000');
+        }
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        if (apiUrl && /^https?:\/\/localhost(:\d+)?$/.test(apiUrl)) {
+          extra.push(apiUrl);
+        }
+        return extra.length ? `${base} ${extra.join(' ')}` : base;
+      })(),
       // Frames: allow YouTube and Vimeo embeds for video lessons
       "frame-src 'self' https://www.youtube.com https://youtube.com https://player.vimeo.com",
       // Frames: prevent clickjacking

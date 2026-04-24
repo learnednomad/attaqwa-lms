@@ -86,7 +86,7 @@ jobs:
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 35
 
     services:
       postgres:
@@ -105,13 +105,34 @@ jobs:
 
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/attaqwa_lms
-      BETTER_AUTH_SECRET: ci-e2e-secret-not-for-prod
+      # Strapi env — matches apps/api/config defaults
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: localhost
+      DATABASE_PORT: '5432'
+      DATABASE_NAME: attaqwa_lms
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_SSL: 'false'
+      APP_KEYS: k1,k2,k3,k4
+      API_TOKEN_SALT: ci-api-token-salt
+      ADMIN_JWT_SECRET: ci-admin-jwt-secret
+      TRANSFER_TOKEN_SALT: ci-transfer-token-salt
+      ENCRYPTION_KEY: ci-encryption-key
+      JWT_SECRET: ci-jwt-secret
+      # BetterAuth (used by website)
+      BETTER_AUTH_SECRET: ci-e2e-secret-not-for-prod-0123456789abcdef
       BETTER_AUTH_BASE_URL: http://localhost:3003
+      # Shared URLs
       NEXT_PUBLIC_API_URL: http://localhost:1337
+      STRAPI_URL: http://localhost:1337
       NEXT_PUBLIC_AUTH_URL: http://localhost:3003
       NEXT_PUBLIC_ADMIN_URL: http://localhost:3000
       ADMIN_URL: http://localhost:3000
-      NODE_ENV: test
+      AUTH_INTERNAL_URL: http://localhost:3003
+      STRAPI_INTERNAL_URL: http://localhost:1337
+      # Test run mode. all-pages.spec.ts stays gated on E2E_FULL_STACK until
+      # its drifted ARIA/markup assertions are rewritten — critical-paths.spec
+      # carries the real coverage and self-gates per-test.
       PLAYWRIGHT_SKIP_WEBSERVER: '1'
 
     steps:
@@ -146,41 +167,116 @@ jobs:
         working-directory: apps/website
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: Build website (standalone output)
+      # ────────────────────────────────────────────────────────────────────
+      # Build: api (Strapi) first — its NODE_ENV at build time doesn't matter.
+      # ────────────────────────────────────────────────────────────────────
+      - name: Build api (Strapi)
+        run: pnpm --filter api build
+
+      # Start Strapi in development mode so bootstrap.ts seeds 15 courses +
+      # super-admin (superadmin@attaqwa.org / SuperAdmin123!). Production mode
+      # skips seeding by design. The server itself still uses the built admin
+      # panel — no watch/rebuild penalty.
+      - name: Start api (Strapi) in background
+        env:
+          NODE_ENV: development
+          HOST: 0.0.0.0
+          PORT: '1337'
+        run: |
+          nohup pnpm --filter api start > /tmp/strapi.log 2>&1 &
+          echo $! > /tmp/strapi.pid
+          echo "Strapi PID=$(cat /tmp/strapi.pid)"
+
+      - name: Wait for Strapi to be reachable
+        run: |
+          for i in {1..90}; do
+            code=$(curl -sS -o /dev/null -w "%{http_code}" http://localhost:1337/_health 2>/dev/null || echo 000)
+            if [ "$code" = "204" ] || [ "$code" = "200" ]; then
+              echo "Strapi up (HTTP $code) after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Strapi did not become reachable — dumping log:"
+          tail -200 /tmp/strapi.log || true
+          exit 1
+
+      # ────────────────────────────────────────────────────────────────────
+      # CI bootstrap: login as the bootstrap-seeded super-admin and mint a
+      # deterministic full-access API token. Exports STRAPI_API_TOKEN to
+      # subsequent steps via $GITHUB_ENV.
+      # ────────────────────────────────────────────────────────────────────
+      - name: Bootstrap Strapi admin + API token
+        id: strapi-bootstrap
+        run: |
+          pnpm --filter api exec tsx scripts/seed/ci-bootstrap.ts > /tmp/ci-bootstrap.out 2>/tmp/ci-bootstrap.err || {
+            echo "ci-bootstrap failed"; cat /tmp/ci-bootstrap.err; exit 1;
+          }
+          # Emit STRAPI_API_TOKEN only — JWT is short-lived and unused downstream.
+          grep '^STRAPI_API_TOKEN=' /tmp/ci-bootstrap.out >> "$GITHUB_ENV"
+          echo "Bootstrap OK ($(wc -l < /tmp/ci-bootstrap.out) lines)"
+
+      - name: Seed Strapi content (users, enrollments, achievements, ...)
+        run: pnpm --filter api exec tsx scripts/seed/seed-complete.ts
+
+      # ────────────────────────────────────────────────────────────────────
+      # Build + start website (3003) and admin (3000) now that STRAPI_API_TOKEN
+      # is on the env and Strapi has content.
+      # ────────────────────────────────────────────────────────────────────
+      - name: Build website
         working-directory: apps/website
+        run: pnpm build
+
+      - name: Build admin
+        working-directory: apps/admin
         run: pnpm build
 
       - name: Start website (background)
         working-directory: apps/website
         env:
           PORT: '3003'
+          NODE_ENV: production
         run: |
           nohup pnpm start > /tmp/website.log 2>&1 &
           echo $! > /tmp/website.pid
 
-      - name: Wait for website to be reachable
+      - name: Start admin (background)
+        working-directory: apps/admin
+        env:
+          PORT: '3000'
+          NODE_ENV: production
         run: |
-          for i in {1..60}; do
-            if curl -sSf -o /dev/null http://localhost:3003/; then
-              echo "Website is up after ${i} attempt(s)"
+          nohup pnpm start > /tmp/admin.log 2>&1 &
+          echo $! > /tmp/admin.pid
+
+      - name: Wait for website + admin
+        run: |
+          for i in {1..90}; do
+            w=$(curl -sS -o /dev/null -w "%{http_code}" http://localhost:3003/ 2>/dev/null || echo 000)
+            a=$(curl -sS -o /dev/null -w "%{http_code}" http://localhost:3000/ 2>/dev/null || echo 000)
+            echo "[$i] website=$w admin=$a"
+            # website: 200 on / (public) ; admin: 200/302/307 (middleware redirect allowed)
+            if [ "$w" = "200" ] && { [ "$a" = "200" ] || [ "$a" = "302" ] || [ "$a" = "307" ]; }; then
+              echo "Website + admin up"
               exit 0
             fi
             sleep 2
           done
-          echo "Website did not become reachable — dumping log:"
-          tail -100 /tmp/website.log || true
+          echo "Services did not become ready — dumping logs"
+          echo "--- website.log ---"; tail -200 /tmp/website.log || true
+          echo "--- admin.log ---";   tail -200 /tmp/admin.log || true
           exit 1
 
       - name: Run Playwright E2E tests
         working-directory: apps/website
         run: pnpm exec playwright test --project=chromium
 
-      - name: Stop website
+      - name: Stop background services
         if: always()
         run: |
-          if [ -f /tmp/website.pid ]; then
-            kill "$(cat /tmp/website.pid)" 2>/dev/null || true
-          fi
+          for pid in /tmp/website.pid /tmp/admin.pid /tmp/strapi.pid; do
+            [ -f "$pid" ] && kill "$(cat "$pid")" 2>/dev/null || true
+          done
 
       - name: Upload Playwright report
         if: always()
@@ -191,11 +287,16 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
 
-      - name: Upload website log (on failure)
+      - name: Upload service logs (on failure)
         if: failure()
         uses: actions/upload-artifact@v5
         with:
-          name: website-log
-          path: /tmp/website.log
+          name: service-logs
+          path: |
+            /tmp/website.log
+            /tmp/admin.log
+            /tmp/strapi.log
+            /tmp/ci-bootstrap.out
+            /tmp/ci-bootstrap.err
           retention-days: 3
           if-no-files-found: ignore
