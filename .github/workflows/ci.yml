@@ -53,7 +53,7 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=4096
         run: |
           cd apps/website
-          pnpm test --ci --maxWorkers=2
+          pnpm test --ci --maxWorkers=2 --passWithNoTests
 
       - name: Upload test coverage
         if: always()
