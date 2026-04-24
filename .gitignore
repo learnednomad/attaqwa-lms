@@ -71,5 +71,16 @@ coverage/
 !apps/**/public/**/*.png
 backups/
 test-screenshots/
-apps/website/tsconfig.tsbuildinfo
 docs/screenshots/
+
+# Test artifacts
+playwright-report/
+test-results/
+*.tsbuildinfo
+
+# Generated types (Strapi etc.)
+apps/api/types/generated/
+
+# Stray PDFs (allow legitimate docs PDFs)
+*.pdf
+!docs/**/*.pdf
