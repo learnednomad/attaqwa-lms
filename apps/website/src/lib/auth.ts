@@ -57,10 +57,15 @@ export const auth = betterAuth({
     ...(process.env.BETTER_AUTH_BASE_URL
       ? [process.env.BETTER_AUTH_BASE_URL]
       : ["http://localhost:3001"]),
-    // Admin portal always needs access
-    ...(process.env.NEXT_PUBLIC_ADMIN_URL
-      ? [process.env.NEXT_PUBLIC_ADMIN_URL]
-      : ["http://localhost:3000"]),
+    // Admin portal always needs access.
+    // Read ADMIN_URL (runtime) before NEXT_PUBLIC_ADMIN_URL — the NEXT_PUBLIC_*
+    // variant is statically inlined at build time by Next.js, so if the build
+    // ran without that arg set, the fallback gets baked in permanently.
+    ...(process.env.ADMIN_URL
+      ? [process.env.ADMIN_URL]
+      : process.env.NEXT_PUBLIC_ADMIN_URL
+        ? [process.env.NEXT_PUBLIC_ADMIN_URL]
+        : ["http://localhost:3000"]),
     ...(process.env.NODE_ENV === "development"
       ? ["http://localhost:3003", "exp://", "exp://**", "exp://192.168.*.*:*/**"]
       : []),

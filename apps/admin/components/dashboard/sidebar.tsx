@@ -13,6 +13,7 @@ import {
   Clock,
   GraduationCap,
   Home,
+  Library,
   Shield,
   Users,
   X,
@@ -27,6 +28,7 @@ import { useAuth } from '@/lib/hooks/use-auth';
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home, roles: ['teacher', 'admin'] },
   { name: 'Courses', href: '/courses', icon: BookOpen, roles: ['teacher', 'admin'] },
+  { name: 'Library', href: '/library', icon: Library, roles: ['admin'] },
   { name: 'Users', href: '/students', icon: Users, roles: ['teacher', 'admin'] },
   { name: 'Analytics', href: '/analytics', icon: BarChart3, roles: ['teacher', 'admin'] },
   { name: 'Prayer Times', href: '/prayer-times', icon: Clock, roles: ['admin'] },
