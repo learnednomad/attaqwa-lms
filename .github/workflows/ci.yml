@@ -49,9 +49,11 @@ jobs:
         run: pnpm run type-check
 
       - name: Run tests (website)
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
         run: |
           cd apps/website
-          pnpm test:coverage
+          pnpm test --ci --maxWorkers=2
 
       - name: Upload test coverage
         if: always()
