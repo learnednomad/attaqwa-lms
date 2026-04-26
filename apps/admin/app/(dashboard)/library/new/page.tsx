@@ -38,8 +38,18 @@ export default function CreateLibraryResourcePage() {
         coverImageId = uploadedCover.id;
       }
 
+      // Strapi requires a slug on the library-resource content type. Generate
+      // one from the title with a timestamp suffix to keep it unique — mirrors
+      // the pattern in apps/admin/app/(dashboard)/courses/new/page.tsx.
+      const slug = values.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+        + '-' + Date.now().toString(36);
+
       const payload: LibraryResourcePayload = {
         title: values.title.trim(),
+        slug,
         description: values.description.trim() || undefined,
         category: values.category,
         language: values.language,
