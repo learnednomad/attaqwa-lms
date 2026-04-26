@@ -130,10 +130,13 @@ jobs:
       ADMIN_URL: http://localhost:3000
       AUTH_INTERNAL_URL: http://localhost:3003
       STRAPI_INTERNAL_URL: http://localhost:1337
-      # Test run mode. all-pages.spec.ts stays gated on E2E_FULL_STACK until
-      # its drifted ARIA/markup assertions are rewritten — critical-paths.spec
-      # carries the real coverage and self-gates per-test.
+      # Test run mode. all-pages.spec.ts and critical-paths.spec both run
+      # against the seeded Strapi + BetterAuth stack provisioned below.
+      E2E_FULL_STACK: '1'
       PLAYWRIGHT_SKIP_WEBSERVER: '1'
+      # Parallel Playwright workers trip BetterAuth's default sign-in rate
+      # limit (see apps/website/src/lib/auth.ts); disable it for CI only.
+      E2E_DISABLE_RATE_LIMIT: '1'
 
     steps:
       - name: Checkout code
