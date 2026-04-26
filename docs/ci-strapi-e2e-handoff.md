@@ -7,6 +7,7 @@
 ## Status updates (2026-04-26)
 
 - **Step 1 — DONE.** All-pages skip-gate retired in `cdb3425`; 28/28 pass against the seeded stack on CI in ~34s. Final fixes were two test-helper hardenings: `submitLogin` waits for hydration before clicking; the dashboard-redirect test gets a 30s timeout because Next.js 16 dev mode resolves `redirect()` through an RSC payload slower than a prod 307 hop.
+- **Step 3 — DONE (2026-04-26).** CI Strapi flipped to `NODE_ENV=production` + `STRAPI_PROXY=true`. Content seed (courses/lessons/quizzes) extracted from `apps/api/src/bootstrap.ts` into `apps/api/scripts/seed/seed-bootstrap.ts` (HTTP, uses `STRAPI_API_TOKEN`) plus shared `templates.ts` / `lesson-quiz-templates.ts`. `ci-bootstrap.ts` and `seed-complete.ts` now send `X-Forwarded-Proto: https` so admin login/register survive Strapi 5's secure-cookie enforcement over plain-HTTP localhost. **Local-dev caveat:** `pnpm --filter api dev` no longer auto-seeds — run `pnpm --filter api seed:bootstrap` once after first boot.
 - **Two production admin bugs surfaced + fixed during the dev→main promotion:**
   - PR [#26](https://github.com/learnednomad/attaqwa-lms/pull/26) — library new-resource form now generates a slug (was 400ing on Strapi's "slug must be defined" validator).
   - PR [#27](https://github.com/learnednomad/attaqwa-lms/pull/27) — `listLessons` filter switched from numeric `id` to `documentId` (Strapi 5 type mismatch was 500ing the lessons tab).
@@ -119,18 +120,9 @@ Outcome: ARIA landmarks added to `header.tsx` / `floating-header.tsx`, `E2E_DISA
 
 **Verification.** CP2 passes; test log shows `6 passed / 0 skipped` for critical-paths.
 
-### Step 3 — `NODE_ENV=production` for Strapi in CI (~2 hours)
+### Step 3 — `NODE_ENV=production` for Strapi in CI ✅ DONE (2026-04-26)
 
-**Why.** Today CI runs Strapi in `NODE_ENV=development` because `apps/api/src/bootstrap.ts:951` guards seed with `if (process.env.NODE_ENV === 'production') { skip }`. That means CI and prod diverge on one env bit.
-
-**What to do.**
-1. In `apps/api/src/bootstrap.ts`, split the file into two:
-   - Keep the permissions / public role config in `bootstrap.ts`.
-   - Move `seedStrapiAdmin()`, `seedCoursesIfEmpty()`, `seedLessonsIfEmpty()`, `seedQuizzesIfEmpty()`, and `runComprehensiveSeed()` logic into a new `apps/api/scripts/seed/seed-bootstrap.ts`.
-2. Add `"seed:bootstrap": "tsx scripts/seed/seed-bootstrap.ts"` to `apps/api/package.json`.
-3. In `.github/workflows/ci.yml`, change `NODE_ENV: development` on the Strapi start step to `NODE_ENV: production`. Add a new step after "Wait for Strapi" and before "Bootstrap Strapi admin + API token": `run: pnpm --filter api seed:bootstrap`.
-
-**Verification.** CI stays green with `NODE_ENV=production` on every service; `docker-compose.dev.yml` still self-seeds via the inline `init` container (unchanged).
+Outcome: `bootstrap.ts` trimmed to admin seed + permissions + token (always-on, prod-safe); content seed extracted to `apps/api/scripts/seed/seed-bootstrap.ts` (HTTP, idempotent, runs in CI as a dedicated step). CI workflow now sets `NODE_ENV: production` + `STRAPI_PROXY: 'true'`; `ci-bootstrap.ts` / `seed-complete.ts` send `X-Forwarded-Proto: https` so admin auth's secure-cookie check passes over plain-HTTP localhost. See PR for verification (33 passed / 1 self-skipped, same as Step 1 baseline).
 
 ### Step 4 — Reuse `build (api)` GHCR image in e2e (~3 hours, saves ~2 min/run)
 

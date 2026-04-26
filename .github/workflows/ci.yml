@@ -176,15 +176,21 @@ jobs:
       - name: Build api (Strapi)
         run: pnpm --filter api build
 
-      # Start Strapi in development mode so bootstrap.ts seeds 15 courses +
-      # super-admin (superadmin@attaqwa.org / SuperAdmin123!). Production mode
-      # skips seeding by design. The server itself still uses the built admin
-      # panel — no watch/rebuild penalty.
+      # Start Strapi in production mode for parity with prod deploys.
+      # Bootstrap (apps/api/src/bootstrap.ts) still seeds the super-admin,
+      # configures permissions, and mints a full-access token in any NODE_ENV.
+      # Content (courses/lessons/quizzes) is seeded by an explicit
+      # `pnpm --filter api seed:bootstrap` step further down — that script
+      # runs against the live HTTP API using STRAPI_API_TOKEN.
       - name: Start api (Strapi) in background
         env:
-          NODE_ENV: development
+          NODE_ENV: production
           HOST: 0.0.0.0
           PORT: '1337'
+          # Trust X-Forwarded-* on inbound requests so Strapi treats them as
+          # TLS-terminated upstream. Required for admin /register-admin and
+          # /login under plain-HTTP localhost while NODE_ENV=production.
+          STRAPI_PROXY: 'true'
         run: |
           nohup pnpm --filter api start > /tmp/strapi.log 2>&1 &
           echo $! > /tmp/strapi.pid
@@ -218,6 +224,12 @@ jobs:
           # Emit STRAPI_API_TOKEN only — JWT is short-lived and unused downstream.
           grep '^STRAPI_API_TOKEN=' /tmp/ci-bootstrap.out >> "$GITHUB_ENV"
           echo "Bootstrap OK ($(wc -l < /tmp/ci-bootstrap.out) lines)"
+
+      # Seed courses + lessons + quizzes via HTTP. Replaces the in-bootstrap
+      # template seed that was gated on `NODE_ENV !== 'production'`. Idempotent:
+      # short-circuits when each entity type already has rows.
+      - name: Seed Strapi content (courses, lessons, quizzes)
+        run: pnpm --filter api seed:bootstrap
 
       - name: Seed Strapi content (users, enrollments, achievements, ...)
         run: pnpm --filter api exec tsx scripts/seed/seed-complete.ts
