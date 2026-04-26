@@ -134,7 +134,7 @@ async function seedUsers() {
     console.log('✅ User seeding complete!');
     console.log('\n🔐 You can now log in with any of these accounts:\n');
     console.log('   Website: http://localhost:3003');
-    console.log('   Admin: http://localhost:3001');
+    console.log('   Admin: http://localhost:3000');
     console.log('   API: http://localhost:1337\n');
 
   } catch (error: any) {

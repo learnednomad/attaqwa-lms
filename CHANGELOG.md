@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added - 2026-04-24
+
+#### CI: full-stack E2E — Strapi + admin + website (PR #25, branch `fix/ci-strapi-e2e`)
+- `.github/workflows/ci.yml` (`e2e-tests` job) — builds and starts api (Strapi, `NODE_ENV=development` so `apps/api/src/bootstrap.ts` seeds 15 courses + super-admin), admin (:3000), and website (:3003) alongside the existing Postgres service container. Adds health gates on `/_health`, `/` (website), and `/` (admin accepts 200/302/307 to handle the middleware redirect). Captures `/tmp/{website,admin,strapi,ci-bootstrap}.{log,out,err}` as a `service-logs` artifact on failure. Job timeout extended from 25 → 35 min to absorb the larger build graph.
+- `apps/api/scripts/seed/ci-bootstrap.ts` (new; `pnpm --filter api seed:ci-bootstrap`) — logs in as the bootstrap-seeded `superadmin@attaqwa.org` super-admin via `/admin/login`, deletes any stale `ci-e2e-full-access` API token, mints a fresh full-access non-expiring token via `/admin/api-tokens`, and emits `STRAPI_ADMIN_JWT=…` / `STRAPI_API_TOKEN=…` on stdout (log chatter goes to stderr). The workflow greps only the `STRAPI_API_TOKEN=` line into `$GITHUB_ENV` so subsequent website/admin builds pick it up.
+- `apps/api/scripts/seed/seed-complete.ts:125` — Phase 0 admin creds now default to `superadmin@attaqwa.org` / `SuperAdmin123!` (matching `apps/api/src/bootstrap.ts:DEV_SEED_ADMIN_DEFAULTS`) and accept `STRAPI_ADMIN_EMAIL` / `SEED_ADMIN_EMAIL` overrides. Eliminates the register-400 / login-400 deadlock that happened when the script's hardcoded `admin@attaqwa.local` collided with the idempotent bootstrap seeder.
+- `apps/website/next.config.ts:39` — CSP `connect-src` now accepts `NEXT_PUBLIC_API_URL` when it matches `^https?://localhost(:\d+)?$`. Previously the localhost allowance was gated on `NODE_ENV === 'development'`, so production-mode E2E (`next start`) against a local Strapi was blocked with `Refused to connect to 'http://localhost:1337/api/v1/courses'`.
+- `apps/website/src/app/(main)/education/browse/page.tsx:319-327` — added `data-testid="course-card"` to the course grid wrapper `<div>`, giving E2E a stable selector that survives class/markup churn.
+- `apps/website/tests/e2e/critical-paths.spec.ts`:
+  - `loginAsAdmin` now navigates to `/login` (admin's actual page; `/admin/login` bounces through the middleware redirect) and waits on `**/dashboard` (the real post-login destination set by `apps/admin/lib/hooks/use-auth.ts:30`), not `**/admin`.
+  - CP1 / CP2 now `Promise.race` a `course-card` visible-wait against an empty-state visible-wait before deciding to skip — the browse page is client-rendered via React Query and `locator.count()` is 0 at DOMready.
+  - CP3 rewritten end-to-end: direct-navigates to `/courses` and `/courses/new` (the sidebar is hydrated client-side from the BetterAuth session and was racing the `getByRole('link', { name: /Courses/i })` assertion), uses `getByLabel('Course Title')` instead of brittle `input[name="title"]`, and clicks the real `Create Course` submit button (was `Save|Submit`).
+
+#### CI result on this PR
+- 10/10 PR-blocking checks green on the first run: `validate` 6s, `Code Quality & Type Safety` 59s, `migrations` 53s, `Analyze Bundle Sizes` 2m41s, `Build Validation` 2m43s, `build (init)` 2m40s, `build (admin)` 3m59s, `build (website)` 4m15s, `E2E Tests` 4m43s, `build (api)` 6m51s.
+- `E2E Tests` breakdown: 34 tests, 5 passed (CP1, CP3, CP4, CP5, System Health Check), 29 skipped (CP2 quiz UI isn't implemented so it self-skips per-test; the entire `all-pages.spec.ts` sweep stays gated on `E2E_FULL_STACK=1` — see Next Steps below).
+
+### Next Steps
+
+The green CI on `fix/ci-strapi-e2e` unblocks further work. Tracked items, ordered by ROI:
+
+1. **Rewrite `apps/website/tests/e2e/all-pages.spec.ts` against current markup (~2 days).** 18 of 28 tests fail with `locator('nav[aria-label]') Expected 1 Received 0` and similar — the ARIA / role assertions were written against an older header and the page copy has drifted. The suite is gated on `E2E_FULL_STACK=1`; once it's green, set that env in `.github/workflows/ci.yml` `e2e-tests` job env and the full 28-test sweep runs per PR. Local verification loop: start the stack with `docker compose -f docker-compose.dev.yml up -d --wait`, then `E2E_FULL_STACK=1 PLAYWRIGHT_SKIP_WEBSERVER=1 ADMIN_URL=http://localhost:3000 pnpm --filter website exec playwright test tests/e2e/all-pages.spec.ts`.
+2. **Implement the student quiz UI so CP2 can drop its self-skip (~1 day).** `apps/website/src/app/(main)/education/courses/[id]/page.tsx` doesn't expose a `Start Quiz` button today — the quiz journey is present in the data model (24 quizzes seeded, linked to lessons) but not rendered. When the course detail page gains a `Start Quiz` affordance + a `/education/.../quiz/[id]` route, CP2 will pass without any test edits.
+3. **Switch `strapi start` back to `NODE_ENV=production` for CI (~2 hours).** Today CI runs Strapi in `development` so `bootstrap.ts` seeds the 15 courses + super-admin; prod skips seeding by design. Factor the seed block out of `bootstrap.ts` into an explicit `pnpm --filter api seed:bootstrap` script that CI runs after `strapi start` comes up. Matches prod wiring exactly and removes one meaningful dev/CI drift.
+4. **Bake a GHCR CI image for Strapi (~3 hours, cuts ~2 min off every E2E run).** `build (api)` takes 6m51s in `docker.yml` already; we're building the same artifact twice per PR (once for the image, once inline in the e2e-tests job). Have `e2e-tests` `needs: [build]` on the docker workflow and `docker run` the pushed image instead of `pnpm --filter api start`. Saves build time and de-dupes the artifact.
+5. **Rewrite the 5 drifted Jest suites (~2–4 hours each).** `EducationContentCard`, `AgeTierFilter`, `PrayerTimeCard`, `islamic-features`, `IslamicDashboard` are already deleted per `docs/ci-hardening-handoff.md` — CP already covers the same journeys in E2E. Re-add narrow unit tests only where CP can't catch a specific regression (e.g. pure utility functions or hook edge cases).
+6. **Unify website port to 3003 in prod compose (~30 min).** `docker-compose.yml` still publishes website on 3001 in prod; dev + CI + Playwright all agree on 3003. Changing `PORT`, the `"3001:3001"` mapping, the admin's `AUTH_INTERNAL_URL`, and the Coolify service config unifies the whole stack — see `docs/ci-hardening-handoff.md` §2.3.
+7. **Silence the ~430 React Compiler warnings (~4–6 hours).** Not a CI blocker (warnings, not errors) but drowns out real lint signal. Focus on `set-state-in-effect`, `cannot access variable before it is declared`, `cannot call impure function during render`.
+
 ### Added - 2026-04-23
 
 #### Email notifications for inquiry forms (PR #11, #12)

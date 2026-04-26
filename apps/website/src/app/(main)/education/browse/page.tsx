@@ -317,7 +317,11 @@ export default function EducationBrowsePage() {
                 }
               >
                 {sortedCourses.map((content) => (
-                  <div key={content.id} className={viewMode === 'list' ? 'w-full' : ''}>
+                  <div
+                    key={content.id}
+                    data-testid="course-card"
+                    className={viewMode === 'list' ? 'w-full' : ''}
+                  >
                     <EducationContentCard
                       content={content}
                       onClick={(content) => {

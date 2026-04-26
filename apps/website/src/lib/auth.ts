@@ -10,7 +10,7 @@ const pool = new Pool({
 });
 
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_BASE_URL || "http://localhost:3001",
+  baseURL: process.env.BETTER_AUTH_BASE_URL || "http://localhost:3003",
   database: pool,
   /**
    * Custom user fields. `requiresPasswordChange` is set to `true` when an
@@ -52,11 +52,18 @@ export const auth = betterAuth({
     expiresIn: 7 * 24 * 60 * 60, // 7 days
     updateAge: 24 * 60 * 60, // refresh every 1 day
   },
+  // E2E escape hatch: Playwright can run several login attempts in parallel
+  // against a single localhost IP, which trips the default sign-in limiter
+  // (10/min/IP) and produces spurious "Too many requests" failures. Gate the
+  // disable on an explicit env flag so it never weakens real deployments.
+  rateLimit: {
+    enabled: process.env.E2E_DISABLE_RATE_LIMIT !== '1',
+  },
   trustedOrigins: [
     "AttaqwaMasjid://",
     ...(process.env.BETTER_AUTH_BASE_URL
       ? [process.env.BETTER_AUTH_BASE_URL]
-      : ["http://localhost:3001"]),
+      : ["http://localhost:3003"]),
     // Admin portal always needs access.
     // Read ADMIN_URL (runtime) before NEXT_PUBLIC_ADMIN_URL — the NEXT_PUBLIC_*
     // variant is statically inlined at build time by Next.js, so if the build
@@ -67,7 +74,7 @@ export const auth = betterAuth({
         ? [process.env.NEXT_PUBLIC_ADMIN_URL]
         : ["http://localhost:3000"]),
     ...(process.env.NODE_ENV === "development"
-      ? ["http://localhost:3003", "exp://", "exp://**", "exp://192.168.*.*:*/**"]
+      ? ["exp://", "exp://**", "exp://192.168.*.*:*/**"]
       : []),
   ],
   plugins: [
