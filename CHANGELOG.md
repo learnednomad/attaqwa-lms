@@ -9,13 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed - 2026-04-26
 
-#### CI: Strapi runs `NODE_ENV=production` for prod parity (Step 3 of `docs/ci-strapi-e2e-handoff.md`)
+#### CI: Strapi runs `NODE_ENV=production` for prod parity (PR [#30](https://github.com/learnednomad/attaqwa-lms/pull/30), merge commit `0ca6b96`, Step 3 of `docs/ci-strapi-e2e-handoff.md`)
 - `.github/workflows/ci.yml` (`e2e-tests`) — `Start api (Strapi)` flips `NODE_ENV: development` → `production` and adds `STRAPI_PROXY: 'true'` so Koa trusts forwarded proto/host headers (otherwise admin login fails with `Cannot send secure cookie over unencrypted connection` because Strapi 5 forces `Secure` cookies in production). New step `Seed Strapi content (courses, lessons, quizzes)` runs `pnpm --filter api seed:bootstrap` after the existing `Bootstrap Strapi admin + API token` step and before `Seed Strapi content (users, ...)`.
 - `apps/api/scripts/seed/seed-bootstrap.ts` (new; `pnpm --filter api seed:bootstrap`) — HTTP-based content seeder using `STRAPI_API_TOKEN`. Posts 15 courses → 60 lessons (`/api/v1/...`, versioned per `apps/api/src/api/<ct>/routes/<ct>.ts:prefix: '/v1'`) → 15 quizzes (one per assessment lesson). Idempotent: each phase short-circuits on existing rows. Replaces the in-bootstrap template seed that was gated on `NODE_ENV !== 'production'`.
 - `apps/api/scripts/seed/templates.ts` + `apps/api/scripts/seed/lesson-quiz-templates.ts` (new) — pure-data extraction of the 15-course catalog, lesson-template generator, and quiz-question/template generators. Previously inlined in `apps/api/src/bootstrap.ts:9-698`.
 - `apps/api/src/bootstrap.ts` — drops the moved-out template functions and the production-guarded content-seed block (now ~750 LOC lighter). Keeps admin seed (idempotent, prod-safe via `SEED_ADMIN_EMAIL`/`SEED_ADMIN_PASSWORD`), permissions config, and full-access API token creation — these still run on every boot in any `NODE_ENV`.
 - `apps/api/scripts/seed/{ci-bootstrap,seed-complete}.ts` — base `fetch` helpers add `X-Forwarded-Proto: https` + `X-Forwarded-Host` so admin login/register over plain-HTTP localhost survives `NODE_ENV=production`. Pairs with the workflow's new `STRAPI_PROXY=true`. Mirrors what Caddy/Traefik do in real prod.
 - `apps/api/package.json` — new `seed:bootstrap` script.
+
+**CI verification:** 10/10 PR-blocking checks green; `E2E Tests` reports 33 passed / 1 self-skipped in 38.1s (seed:bootstrap step finishes in 4.4s). Matches the Step 1 baseline.
 
 **Local-dev impact:** `pnpm --filter api dev` (NODE_ENV=development) no longer auto-seeds 15 courses on first boot. Run `pnpm --filter api seed:bootstrap` once after the first Strapi start (or use `docker compose -f docker-compose.dev.yml up -d`, which still wires its own init container).
 
