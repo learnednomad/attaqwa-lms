@@ -234,7 +234,10 @@ function buildLessonListParams(params: ListLessonsParams): URLSearchParams {
   query.set('pagination[pageSize]', String(params.pageSize ?? 25));
 
   if (params.courseId) {
-    query.set('filters[course][id][$eq]', String(params.courseId));
+    // courseId is the Strapi 5 documentId (string) sourced from /courses/[id]/...
+    // route params, not the numeric primary key. Filtering on `id` 500s in
+    // Strapi when the value can't cast to integer.
+    query.set('filters[course][documentId][$eq]', String(params.courseId));
   }
   if (params.type) {
     query.set('filters[lesson_type][$eq]', params.type);
