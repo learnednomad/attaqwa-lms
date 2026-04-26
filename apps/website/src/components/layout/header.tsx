@@ -31,7 +31,7 @@ export function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav aria-label="Main navigation" className="hidden md:flex items-center gap-6">
             {navigation.map((item) =>
               item.submenu ? (
                 <DropdownMenu key={item.name}>
@@ -76,6 +76,8 @@ export function Header() {
             variant="ghost"
             size="sm"
             className="md:hidden"
+            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={isMenuOpen}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? (
@@ -89,7 +91,7 @@ export function Header() {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="border-t bg-white pb-4 md:hidden">
-            <nav className="flex flex-col gap-1 pt-4">
+            <nav aria-label="Mobile navigation" className="flex flex-col gap-1 pt-4">
               {navigation.map((item) =>
                 item.submenu ? (
                   <div key={item.name} className="space-y-1">

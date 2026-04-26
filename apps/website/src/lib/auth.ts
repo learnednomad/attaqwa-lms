@@ -52,6 +52,13 @@ export const auth = betterAuth({
     expiresIn: 7 * 24 * 60 * 60, // 7 days
     updateAge: 24 * 60 * 60, // refresh every 1 day
   },
+  // E2E escape hatch: Playwright can run several login attempts in parallel
+  // against a single localhost IP, which trips the default sign-in limiter
+  // (10/min/IP) and produces spurious "Too many requests" failures. Gate the
+  // disable on an explicit env flag so it never weakens real deployments.
+  rateLimit: {
+    enabled: process.env.E2E_DISABLE_RATE_LIMIT !== '1',
+  },
   trustedOrigins: [
     "AttaqwaMasjid://",
     ...(process.env.BETTER_AUTH_BASE_URL

@@ -156,6 +156,7 @@ export function FloatingHeader() {
         )}
       >
         <nav
+          aria-label="Main navigation"
           className={cn(
             'flex items-center gap-1 px-2 py-1.5 rounded-lg transition-colors duration-300',
             pastHero
@@ -233,6 +234,7 @@ export function FloatingHeader() {
             : 'bg-white/10 backdrop-blur-md hover:bg-white/15'
         )}
         aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+        aria-expanded={isMenuOpen}
       >
         {isMenuOpen ? (
           <X className={cn('h-5 w-5', pastHero ? 'text-gray-700' : 'text-white')} />
@@ -249,7 +251,7 @@ export function FloatingHeader() {
             ? 'bg-white border border-gray-200'
             : 'bg-white/10 backdrop-blur-sm border border-white/20'
         )}>
-            <nav className="flex flex-col gap-0.5">
+            <nav aria-label="Mobile navigation" className="flex flex-col gap-0.5">
               {navigation.map((item) =>
                 item.submenu ? (
                   <div key={item.name} className="space-y-0.5">
