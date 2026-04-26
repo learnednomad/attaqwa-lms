@@ -62,7 +62,16 @@ async function api(path: string, opts: RequestInit = {}) {
   const url = `${STRAPI_URL}${path}`;
   const res = await fetch(url, {
     ...opts,
-    headers: { 'Content-Type': 'application/json', ...opts.headers },
+    headers: {
+      'Content-Type': 'application/json',
+      // Strapi 5 admin auth requires Secure cookies under NODE_ENV=production.
+      // Pair with `STRAPI_PROXY=true` server-side so Koa trusts these
+      // forwarded headers and treats the request as TLS-terminated upstream.
+      // Mirrors what Caddy/Traefik would set in prod.
+      'X-Forwarded-Proto': 'https',
+      'X-Forwarded-Host': new URL(STRAPI_URL).host,
+      ...opts.headers,
+    },
   });
   const body = await res.json().catch(() => null);
   return { ok: res.ok, status: res.status, body };

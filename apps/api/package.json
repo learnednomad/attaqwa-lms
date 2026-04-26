@@ -19,6 +19,7 @@
     "seed:comprehensive": "tsx scripts/seed/seed-comprehensive.ts",
     "seed:complete": "tsx scripts/seed/seed-complete.ts",
     "seed:ci-bootstrap": "tsx scripts/seed/ci-bootstrap.ts",
+    "seed:bootstrap": "tsx scripts/seed/seed-bootstrap.ts",
     "seed:iqamah": "tsx scripts/seed/seed-iqamah.ts",
     "seed:courses": "tsx scripts/seed/seed-courses.ts",
     "seed:users": "tsx scripts/seed/seed-users.ts",

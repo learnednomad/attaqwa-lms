@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed - 2026-04-26
+
+#### CI: Strapi runs `NODE_ENV=production` for prod parity (PR [#30](https://github.com/learnednomad/attaqwa-lms/pull/30), merge commit `0ca6b96`, Step 3 of `docs/ci-strapi-e2e-handoff.md`)
+- `.github/workflows/ci.yml` (`e2e-tests`) — `Start api (Strapi)` flips `NODE_ENV: development` → `production` and adds `STRAPI_PROXY: 'true'` so Koa trusts forwarded proto/host headers (otherwise admin login fails with `Cannot send secure cookie over unencrypted connection` because Strapi 5 forces `Secure` cookies in production). New step `Seed Strapi content (courses, lessons, quizzes)` runs `pnpm --filter api seed:bootstrap` after the existing `Bootstrap Strapi admin + API token` step and before `Seed Strapi content (users, ...)`.
+- `apps/api/scripts/seed/seed-bootstrap.ts` (new; `pnpm --filter api seed:bootstrap`) — HTTP-based content seeder using `STRAPI_API_TOKEN`. Posts 15 courses → 60 lessons (`/api/v1/...`, versioned per `apps/api/src/api/<ct>/routes/<ct>.ts:prefix: '/v1'`) → 15 quizzes (one per assessment lesson). Idempotent: each phase short-circuits on existing rows. Replaces the in-bootstrap template seed that was gated on `NODE_ENV !== 'production'`.
+- `apps/api/scripts/seed/templates.ts` + `apps/api/scripts/seed/lesson-quiz-templates.ts` (new) — pure-data extraction of the 15-course catalog, lesson-template generator, and quiz-question/template generators. Previously inlined in `apps/api/src/bootstrap.ts:9-698`.
+- `apps/api/src/bootstrap.ts` — drops the moved-out template functions and the production-guarded content-seed block (now ~750 LOC lighter). Keeps admin seed (idempotent, prod-safe via `SEED_ADMIN_EMAIL`/`SEED_ADMIN_PASSWORD`), permissions config, and full-access API token creation — these still run on every boot in any `NODE_ENV`.
+- `apps/api/scripts/seed/{ci-bootstrap,seed-complete}.ts` — base `fetch` helpers add `X-Forwarded-Proto: https` + `X-Forwarded-Host` so admin login/register over plain-HTTP localhost survives `NODE_ENV=production`. Pairs with the workflow's new `STRAPI_PROXY=true`. Mirrors what Caddy/Traefik do in real prod.
+- `apps/api/package.json` — new `seed:bootstrap` script.
+
+**CI verification:** 10/10 PR-blocking checks green; `E2E Tests` reports 33 passed / 1 self-skipped in 38.1s (seed:bootstrap step finishes in 4.4s). Matches the Step 1 baseline.
+
+**Local-dev impact:** `pnpm --filter api dev` (NODE_ENV=development) no longer auto-seeds 15 courses on first boot. Run `pnpm --filter api seed:bootstrap` once after the first Strapi start (or use `docker compose -f docker-compose.dev.yml up -d`, which still wires its own init container).
+
+### Added - 2026-04-26
+
+#### CI: all-pages.spec.ts skip-gate retired — Step 1 of CI Strapi-in-E2E handoff (PR #25, commit `cdb3425`)
+- `apps/website/src/components/layout/{header,floating-header}.tsx` — `<nav>` elements get `aria-label="Main navigation"` / `"Mobile navigation"`; mobile menu button gets `aria-expanded` reflecting open state. Lets the all-pages spec target landmarks via `getByRole` instead of brittle CSS selectors.
+- `apps/website/src/lib/auth.ts` — Better Auth signin limiter (10/min/IP) trips Playwright's parallel workers from a single localhost; gate the disable on `E2E_DISABLE_RATE_LIMIT=1` so prod stays protected.
+- `.github/workflows/ci.yml` — flip `E2E_FULL_STACK=1` and `E2E_DISABLE_RATE_LIMIT=1`, drop the `all-pages.spec.ts` skip gate. CI now runs 28/28 of all-pages.spec.ts against the real seeded stack in ~34s.
+- `apps/website/tests/e2e/all-pages.spec.ts` — rewrite to ARIA-landmark assertions; `submitLogin` waits for hydration (networkidle) before clicking (else Playwright fires the click before React attaches `onSubmit` and the form falls back to a default GET that clears inputs); dashboard-redirect test gets a 30s timeout + `waitForLoadState` since Next.js 16 dev mode resolves `redirect()` through an RSC payload that's slower than a prod 307 hop.
+- `apps/website/test-results/.last-run.json` untracked (was committed before `test-results/` landed in `.gitignore`).
+
+#### Admin: production bug fixes surfaced during dev→main promotion (PRs #26, #27)
+- `apps/admin/app/(dashboard)/library/new/page.tsx` (PR #26) — generate a `slug` from title + timestamp before POSTing to `/api/v1/library-resources`. Strapi's library-resource content type marks `slug` as `required: true`; the form was never setting it, so every submission 400'd with "slug must be defined" and surfaced as a generic "Could not save resource" / "Upload failed" in the UI. Mirrors the slug-from-title pattern already used in `apps/admin/app/(dashboard)/courses/new/page.tsx`.
+- `apps/admin/lib/api/strapi-client.ts` (PR #27) — `listLessons` now filters by `filters[course][documentId][$eq]` instead of `filters[course][id][$eq]`. The URL param `[id]` from `/courses/[id]/lessons` is the Strapi 5 documentId string, not the numeric primary key, so the previous `id` filter caused an integer-cast 500 inside Strapi's SQL builder. Surfaced as `[CourseLessonsOutline] fetch failed → ERR_BAD_RESPONSE 500` on the deployed admin once the production `STRAPI_API_TOKEN` was set.
+
+#### Promotion: development → main (PR #28, merge commit `7edc3b0`)
+- 25 commits from `development` promoted to `main`. Resolution merge `1158e6c` took development's version for all 7 conflict files (CI workflow, jest config, playwright config, auth.ts, both e2e specs, library/new/page.tsx) since main had no substantive content not already reachable from dev — the conflicts arose from PR #23 landing the library feature on main separately while dev had the same change plus subsequent iterations.
+
+#### Operational: production STRAPI_API_TOKEN minted
+- Coolify production service `attaqwa-lms` (uuid `s40wwgww4oc8cc0gks08ko4g`) had `STRAPI_API_TOKEN=""` since deployment, root cause of three admin bugs Labibah reported (course creation 500, iqamah save fail, library upload 403 — see iMessage 2026-04-25). Mitigated by minting a full-access token in Strapi admin UI at `https://attaqwa-api.learnednomad.com/admin` and pasting into the Coolify env, then restarting the service. CI was never affected because `apps/api/scripts/seed/ci-bootstrap.ts` mints a fresh token on every run.
+
 ### Added - 2026-04-24
 
 #### CI: full-stack E2E — Strapi + admin + website (PR #25, branch `fix/ci-strapi-e2e`)

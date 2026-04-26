@@ -26,7 +26,18 @@ interface Json {
 async function http(path: string, init: RequestInit = {}): Promise<{ ok: boolean; status: number; body: Json | null }> {
   const res = await fetch(`${STRAPI_URL}${path}`, {
     ...init,
-    headers: { 'Content-Type': 'application/json', ...(init.headers || {}) },
+    headers: {
+      'Content-Type': 'application/json',
+      // Strapi 5 admin auth issues `Secure` cookies when NODE_ENV=production.
+      // We hit Strapi over plain HTTP in CI, so without these headers Koa
+      // refuses ("Cannot send secure cookie over unencrypted connection").
+      // Combined with `STRAPI_PROXY=true` (config/server.ts), Koa trusts
+      // these forwarded headers and treats the request as TLS-terminated
+      // upstream. Mirrors what Caddy/Traefik would set in prod.
+      'X-Forwarded-Proto': 'https',
+      'X-Forwarded-Host': new URL(STRAPI_URL).host,
+      ...(init.headers || {}),
+    },
   });
   const body = (await res.json().catch(() => null)) as Json | null;
   return { ok: res.ok, status: res.status, body };
