@@ -333,14 +333,76 @@ NEXT_PUBLIC_API_URL=https://yourdomain.com
 
 ## Coolify / VPS Deployment
 
-If using Coolify or a similar PaaS:
+The production deployment lives on Coolify under project **attaqwa-masjid**, service **attaqwa-lms** (uuid `s40wwgww4oc8cc0gks08ko4g`).
 
-1. Set the Docker Compose file to `docker-compose.yml` (base)
-2. Add `docker-compose.prod.yml` as override
-3. Set all `REQUIRED` env vars in Coolify's environment settings
-4. Ensure `STRAPI_URL=http://api:1337` is set (critical for website BFF)
-5. Set `BETTER_AUTH_BASE_URL` to your public domain
-6. Coolify handles TLS — you may not need the Caddy service
+### Compose source of truth
+
+Coolify stores its compose in a database field (`docker_compose_raw`), separate from this repo. To keep them in sync we maintain **`docker-compose.coolify.yml`** at the repo root — it mirrors what's currently deployed and serves as the canonical recovery artifact.
+
+**Do NOT use `docker-compose.yml` + `docker-compose.prod.yml` for Coolify** — that pair is for self-hosted Caddy deployments. Coolify uses Traefik with a different label syntax.
+
+### Setting up a fresh Coolify service
+
+1. Create a Docker Compose service in Coolify's UI.
+2. Paste the contents of `docker-compose.coolify.yml` into the compose editor.
+3. Set all `REQUIRED` env vars (see §5 above) plus the MinIO/S3 vars:
+   - `MINIO_ROOT_USER`, `MINIO_ROOT_PASSWORD`
+   - `S3_ACCESS_KEY_ID`, `S3_ACCESS_SECRET` (typically equal to the MinIO root credentials)
+   - `S3_ENDPOINT=http://minio:9000` (internal)
+   - `S3_BUCKET=uploads-public`
+   - `S3_BASE_URL=https://attaqwa-s3.learnednomad.com/uploads-public` (public)
+   - `STRAPI_API_TOKEN` (mint in Strapi admin, paste here — empty value causes admin bugs)
+4. Configure DNS: both `taqwa-minio.learnednomad.com` AND `attaqwa-s3.learnednomad.com` must resolve to the Coolify host (`31.97.135.102`).
+5. Deploy. Wait ~60-120s for Let's Encrypt to issue certs on both new FQDNs.
+
+### MinIO Coolify recovery
+
+If the MinIO routes break (admin library shows broken thumbnails, or `https://taqwa-minio.learnednomad.com` returns 503):
+
+```bash
+# 1. Pull the working compose
+cat docker-compose.coolify.yml | base64 > /tmp/compose.b64
+
+# 2. Build payload + push (token from your Coolify profile)
+TOKEN=<your-coolify-api-token>
+python3 -c "
+import json, base64
+yaml = open('docker-compose.coolify.yml','rb').read()
+json.dump({'docker_compose_raw': base64.b64encode(yaml).decode()}, open('/tmp/body.json','w'))
+"
+curl -X PATCH https://coolify.learnednomad.com/api/v1/services/s40wwgww4oc8cc0gks08ko4g \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d @/tmp/body.json
+
+# 3. Trigger redeploy
+curl "https://coolify.learnednomad.com/api/v1/deploy?uuid=s40wwgww4oc8cc0gks08ko4g&force=false" \
+  -H "Authorization: Bearer $TOKEN"
+
+# 4. Verify (wait ~120s for LE certs first)
+curl -sSI https://taqwa-minio.learnednomad.com/                                # console
+curl -sS  'https://attaqwa-s3.learnednomad.com/uploads-public/?list-type=2'    # S3 list
+```
+
+Both should return HTTP 200 with valid Let's Encrypt certs and `server: MinIO`. The admin library will start rendering thumbnails immediately after.
+
+### Why MinIO needs special handling on Coolify
+
+Coolify's auto-label generator has a MinIO-specific code path that silently emits **zero Traefik labels** unless `MINIO_BROWSER_REDIRECT_URL` and `MINIO_SERVER_URL` are both set. And by default it only generates a router for the FQDN port encoded in `SERVICE_FQDN_MINIO_*` — so the second router (S3 API on port 9000 at `attaqwa-s3.learnednomad.com`) must be wired manually via raw Traefik labels. Both are present in `docker-compose.coolify.yml`. See the inline comment in that file for the full diagnosis.
+
+### Updating the Coolify compose
+
+Whenever you change service config in the Coolify UI (env vars, image tags, labels) and want to persist it in the repo:
+
+```bash
+TOKEN=<your-coolify-api-token>
+curl -sS https://coolify.learnednomad.com/api/v1/services/s40wwgww4oc8cc0gks08ko4g \
+  -H "Authorization: Bearer $TOKEN" \
+  | python3 -c "import json,sys; print(json.load(sys.stdin)['data']['docker_compose_raw'])" \
+  > docker-compose.coolify.yml.new
+
+diff docker-compose.coolify.yml docker-compose.coolify.yml.new
+# Review, then replace + commit
+```
 
 ## Troubleshooting
 

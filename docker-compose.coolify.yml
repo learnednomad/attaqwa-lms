@@ -1,0 +1,274 @@
+# =============================================================================
+# Coolify Production Compose — Source of Truth
+# =============================================================================
+# This file mirrors the docker_compose_raw stored in Coolify for the
+# attaqwa-lms service (uuid s40wwgww4oc8cc0gks08ko4g) on
+# https://coolify.learnednomad.com.
+#
+# WHY THIS FILE EXISTS:
+# Coolify's docker_compose_raw lives in Coolify's database, not in git.
+# If the service is ever recreated, re-templated, or restored from a Coolify
+# backup that predates the MinIO Traefik fixes (2026-04-27), all routing
+# breaks. This file lets us re-paste the working compose in seconds.
+#
+# WHAT MAKES IT DIFFERENT FROM docker-compose.yml:
+#   1. Two explicit Traefik routers on the minio service:
+#      - minio-console → Host(`taqwa-minio.learnednomad.com`) → :9001
+#      - minio-s3      → Host(`attaqwa-s3.learnednomad.com`)  → :9000
+#   2. Two MinIO env vars that unblock Coolify's auto-label generator:
+#      - MINIO_BROWSER_REDIRECT_URL (public console URL)
+#      - MINIO_SERVER_URL (internal S3 URL)
+#   3. `expose:` instead of `ports:` (Traefik routes via the container,
+#      Coolify forbids host port mapping for sub-apps).
+#   4. SERVICE_FQDN_MINIO_9001 magic var so Coolify still tracks the FQDN.
+#
+# IF EVER RESTORING:
+#   1. Open the Coolify service compose editor (UI or via PATCH /api/v1/services/{uuid}).
+#   2. Replace docker_compose_raw with the contents of this file (base64
+#      encode for the API).
+#   3. Trigger a redeploy. Wait ~60-120s for LE certs on both FQDNs.
+#   4. Verify per docs/OPERATIONS.md → "MinIO Coolify recovery".
+#
+# DO NOT use this file for `docker compose up -d` locally — it has hardcoded
+# production hostnames. Use docker-compose.dev.yml for local development and
+# docker-compose.yml + docker-compose.prod.yml for self-hosted (non-Coolify)
+# production behind Caddy.
+#
+# Last synced from live Coolify: 2026-04-27 ~03:32 EDT
+# =============================================================================
+services:
+  postgres:
+    image: 'pgvector/pgvector:pg16'
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: attaqwa_lms
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
+    volumes:
+      - 'postgres_data:/var/lib/postgresql/data'
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'pg_isready -U postgres'
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  redis:
+    image: 'redis:7-alpine'
+    restart: unless-stopped
+    command: 'redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru --appendonly yes --requirepass ${REDIS_PASSWORD}'
+    volumes:
+      - 'redis_data:/data'
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - '-a'
+        - '${REDIS_PASSWORD}'
+        - ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  minio:
+    image: 'minio/minio:RELEASE.2025-09-07T16-13-09Z'
+    restart: unless-stopped
+    command: 'server /data --console-address ":9001"'
+    environment:
+      SERVICE_FQDN_MINIO_9001: 'https://taqwa-minio.learnednomad.com'
+      MINIO_ROOT_USER: '${MINIO_ROOT_USER}'
+      MINIO_ROOT_PASSWORD: '${MINIO_ROOT_PASSWORD}'
+      MINIO_BROWSER_REDIRECT_URL: 'https://taqwa-minio.learnednomad.com'
+      MINIO_SERVER_URL: 'http://minio:9000'
+    expose:
+      - '9000'
+      - '9001'
+    volumes:
+      - 'minio_data:/data'
+    labels:
+      - traefik.enable=true
+      - 'traefik.http.routers.minio-console.rule=Host(`taqwa-minio.learnednomad.com`)'
+      - traefik.http.routers.minio-console.entryPoints=https
+      - traefik.http.routers.minio-console.tls=true
+      - traefik.http.routers.minio-console.tls.certresolver=letsencrypt
+      - traefik.http.routers.minio-console.service=minio-console
+      - traefik.http.services.minio-console.loadbalancer.server.port=9001
+      - 'traefik.http.routers.minio-s3.rule=Host(`attaqwa-s3.learnednomad.com`)'
+      - traefik.http.routers.minio-s3.entryPoints=https
+      - traefik.http.routers.minio-s3.tls=true
+      - traefik.http.routers.minio-s3.tls.certresolver=letsencrypt
+      - traefik.http.routers.minio-s3.service=minio-s3
+      - traefik.http.services.minio-s3.loadbalancer.server.port=9000
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - '-f'
+        - 'http://localhost:9000/minio/health/live'
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+  minio-init:
+    image: 'minio/mc:RELEASE.2025-08-13T08-35-41Z'
+    restart: 'no'
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: "sh -c \"mc alias set attaqwa http://minio:9000 $${MINIO_ROOT_USER} $${MINIO_ROOT_PASSWORD} &&\n       mc mb --ignore-existing attaqwa/$${S3_BUCKET} &&\n       mc anonymous set download attaqwa/$${S3_BUCKET} &&\n       echo 'MinIO bucket ready'\"\n"
+    environment:
+      MINIO_ROOT_USER: '${MINIO_ROOT_USER}'
+      MINIO_ROOT_PASSWORD: '${MINIO_ROOT_PASSWORD}'
+      S3_BUCKET: '${S3_BUCKET}'
+  init:
+    image: 'ghcr.io/learnednomad/attaqwa-lms/init:main'
+    restart: 'no'
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: '${DATABASE_URL}'
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: postgres
+      BETTER_AUTH_SECRET: '${BETTER_AUTH_SECRET}'
+      BETTER_AUTH_BASE_URL: '${BETTER_AUTH_BASE_URL}'
+    depends_on:
+      postgres:
+        condition: service_healthy
+  api:
+    image: 'ghcr.io/learnednomad/attaqwa-lms/api:main'
+    restart: unless-stopped
+    environment:
+      HOST: 0.0.0.0
+      PORT: 1337
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: attaqwa_lms
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: '${POSTGRES_PASSWORD}'
+      DATABASE_SSL: '${DATABASE_SSL:-false}'
+      APP_KEYS: '${APP_KEYS}'
+      API_TOKEN_SALT: '${API_TOKEN_SALT}'
+      ADMIN_JWT_SECRET: '${ADMIN_JWT_SECRET}'
+      TRANSFER_TOKEN_SALT: '${TRANSFER_TOKEN_SALT}'
+      ENCRYPTION_KEY: '${ENCRYPTION_KEY}'
+      JWT_SECRET: '${JWT_SECRET}'
+      NODE_ENV: production
+      OLLAMA_BASE_URL: 'http://ollama:11434'
+      OLLAMA_MODEL: '${OLLAMA_MODEL:-mistral:7b-instruct-q4_K_M}'
+      OLLAMA_EMBED_MODEL: '${OLLAMA_EMBED_MODEL:-nomic-embed-text}'
+      OLLAMA_TIMEOUT_MS: '${OLLAMA_TIMEOUT_MS:-120000}'
+      OLLAMA_ENABLED: '${OLLAMA_ENABLED:-true}'
+      OLLAMA_MAX_PARALLEL: '${OLLAMA_MAX_PARALLEL:-2}'
+      EMBEDDING_DIMENSION: '${EMBEDDING_DIMENSION:-768}'
+      UPLOAD_PROVIDER: '${UPLOAD_PROVIDER:-aws-s3}'
+      S3_ACCESS_KEY_ID: '${S3_ACCESS_KEY_ID}'
+      S3_ACCESS_SECRET: '${S3_ACCESS_SECRET}'
+      S3_ENDPOINT: 'http://minio:9000'
+      S3_REGION: '${S3_REGION:-us-east-1}'
+      S3_BUCKET: '${S3_BUCKET}'
+      S3_BASE_URL: '${S3_BASE_URL}'
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: '${REDIS_PASSWORD}'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+      init:
+        condition: service_completed_successfully
+      ollama:
+        condition: service_healthy
+    volumes:
+      - 'api_uploads:/app/apps/api/public/uploads'
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - '--quiet'
+        - '--tries=1'
+        - '--spider'
+        - 'http://127.0.0.1:1337/_health'
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 5
+  admin:
+    image: 'ghcr.io/learnednomad/attaqwa-lms/admin:main'
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+      NEXT_PUBLIC_API_URL: '${NEXT_PUBLIC_API_URL}'
+      NEXT_PUBLIC_AUTH_URL: '${NEXT_PUBLIC_AUTH_URL}'
+      AUTH_INTERNAL_URL: 'http://website:3001'
+      STRAPI_INTERNAL_URL: 'http://api:1337'
+      STRAPI_API_TOKEN: '${STRAPI_API_TOKEN:-}'
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - '--quiet'
+        - '--tries=1'
+        - '--spider'
+        - 'http://127.0.0.1:3000'
+      interval: 30s
+      timeout: 10s
+      start_period: 15s
+      retries: 3
+  website:
+    image: 'ghcr.io/learnednomad/attaqwa-lms/website:main'
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      HOSTNAME: 0.0.0.0
+      NEXT_PUBLIC_API_URL: '${NEXT_PUBLIC_API_URL}'
+      STRAPI_URL: '${STRAPI_URL}'
+      DATABASE_URL: '${DATABASE_URL}'
+      BETTER_AUTH_SECRET: '${BETTER_AUTH_SECRET}'
+      BETTER_AUTH_BASE_URL: '${BETTER_AUTH_BASE_URL}'
+      STRAPI_API_TOKEN: '${STRAPI_API_TOKEN:-}'
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - '--quiet'
+        - '--tries=1'
+        - '--spider'
+        - 'http://127.0.0.1:3001'
+      interval: 30s
+      timeout: 10s
+      start_period: 15s
+      retries: 3
+  ollama:
+    image: ollama/ollama
+    restart: unless-stopped
+    volumes:
+      - 'ollama_data:/root/.ollama'
+    environment:
+      OLLAMA_MAX_LOADED_MODELS: '${OLLAMA_MAX_LOADED_MODELS:-1}'
+    healthcheck:
+      test:
+        - CMD
+        - ollama
+        - list
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+volumes:
+  postgres_data: null
+  api_uploads: null
+  ollama_data: null
+  redis_data: null
+  minio_data: null
