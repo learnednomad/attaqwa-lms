@@ -84,26 +84,38 @@ interface StrapiListBody<T> {
 
 type Pagination = NonNullable<NonNullable<StrapiListBody<unknown>['meta']>['pagination']>;
 
-// The axios client already unwraps one layer, so the shape we see here is
-// `{ data: T[], meta }`. But older Strapi proxies sometimes double-wrap — be
-// defensive.
+// strapiClient.get unwraps the axios envelope and returns the JSON body
+// directly. Standard Strapi list shape is `{ data: T[], meta: {pagination} }`.
+// Some older proxies double-wrap as `{ data: { data: T[], meta } }`.
+// Handle both — fall through to empty if neither matches.
 function normalizeList<T>(raw: unknown): { items: T[]; pagination?: Pagination } {
-  const wrapper = raw as { data?: unknown } | null | undefined;
-  const body =
-    wrapper && typeof wrapper === 'object' && 'data' in wrapper
-      ? ((wrapper.data as StrapiListBody<T>) ?? (raw as StrapiListBody<T>))
-      : (raw as StrapiListBody<T>);
-  const items = Array.isArray(body?.data) ? (body.data as T[]) : [];
-  return { items, pagination: body?.meta?.pagination };
+  const r = raw as { data?: unknown; meta?: { pagination?: Pagination } } | null | undefined;
+  // Standard: { data: T[], meta }
+  if (r && Array.isArray(r.data)) {
+    return { items: r.data as T[], pagination: r.meta?.pagination };
+  }
+  // Double-wrapped: { data: { data: T[], meta } }
+  const inner = r?.data as
+    | { data?: unknown; meta?: { pagination?: Pagination } }
+    | undefined;
+  if (inner && Array.isArray(inner.data)) {
+    return { items: inner.data as T[], pagination: inner.meta?.pagination };
+  }
+  return { items: [], pagination: undefined };
 }
 
 function normalizeEntity<T>(raw: unknown): T | null {
-  const wrapper = raw as { data?: unknown } | null | undefined;
-  const body =
-    wrapper && typeof wrapper === 'object' && 'data' in wrapper
-      ? ((wrapper.data as { data?: T }) ?? (raw as { data?: T }))
-      : (raw as { data?: T });
-  return (body?.data as T) ?? null;
+  const r = raw as { data?: unknown } | null | undefined;
+  // Standard: { data: T }
+  if (r && r.data && !Array.isArray(r.data) && typeof r.data === 'object') {
+    return r.data as T;
+  }
+  // Double-wrapped: { data: { data: T } }
+  const inner = r?.data as { data?: unknown } | undefined;
+  if (inner && inner.data && typeof inner.data === 'object') {
+    return inner.data as T;
+  }
+  return null;
 }
 
 export interface ListLibraryParams {
