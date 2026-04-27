@@ -90,6 +90,17 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          # NEXT_PUBLIC_* values are baked into the website + admin client
+          # bundles at build time. Without these args the bundle falls back to
+          # `http://localhost:1337` and the CSP `upgrade-insecure-requests`
+          # rewrites every API call to `https://localhost:1337` in production
+          # — which obviously fails. Repository-level Variables (vars.*) hold
+          # the public hostnames; SUNNAH_API_KEY lives in Secrets.
+          build-args: |
+            NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL || 'https://attaqwa-api.learnednomad.com' }}
+            NEXT_PUBLIC_AUTH_URL=${{ vars.NEXT_PUBLIC_AUTH_URL || 'https://attaqwa.learnednomad.com' }}
+            NEXT_PUBLIC_ADMIN_URL=${{ vars.NEXT_PUBLIC_ADMIN_URL || 'https://attaqwa-admin.learnednomad.com' }}
+            NEXT_PUBLIC_SUNNAH_API_KEY=${{ secrets.NEXT_PUBLIC_SUNNAH_API_KEY }}
 
   # ---------------------------------------------------------------------------
   # Security scanning with Trivy
