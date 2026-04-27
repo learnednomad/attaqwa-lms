@@ -48,10 +48,12 @@ export default function LibraryPage() {
   const [status, setStatus] = useState<StatusFilter>('all');
   const [resources, setResources] = useState<LibraryResource[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [mutatingId, setMutatingId] = useState<string | number | null>(null);
 
   const fetchResources = useCallback(async () => {
     setIsLoading(true);
+    setFetchError(null);
     try {
       const { items } = await listLibraryResources({
         q: query || null,
@@ -64,6 +66,11 @@ export default function LibraryPage() {
     } catch (error) {
       console.error('Failed to fetch library resources:', error);
       setResources([]);
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Unknown error fetching library resources';
+      setFetchError(message);
     } finally {
       setIsLoading(false);
     }
@@ -184,6 +191,22 @@ export default function LibraryPage() {
           <div className="flex items-center justify-center py-12">
             <Loader2 className="mr-2 h-6 w-6 animate-spin text-primary-500" />
             <span className="text-charcoal-500">Loading library...</span>
+          </div>
+        ) : fetchError ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <p className="text-sm font-medium text-red-700">
+              Couldn&apos;t load library resources
+            </p>
+            <p className="mt-1 max-w-md text-xs text-red-600">{fetchError}</p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-4"
+              onClick={fetchResources}
+            >
+              <RefreshCw className="mr-1 h-3 w-3" />
+              Retry
+            </Button>
           </div>
         ) : resources.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
