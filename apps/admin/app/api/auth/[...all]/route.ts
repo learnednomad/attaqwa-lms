@@ -21,10 +21,21 @@ async function proxyAuth(request: NextRequest) {
         : undefined,
   });
 
+  // Strip CORS headers from upstream — request is same-origin from the
+  // browser's perspective (admin's own /api/auth/*). The website's
+  // BetterAuth emits Access-Control-Allow-Origin pinned to its own host,
+  // which Safari treats as a CORS violation when forwarded verbatim.
+  const responseHeaders = new Headers(response.headers);
+  for (const key of Array.from(responseHeaders.keys())) {
+    if (key.toLowerCase().startsWith("access-control-")) {
+      responseHeaders.delete(key);
+    }
+  }
+
   return new NextResponse(response.body, {
     status: response.status,
     statusText: response.statusText,
-    headers: response.headers,
+    headers: responseHeaders,
   });
 }
 

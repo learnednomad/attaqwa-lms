@@ -69,10 +69,21 @@ async function proxyToStrapi(request: NextRequest) {
         : undefined,
   });
 
+  // Strip CORS headers from upstream — request is same-origin from the
+  // browser's perspective (admin's own /api/v1/*). Strapi may emit
+  // Access-Control-Allow-Origin pinned to a different host; Safari then
+  // treats the response as a CORS violation when forwarded verbatim.
+  const responseHeaders = new Headers(response.headers);
+  for (const key of Array.from(responseHeaders.keys())) {
+    if (key.toLowerCase().startsWith("access-control-")) {
+      responseHeaders.delete(key);
+    }
+  }
+
   return new NextResponse(response.body, {
     status: response.status,
     statusText: response.statusText,
-    headers: response.headers,
+    headers: responseHeaders,
   });
 }
 
