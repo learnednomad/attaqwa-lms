@@ -63,7 +63,7 @@ function CourseImageDropzone({
   );
 }
 
-export interface CourseFormProps {
+ interface CourseFormProps {
   initialData?: Record<string, unknown>;
   onSubmit: (data: CourseFormData) => Promise<void>;
   onCancel: () => void;

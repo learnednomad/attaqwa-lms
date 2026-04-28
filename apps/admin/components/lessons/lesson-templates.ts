@@ -6,7 +6,7 @@
 
 import type { LessonType } from '@/components/lessons/lesson-type-badge';
 
-export interface LessonTemplate {
+ interface LessonTemplate {
   name: string;
   description: string;
   // Form defaults (merged into LessonForm initialData).

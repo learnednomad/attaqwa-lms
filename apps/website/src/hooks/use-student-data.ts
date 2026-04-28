@@ -15,7 +15,7 @@ import { CACHE_TTL } from '@attaqwa/shared';
 // QUERY KEY FACTORY
 // ============================================================================
 
-export const studentKeys = {
+const studentKeys = {
   progress: {
     all: ['student', 'progress'] as const,
     list: (params?: { course_id?: string; status?: string }) =>
@@ -144,7 +144,7 @@ export function useEnrollments(params?: {
   });
 }
 
-export function useStudentDashboard() {
+function useStudentDashboard() {
   return useQuery({
     queryKey: studentKeys.dashboard.all,
     queryFn: () => studentApi.dashboard.getData(),
@@ -214,7 +214,7 @@ export function useUpdateLessonProgress() {
   });
 }
 
-export function useSubmitQuiz() {
+function useSubmitQuiz() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -234,7 +234,7 @@ export function useSubmitQuiz() {
   });
 }
 
-export function useEnrollInCourse() {
+function useEnrollInCourse() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -247,7 +247,7 @@ export function useEnrollInCourse() {
   });
 }
 
-export function useDropCourse() {
+function useDropCourse() {
   const queryClient = useQueryClient();
 
   return useMutation({

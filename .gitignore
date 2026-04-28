@@ -84,3 +84,7 @@ apps/api/types/generated/
 # Stray PDFs (allow legitimate docs PDFs)
 *.pdf
 !docs/**/*.pdf
+.fallow/*
+!.fallow/dead-code-baseline.json
+!.fallow/health-baseline.json
+!.fallow/dupes-baseline.json

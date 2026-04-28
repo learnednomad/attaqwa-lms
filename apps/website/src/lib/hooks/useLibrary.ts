@@ -26,7 +26,7 @@ export const LIBRARY_CATEGORY_LABELS: Record<LibraryCategory, string> = {
   other: 'Other',
 };
 
-export interface LibraryResource {
+ interface LibraryResource {
   id: number;
   documentId?: string;
   title: string;

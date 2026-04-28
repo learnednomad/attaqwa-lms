@@ -40,7 +40,7 @@ export interface LibraryFormValues {
   coverImage: File | LibraryMedia | null;
 }
 
-export interface LibraryFormProps {
+ interface LibraryFormProps {
   initialValues?: Partial<LibraryFormValues>;
   isLoading?: boolean;
   submitLabel: string;

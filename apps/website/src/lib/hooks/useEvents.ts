@@ -20,7 +20,7 @@ export function useEvents(params: UseEventsParams = {}) {
   });
 }
 
-export function useUpcomingEvents(limit: number = 5) {
+function useUpcomingEvents(limit: number = 5) {
   return useQuery({
     queryKey: [CACHE_KEYS.EVENTS, 'upcoming', { limit }],
     queryFn: () => eventsApi.getAll({ upcoming: true, isActive: true, limit }),

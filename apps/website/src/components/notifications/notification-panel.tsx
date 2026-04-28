@@ -7,9 +7,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-export type NotificationType = 'assignment' | 'resource' | 'announcement' | 'enrollment' | 'grade' | 'message';
+ type NotificationType = 'assignment' | 'resource' | 'announcement' | 'enrollment' | 'grade' | 'message';
 
-export interface NotificationAttachment {
+ interface NotificationAttachment {
   name: string;
   type: string; // 'PDF', 'PPT', 'DOCX', 'Google Form', etc.
   size?: string;

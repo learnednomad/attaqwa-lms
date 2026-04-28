@@ -19,6 +19,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
+        with:
+          # fallow audit needs the base branch to compute changed files
+          fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -39,6 +42,9 @@ jobs:
 
       - name: Run TypeScript type checking
         run: pnpm run type-check
+
+      - name: Run fallow audit (dead code + complexity + duplication)
+        run: pnpm dlx fallow audit --base origin/${{ github.base_ref || 'main' }} --format compact
 
       - name: Run tests (website)
         env:

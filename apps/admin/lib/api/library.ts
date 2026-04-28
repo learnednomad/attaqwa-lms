@@ -118,7 +118,7 @@ function normalizeEntity<T>(raw: unknown): T | null {
   return null;
 }
 
-export interface ListLibraryParams {
+ interface ListLibraryParams {
   q?: string | null;
   category?: LibraryCategory | 'all';
   language?: LibraryLanguage | 'all';

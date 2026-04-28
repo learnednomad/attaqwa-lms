@@ -270,5 +270,5 @@ export async function generateQuiz(
  * Get the status of an async AI job.
  */
 export function getJob(jobId: string) {
-  return jobQueue.getJob(jobId);
+  return jobQueue.getJobById(jobId);
 }
