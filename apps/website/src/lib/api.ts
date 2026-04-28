@@ -29,8 +29,14 @@ import type {
 
 export type { AuthUser, LoginInput, RegisterInput };
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
+// Browser: hit own origin → /api/v1/* catch-all proxy attaches the token
+//          server-side, no localhost fallback ever ends up in the bundle.
+// SSR / Node: hit Strapi directly via the internal URL with the token.
 const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN;
+const SSR_API_BASE =
+  process.env.STRAPI_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  'http://localhost:1337';
 
 export class ApiError extends Error {
   constructor(public statusCode: number, message: string) {
@@ -43,14 +49,19 @@ async function makeRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const url = `${API_BASE_URL}${endpoint}`;
+  const isBrowser = typeof window !== 'undefined';
+  // Browser: endpoint is a relative path (e.g. `/api/v1/announcements`) that
+  // hits the website's own catch-all proxy on the same origin.
+  // Server: prepend the Strapi base URL so SSR / Node still works.
+  const url = isBrowser ? endpoint : `${SSR_API_BASE}${endpoint}`;
 
   const defaultHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
   };
 
-  // Use Strapi API token for server-to-server content requests
-  if (STRAPI_API_TOKEN) {
+  // Server-side calls need the token directly. Browser calls skip the token
+  // here — the catch-all proxy adds it server-side.
+  if (!isBrowser && STRAPI_API_TOKEN) {
     defaultHeaders['Authorization'] = `Bearer ${STRAPI_API_TOKEN}`;
   }
 
