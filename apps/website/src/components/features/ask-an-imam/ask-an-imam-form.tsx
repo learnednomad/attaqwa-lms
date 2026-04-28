@@ -37,7 +37,9 @@ const categoryOptions: Array<{ value: LegalFormValues['category']; label: string
   { value: 'other', label: 'Other' },
 ];
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
+// Client component — call our own catch-all proxy on the website's origin.
+// The proxy attaches STRAPI_API_TOKEN server-side; no URL baked into bundle.
+const API_BASE = '';
 
 export function AskAnImamForm() {
   const [submitState, setSubmitState] = useState<

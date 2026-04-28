@@ -4,8 +4,17 @@
  */
 
 // Strapi base URL
-const STRAPI_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
-const API_BASE = `${STRAPI_BASE}/api/v1`;
+// Browser: hit own origin → /api/v1/* catch-all proxy attaches the token.
+// Server: use the internal STRAPI_URL (or NEXT_PUBLIC_API_URL) directly.
+const SSR_STRAPI_BASE =
+  process.env.STRAPI_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  'http://localhost:1337';
+const API_BASE_BROWSER = '/api/v1';
+const API_BASE_SSR = `${SSR_STRAPI_BASE}/api/v1`;
+function getApiBase(): string {
+  return typeof window !== 'undefined' ? API_BASE_BROWSER : API_BASE_SSR;
+}
 
 // ============================================================================
 // Type Definitions
@@ -210,7 +219,7 @@ async function fetchStrapi<T>(
   options?: RequestInit
 ): Promise<StrapiResponse<T>> {
   const query = queryParams ? buildStrapiQuery(queryParams) : '';
-  const url = `${API_BASE}${endpoint}${query ? `?${query}` : ''}`;
+  const url = `${getApiBase()}${endpoint}${query ? `?${query}` : ''}`;
 
   const response = await fetch(url, {
     ...options,
