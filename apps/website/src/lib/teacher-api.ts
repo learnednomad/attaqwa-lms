@@ -28,7 +28,7 @@ export interface StudentEnrollment extends Enrollment {
   progress?: number; // Alias for overall_progress for convenience
 }
 
-export interface AssignmentSubmission {
+ interface AssignmentSubmission {
   id: number;
   documentId: string;
   student_id: number;
@@ -41,7 +41,7 @@ export interface AssignmentSubmission {
   status: 'pending' | 'graded' | 'returned';
 }
 
-export interface TeacherDashboardData {
+ interface TeacherDashboardData {
   teacher: {
     id: number;
     name: string;
@@ -137,7 +137,7 @@ export interface CourseFormData {
 // ============================================================================
 // TEACHER COURSES API
 // ============================================================================
-export const teacherCoursesApi = {
+const teacherCoursesApi = {
   /**
    * Get courses taught by the teacher
    */
@@ -219,7 +219,7 @@ export const teacherCoursesApi = {
 // ============================================================================
 // TEACHER STUDENTS API
 // ============================================================================
-export const teacherStudentsApi = {
+const teacherStudentsApi = {
   /**
    * Get all students in teacher's courses
    */
@@ -241,7 +241,7 @@ export const teacherStudentsApi = {
 // ============================================================================
 // TEACHER GRADES API
 // ============================================================================
-export const teacherGradesApi = {
+const teacherGradesApi = {
   /**
    * Get all submissions pending grading
    */
@@ -280,7 +280,7 @@ export const teacherGradesApi = {
 // ============================================================================
 // TEACHER LESSONS API
 // ============================================================================
-export const teacherLessonsApi = {
+const teacherLessonsApi = {
   /**
    * Get all lessons across all courses
    */
@@ -335,7 +335,7 @@ export const teacherLessonsApi = {
 // ============================================================================
 // TEACHER ANALYTICS API
 // ============================================================================
-export const teacherAnalyticsApi = {
+const teacherAnalyticsApi = {
   /**
    * Get course analytics
    */
@@ -360,7 +360,7 @@ export const teacherAnalyticsApi = {
 // ============================================================================
 // TEACHER DASHBOARD API
 // ============================================================================
-export const teacherDashboardApi = {
+const teacherDashboardApi = {
   /**
    * Get aggregated dashboard data
    */
@@ -420,4 +420,3 @@ export const teacherApi = {
   dashboard: teacherDashboardApi,
 };
 
-export default teacherApi;

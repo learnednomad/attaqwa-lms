@@ -22,7 +22,7 @@ const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN || '';
 
 const ADMIN_ROLES = new Set(['admin', 'superadmin', 'masjidadmin']);
 
-export interface AdminGuardResult {
+ interface AdminGuardResult {
   ok: boolean;
   response?: NextResponse;
   session?: {

@@ -26,7 +26,7 @@ export const LIBRARY_CATEGORY_LABELS: Record<LibraryCategory, string> = {
   other: 'Other',
 };
 
-export interface LibraryResource {
+ interface LibraryResource {
   id: number;
   documentId?: string;
   title: string;
@@ -51,7 +51,10 @@ export interface LibraryResource {
   };
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
+// Client hook — call our own catch-all proxy on the website's origin.
+// The proxy attaches STRAPI_API_TOKEN server-side; no URL bake required and
+// CSP `connect-src 'self'` is satisfied.
+const API_BASE = '';
 
 interface UseLibraryParams {
   categories?: LibraryCategory[];

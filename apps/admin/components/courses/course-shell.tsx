@@ -12,7 +12,7 @@ import Link from 'next/link';
 
 import { cn } from '@/lib/utils/cn';
 
-export type CourseShellTab = 'lessons' | 'settings';
+ type CourseShellTab = 'lessons' | 'settings';
 
 interface CourseShellProps {
   courseId: string;

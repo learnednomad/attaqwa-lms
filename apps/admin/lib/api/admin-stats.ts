@@ -24,7 +24,7 @@ async function strapiGet<T>(endpoint: string, params?: Record<string, string>): 
   return response as unknown as StrapiResponse<T>;
 }
 
-export async function getResourceCount(resource: string): Promise<number> {
+async function getResourceCount(resource: string): Promise<number> {
   const data = await strapiGet(resource, { 'pagination[pageSize]': '1' });
   return data.meta.pagination.total;
 }
@@ -100,7 +100,7 @@ export async function getRecentEnrollments(): Promise<any[]> {
   return data.data;
 }
 
-export async function getRecentProgress(): Promise<any[]> {
+async function getRecentProgress(): Promise<any[]> {
   const data = await strapiGet<any>('user-progresses', {
     'pagination[pageSize]': '10',
     'sort': 'updatedAt:desc',
@@ -119,14 +119,14 @@ export async function getLessonsWithStats(): Promise<any[]> {
   return data.data;
 }
 
-export async function getAchievements(): Promise<any[]> {
+async function getAchievements(): Promise<any[]> {
   const data = await strapiGet<any>('achievements', {
     'pagination[pageSize]': '100',
   });
   return data.data;
 }
 
-export async function getUserAchievements(): Promise<any[]> {
+async function getUserAchievements(): Promise<any[]> {
   const data = await strapiGet<any>('user-achievements', {
     'pagination[pageSize]': '100',
     'populate[0]': 'user',

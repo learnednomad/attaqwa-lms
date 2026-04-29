@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 
-export interface AuthUser {
+ interface AuthUser {
   userId: string;
   email: string;
   name: string;
@@ -42,7 +42,7 @@ export async function verifyAuth(request: NextRequest): Promise<AuthUser | null>
 /**
  * Create authentication middleware for API routes.
  */
-export function createAuthMiddleware(requiredRole?: string | string[]) {
+function createAuthMiddleware(requiredRole?: string | string[]) {
   return async (request: NextRequest): Promise<NextResponse | null> => {
     const user = await verifyAuth(request);
 

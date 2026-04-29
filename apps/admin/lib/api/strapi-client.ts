@@ -103,7 +103,7 @@ class StrapiClient {
 export const strapiClient = new StrapiClient();
 
 // Helper functions for building Strapi queries
-export const buildStrapiQuery = {
+const buildStrapiQuery = {
   filters: (filters: Record<string, string | number | boolean>) => {
     const params = new URLSearchParams();
     Object.entries(filters).forEach(([key, value]) => {
@@ -175,7 +175,6 @@ export const adminApiEndpoints = {
 } as const;
 
 // Export shared endpoints for consistency
-export { API_V1_ENDPOINTS, API_CONFIG };
 
 // ---------------------------------------------------------------------------
 // Lesson helpers (Phase 1: global library, Phase 2: outline + drawer)
@@ -207,7 +206,7 @@ export interface AdminLesson {
   course?: AdminLessonCourse | null;
 }
 
-export interface ListLessonsParams {
+ interface ListLessonsParams {
   courseId?: string | number | null;
   type?: string | null;
   q?: string | null;
@@ -216,7 +215,7 @@ export interface ListLessonsParams {
   sort?: string[];
 }
 
-export interface ListLessonsResult {
+ interface ListLessonsResult {
   items: AdminLesson[];
   pagination: { page: number; pageSize: number; pageCount: number; total: number };
 }

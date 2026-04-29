@@ -1,4 +1,4 @@
-export type NavItem = {
+ type NavItem = {
   name: string;
   href?: string;
   submenu?: { name: string; href: string }[];

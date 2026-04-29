@@ -38,7 +38,7 @@ const SSR_API_BASE =
   process.env.NEXT_PUBLIC_API_URL ||
   'http://localhost:1337';
 
-export class ApiError extends Error {
+class ApiError extends Error {
   constructor(public statusCode: number, message: string) {
     super(message);
     this.name = 'ApiError';
@@ -266,7 +266,7 @@ export const eventsApi = {
 };
 
 // Prayer Times API (using v1 endpoints)
-export const prayerTimesApi = {
+const prayerTimesApi = {
   getToday: async (params?: {
     city?: string;
     country?: string;
@@ -453,7 +453,7 @@ export const appealsApi = {
 };
 
 // Export a single API object for convenience
-export const api = {
+const api = {
   announcements: announcementsApi,
   events: eventsApi,
   prayerTimes: prayerTimesApi,

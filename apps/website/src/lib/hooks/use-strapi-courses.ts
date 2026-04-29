@@ -21,7 +21,7 @@ import {
 // Query Keys
 // ============================================================================
 
-export const courseKeys = {
+const courseKeys = {
   all: ['courses'] as const,
   lists: () => [...courseKeys.all, 'list'] as const,
   list: (filters?: any) => [...courseKeys.lists(), filters] as const,
@@ -30,7 +30,7 @@ export const courseKeys = {
   detailById: (id: string) => [...courseKeys.details(), 'id', id] as const,
 };
 
-export const lessonKeys = {
+const lessonKeys = {
   all: ['lessons'] as const,
   lists: () => [...lessonKeys.all, 'list'] as const,
   list: (courseSlug: string) => [...lessonKeys.lists(), courseSlug] as const,
@@ -39,21 +39,21 @@ export const lessonKeys = {
   detailById: (id: string) => [...lessonKeys.details(), 'id', id] as const,
 };
 
-export const quizKeys = {
+const quizKeys = {
   all: ['quizzes'] as const,
   details: () => [...quizKeys.all, 'detail'] as const,
   detail: (id: string) => [...quizKeys.details(), id] as const,
   byLesson: (lessonSlug: string) => [...quizKeys.all, 'lesson', lessonSlug] as const,
 };
 
-export const enrollmentKeys = {
+const enrollmentKeys = {
   all: ['enrollments'] as const,
   my: (userId: string) => [...enrollmentKeys.all, 'my', userId] as const,
   byCourse: (userId: string, courseSlug: string) =>
     [...enrollmentKeys.all, 'course', userId, courseSlug] as const,
 };
 
-export const progressKeys = {
+const progressKeys = {
   all: ['lesson-progress'] as const,
   detail: (enrollmentId: string, lessonId: string) =>
     [...progressKeys.all, enrollmentId, lessonId] as const,
@@ -63,7 +63,7 @@ export const progressKeys = {
 // Course Hooks
 // ============================================================================
 
-export interface CoursesFilters {
+ interface CoursesFilters {
   subject?: string;
   age_tier?: string;
   difficulty?: string; // Changed from difficulty_level to match Strapi
@@ -84,7 +84,7 @@ export function useCourses(filters?: CoursesFilters) {
 /**
  * Fetch single course by slug
  */
-export function useCourse(slug: string, enabled: boolean = true) {
+function useCourse(slug: string, enabled: boolean = true) {
   return useQuery({
     queryKey: courseKeys.detail(slug),
     queryFn: () => coursesApi.getBySlug(slug),
@@ -108,7 +108,7 @@ export function useCourseById(id: string, enabled: boolean = true) {
 /**
  * Fetch course with full details (lessons + quizzes)
  */
-export function useCourseWithDetails(slug: string, enabled: boolean = true) {
+function useCourseWithDetails(slug: string, enabled: boolean = true) {
   return useQuery({
     queryKey: [...courseKeys.detail(slug), 'full'] as const,
     queryFn: () => coursesApi.getWithDetails(slug),
@@ -124,7 +124,7 @@ export function useCourseWithDetails(slug: string, enabled: boolean = true) {
 /**
  * Fetch all lessons for a course
  */
-export function useLessonsByCourse(courseSlug: string, enabled: boolean = true) {
+function useLessonsByCourse(courseSlug: string, enabled: boolean = true) {
   return useQuery({
     queryKey: lessonKeys.list(courseSlug),
     queryFn: () => lessonsApi.getByCourse(courseSlug),
@@ -136,7 +136,7 @@ export function useLessonsByCourse(courseSlug: string, enabled: boolean = true) 
 /**
  * Fetch single lesson by slug
  */
-export function useLesson(slug: string, enabled: boolean = true) {
+function useLesson(slug: string, enabled: boolean = true) {
   return useQuery({
     queryKey: lessonKeys.detail(slug),
     queryFn: () => lessonsApi.getBySlug(slug),
@@ -176,7 +176,7 @@ export function useQuiz(id: string, enabled: boolean = true) {
 /**
  * Fetch quiz for a lesson
  */
-export function useQuizByLesson(lessonSlug: string, enabled: boolean = true) {
+function useQuizByLesson(lessonSlug: string, enabled: boolean = true) {
   return useQuery({
     queryKey: quizKeys.byLesson(lessonSlug),
     queryFn: () => quizzesApi.getByLesson(lessonSlug),
@@ -192,7 +192,7 @@ export function useQuizByLesson(lessonSlug: string, enabled: boolean = true) {
 /**
  * Fetch user's enrollments
  */
-export function useMyEnrollments(userId: string, enabled: boolean = true) {
+function useMyEnrollments(userId: string, enabled: boolean = true) {
   return useQuery({
     queryKey: enrollmentKeys.my(userId),
     queryFn: () => enrollmentsApi.getMy(userId),
@@ -204,7 +204,7 @@ export function useMyEnrollments(userId: string, enabled: boolean = true) {
 /**
  * Fetch enrollment for specific course
  */
-export function useEnrollmentByCourse(
+function useEnrollmentByCourse(
   userId: string,
   courseSlug: string,
   enabled: boolean = true
@@ -220,7 +220,7 @@ export function useEnrollmentByCourse(
 /**
  * Create new enrollment mutation
  */
-export function useCreateEnrollment() {
+function useCreateEnrollment() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -240,7 +240,7 @@ export function useCreateEnrollment() {
 /**
  * Fetch progress for specific lesson
  */
-export function useLessonProgress(
+function useLessonProgress(
   enrollmentId: string,
   lessonId: string,
   enabled: boolean = true
@@ -256,7 +256,7 @@ export function useLessonProgress(
 /**
  * Update lesson progress mutation
  */
-export function useUpdateLessonProgress() {
+function useUpdateLessonProgress() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -284,7 +284,7 @@ export function useUpdateLessonProgress() {
 /**
  * Create lesson progress mutation
  */
-export function useCreateLessonProgress() {
+function useCreateLessonProgress() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -304,7 +304,7 @@ export function useCreateLessonProgress() {
 /**
  * Check if user is enrolled in a course
  */
-export function useIsEnrolled(userId: string | undefined, courseSlug: string | undefined) {
+function useIsEnrolled(userId: string | undefined, courseSlug: string | undefined) {
   const { data: enrollment, isLoading } = useEnrollmentByCourse(
     userId || '',
     courseSlug || '',
@@ -321,7 +321,7 @@ export function useIsEnrolled(userId: string | undefined, courseSlug: string | u
 /**
  * Get course progress percentage
  */
-export function useCourseProgress(userId: string | undefined, courseSlug: string | undefined) {
+function useCourseProgress(userId: string | undefined, courseSlug: string | undefined) {
   const { enrollment, isEnrolled, isLoading } = useIsEnrolled(userId, courseSlug);
 
   return {

@@ -35,7 +35,7 @@ export const SEO_KEYWORDS = {
 } as const;
 
 // Mosque Location Data (to be updated with actual coordinates)
-export const MOSQUE_LOCATION = {
+const MOSQUE_LOCATION = {
   name: MOSQUE_INFO.name,
   address: 'Your Full Address Here', // Update with actual address
   city: 'Your City',
@@ -49,7 +49,7 @@ export const MOSQUE_LOCATION = {
 } as const;
 
 // Islamic Content Categories for SEO
-export const ISLAMIC_CONTENT_CATEGORIES = {
+const ISLAMIC_CONTENT_CATEGORIES = {
   PRAYER: {
     title: 'Prayer Times & Islamic Worship',
     description: 'Daily prayer times, Qibla direction, and Islamic worship guidance',

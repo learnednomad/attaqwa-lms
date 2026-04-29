@@ -16,7 +16,7 @@ import {
 type FormInternalType = LessonFormData['type'];
 
 /** Map the LessonForm's internal type to the Strapi enum. */
-export function formTypeToStrapi(type: FormInternalType): LessonType {
+function formTypeToStrapi(type: FormInternalType): LessonType {
   switch (type) {
     case 'video':
       return 'video';
@@ -71,7 +71,7 @@ async function uploadFile(file: File): Promise<number> {
   return uploaded[0]?.id;
 }
 
-export interface SubmitLessonArgs {
+ interface SubmitLessonArgs {
   mode: 'create' | 'edit';
   courseId: string | number;
   lessonId?: string | number;

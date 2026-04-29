@@ -2,7 +2,7 @@ import 'server-only';
 
 const QURAN_API_BASE = 'https://api.alquran.cloud/v1';
 
-export interface DailyAyah {
+ interface DailyAyah {
   number: number;
   numberInSurah: number;
   text: string;
@@ -15,7 +15,7 @@ export interface DailyAyah {
   audio: string;
 }
 
-export interface MushafPageAyah {
+ interface MushafPageAyah {
   number: number;
   numberInSurah: number;
   text: string;
@@ -26,7 +26,7 @@ export interface MushafPageAyah {
   hizbQuarter: number;
 }
 
-export interface MushafPage {
+ interface MushafPage {
   pageNumber: number;
   ayahs: MushafPageAyah[];
   juz: number;
@@ -34,20 +34,20 @@ export interface MushafPage {
   surahs: { number: number; name: string; englishName: string }[];
 }
 
-export interface ContextGroup {
+ interface ContextGroup {
   title: string;
   ayahRange: [number, number];
   theme: string;
 }
 
-export interface PopularSurah {
+ interface PopularSurah {
   number: number;
   name: string;
   verses: number;
   theme: string;
 }
 
-export async function fetchDailyAyah(): Promise<DailyAyah | null> {
+async function fetchDailyAyah(): Promise<DailyAyah | null> {
   try {
     const today = new Date();
     const dayOfYear = Math.floor(

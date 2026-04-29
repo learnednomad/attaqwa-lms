@@ -42,7 +42,7 @@ function generateJobId(): string {
 /**
  * Get a job by ID.
  */
-export function getJob(jobId: string): AIJob | undefined {
+export function getJobById(jobId: string): AIJob | undefined {
   return jobs.get(jobId);
 }
 

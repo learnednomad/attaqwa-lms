@@ -18,7 +18,7 @@ export interface CreatedEntry {
   reason?: string;
 }
 
-export interface CreateOptions {
+ interface CreateOptions {
   tempPassword: string;
   onProgress?: (done: number, total: number) => void;
 }

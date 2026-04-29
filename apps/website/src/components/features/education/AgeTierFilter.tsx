@@ -61,7 +61,7 @@ const AGE_TIER_CONFIG: Record<AgeTier, {
   },
 };
 
-export function AgeTierFilter({
+function AgeTierFilter({
   selectedTier,
   onTierChange,
   showStats = false,
@@ -247,7 +247,7 @@ export function AgeTierBadge({
 }
 
 // Hook for age tier filtering logic
-export function useAgeTierFilter() {
+function useAgeTierFilter() {
   const [selectedTier, setSelectedTier] = React.useState<AgeTier | undefined>();
 
   const filterContentByAge = React.useCallback((content: any[]) => {
