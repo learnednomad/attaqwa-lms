@@ -18,11 +18,21 @@ interface RateLimitEntry {
 // In-memory store for rate limiting
 const rateLimitStore = new Map<string, RateLimitEntry>();
 
-// Rate limit configuration
+// Rate limit configuration — defaults can be overridden via env vars for
+// load testing or to tune for traffic patterns:
+//   RATE_LIMIT_ANONYMOUS_PER_MIN=100
+//   RATE_LIMIT_AUTH_PER_MIN=500
+//   RATE_LIMIT_ADMIN_PER_MIN=1000
+const intEnv = (key: string, def: number): number => {
+  const v = process.env[key];
+  if (!v) return def;
+  const n = parseInt(v, 10);
+  return Number.isFinite(n) && n > 0 ? n : def;
+};
 const RATE_LIMITS = {
-  anonymous: { maxRequests: 100, windowMs: 60 * 1000 }, // 100 req/min
-  authenticated: { maxRequests: 500, windowMs: 60 * 1000 }, // 500 req/min
-  admin: { maxRequests: 1000, windowMs: 60 * 1000 }, // 1000 req/min
+  anonymous:     { maxRequests: intEnv('RATE_LIMIT_ANONYMOUS_PER_MIN', 100),  windowMs: 60 * 1000 },
+  authenticated: { maxRequests: intEnv('RATE_LIMIT_AUTH_PER_MIN',     500),  windowMs: 60 * 1000 },
+  admin:         { maxRequests: intEnv('RATE_LIMIT_ADMIN_PER_MIN',    1000), windowMs: 60 * 1000 },
 };
 
 // Clean up expired entries every 5 minutes
