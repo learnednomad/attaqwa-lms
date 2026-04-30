@@ -1,0 +1,432 @@
+# =============================================================================
+# Coolify Production Monitoring Stack — Source of Truth
+# =============================================================================
+# Mirrors the docker_compose_raw stored in Coolify for the
+# attaqwa-monitoring service. Mirrors the model of docker-compose.coolify.yml:
+# this file is the canonical recovery artifact if the Coolify service is ever
+# recreated or restored from backup.
+#
+# WHAT'S IN HERE:
+#   prometheus       — metrics collection (30d retention, 1G mem cap)
+#   grafana          — dashboards, public at attaqwa-grafana.learnednomad.com
+#   loki             — log aggregation
+#   promtail         — ships container logs to loki via /var/run/docker.sock
+#   node-exporter    — host CPU/RAM/disk/network metrics
+#   cadvisor         — per-container resource metrics
+#   postgres-exporter — Postgres query/connection/lock metrics
+#   redis-exporter   — Redis hit/miss/memory/keyspace metrics
+#
+# NETWORKING:
+#   Joins external network `s40wwgww4oc8cc0gks08ko4g` (the LMS service's
+#   network) so Prometheus can scrape api/postgres/redis directly by their
+#   Coolify container names. This is the primary cross-service link.
+#
+# AUTH MODEL:
+#   Grafana   — public via Traefik, login required (env var password).
+#   Prometheus — internal only, no public route. Access via Grafana datasource
+#                or `coolify exec` for ad-hoc queries.
+#   Loki/Promtail/exporters — internal only, scraped by Prometheus.
+#
+# DEPLOYMENT:
+#   1. Stand up a new "Docker Compose" service in Coolify under the
+#      attaqwa-masjid project.
+#   2. Paste this file's contents.
+#   3. Set the env vars (see end of file for required list).
+#   4. Confirm DNS for attaqwa-grafana.learnednomad.com → server IP (already
+#      wildcarded for *.learnednomad.com).
+#   5. Deploy. Wait ~60-120s for LE cert + container start.
+#   6. Open https://attaqwa-grafana.learnednomad.com, log in with
+#      GRAFANA_USER / GRAFANA_PASSWORD.
+#
+# Last synced from compose definition: 2026-04-29
+# =============================================================================
+services:
+  prometheus:
+    image: 'prom/prometheus:v2.51.0'
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+      # Allows k6 (and any other client) to push metrics in via remote-write.
+      # k6 invokes prometheus at http://prometheus:9090/api/v1/write
+      - '--web.enable-remote-write-receiver'
+    configs:
+      - source: prometheus_yml
+        target: /etc/prometheus/prometheus.yml
+    volumes:
+      - 'prometheus_data:/prometheus'
+    expose:
+      - '9090'
+    healthcheck:
+      test: ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://localhost:9090/-/healthy']
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  grafana:
+    image: 'grafana/grafana:10.4.0'
+    restart: unless-stopped
+    environment:
+      SERVICE_FQDN_GRAFANA_3000: 'https://attaqwa-grafana.learnednomad.com'
+      GF_SECURITY_ADMIN_USER: '${GRAFANA_USER}'
+      GF_SECURITY_ADMIN_PASSWORD: '${GRAFANA_PASSWORD}'
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+      GF_SERVER_ROOT_URL: 'https://attaqwa-grafana.learnednomad.com'
+      GF_INSTALL_PLUGINS: 'grafana-piechart-panel'
+    configs:
+      - source: grafana_datasources
+        target: /etc/grafana/provisioning/datasources/datasources.yml
+    volumes:
+      - 'grafana_data:/var/lib/grafana'
+    expose:
+      - '3000'
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    labels:
+      - traefik.enable=true
+      - 'traefik.http.routers.grafana.rule=Host(`attaqwa-grafana.learnednomad.com`)'
+      - traefik.http.routers.grafana.entryPoints=https
+      - traefik.http.routers.grafana.tls=true
+      - traefik.http.routers.grafana.tls.certresolver=letsencrypt
+      - traefik.http.routers.grafana.service=grafana
+      - traefik.http.services.grafana.loadbalancer.server.port=3000
+    healthcheck:
+      test: ['CMD-SHELL', 'wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1']
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  loki:
+    image: 'grafana/loki:2.9.6'
+    restart: unless-stopped
+    command: '-config.file=/etc/loki/local-config.yaml'
+    volumes:
+      - 'loki_data:/loki'
+    expose:
+      - '3100'
+    healthcheck:
+      test: ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://localhost:3100/ready']
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  promtail:
+    image: 'grafana/promtail:2.9.6'
+    restart: unless-stopped
+    command: '-config.file=/etc/promtail/config.yml'
+    configs:
+      - source: promtail_yml
+        target: /etc/promtail/config.yml
+    volumes:
+      - '/var/log:/var/log:ro'
+      - '/var/lib/docker/containers:/var/lib/docker/containers:ro'
+      - '/var/run/docker.sock:/var/run/docker.sock:ro'
+    depends_on:
+      loki:
+        condition: service_healthy
+
+  node-exporter:
+    image: 'prom/node-exporter:v1.7.0'
+    restart: unless-stopped
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    volumes:
+      - '/proc:/host/proc:ro'
+      - '/sys:/host/sys:ro'
+      - '/:/rootfs:ro'
+    expose:
+      - '9100'
+    pid: host
+
+  cadvisor:
+    image: 'gcr.io/cadvisor/cadvisor:v0.49.1'
+    restart: unless-stopped
+    privileged: true
+    volumes:
+      - '/:/rootfs:ro'
+      - '/var/run:/var/run:ro'
+      - '/sys:/sys:ro'
+      - '/var/lib/docker/:/var/lib/docker:ro'
+      - '/dev/disk/:/dev/disk:ro'
+    expose:
+      - '8080'
+
+  postgres-exporter:
+    image: 'prometheuscommunity/postgres-exporter:v0.15.0'
+    restart: unless-stopped
+    # The DNS alias on the s40… network is the SERVICE name (`postgres`),
+    # not the container_name (`postgres-s40…`). Split env vars used so
+    # passwords with `/+=` don't break URL parsing.
+    # Explicitly join BOTH networks: Coolify auto-generates a per-service
+    # network and overrides the `default` mapping at the top of this file.
+    environment:
+      DATA_SOURCE_URI: 'postgres:5432/attaqwa_lms?sslmode=disable'
+      DATA_SOURCE_USER: 'postgres'
+      DATA_SOURCE_PASS: '${POSTGRES_PASSWORD_RAW}'
+    expose:
+      - '9187'
+    networks:
+      - lms_net
+
+  # k6 load testing — runs on demand, not by default.
+  # Invoke with: docker compose --profile ondemand run --rm k6 run /scripts/<file>.js
+  # (or via Coolify scheduled tasks for periodic runs)
+  k6:
+    image: 'grafana/k6:0.49.0'
+    profiles: ['ondemand']
+    command:
+      - 'run'
+      - '--out'
+      - 'experimental-prometheus-rw=http://prometheus:9090/api/v1/write'
+      - '/scripts/smoke.js'
+    environment:
+      K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM: 'true'
+      K6_PROMETHEUS_RW_TREND_STATS: 'p(50),p(95),p(99),min,max,avg'
+      # Hostnames k6 scripts will hit. Override at runtime via -e flags or
+      # environment vars to test different envs (staging, etc).
+      K6_BASE_URL: '${K6_BASE_URL:-https://attaqwa.learnednomad.com}'
+      K6_API_URL: '${K6_API_URL:-https://attaqwa-api.learnednomad.com}'
+      K6_ADMIN_URL: '${K6_ADMIN_URL:-https://attaqwa-admin.learnednomad.com}'
+    configs:
+      - source: k6_smoke
+        target: /scripts/smoke.js
+      - source: k6_load
+        target: /scripts/load.js
+      - source: k6_stress
+        target: /scripts/stress.js
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    networks:
+      - lms_net
+
+  redis-exporter:
+    image: 'oliver006/redis_exporter:v1.58.0'
+    restart: unless-stopped
+    # The DNS alias on the s40… network is the SERVICE name (`redis`),
+    # not the container_name. No `redis://` scheme either — the bare
+    # host:port form avoids Go's net.Dial treating `redis` as an
+    # unknown network type.
+    # Explicitly join the s40 network — Coolify ignores the default
+    # network override at the top of this file.
+    environment:
+      REDIS_ADDR: 'redis:6379'
+      REDIS_PASSWORD: '${REDIS_PASSWORD}'
+    expose:
+      - '9121'
+    networks:
+      - lms_net
+
+configs:
+  prometheus_yml:
+    content: |
+      global:
+        scrape_interval: 15s
+        evaluation_interval: 15s
+        scrape_timeout: 10s
+      scrape_configs:
+        - job_name: 'prometheus'
+          static_configs:
+            - targets: ['prometheus:9090']
+        - job_name: 'node-exporter'
+          static_configs:
+            - targets: ['node-exporter:9100']
+        - job_name: 'cadvisor'
+          static_configs:
+            - targets: ['cadvisor:8080']
+        - job_name: 'postgres-exporter'
+          static_configs:
+            - targets: ['postgres-exporter:9187']
+        - job_name: 'redis-exporter'
+          static_configs:
+            - targets: ['redis-exporter:9121']
+
+  promtail_yml:
+    content: |
+      server:
+        http_listen_port: 9080
+        grpc_listen_port: 0
+      positions:
+        filename: /tmp/positions.yaml
+      clients:
+        - url: http://loki:3100/loki/api/v1/push
+      scrape_configs:
+        - job_name: docker
+          docker_sd_configs:
+            - host: unix:///var/run/docker.sock
+              refresh_interval: 5s
+          relabel_configs:
+            - source_labels: ['__meta_docker_container_name']
+              regex: '/(.*)'
+              target_label: 'container'
+            - source_labels: ['__meta_docker_container_log_stream']
+              target_label: 'stream'
+
+  grafana_datasources:
+    content: |
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          access: proxy
+          url: http://prometheus:9090
+          isDefault: true
+          editable: false
+        - name: Loki
+          type: loki
+          access: proxy
+          url: http://loki:3100
+          editable: false
+
+  # ---------------------------------------------------------------------------
+  # k6 test scripts — invoked on demand via the `ondemand` compose profile.
+  # ---------------------------------------------------------------------------
+  k6_smoke:
+    content: |
+      // Smoke test — 5 VUs × 30s, fails if any critical endpoint 5xx's.
+      // Run: docker compose --profile ondemand run --rm k6 run /scripts/smoke.js
+      import http from 'k6/http';
+      import { check, sleep } from 'k6';
+
+      const BASE = __ENV.K6_BASE_URL || 'https://attaqwa.learnednomad.com';
+      const API = __ENV.K6_API_URL || 'https://attaqwa-api.learnednomad.com';
+
+      export const options = {
+        vus: 5,
+        duration: '30s',
+        thresholds: {
+          http_req_failed: ['rate<0.01'],          // <1% errors
+          http_req_duration: ['p(95)<2000'],       // 95% of requests under 2s
+        },
+      };
+
+      export default function () {
+        const endpoints = [
+          `${BASE}/`,
+          `${BASE}/events`,
+          `${BASE}/announcements`,
+          `${BASE}/prayer-times`,
+          `${API}/_health`,
+          `${API}/api/v1/announcements?pagination%5BpageSize%5D=3`,
+        ];
+        for (const url of endpoints) {
+          const res = http.get(url, { tags: { name: url } });
+          check(res, {
+            'status not 5xx': (r) => r.status < 500,
+            'duration < 5s': (r) => r.timings.duration < 5000,
+          });
+        }
+        sleep(1);
+      }
+
+  k6_load:
+    content: |
+      // Load test — 50 VUs × 5 min, simulates realistic traffic on
+      // public-facing pages.
+      // Run: docker compose --profile ondemand run --rm k6 run /scripts/load.js
+      import http from 'k6/http';
+      import { check, sleep, group } from 'k6';
+
+      const BASE = __ENV.K6_BASE_URL || 'https://attaqwa.learnednomad.com';
+      const API = __ENV.K6_API_URL || 'https://attaqwa-api.learnednomad.com';
+
+      export const options = {
+        stages: [
+          { duration: '30s', target: 10 },   // warm-up
+          { duration: '1m',  target: 50 },   // ramp to 50 VUs
+          { duration: '3m',  target: 50 },   // hold
+          { duration: '30s', target: 0 },    // ramp down
+        ],
+        thresholds: {
+          http_req_failed: ['rate<0.02'],
+          http_req_duration: ['p(95)<3000', 'p(99)<5000'],
+        },
+      };
+
+      export default function () {
+        group('homepage', () => {
+          const res = http.get(`${BASE}/`);
+          check(res, { 'home 200': (r) => r.status === 200 });
+        });
+        sleep(Math.random() * 2);
+
+        group('events listing', () => {
+          const res = http.get(`${API}/api/v1/events?pagination%5BpageSize%5D=10&filters%5BisActive%5D%5B%24eq%5D=true`);
+          check(res, { 'events 200': (r) => r.status === 200 });
+        });
+        sleep(Math.random() * 2);
+
+        group('prayer times', () => {
+          const res = http.get(`${BASE}/prayer-times`);
+          check(res, { 'prayer 200': (r) => r.status === 200 });
+        });
+        sleep(Math.random() * 3);
+      }
+
+  k6_stress:
+    content: |
+      // Stress test — ramp to 200 VUs to find the breaking point.
+      // WARNING: only run this against a known stable build, NOT during
+      // peak hours. It WILL load the production stack heavily.
+      // Run: docker compose --profile ondemand run --rm k6 run /scripts/stress.js
+      import http from 'k6/http';
+      import { check, sleep } from 'k6';
+
+      const BASE = __ENV.K6_BASE_URL || 'https://attaqwa.learnednomad.com';
+
+      export const options = {
+        stages: [
+          { duration: '1m',  target: 50 },
+          { duration: '2m',  target: 100 },
+          { duration: '2m',  target: 200 },
+          { duration: '2m',  target: 200 },
+          { duration: '1m',  target: 0 },
+        ],
+        thresholds: {
+          // Looser thresholds — we expect things to slow down, just not break
+          http_req_failed: ['rate<0.10'],
+          http_req_duration: ['p(95)<10000'],
+        },
+      };
+
+      export default function () {
+        const res = http.get(`${BASE}/`);
+        check(res, {
+          'no 5xx': (r) => r.status < 500,
+          'no timeout': (r) => r.timings.duration < 30000,
+        });
+        sleep(Math.random() * 2);
+      }
+
+volumes:
+  prometheus_data: null
+  grafana_data: null
+  loki_data: null
+
+# Coolify auto-generates a per-service network and forces it as the default,
+# so we declare the LMS network as a NAMED secondary network and explicitly
+# attach the postgres-exporter and redis-exporter services. The other
+# monitoring services don't need cross-stack reach.
+networks:
+  lms_net:
+    name: s40wwgww4oc8cc0gks08ko4g
+    external: true
+
+# =============================================================================
+# Required env vars (set in Coolify service Env tab):
+#   GRAFANA_USER             — admin username (e.g., admin)
+#   GRAFANA_PASSWORD         — admin password (16+ chars)
+#   POSTGRES_PASSWORD_RAW    — actual postgres password (URL-decoded — the
+#                              one in the LMS service is URL-encoded for
+#                              DATABASE_URL, copy the raw form)
+#   REDIS_PASSWORD           — same as the LMS service
+# =============================================================================
