@@ -18,7 +18,7 @@ export interface Announcement {
   updatedAt: string;
 }
 
-export type EventCategory = 'lecture' | 'community' | 'youth' | 'sisters' | 'fundraiser' | 'other';
+type EventCategory = 'lecture' | 'community' | 'youth' | 'sisters' | 'fundraiser' | 'other';
 
 export interface Event {
   id: string;
@@ -57,7 +57,7 @@ export interface PrayerTimeOverride {
   updatedAt: string;
 }
 
-export type ItikafDurationType = 'full' | 'last_ten' | 'weekend' | 'custom';
+type ItikafDurationType = 'full' | 'last_ten' | 'weekend' | 'custom';
 export type ItikafStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
 
 export interface ItikafRegistration {
@@ -110,12 +110,6 @@ export interface PrayerTime {
   location?: string;
 }
 
-export interface ZakatInfo {
-  amount: number;
-  currency: string;
-  description?: string;
-}
-
 export interface Calendar {
   id: string;
   title: string;
@@ -150,51 +144,6 @@ export interface DailyPrayerTimes {
   tarawih?: string; // Tarawih prayer time (Ramadan only)
 }
 
-export interface Donation {
-  id: string;
-  amount: number;
-  currency: string;
-  type: 'zakat' | 'sadaqah' | 'general';
-  donorName?: string;
-  email?: string;
-  isAnonymous: boolean;
-  paymentStatus: 'pending' | 'completed' | 'failed';
-  createdAt: Date;
-}
-
-export interface BlogPost {
-  id: string;
-  title: string;
-  content: string;
-  excerpt: string;
-  author: string;
-  publishedAt: Date;
-  isPublished: boolean;
-  tags: string[];
-  imageUrl?: string;
-  imageAlt?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface ContactForm {
-  name: string;
-  email: string;
-  subject?: string;
-  message: string;
-  phone?: string;
-}
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: 'admin' | 'user';
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export interface ApiResponse<T> {
   data: T;
   message?: string;
@@ -217,95 +166,4 @@ export interface ErrorResponse {
   message: string;
   statusCode: number;
   success: false;
-}
-
-export type EventType = 'eid' | 'ramadan' | 'graduation' | 'general';
-export type AnnouncementType = 'general' | 'urgent' | 'event' | 'reminder';
-export type UserRole = 'admin' | 'user';
-export type DonationType = 'zakat' | 'sadaqah' | 'general';
-export type PaymentStatus = 'pending' | 'completed' | 'failed';
-
-// Enhanced UI Types for Premium Components
-export type ComponentVariant = 'default' | 'compact' | 'premium';
-export type ComponentSize = 'sm' | 'md' | 'lg' | 'xl';
-export type AnimationType = 'fade' | 'slide' | 'scale' | 'bounce' | 'none';
-export type ThemeMode = 'light' | 'dark' | 'auto';
-export type LanguagePreference = 'en' | 'ar' | 'both';
-
-// Prayer Times Enhancement
-export interface EnhancedPrayerTime extends PrayerTime {
-  icon?: string;
-  description?: string;
-  descriptionArabic?: string;
-  remainingTime?: string;
-  isNext?: boolean;
-  isPast?: boolean;
-}
-
-// UI Preferences
-export interface UserPreferences {
-  id: string;
-  userId: string;
-  theme: ThemeMode;
-  language: LanguagePreference;
-  showArabicText: boolean;
-  prayerNotifications: boolean;
-  eventReminders: boolean;
-  animationsEnabled: boolean;
-  fontSize: ComponentSize;
-  prayerTimeFormat: '12h' | '24h';
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-// Enhanced Educational Content
-export interface EducationProgress {
-  id: string;
-  userId: string;
-  contentId: string;
-  progress: number;
-  status: 'not_started' | 'in_progress' | 'completed' | 'paused';
-  timeSpent: number; // in minutes
-  lastAccessed: Date;
-  completedAt?: Date;
-  quizScores?: number[];
-  notes?: string;
-}
-
-// Interactive Quiz Types
-export interface QuizAttempt {
-  id: string;
-  userId: string;
-  quizId: string;
-  score: number;
-  totalQuestions: number;
-  timeSpent: number; // in seconds
-  answers: Array<{
-    questionId: string;
-    selectedAnswer: number;
-    isCorrect: boolean;
-    timeTaken: number;
-  }>;
-  completedAt: Date;
-}
-
-// Notification System
-export interface NotificationSettings {
-  prayerReminders: {
-    enabled: boolean;
-    minutesBefore: number;
-    playSound: boolean;
-  };
-  eventReminders: {
-    enabled: boolean;
-    hoursBefore: number;
-  };
-  educationProgress: {
-    enabled: boolean;
-    weeklyReports: boolean;
-  };
-  announcements: {
-    enabled: boolean;
-    urgentOnly: boolean;
-  };
 }

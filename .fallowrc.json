@@ -1,0 +1,187 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+
+  "audit": {
+    "deadCodeBaseline": ".fallow/dead-code-baseline.json",
+    "healthBaseline": ".fallow/health-baseline.json",
+    "dupesBaseline": ".fallow/dupes-baseline.json"
+  },
+
+  "entry": [
+    "scripts/**/*.{ts,js,mjs,cjs}",
+    "apps/api/scripts/**/*.{ts,js,mjs,cjs}",
+    "apps/api/tests/**/*.test.ts",
+    "apps/website/__tests__/**/*.{test,spec}.{ts,tsx}",
+    "apps/website/src/**/__tests__/**/*.{ts,tsx}",
+    "apps/website/src/**/*.{test,spec}.{ts,tsx}",
+    "apps/admin/scripts/**/*.{ts,js,mjs,cjs}",
+    "apps/admin/seed-data.js",
+    "apps/admin/test-backend-connection.js",
+    "apps/api/config/**/*.{ts,js}",
+    "apps/api/src/api/**/controllers/**/*.{ts,js}",
+    "apps/api/src/api/**/routes/**/*.{ts,js}",
+    "apps/api/src/api/**/services/**/*.{ts,js}",
+    "apps/api/src/api/**/middlewares/**/*.{ts,js}",
+    "apps/api/src/api/**/policies/**/*.{ts,js}",
+    "apps/api/src/api/**/content-types/**/*.{ts,js}",
+    "apps/api/src/middlewares/**/*.{ts,js}",
+    "apps/api/src/policies/**/*.{ts,js}",
+    "apps/api/src/extensions/**/*.{ts,js}",
+    "apps/api/src/admin/**/*.{ts,tsx,js,jsx}"
+  ],
+
+  "dynamicallyLoaded": [
+    "apps/api/database/migrations/**/*.{ts,js}",
+    "apps/api/public/**",
+    "apps/website/public/**",
+    "apps/admin/public/**"
+  ],
+
+  "publicPackages": [
+    "@attaqwa/shared",
+    "@attaqwa/shared-types",
+    "@attaqwa/api-client"
+  ],
+
+  "ignorePatterns": [
+    "**/dist/**",
+    "**/build/**",
+    "**/.next/**",
+    "**/node_modules/**",
+    "**/coverage/**",
+    "apps/api/database/**",
+    "apps/api/dist/**",
+    "packages/coolify-mcp/dist/**",
+    "packages/shared-types/dist/**",
+    "**/*.example.{ts,tsx,js,jsx}",
+    "apps/website/next-env.d.ts",
+    "apps/admin/next-env.d.ts"
+  ],
+
+  "ignoreDependencies": [
+    "postcss-load-config",
+    "@eslint/eslintrc",
+    "eslint-config-next",
+    "eslint-config-prettier",
+    "baseline-browser-mapping",
+    "shadcn",
+    "@strapi/plugin-cloud",
+    "@strapi/plugin-users-permissions",
+    "@strapi/provider-email-nodemailer",
+    "@strapi/provider-upload-aws-s3",
+    "better-sqlite3",
+    "pg",
+    "sharp",
+    "react",
+    "react-dom",
+    "react-router-dom",
+    "styled-components"
+  ],
+
+  "duplicates": {
+    "minLines": 12,
+    "minTokens": 80,
+    "ignore": [
+      "**/*.test.{ts,tsx}",
+      "**/*.spec.{ts,tsx}",
+      "**/__tests__/**",
+      "**/eslint.config.{mjs,js,cjs,ts}",
+      "**/jest.config.{mjs,js,cjs,ts}",
+      "**/next.config.{mjs,js,cjs,ts}",
+      "apps/api/database/migrations/**",
+      "apps/api/src/api/**/content-types/**",
+      "apps/api/scripts/seed/**",
+      "apps/website/src/app/**/page.tsx",
+      "apps/admin/app/**/page.tsx",
+      "apps/admin/lib/api/strapi-client.ts",
+      "packages/api-client/src/index.ts"
+    ]
+  },
+
+  "health": {
+    "maxCyclomatic": 30,
+    "maxCognitive": 25,
+    "maxCrap": 500,
+    "ignore": [
+      "**/*.test.{ts,tsx}",
+      "**/*.spec.{ts,tsx}",
+      "**/__tests__/**",
+      "apps/api/database/migrations/**",
+      "apps/api/scripts/seed/**",
+      "apps/website/src/app/**/page.tsx",
+      "apps/website/src/app/**/layout.tsx",
+      "apps/website/src/app/**/route.ts",
+      "apps/admin/app/**/page.tsx",
+      "apps/admin/app/**/layout.tsx",
+      "apps/admin/app/**/route.ts",
+      "apps/website/src/components/admin/**Form*.tsx",
+      "apps/website/src/components/education/seerah-*.tsx",
+      "apps/website/src/components/education/QuizContent.tsx",
+      "apps/website/src/components/layout/**.tsx",
+      "apps/admin/components/courses/course-form.tsx",
+      "apps/admin/components/lessons/lesson-form.tsx",
+      "apps/admin/components/lessons/submit-lesson.ts",
+      "apps/admin/components/lessons/lesson-drawer.tsx",
+      "apps/admin/components/lessons/ai-tools-panel.tsx",
+      "apps/admin/components/dashboard/sidebar.tsx",
+      "apps/admin/components/courses/course-card.tsx",
+      "apps/admin/components/users/import-users-dialog.tsx",
+      "apps/admin/components/users/import-users-parse.ts"
+    ]
+  },
+
+  "rules": {},
+
+  "overrides": [
+    {
+      "files": ["packages/**"],
+      "rules": {
+        "unused-exports": "off",
+        "unused-types": "off"
+      }
+    },
+    {
+      "files": [
+        "apps/website/src/app/**/page.tsx",
+        "apps/website/src/app/**/layout.tsx",
+        "apps/website/src/app/**/loading.tsx",
+        "apps/website/src/app/**/error.tsx",
+        "apps/website/src/app/**/not-found.tsx",
+        "apps/website/src/app/**/route.ts",
+        "apps/admin/app/**/page.tsx",
+        "apps/admin/app/**/layout.tsx",
+        "apps/admin/app/**/loading.tsx",
+        "apps/admin/app/**/error.tsx",
+        "apps/admin/app/**/not-found.tsx",
+        "apps/admin/app/**/route.ts",
+        "apps/admin/middleware.ts",
+        "apps/website/middleware.ts"
+      ],
+      "rules": {
+        "unused-exports": "off"
+      }
+    },
+    {
+      "files": [
+        "apps/website/src/components/ui/**",
+        "apps/admin/components/ui/**"
+      ],
+      "rules": {
+        "unused-exports": "off",
+        "unused-types": "off"
+      }
+    },
+    {
+      "files": [
+        "apps/website/src/lib/api.ts",
+        "apps/website/src/lib/strapi-api.ts",
+        "apps/website/src/lib/student-api.ts",
+        "apps/website/src/lib/teacher-api.ts",
+        "apps/website/src/hooks/use-student-data.ts"
+      ],
+      "rules": {
+        "unused-types": "off"
+      }
+    }
+  ]
+}

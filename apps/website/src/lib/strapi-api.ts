@@ -32,7 +32,7 @@ export interface StrapiResponse<T> {
   };
 }
 
-export interface StrapiEntity {
+interface StrapiEntity {
   id: number;
   documentId: string;
   createdAt: string;
@@ -78,7 +78,7 @@ export interface Quiz extends StrapiEntity {
   lesson?: Lesson;
 }
 
-export interface QuizQuestion {
+ interface QuizQuestion {
   id: string;
   question_text: string;
   question_type: 'multiple_choice' | 'true_false' | 'short_answer';
@@ -620,80 +620,8 @@ export const lessonProgressApi = {
 };
 
 // ============================================================================
-// AI API
-// ============================================================================
-
-export const aiApi = {
-  /**
-   * Health check for AI service
-   */
-  getHealth: async () => {
-    const response = await fetch(`${API_BASE}/ai/health`);
-    if (!response.ok) return null;
-    const json = await response.json();
-    return json.data;
-  },
-
-  /**
-   * Semantic search across all content
-   */
-  search: async (query: string, contentType?: string, limit?: number) => {
-    const response = await fetch(`${API_BASE}/ai/search`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query, contentType, limit: limit || 10 }),
-    });
-    if (!response.ok) return [];
-    const json = await response.json();
-    return json.data || [];
-  },
-
-  /**
-   * Get AI summary for content
-   */
-  summarize: async (content: string) => {
-    const response = await fetch(`${API_BASE}/ai/summarize`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content }),
-    });
-    if (!response.ok) return null;
-    const json = await response.json();
-    return json.data?.summary || null;
-  },
-
-  /**
-   * Get personalized recommendations for authenticated user
-   */
-  getRecommendations: async (token: string, limit?: number) => {
-    const response = await fetch(
-      `${API_BASE}/ai/recommend?limit=${limit || 5}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    if (!response.ok) return [];
-    const json = await response.json();
-    return json.data || [];
-  },
-};
-
-// ============================================================================
 // Utility Functions
 // ============================================================================
-
-/**
- * Calculate course progress based on completed lessons
- */
-export function calculateCourseProgress(
-  completedLessons: number,
-  totalLessons: number
-): number {
-  if (totalLessons === 0) return 0;
-  return Math.round((completedLessons / totalLessons) * 100);
-}
 
 /**
  * Format duration in minutes to human-readable string

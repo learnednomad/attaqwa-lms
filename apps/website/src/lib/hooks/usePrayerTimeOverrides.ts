@@ -19,7 +19,7 @@ export function usePrayerTimeOverrides(params: UsePrayerTimeOverridesParams = {}
   });
 }
 
-export function usePrayerTimeOverride(id: string) {
+function usePrayerTimeOverride(id: string) {
   return useQuery({
     queryKey: [CACHE_KEYS.PRAYER_TIME_OVERRIDES, id],
     queryFn: () => prayerTimeOverridesApi.getById(id),
@@ -39,7 +39,7 @@ export function useCreatePrayerTimeOverride() {
   });
 }
 
-export function useUpdatePrayerTimeOverride() {
+function useUpdatePrayerTimeOverride() {
   const queryClient = useQueryClient();
 
   return useMutation({

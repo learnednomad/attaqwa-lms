@@ -28,7 +28,7 @@ export function useItikafRegistration(id: string) {
   });
 }
 
-export function useCreateItikafRegistration() {
+function useCreateItikafRegistration() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -52,7 +52,7 @@ export function useUpdateItikafRegistration() {
   });
 }
 
-export function useDeleteItikafRegistration() {
+function useDeleteItikafRegistration() {
   const queryClient = useQueryClient();
 
   return useMutation({

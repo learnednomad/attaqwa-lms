@@ -23,14 +23,14 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils/cn';
 import { formatCategoryLabel, formatDuration, formatRelativeTime } from '@/lib/utils/formatters';
 
-export interface CourseCardLesson {
+ interface CourseCardLesson {
   id: number;
   lesson_type?: string | null;
   duration_minutes?: number | null;
   updatedAt?: string | null;
 }
 
-export interface CourseCardThumbnail {
+ interface CourseCardThumbnail {
   url?: string | null;
   formats?: {
     thumbnail?: { url?: string | null };

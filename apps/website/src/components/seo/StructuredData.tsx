@@ -10,7 +10,7 @@ interface StructuredDataProps {
   data?: any;
 }
 
-export function StructuredData({ type, data }: StructuredDataProps) {
+function StructuredData({ type, data }: StructuredDataProps) {
   let structuredData;
   
   switch (type) {
@@ -81,7 +81,7 @@ interface EventStructuredDataProps {
   event: any;
 }
 
-export function EventStructuredData({ event }: EventStructuredDataProps) {
+function EventStructuredData({ event }: EventStructuredDataProps) {
   return <StructuredData type="event" data={event} />;
 }
 
@@ -89,7 +89,7 @@ interface EducationStructuredDataProps {
   content: any;
 }
 
-export function EducationStructuredData({ content }: EducationStructuredDataProps) {
+function EducationStructuredData({ content }: EducationStructuredDataProps) {
   return <StructuredData type="education" data={content} />;
 }
 
@@ -107,7 +107,7 @@ interface MultipleStructuredDataProps {
   }>;
 }
 
-export function MultipleStructuredData({ items }: MultipleStructuredDataProps) {
+function MultipleStructuredData({ items }: MultipleStructuredDataProps) {
   return (
     <>
       {items.map((item, index) => (

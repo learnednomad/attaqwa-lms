@@ -89,7 +89,7 @@ export function sanitizeHtml(html: string): string {
  * @param text - String that may contain HTML
  * @returns Plain text with no HTML tags
  */
-export function sanitizeText(text: string): string {
+function sanitizeText(text: string): string {
   if (!text || typeof text !== 'string') {
     return '';
   }
@@ -115,7 +115,7 @@ export function sanitizeText(text: string): string {
  * @param url - URL string to sanitize
  * @returns Sanitized URL or empty string if invalid/dangerous
  */
-export function sanitizeUrl(url: string): string {
+function sanitizeUrl(url: string): string {
   if (!url || typeof url !== 'string') {
     return '';
   }
@@ -156,7 +156,7 @@ export function sanitizeUrl(url: string): string {
  * @param text - Plain text to escape
  * @returns HTML-escaped string
  */
-export function escapeHtml(text: string): string {
+function escapeHtml(text: string): string {
   if (!text || typeof text !== 'string') {
     return '';
   }
@@ -176,7 +176,7 @@ export function escapeHtml(text: string): string {
  * @param maxLength - Maximum allowed length
  * @returns Sanitized input
  */
-export function sanitizeInput(input: string, maxLength: number = 1000): string {
+function sanitizeInput(input: string, maxLength: number = 1000): string {
   if (!input || typeof input !== 'string') {
     return '';
   }

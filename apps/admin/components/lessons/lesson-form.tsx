@@ -22,7 +22,7 @@ interface QuizQuestion {
   points: number;
 }
 
-export interface LessonFormProps {
+ interface LessonFormProps {
   initialData?: Record<string, unknown>;
   courseId: string;
   onSubmit: (data: LessonFormData) => Promise<void>;

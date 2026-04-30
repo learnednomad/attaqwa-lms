@@ -27,7 +27,7 @@ export const JANAZA_PARTNER = {
   email: 'info@janazaga.com'
 } as const;
 
-export const PRAYER_NAMES = {
+const PRAYER_NAMES = {
   FAJR: 'Fajr',
   SUNRISE: 'Sunrise',
   DHUHR: 'Dhuhr',
@@ -36,38 +36,38 @@ export const PRAYER_NAMES = {
   ISHA: 'Isha',
 } as const;
 
-export const EVENT_TYPES = {
+const EVENT_TYPES = {
   EID: 'eid',
   RAMADAN: 'ramadan',
   GRADUATION: 'graduation',
   GENERAL: 'general',
 } as const;
 
-export const ANNOUNCEMENT_TYPES = {
+const ANNOUNCEMENT_TYPES = {
   GENERAL: 'general',
   URGENT: 'urgent',
   EVENT: 'event',
   REMINDER: 'reminder',
 } as const;
 
-export const DONATION_TYPES = {
+const DONATION_TYPES = {
   ZAKAT: 'zakat',
   SADAQAH: 'sadaqah',
   GENERAL: 'general',
 } as const;
 
-export const USER_ROLES = {
+const USER_ROLES = {
   ADMIN: 'admin',
   USER: 'user',
 } as const;
 
-export const PAYMENT_STATUS = {
+const PAYMENT_STATUS = {
   PENDING: 'pending',
   COMPLETED: 'completed',
   FAILED: 'failed',
 } as const;
 
-export const API_ENDPOINTS = {
+const API_ENDPOINTS = {
   ANNOUNCEMENTS: '/api/announcements',
   EVENTS: '/api/events',
   CALENDARS: '/api/calendars',
@@ -79,42 +79,42 @@ export const API_ENDPOINTS = {
   USERS: '/api/users',
 } as const;
 
-export const EXTERNAL_APIS = {
+const EXTERNAL_APIS = {
   ALADHAN: 'https://api.aladhan.com/v1',
   STRIPE: 'https://api.stripe.com/v1',
 } as const;
 
-export const CURRENCY = {
+const CURRENCY = {
   USD: 'USD',
   CAD: 'CAD',
 } as const;
 
-export const DATE_FORMATS = {
+const DATE_FORMATS = {
   DISPLAY: 'MMMM dd, yyyy',
   API: 'yyyy-MM-dd',
   TIME: 'HH:mm',
   DATETIME: 'yyyy-MM-dd HH:mm:ss',
 } as const;
 
-export const PAGINATION = {
+const PAGINATION = {
   DEFAULT_LIMIT: 10,
   MAX_LIMIT: 100,
 } as const;
 
-export const FILE_UPLOAD = {
+const FILE_UPLOAD = {
   MAX_SIZE: 5 * 1024 * 1024, // 5MB
   ALLOWED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/webp'],
   ALLOWED_DOCUMENT_TYPES: ['application/pdf'],
 } as const;
 
-export const CACHE_KEYS = {
+const CACHE_KEYS = {
   ANNOUNCEMENTS: 'announcements',
   EVENTS: 'events',
   PRAYER_TIMES: 'prayer-times',
   CALENDARS: 'calendars',
 } as const;
 
-export const CACHE_TTL = {
+const CACHE_TTL = {
   ANNOUNCEMENTS: 5 * 60 * 1000, // 5 minutes
   EVENTS: 10 * 60 * 1000, // 10 minutes
   PRAYER_TIMES: 60 * 60 * 1000, // 1 hour

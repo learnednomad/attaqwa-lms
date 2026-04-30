@@ -32,7 +32,7 @@ export interface Course {
   lessons?: Lesson[];
 }
 
-export interface StrapiMedia {
+ interface StrapiMedia {
   id: number;
   url: string;
   name: string;
@@ -133,7 +133,7 @@ export interface Achievement {
   requirement_value: number;
 }
 
-export interface UserAchievement {
+ interface UserAchievement {
   id: number;
   documentId: string;
   earned_at: string;
@@ -189,7 +189,7 @@ async function fetchWithAuth<T>(
 // ============================================================================
 // COURSES API
 // ============================================================================
-export const coursesApi = {
+const coursesApi = {
   /**
    * Get all available courses
    */
@@ -222,7 +222,7 @@ export const coursesApi = {
 // ============================================================================
 // LESSONS API
 // ============================================================================
-export const lessonsApi = {
+const lessonsApi = {
   /**
    * Get all lessons (optionally filter by course)
    */
@@ -251,7 +251,7 @@ export const lessonsApi = {
 // ============================================================================
 // QUIZZES API
 // ============================================================================
-export const quizzesApi = {
+const quizzesApi = {
   /**
    * Get all quizzes
    */
@@ -270,7 +270,7 @@ export const quizzesApi = {
 // ============================================================================
 // USER ENROLLMENTS API (Authenticated)
 // ============================================================================
-export const enrollmentsApi = {
+const enrollmentsApi = {
   /**
    * Get current user's enrollments
    */
@@ -318,7 +318,7 @@ export const enrollmentsApi = {
 // ============================================================================
 // USER PROGRESS API (Authenticated)
 // ============================================================================
-export const progressApi = {
+const progressApi = {
   /**
    * Get current user's progress across all courses
    */
@@ -378,7 +378,7 @@ export const progressApi = {
 // ============================================================================
 // USER ACHIEVEMENTS API (Authenticated)
 // ============================================================================
-export const achievementsApi = {
+const achievementsApi = {
   /**
    * Get all available achievements
    */
@@ -426,7 +426,7 @@ export interface StudentDashboardData {
   };
 }
 
-export const dashboardApi = {
+const dashboardApi = {
   /**
    * Get aggregated dashboard data
    * Combines multiple API calls into a single dashboard response
@@ -518,4 +518,3 @@ export const studentApi = {
   dashboard: dashboardApi,
 };
 
-export default studentApi;

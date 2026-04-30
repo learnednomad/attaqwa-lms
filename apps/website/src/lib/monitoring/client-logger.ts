@@ -398,7 +398,7 @@ class ClientLogger {
 }
 
 // Create singleton instance
-export const clientLogger = new ClientLogger();
+const clientLogger = new ClientLogger();
 
 // React Error Boundary helper
 export const logReactError = (error: Error, errorInfo: { componentStack: string }) => {
@@ -406,7 +406,7 @@ export const logReactError = (error: Error, errorInfo: { componentStack: string 
 };
 
 // Performance measurement helper
-export const measurePerformance = (name: string, fn: () => void | Promise<void>) => {
+const measurePerformance = (name: string, fn: () => void | Promise<void>) => {
   return async () => {
     const start = performance.now();
     try {
@@ -419,7 +419,7 @@ export const measurePerformance = (name: string, fn: () => void | Promise<void>)
 };
 
 // Hook for logging user interactions
-export const useClientLogger = () => {
+const useClientLogger = () => {
   return {
     logPrayerTimeViewed: clientLogger.logPrayerTimeViewed.bind(clientLogger),
     logEducationContentViewed: clientLogger.logEducationContentViewed.bind(clientLogger),

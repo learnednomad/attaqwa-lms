@@ -42,7 +42,7 @@ interface QiblahData {
 }
 
 // Hadith Collections from Sunnah.com API
-export async function fetchAuthenticHadith(
+async function fetchAuthenticHadith(
   collection: string = 'bukhari',
   bookNumber?: number
 ): Promise<HadithData[]> {
@@ -79,7 +79,7 @@ export async function fetchAuthenticHadith(
 }
 
 // Quran API for Ayah of the Day with Tafsir
-export async function fetchAyahOfTheDay(): Promise<AyahData> {
+async function fetchAyahOfTheDay(): Promise<AyahData> {
   try {
     // Generate a random ayah for the day based on date
     const today = new Date();
@@ -126,7 +126,7 @@ interface SurahContextData {
 }
 
 // Fetch Surah with grouped ayahs by context
-export async function fetchSurahWithContext(surahNumber: number): Promise<SurahContextData | null> {
+async function fetchSurahWithContext(surahNumber: number): Promise<SurahContextData | null> {
   try {
     const response = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}`);
     const translationResponse = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/en.sahih`);
