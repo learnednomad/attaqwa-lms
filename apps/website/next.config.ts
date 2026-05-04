@@ -27,7 +27,9 @@ const securityHeaders = [
       "default-src 'self'",
       // Scripts: self, inline for React hydration, eval for development.
       // Donorbox: widget.js for the embedded donation form.
-      "script-src 'self' 'unsafe-inline' https://donorbox.org" + (process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''),
+      // PayPal: Donorbox's PayPal Express button injects checkout.js into
+      // the parent document.
+      "script-src 'self' 'unsafe-inline' https://donorbox.org https://www.paypalobjects.com" + (process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''),
       // Styles: self, inline for styled components, Google Fonts
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       // Fonts: self, Google Fonts
@@ -94,7 +96,9 @@ const securityHeaders = [
       'camera=()',
       'microphone=()',
       'geolocation=(self)',
-      'payment=()',
+      // payment: allow our own origin + Donorbox iframe so Apple Pay,
+      // Google Pay, and Stripe payment-request work inside the embed.
+      'payment=(self "https://donorbox.org")',
       'usb=()',
       'magnetometer=()',
       'gyroscope=()',
