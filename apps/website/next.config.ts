@@ -27,9 +27,11 @@ const securityHeaders = [
       "default-src 'self'",
       // Scripts: self, inline for React hydration, eval for development.
       // Donorbox: widget.js for the embedded donation form.
-      // PayPal: Donorbox's PayPal Express button injects checkout.js into
-      // the parent document.
-      "script-src 'self' 'unsafe-inline' https://donorbox.org https://www.paypalobjects.com" + (process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''),
+      // PayPal:
+      //   - paypalobjects.com — checkout.js (PayPal Express button)
+      //   - paypal.com — pptm.js (PayPal tag manager / analytics, loaded
+      //     by checkout.js after first render)
+      "script-src 'self' 'unsafe-inline' https://donorbox.org https://www.paypalobjects.com https://www.paypal.com" + (process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''),
       // Styles: self, inline for styled components, Google Fonts
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       // Fonts: self, Google Fonts
@@ -41,9 +43,10 @@ const securityHeaders = [
       // API connections. Allow the configured Strapi/S3 origins when they
       // point at localhost (CI, local dev) — prod uses HTTPS-only wildcards.
       (() => {
-        // Base allow-list. donorbox.org needed because widget.js phones
-        // home for analytics and PayPal handshake.
-        const base = "connect-src 'self' https://api.aladhan.com https://cms.learnednomad.com https://hadithapi.com https://donorbox.org wss:";
+        // Base allow-list.
+        // donorbox.org — widget.js phones home for analytics / handshake.
+        // paypal.com — pptm.js posts analytics events back to PayPal.
+        const base = "connect-src 'self' https://api.aladhan.com https://cms.learnednomad.com https://hadithapi.com https://donorbox.org https://www.paypal.com wss:";
         const extra: string[] = [];
         if (process.env.NODE_ENV === 'development') {
           extra.push('http://localhost:1337', 'http://localhost:9000');
