@@ -65,6 +65,11 @@ export function DonorboxWidget({
         // The iframe needs scripts (Stripe, PayPal SDKs etc.) but no top-
         // navigation. allow-popups lets the PayPal flow open its window.
         sandbox="allow-scripts allow-forms allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
+        // Delegate the Payment Request API into the Donorbox iframe so
+        // Apple Pay / Google Pay / Stripe payment-request work. Our
+        // top-level Permissions-Policy already lists donorbox.org under
+        // `payment`, but iframes still need an explicit `allow` attr.
+        allow="payment 'self' https://donorbox.org"
         title="Donate via Donorbox"
       />
     </div>
