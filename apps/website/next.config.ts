@@ -25,8 +25,9 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      // Scripts: self, inline for React hydration, eval for development
-      "script-src 'self' 'unsafe-inline'" + (process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''),
+      // Scripts: self, inline for React hydration, eval for development.
+      // Donorbox: widget.js for the embedded donation form.
+      "script-src 'self' 'unsafe-inline' https://donorbox.org" + (process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''),
       // Styles: self, inline for styled components, Google Fonts
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       // Fonts: self, Google Fonts
@@ -38,7 +39,9 @@ const securityHeaders = [
       // API connections. Allow the configured Strapi/S3 origins when they
       // point at localhost (CI, local dev) — prod uses HTTPS-only wildcards.
       (() => {
-        const base = "connect-src 'self' https://api.aladhan.com https://cms.learnednomad.com https://hadithapi.com wss:";
+        // Base allow-list. donorbox.org needed because widget.js phones
+        // home for analytics and PayPal handshake.
+        const base = "connect-src 'self' https://api.aladhan.com https://cms.learnednomad.com https://hadithapi.com https://donorbox.org wss:";
         const extra: string[] = [];
         if (process.env.NODE_ENV === 'development') {
           extra.push('http://localhost:1337', 'http://localhost:9000');
@@ -49,8 +52,9 @@ const securityHeaders = [
         }
         return extra.length ? `${base} ${extra.join(' ')}` : base;
       })(),
-      // Frames: allow YouTube and Vimeo embeds for video lessons
-      "frame-src 'self' https://www.youtube.com https://youtube.com https://player.vimeo.com",
+      // Frames: allow YouTube + Vimeo (video lessons) and Donorbox (donate
+      // page embedded form).
+      "frame-src 'self' https://www.youtube.com https://youtube.com https://player.vimeo.com https://donorbox.org",
       // Frames: prevent clickjacking
       "frame-ancestors 'none'",
       // Forms: self only
