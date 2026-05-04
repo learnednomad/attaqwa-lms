@@ -11,15 +11,14 @@ import {
   Home,
   GraduationCap,
   Calculator,
-  CreditCard,
-  Banknote,
-  Smartphone,
   Phone,
   Mail,
   ChevronRight,
   Check,
 } from 'lucide-react';
 import Link from 'next/link';
+
+import { DonorboxWidget } from '@/components/features/donate/DonorboxWidget';
 
 const donationCategories = [
   {
@@ -318,82 +317,21 @@ export default function DonatePage() {
               </div>
             </div>
 
-            {/* Payment Methods */}
+            {/* Donate via Donorbox — handles all payment methods (card,
+                bank, Apple Pay, PayPal Express). Replaces the previous
+                placeholder form which had no actual payment processing. */}
             <div className="border-t border-neutral-100 mt-8 pt-8">
-              <h4 className="text-sm font-medium text-neutral-900 mb-4">Payment Method</h4>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
-                {[
-                  { icon: CreditCard, label: 'Credit/Debit Card', desc: 'Secure online payment' },
-                  { icon: Banknote, label: 'Bank Transfer', desc: 'Direct bank transfer' },
-                  { icon: Smartphone, label: 'Zelle / Venmo', desc: 'Mobile payment' },
-                ].map((method) => (
-                  <div
-                    key={method.label}
-                    className="rounded-lg border border-neutral-200 bg-white p-4 text-center hover:border-neutral-300 transition-colors cursor-pointer"
-                  >
-                    <method.icon className="h-5 w-5 mx-auto mb-2 text-neutral-400" />
-                    <p className="text-sm font-medium text-neutral-900">{method.label}</p>
-                    <p className="text-xs text-neutral-400">{method.desc}</p>
-                  </div>
-                ))}
+              <div className="mb-4 flex items-center justify-between flex-wrap gap-2">
+                <h4 className="text-sm font-medium text-neutral-900">
+                  Complete your donation
+                </h4>
+                <p className="text-xs text-neutral-500">
+                  Secured by Donorbox · Cards, Apple Pay, PayPal accepted
+                </p>
               </div>
 
-              {/* Donation Form */}
-              <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-6">
-                <h5 className="text-sm font-medium text-neutral-900 mb-4">Donation Details</h5>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-xs font-medium text-neutral-500 mb-1.5">
-                      Full Name (Optional)
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="For tax receipt"
-                      className="w-full px-4 py-2.5 text-sm border border-neutral-200 rounded-lg bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-shadow"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-neutral-500 mb-1.5">
-                      Email Address (Optional)
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="For receipt delivery"
-                      className="w-full px-4 py-2.5 text-sm border border-neutral-200 rounded-lg bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-shadow"
-                    />
-                  </div>
-                </div>
-
-                <div className="mb-4">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="rounded border-neutral-300 text-emerald-600 focus:ring-emerald-500"
-                    />
-                    <span className="text-sm text-neutral-600">Make this donation anonymous</span>
-                  </label>
-                </div>
-
-                <div className="mb-6">
-                  <label className="block text-xs font-medium text-neutral-500 mb-1.5">
-                    Special Instructions (Optional)
-                  </label>
-                  <textarea
-                    rows={3}
-                    placeholder="Any specific instructions for your donation..."
-                    className="w-full px-4 py-2.5 text-sm border border-neutral-200 rounded-lg bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-shadow resize-none"
-                  />
-                </div>
-
-                <button
-                  disabled={finalAmount === 0}
-                  className="inline-flex items-center justify-center gap-2 w-full rounded-lg bg-emerald-600 px-5 py-3 text-sm font-medium text-white hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Heart className="h-4 w-4" />
-                  Donate ${finalAmount.toFixed(2)}
-                </button>
+              <div className="flex justify-center">
+                <DonorboxWidget formId="donation-481" />
               </div>
             </div>
           </div>
