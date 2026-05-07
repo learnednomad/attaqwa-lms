@@ -50,10 +50,16 @@ services:
       # Default false so production never seeds accidentally. Compose overlays
       # (docker-compose.dev.yml, docker-compose.staging.yml) set this to true.
       SEED_USERS: ${SEED_USERS:-false}
-      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?required}@postgres:5432/attaqwa_lms # placeholder
+      # Split fields only — the init image's db-url-entrypoint.sh builds
+      # DATABASE_URL with a properly URL-encoded password before invoking
+      # the migration script. Don't reintroduce a `DATABASE_URL:` line
+      # that interpolates ${POSTGRES_PASSWORD} directly: passwords with
+      # /+=@: characters break URL parsing and have caused auth failures.
       DATABASE_HOST: postgres
       DATABASE_PORT: 5432
+      DATABASE_NAME: attaqwa_lms
       DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET is required}
     depends_on:
       postgres:
@@ -165,7 +171,15 @@ services:
       HOSTNAME: 0.0.0.0
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:1337}
       STRAPI_URL: ${STRAPI_URL:-http://api:1337}
-      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?required}@postgres:5432/attaqwa_lms # placeholder
+      # See note on the init service: the website image's db-url-entrypoint.sh
+      # builds DATABASE_URL with a URL-encoded password from the split fields
+      # below, so BetterAuth (apps/website/src/lib/auth.ts) can keep reading
+      # process.env.DATABASE_URL safely regardless of password contents.
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: attaqwa_lms
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET is required}
       BETTER_AUTH_BASE_URL: ${BETTER_AUTH_BASE_URL:-http://localhost:3001}
       NEXT_PUBLIC_ADMIN_URL: ${NEXT_PUBLIC_ADMIN_URL:-http://localhost:3000}
