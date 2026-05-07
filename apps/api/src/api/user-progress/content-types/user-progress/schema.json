@@ -12,6 +12,10 @@
   },
   "pluginOptions": {},
   "attributes": {
+    "user_email": {
+      "type": "email",
+      "required": false
+    },
     "user": {
       "type": "relation",
       "relation": "manyToOne",
