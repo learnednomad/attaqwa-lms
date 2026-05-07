@@ -124,10 +124,15 @@ services:
     restart: 'no'
     environment:
       NODE_ENV: production
-      DATABASE_URL: '${DATABASE_URL}'
+      # Pass the password as a separate field, NOT embedded in DATABASE_URL.
+      # The init image's db-url-entrypoint.sh URL-encodes it before building
+      # the connection string. The legacy DATABASE_URL Coolify env can be
+      # deleted once this version is deployed (it is no longer referenced).
       DATABASE_HOST: postgres
       DATABASE_PORT: 5432
+      DATABASE_NAME: attaqwa_lms
       DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: '${POSTGRES_PASSWORD}'
       BETTER_AUTH_SECRET: '${BETTER_AUTH_SECRET}'
       BETTER_AUTH_BASE_URL: '${BETTER_AUTH_BASE_URL}'
     depends_on:
@@ -231,7 +236,12 @@ services:
       HOSTNAME: 0.0.0.0
       NEXT_PUBLIC_API_URL: '${NEXT_PUBLIC_API_URL}'
       STRAPI_URL: '${STRAPI_URL}'
-      DATABASE_URL: '${DATABASE_URL}'
+      # Same split-fields pattern as the init service — see note there.
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: attaqwa_lms
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: '${POSTGRES_PASSWORD}'
       BETTER_AUTH_SECRET: '${BETTER_AUTH_SECRET}'
       BETTER_AUTH_BASE_URL: '${BETTER_AUTH_BASE_URL}'
       STRAPI_API_TOKEN: '${STRAPI_API_TOKEN:-}'

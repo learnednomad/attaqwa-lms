@@ -176,6 +176,10 @@ COPY --from=website-builder --chown=nextjs:nodejs /app/apps/website/.next/standa
 COPY --from=website-builder --chown=nextjs:nodejs /app/apps/website/.next/static ./apps/website/.next/static
 COPY --from=website-builder --chown=nextjs:nodejs /app/apps/website/public ./apps/website/public
 
+# Build DATABASE_URL from split fields with URL-encoded password at start.
+COPY docker/db-url-entrypoint.sh /usr/local/bin/db-url-entrypoint.sh
+RUN chmod +x /usr/local/bin/db-url-entrypoint.sh
+
 USER nextjs
 
 ENV NODE_ENV=production
@@ -188,7 +192,7 @@ EXPOSE 3001
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
   CMD wget --quiet --tries=1 --spider http://127.0.0.1:3001 || exit 1
 
-ENTRYPOINT ["dumb-init", "--"]
+ENTRYPOINT ["dumb-init", "--", "/usr/local/bin/db-url-entrypoint.sh"]
 CMD ["node", "apps/website/server.js"]
 
 # ===========================================================================
@@ -213,12 +217,16 @@ WORKDIR /app
 # Copy the init runtime assets. `scripts/` may contain additional TS helpers
 # referenced by the entrypoint (e.g. migrate-users-to-betterauth.ts).
 COPY docker/init/entrypoint.sh /entrypoint.sh
+COPY docker/db-url-entrypoint.sh /usr/local/bin/db-url-entrypoint.sh
 COPY scripts/seed-auth-users.sql /app/scripts/seed-auth-users.sql
 COPY scripts/migrate-users-to-betterauth.ts /app/scripts/migrate-users-to-betterauth.ts
-RUN chmod +x /entrypoint.sh
+RUN chmod +x /entrypoint.sh /usr/local/bin/db-url-entrypoint.sh
 
 # Smoke-check that the BetterAuth CLI is present in the baked image so a
 # misconfigured lockfile fails the build rather than the deploy.
 RUN pnpm --filter website exec better-auth --help > /dev/null
 
-ENTRYPOINT ["/entrypoint.sh"]
+# db-url-entrypoint builds a properly URL-encoded DATABASE_URL from split
+# DATABASE_* env vars before handing off to the init script, so passwords
+# containing /+=@: round-trip cleanly to BetterAuth and psql.
+ENTRYPOINT ["/usr/local/bin/db-url-entrypoint.sh", "/entrypoint.sh"]

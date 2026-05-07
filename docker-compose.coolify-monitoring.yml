@@ -171,7 +171,7 @@ services:
     environment:
       DATA_SOURCE_URI: 'postgres:5432/attaqwa_lms?sslmode=disable'
       DATA_SOURCE_USER: 'postgres'
-      DATA_SOURCE_PASS: '${POSTGRES_PASSWORD_RAW}'
+      DATA_SOURCE_PASS: '${POSTGRES_PASSWORD}'
     expose:
       - '9187'
     networks:
@@ -425,8 +425,6 @@ networks:
 # Required env vars (set in Coolify service Env tab):
 #   GRAFANA_USER             — admin username (e.g., admin)
 #   GRAFANA_PASSWORD         — admin password (16+ chars)
-#   POSTGRES_PASSWORD_RAW    — actual postgres password (URL-decoded — the
-#                              one in the LMS service is URL-encoded for
-#                              DATABASE_URL, copy the raw form)
+#   POSTGRES_PASSWORD        — same raw value as the LMS service
 #   REDIS_PASSWORD           — same as the LMS service
 # =============================================================================
