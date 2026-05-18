@@ -37,6 +37,40 @@ interface IqamahSchedule {
 
 type EditForm = Omit<IqamahSchedule, 'id' | 'documentId'>;
 
+// Accepted shapes — must stay in sync with `resolveIqamahTime` in
+// apps/website/src/app/api/v1/prayer-times/route.ts. Values that don't
+// match are silently dropped by the public BFF, so we block them at save.
+const TIME_12H_RE = /^(0?[1-9]|1[0-2]):[0-5]\d\s*(AM|PM)$/i;
+const TIME_24H_RE = /^([01]?\d|2[0-3]):[0-5]\d$/;
+const OFFSET_RE = /^\+\d{1,3}$/;
+
+function validateTime(raw: string, opts: { required: boolean; allowOffset: boolean }): string | null {
+  const value = raw.trim();
+  if (!value) return opts.required ? 'Required' : null;
+  if (opts.allowOffset && OFFSET_RE.test(value)) return null;
+  if (TIME_12H_RE.test(value) || TIME_24H_RE.test(value)) return null;
+  return opts.allowOffset
+    ? 'Use h:mm AM/PM, HH:mm, or +minutes'
+    : 'Use h:mm AM/PM or HH:mm';
+}
+
+type TimeField = 'fajr' | 'dhuhr' | 'asr' | 'maghrib' | 'isha' | 'jumuah1' | 'jumuah2';
+type FormErrors = Partial<Record<TimeField, string>>;
+
+function getFormErrors(form: EditForm): FormErrors {
+  const errs: FormErrors = {};
+  const required: TimeField[] = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+  for (const f of required) {
+    const e = validateTime(form[f] ?? '', { required: true, allowOffset: true });
+    if (e) errs[f] = e;
+  }
+  for (const f of ['jumuah1', 'jumuah2'] as const) {
+    const e = validateTime(form[f] ?? '', { required: false, allowOffset: false });
+    if (e) errs[f] = e;
+  }
+  return errs;
+}
+
 const emptyForm: EditForm = {
   month: 1,
   dayRangeStart: 1,
@@ -123,15 +157,29 @@ export default function PrayerTimesPage() {
     setEditForm(emptyForm);
   };
 
+  const formErrors = getFormErrors(editForm);
+  const hasErrors = Object.keys(formErrors).length > 0;
+
   const saveSchedule = async () => {
+    if (hasErrors) return;
+    const trimmed: EditForm = {
+      ...editForm,
+      fajr: editForm.fajr.trim(),
+      dhuhr: editForm.dhuhr.trim(),
+      asr: editForm.asr.trim(),
+      maghrib: editForm.maghrib.trim(),
+      isha: editForm.isha.trim(),
+      jumuah1: editForm.jumuah1?.trim() || null,
+      jumuah2: editForm.jumuah2?.trim() || null,
+    };
     setSaving(true);
     try {
       if (isCreating) {
-        await strapiClient.post(adminApiEndpoints.iqamahSchedules, { data: editForm });
+        await strapiClient.post(adminApiEndpoints.iqamahSchedules, { data: trimmed });
       } else if (editingId) {
         const schedule = schedules.find(s => s.id === editingId);
         const identifier = schedule?.documentId || editingId;
-        await strapiClient.put(adminApiEndpoints.iqamahSchedules + '/' + identifier, { data: editForm });
+        await strapiClient.put(adminApiEndpoints.iqamahSchedules + '/' + identifier, { data: trimmed });
       }
       cancelEdit();
       await fetchSchedules();
@@ -205,9 +253,9 @@ export default function PrayerTimesPage() {
             <CardTitle className="text-lg">New Iqamah Entry - {MONTH_NAMES[selectedMonth]}</CardTitle>
           </CardHeader>
           <CardContent>
-            <ScheduleForm form={editForm} updateField={updateField} />
+            <ScheduleForm form={editForm} updateField={updateField} errors={formErrors} />
             <div className="flex gap-2 mt-4">
-              <Button onClick={saveSchedule} disabled={saving} className="flex items-center gap-2">
+              <Button onClick={saveSchedule} disabled={saving || hasErrors} className="flex items-center gap-2">
                 <Save className="h-4 w-4" />
                 {saving ? 'Saving...' : 'Save'}
               </Button>
@@ -241,9 +289,9 @@ export default function PrayerTimesPage() {
                 <div key={schedule.id} className="border border-charcoal-200 rounded-lg p-4">
                   {editingId === schedule.id ? (
                     <>
-                      <ScheduleForm form={editForm} updateField={updateField} />
+                      <ScheduleForm form={editForm} updateField={updateField} errors={formErrors} />
                       <div className="flex gap-2 mt-4">
-                        <Button onClick={saveSchedule} disabled={saving} size="sm" className="flex items-center gap-1">
+                        <Button onClick={saveSchedule} disabled={saving || hasErrors} size="sm" className="flex items-center gap-1">
                           <Save className="h-3 w-3" />
                           {saving ? 'Saving...' : 'Save'}
                         </Button>
@@ -327,9 +375,11 @@ export default function PrayerTimesPage() {
 function ScheduleForm({
   form,
   updateField,
+  errors,
 }: {
   form: EditForm;
   updateField: (field: keyof EditForm, value: string | number | boolean | null) => void;
+  errors: FormErrors;
 }) {
   return (
     <div className="space-y-4">
@@ -379,18 +429,21 @@ function ScheduleForm({
           value={form.fajr}
           onChange={e => updateField('fajr', e.target.value)}
           placeholder="6:30 AM"
+          error={errors.fajr}
         />
         <Input
           label="Dhuhr"
           value={form.dhuhr}
           onChange={e => updateField('dhuhr', e.target.value)}
           placeholder="1:00 PM"
+          error={errors.dhuhr}
         />
         <Input
           label="Asr"
           value={form.asr}
           onChange={e => updateField('asr', e.target.value)}
           placeholder="4:30 PM"
+          error={errors.asr}
         />
         <Input
           label="Maghrib"
@@ -398,12 +451,14 @@ function ScheduleForm({
           onChange={e => updateField('maghrib', e.target.value)}
           placeholder="+5"
           helperText="+N = minutes after adhan"
+          error={errors.maghrib}
         />
         <Input
           label="Isha"
           value={form.isha}
           onChange={e => updateField('isha', e.target.value)}
           placeholder="8:00 PM"
+          error={errors.isha}
         />
       </div>
       <div className="grid grid-cols-2 gap-3">
@@ -412,12 +467,14 @@ function ScheduleForm({
           value={form.jumuah1 || ''}
           onChange={e => updateField('jumuah1', e.target.value || null)}
           placeholder="1:15 PM"
+          error={errors.jumuah1}
         />
         <Input
           label="Jumu'ah 2nd Khutbah"
           value={form.jumuah2 || ''}
           onChange={e => updateField('jumuah2', e.target.value || null)}
           placeholder="2:15 PM"
+          error={errors.jumuah2}
         />
       </div>
     </div>
