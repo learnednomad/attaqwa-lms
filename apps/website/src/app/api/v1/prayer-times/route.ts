@@ -58,9 +58,11 @@ interface IqamahSchedule {
   isActive: boolean;
 }
 
-// Cache iqamah schedules for 1 hour
+// Iqamah is admin-edited and expected to reflect saves promptly,
+// so cache for 60s (matches the announcements/events 5-10min guidance
+// while staying short enough that a save is visible within a minute).
 let iqamahCache: { data: IqamahSchedule[]; fetchedAt: number } | null = null;
-const IQAMAH_CACHE_TTL = 60 * 60 * 1000; // 1 hour
+const IQAMAH_CACHE_TTL = 60 * 1000;
 
 async function fetchIqamahSchedules(): Promise<IqamahSchedule[]> {
   if (iqamahCache && Date.now() - iqamahCache.fetchedAt < IQAMAH_CACHE_TTL) {
@@ -70,7 +72,7 @@ async function fetchIqamahSchedules(): Promise<IqamahSchedule[]> {
   try {
     const res = await fetch(
       `${STRAPI_URL}/api/v1/iqamah-schedules?pagination[pageSize]=100&filters[isActive][$eq]=true`,
-      { next: { revalidate: 3600 } }
+      { next: { revalidate: 60 } }
     );
     if (!res.ok) throw new Error(`Strapi error: ${res.status}`);
     const json = await res.json();
