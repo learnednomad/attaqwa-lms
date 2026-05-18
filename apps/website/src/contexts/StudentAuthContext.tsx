@@ -7,7 +7,6 @@ import { authClient } from '@/lib/auth-client';
 interface User {
   id: string;
   email: string;
-  studentId?: string;
   name: string;
   role: string;
   requiresPasswordChange?: boolean;
@@ -17,7 +16,6 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  loginWithStudentId: (studentId: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -76,22 +74,6 @@ export function StudentAuthProvider({ children }: { children: React.ReactNode })
     router.push(landingPathFor({ requiresPasswordChange: requires }));
   };
 
-  const loginWithStudentId = async (studentId: string, password: string) => {
-    // Student ID login: use the student ID as the email identifier
-    // This assumes student IDs are mapped to email addresses in the system
-    const { error } = await authClient.signIn.email({
-      email: studentId,
-      password,
-    });
-    if (error) {
-      throw new Error(error.message || 'Login failed');
-    }
-    const { data: freshSession } = await authClient.getSession();
-    const requires =
-      (freshSession?.user as { requiresPasswordChange?: boolean })?.requiresPasswordChange === true;
-    router.push(landingPathFor({ requiresPasswordChange: requires }));
-  };
-
   const logout = async () => {
     await authClient.signOut();
     router.push('/student/login');
@@ -103,7 +85,7 @@ export function StudentAuthProvider({ children }: { children: React.ReactNode })
 
   return (
     <AuthContext.Provider
-      value={{ user, loading: isPending, login, loginWithStudentId, logout, refreshUser }}
+      value={{ user, loading: isPending, login, logout, refreshUser }}
     >
       {children}
     </AuthContext.Provider>

@@ -2,24 +2,21 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Eye, EyeOff, BookOpen, GraduationCap, User } from 'lucide-react';
+import { Eye, EyeOff, GraduationCap, User } from 'lucide-react';
 import { useStudentAuth } from '@/contexts/StudentAuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function StudentLoginPage() {
-  const { login, loginWithStudentId } = useStudentAuth();
+  const { login } = useStudentAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [studentId, setStudentId] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [loginMethod, setLoginMethod] = useState<'email' | 'studentId'>('email');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,14 +24,15 @@ export default function StudentLoginPage() {
     setLoading(true);
 
     try {
-      if (loginMethod === 'email') {
-        await login(email, password);
-      } else {
-        await loginWithStudentId(studentId, password);
-      }
+      await login(email, password);
       // Context handles router.push('/student/dashboard')
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Invalid credentials. Please try again.');
+      // Better-Auth surfaces INVALID_EMAIL / INVALID_EMAIL_OR_PASSWORD codes,
+      // both of which a student reads as "I typed something wrong." Collapse
+      // to a single human-friendly line.
+      const raw = err instanceof Error ? err.message : '';
+      const looksLikeCreds = /invalid email|invalid email or password|invalid credentials/i.test(raw);
+      setError(looksLikeCreds ? 'Invalid email or password. Please try again.' : raw || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -61,51 +59,23 @@ export default function StudentLoginPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Login Method Tabs */}
-              <Tabs value={loginMethod} onValueChange={(value) => setLoginMethod(value as 'email' | 'studentId')}>
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="email">Email Login</TabsTrigger>
-                  <TabsTrigger value="studentId">Student ID</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="email" className="space-y-4">
-                  <div>
-                    <Label htmlFor="email">Email Address</Label>
-                    <div className="relative">
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="student@attaqwa.org"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required={loginMethod === 'email'}
-                        className="pl-10"
-                        disabled={loading}
-                      />
-                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="studentId" className="space-y-4">
-                  <div>
-                    <Label htmlFor="studentId">Student ID</Label>
-                    <div className="relative">
-                      <Input
-                        id="studentId"
-                        type="text"
-                        placeholder="STU2024001"
-                        value={studentId}
-                        onChange={(e) => setStudentId(e.target.value)}
-                        required={loginMethod === 'studentId'}
-                        className="pl-10"
-                        disabled={loading}
-                      />
-                      <BookOpen className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
+              <div>
+                <Label htmlFor="email">Email Address</Label>
+                <div className="relative">
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="student@attaqwa.org"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="pl-10"
+                    disabled={loading}
+                    autoComplete="email"
+                  />
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                </div>
+              </div>
 
               {/* Password Field */}
               <div>
