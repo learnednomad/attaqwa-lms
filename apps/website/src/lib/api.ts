@@ -18,7 +18,6 @@ import type {
 import type {
   ApiResponse,
   PaginatedResponse,
-  ErrorResponse,
   Announcement,
   Event,
   PrayerTime,
@@ -75,20 +74,37 @@ async function makeRequest<T>(
   });
 
   if (!response.ok) {
-    let errorMessage: string = ERROR_MESSAGES.SERVER_ERROR;
-
-    try {
-      const errorData: ErrorResponse = await response.json();
-      errorMessage = errorData.message || errorData.error;
-    } catch {
-      // Fallback to status text if JSON parsing fails
-      errorMessage = response.statusText || `HTTP ${response.status}`;
-    }
-
-    throw new ApiError(response.status, errorMessage);
+    throw new ApiError(response.status, await extractErrorMessage(response));
   }
 
   return response.json();
+}
+
+/**
+ * Pull a human-readable error string from a non-OK response. Strapi v5 nests
+ * the message at `error.message`; older callers used a flat `message`/`error`
+ * string. Cover both so the UI never surfaces "[object Object]" from a raw
+ * Strapi error envelope.
+ */
+async function extractErrorMessage(response: Response): Promise<string> {
+  try {
+    const body = (await response.json()) as Record<string, unknown> | null;
+    if (body && typeof body === 'object') {
+      const nestedError = body.error as Record<string, unknown> | string | undefined;
+      if (nestedError && typeof nestedError === 'object') {
+        const m = nestedError.message;
+        if (typeof m === 'string' && m.trim()) return m;
+        const n = nestedError.name;
+        if (typeof n === 'string' && n.trim()) return n;
+      }
+      if (typeof nestedError === 'string' && nestedError.trim()) return nestedError;
+      const topMessage = body.message;
+      if (typeof topMessage === 'string' && topMessage.trim()) return topMessage;
+    }
+  } catch {
+    // fall through to status text
+  }
+  return response.statusText || `HTTP ${response.status}` || ERROR_MESSAGES.SERVER_ERROR;
 }
 
 // Strapi returns { data, meta: { pagination: { page, pageSize, pageCount, total } } }
@@ -162,14 +178,7 @@ async function makeAdminRequest<T>(
   });
 
   if (!response.ok) {
-    let errorMessage: string = ERROR_MESSAGES.SERVER_ERROR;
-    try {
-      const errorData: ErrorResponse = await response.json();
-      errorMessage = errorData.message || errorData.error;
-    } catch {
-      errorMessage = response.statusText || `HTTP ${response.status}`;
-    }
-    throw new ApiError(response.status, errorMessage);
+    throw new ApiError(response.status, await extractErrorMessage(response));
   }
 
   return response.json();
