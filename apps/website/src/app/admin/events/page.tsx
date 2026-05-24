@@ -126,9 +126,10 @@ export default function EventsPage() {
                 const eventDate = new Date(event.date);
                 const isUpcoming = eventDate > new Date();
                 
+                const eventKey = event.documentId || event.id;
                 return (
                   <div
-                    key={event.id}
+                    key={eventKey}
                     className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
                   >
                     <div className="flex-1 space-y-2 min-w-0">
@@ -201,14 +202,14 @@ export default function EventsPage() {
                     
                     <div className="flex items-center space-x-2 sm:ml-4 flex-shrink-0">
                       <Button size="sm" variant="outline" asChild>
-                        <Link href={`/admin/events/${event.id}/edit`}>
+                        <Link href={`/admin/events/${eventKey}/edit`}>
                           <Edit className="w-4 h-4" />
                         </Link>
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleDelete(event.id, event.title)}
+                        onClick={() => handleDelete(eventKey, event.title)}
                         disabled={deleteMutation.isPending}
                         className="text-red-600 hover:text-red-700 hover:bg-red-50"
                       >

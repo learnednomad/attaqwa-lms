@@ -115,9 +115,11 @@ export default function ItikafRegistrationsPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {filteredRegistrations.map((reg) => (
+              {filteredRegistrations.map((reg) => {
+                const regKey = reg.documentId || reg.id;
+                return (
                 <div
-                  key={reg.id}
+                  key={regKey}
                   className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 p-4 border rounded-lg hover:bg-gray-50"
                 >
                   <div className="flex-1 space-y-2 min-w-0">
@@ -156,7 +158,7 @@ export default function ItikafRegistrationsPage() {
 
                   <div className="flex items-center space-x-2 sm:ml-4 flex-shrink-0">
                     <Button variant="outline" size="sm" asChild>
-                      <Link href={`/admin/itikaf/${reg.id}`}>
+                      <Link href={`/admin/itikaf/${regKey}`}>
                         <Eye className="w-4 h-4" />
                       </Link>
                     </Button>
@@ -166,7 +168,7 @@ export default function ItikafRegistrationsPage() {
                           size="sm"
                           variant="outline"
                           className="text-green-600 hover:text-green-700"
-                          onClick={() => handleQuickAction(reg.id, 'approved')}
+                          onClick={() => handleQuickAction(regKey, 'approved')}
                           disabled={updateRegistration.isPending}
                         >
                           <CheckCircle className="w-4 h-4" />
@@ -175,7 +177,7 @@ export default function ItikafRegistrationsPage() {
                           size="sm"
                           variant="outline"
                           className="text-red-600 hover:text-red-700"
-                          onClick={() => handleQuickAction(reg.id, 'rejected')}
+                          onClick={() => handleQuickAction(regKey, 'rejected')}
                           disabled={updateRegistration.isPending}
                         >
                           <XCircle className="w-4 h-4" />
@@ -184,7 +186,8 @@ export default function ItikafRegistrationsPage() {
                     )}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>
