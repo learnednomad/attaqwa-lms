@@ -141,8 +141,9 @@ export default function AppealsPage() {
         ) : (
           filteredAppeals.map((appeal) => {
             const progress = getProgressPercentage(appeal.currentAmount, appeal.goalAmount);
+            const appealKey = appeal.documentId || appeal.id;
             return (
-              <Card key={appeal.id}>
+              <Card key={appealKey}>
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                     <div className="flex-1 space-y-3 min-w-0">
@@ -203,14 +204,14 @@ export default function AppealsPage() {
 
                     <div className="flex items-center space-x-2 sm:ml-4 flex-shrink-0">
                       <Button variant="outline" size="sm" asChild>
-                        <Link href={`/admin/appeals/${appeal.id}/edit`}>
+                        <Link href={`/admin/appeals/${appealKey}/edit`}>
                           <Edit className="w-4 h-4" />
                         </Link>
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleDelete(appeal.id)}
+                        onClick={() => handleDelete(appealKey)}
                         disabled={deleteAppeal.isPending}
                       >
                         <Trash2 className="w-4 h-4" />

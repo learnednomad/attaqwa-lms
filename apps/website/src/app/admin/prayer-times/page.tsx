@@ -896,8 +896,10 @@ export default function PrayerTimesPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {overridesData.data.map((override) => (
-                      <tr key={override.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    {overridesData.data.map((override) => {
+                      const overrideKey = override.documentId || override.id;
+                      return (
+                      <tr key={overrideKey} className="border-b border-gray-100 hover:bg-gray-50">
                         <td className="py-3">{new Date(override.date).toLocaleDateString()}</td>
                         <td className="py-3 capitalize font-medium">{override.prayer}</td>
                         <td className="py-3 font-mono tabular-nums">{override.overrideTime}</td>
@@ -908,12 +910,13 @@ export default function PrayerTimesPage() {
                           </Badge>
                         </td>
                         <td className="py-3 text-right">
-                          <Button variant="outline" size="sm" onClick={() => handleDeleteOverride(override.id)} disabled={deleteOverride.isPending}>
+                          <Button variant="outline" size="sm" onClick={() => handleDeleteOverride(overrideKey)} disabled={deleteOverride.isPending}>
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </td>
                       </tr>
-                    ))}
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

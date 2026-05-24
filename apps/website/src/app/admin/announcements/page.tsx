@@ -127,9 +127,11 @@ export default function AnnouncementsPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {announcements.map((announcement) => (
+              {announcements.map((announcement) => {
+                const announcementKey = announcement.documentId || announcement.id;
+                return (
                 <div
-                  key={announcement.id}
+                  key={announcementKey}
                   className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
                 >
                   <div className="flex-1 space-y-2 min-w-0">
@@ -183,14 +185,14 @@ export default function AnnouncementsPage() {
 
                   <div className="flex items-center space-x-2 sm:ml-4 flex-shrink-0">
                     <Button size="sm" variant="outline" asChild>
-                      <Link href={`/admin/announcements/${announcement.id}/edit`}>
+                      <Link href={`/admin/announcements/${announcementKey}/edit`}>
                         <Edit className="w-4 h-4" />
                       </Link>
                     </Button>
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => handleDelete(announcement.id, announcement.title)}
+                      onClick={() => handleDelete(announcementKey, announcement.title)}
                       disabled={deleteMutation.isPending}
                       className="text-red-600 hover:text-red-700 hover:bg-red-50"
                     >
@@ -198,7 +200,8 @@ export default function AnnouncementsPage() {
                     </Button>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>
