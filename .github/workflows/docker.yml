@@ -190,12 +190,13 @@ jobs:
     steps:
       - name: Deploy to Coolify (production)
         run: |
-          # /services/{uuid}/restart only bounces existing containers; it does
-          # not pull updated images, so merges to main never picked up the
-          # freshly-built ghcr.io image. /api/v1/deploy runs a proper redeploy
-          # (pull + recreate) and works for both applications and services.
+          # `latest=true` is required: without it, Coolify recreates containers
+          # from the locally cached image and the freshly-built ghcr.io image
+          # is never pulled. /api/v1/deploy only works for Application resources;
+          # for Service resources (our case) it calls StartService with no pull
+          # flag, which has the same problem.
           curl -sSf -X GET \
-            "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_SERVICE_UUID }}&force=true" \
+            "${{ secrets.COOLIFY_URL }}/api/v1/services/${{ secrets.COOLIFY_SERVICE_UUID }}/restart?latest=true" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
             -H "Content-Type: application/json"
 
