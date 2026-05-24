@@ -190,8 +190,12 @@ jobs:
     steps:
       - name: Deploy to Coolify (production)
         run: |
+          # /services/{uuid}/restart only bounces existing containers; it does
+          # not pull updated images, so merges to main never picked up the
+          # freshly-built ghcr.io image. /api/v1/deploy runs a proper redeploy
+          # (pull + recreate) and works for both applications and services.
           curl -sSf -X GET \
-            "${{ secrets.COOLIFY_URL }}/api/v1/services/${{ secrets.COOLIFY_SERVICE_UUID }}/restart" \
+            "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_SERVICE_UUID }}&force=true" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
             -H "Content-Type: application/json"
 
