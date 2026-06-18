@@ -397,8 +397,28 @@ class ClientLogger {
   }
 }
 
-// Create singleton instance
-const clientLogger = new ClientLogger();
+// Create singleton instance lazily so importing this module on the server
+// (where `window`/`navigator` are undefined) does not throw. The ClientLogger
+// constructor wires up `window.addEventListener` and `navigator` lookups, so
+// it must only be instantiated in a browser context.
+let _clientLogger: ClientLogger | null = null;
+type StubKeys = keyof ClientLogger;
+const NOOP_STUB: Record<string, (...args: unknown[]) => void> = new Proxy(
+  {},
+  { get: () => () => {} },
+);
+const clientLogger: ClientLogger =
+  typeof window === 'undefined'
+    ? (NOOP_STUB as unknown as ClientLogger)
+    : new Proxy({} as ClientLogger, {
+        get(_target, prop: StubKeys) {
+          if (!_clientLogger) _clientLogger = new ClientLogger();
+          const value = (_clientLogger as unknown as Record<string, unknown>)[prop as string];
+          return typeof value === 'function'
+            ? (value as (...args: unknown[]) => unknown).bind(_clientLogger)
+            : value;
+        },
+      });
 
 // React Error Boundary helper
 export const logReactError = (error: Error, errorInfo: { componentStack: string }) => {

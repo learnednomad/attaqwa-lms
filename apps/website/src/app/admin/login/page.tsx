@@ -52,7 +52,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-islamic-green-50 via-white to-islamic-green-100 px-4 py-12">
+    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-islamic-green-50 via-white to-islamic-green-100 px-4 py-12">
       <Link
         href="/"
         className="absolute top-6 left-6 inline-flex items-center gap-2 text-sm text-islamic-green-700 hover:text-islamic-green-800 font-medium"
@@ -60,6 +60,8 @@ export default function AdminLoginPage() {
         <ArrowLeft className="h-4 w-4" />
         Back to public site
       </Link>
+
+      <h1 className="sr-only">Admin sign in</h1>
 
       <Card className="w-full max-w-md shadow-lg border-islamic-green-100">
         <CardHeader className="text-center pb-4">
@@ -127,6 +129,6 @@ export default function AdminLoginPage() {
           </form>
         </CardContent>
       </Card>
-    </div>
+    </main>
   );
 }

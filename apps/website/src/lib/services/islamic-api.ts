@@ -198,9 +198,16 @@ interface HijriDateInfo {
 export async function fetchIslamicCalendar(date?: Date): Promise<HijriDateInfo> {
   try {
     const targetDate = date || new Date();
-    const dateString = targetDate.toISOString().split('T')[0];
+    // aladhan.com /v1/gToH expects path-style DD-MM-YYYY, not query-string ISO.
+    const dd = String(targetDate.getDate()).padStart(2, '0');
+    const mm = String(targetDate.getMonth() + 1).padStart(2, '0');
+    const yyyy = targetDate.getFullYear();
+    const dateString = `${dd}-${mm}-${yyyy}`;
 
-    const response = await fetch(`https://api.aladhan.com/v1/gToH?date=${dateString}`);
+    const response = await fetch(`https://api.aladhan.com/v1/gToH/${dateString}`);
+    if (!response.ok) {
+      throw new Error(`aladhan gToH ${response.status}`);
+    }
     const data = await response.json();
 
     return data.data.hijri;
