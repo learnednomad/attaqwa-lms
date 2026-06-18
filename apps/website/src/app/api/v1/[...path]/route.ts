@@ -15,6 +15,10 @@
  *   - GET requests: forwarded with the token (Strapi route definitions
  *     decide if the endpoint is public — most public-content endpoints
  *     have `auth: false` configured in apps/api).
+ *   - POST to public-submission endpoints (see PUBLIC_POST_PATHS): forwarded
+ *     without an admin check. These mirror Strapi routes configured with
+ *     `auth: false` (contact form, ask-an-imam) — without this allowlist
+ *     the public forms get 401 because the website BFF gates everything.
  *   - POST/PUT/PATCH/DELETE: BetterAuth session must exist with role
  *     admin or moderator. 401/403 returned otherwise.
  *
@@ -30,6 +34,14 @@ const STRAPI_URL = process.env.STRAPI_URL || "http://localhost:1337";
 const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN;
 
 const ADMIN_ROLES = new Set(["ADMIN", "MODERATOR", "admin", "moderator"]);
+
+// Endpoints where Strapi has POST `auth: false` configured. Keep in sync
+// with apps/api/src/api/*/routes/*.ts. Submissions are still rate-limited
+// by Strapi middleware.
+const PUBLIC_POST_PATHS = new Set([
+  "/api/v1/contact-inquiries",
+  "/api/v1/legal-inquiries",
+]);
 
 async function proxyToStrapi(
   request: NextRequest,
@@ -113,7 +125,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  return proxyToStrapi(request, true);
+  const path = new URL(request.url).pathname;
+  return proxyToStrapi(request, !PUBLIC_POST_PATHS.has(path));
 }
 
 export async function PUT(request: NextRequest) {
