@@ -61,11 +61,14 @@ export function SeerahProgress() {
 
   const checkAuthAndFetchProgress = async () => {
     try {
-      const authResponse = await fetch('/api/auth/me', {
+      // better-auth exposes the active session at /api/auth/get-session.
+      // A 200 with non-empty body means signed in; 200 with empty body means anon.
+      const authResponse = await fetch('/api/auth/get-session', {
         credentials: 'include',
       });
 
-      if (authResponse.ok) {
+      const session = authResponse.ok ? await authResponse.json().catch(() => null) : null;
+      if (session && session.user) {
         setIsAuthenticated(true);
         const progressResponse = await fetch('/api/seerah/progress', {
           credentials: 'include',

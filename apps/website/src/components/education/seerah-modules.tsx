@@ -51,6 +51,7 @@ interface Module {
 export function SeerahModules() {
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
+  const [comingSoon, setComingSoon] = useState(false);
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
 
   useEffect(() => {
@@ -62,10 +63,17 @@ export function SeerahModules() {
       const response = await fetch('/api/seerah/modules', {
         credentials: 'include',
       });
+      if (!response.ok) {
+        setComingSoon(true);
+        return;
+      }
       const data = await response.json();
-      setModules(data.modules || []);
+      const next = data.modules || [];
+      setModules(next);
+      if (!next.length) setComingSoon(true);
     } catch (error) {
       console.error('Error fetching modules:', error);
+      setComingSoon(true);
     } finally {
       setLoading(false);
     }
@@ -102,6 +110,30 @@ export function SeerahModules() {
 
   if (loading) {
     return <div className="text-center py-8 text-sm text-neutral-400">Loading modules...</div>;
+  }
+
+  if (comingSoon && modules.length === 0) {
+    return (
+      <div>
+        <div className="flex items-center gap-3 mb-6">
+          <h2 className="text-xl font-semibold text-neutral-900">Course Modules</h2>
+          <div className="flex-1 h-px bg-neutral-100" />
+        </div>
+        <div className="rounded-xl border border-neutral-200 bg-white p-10 text-center">
+          <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-emerald-100 bg-emerald-50">
+            <BookOpen className="h-4 w-4 text-emerald-600" />
+          </div>
+          <h3 className="mb-2 text-sm font-semibold text-neutral-900">
+            Curriculum content is being prepared
+          </h3>
+          <p className="mx-auto max-w-md text-xs leading-relaxed text-neutral-500">
+            Our eight-module Seerah curriculum is currently being authored from
+            authentic sources. Please check back soon — or sign in to be notified
+            when the first modules are released.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -3,15 +3,10 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, Suspense } from 'react';
 import dynamic from 'next/dynamic';
+import { ErrorBoundary } from '@/components/monitoring/ErrorBoundary';
 
-// Dynamically import ErrorBoundary with no SSR (client-logger.ts accesses window at module scope)
-const ErrorBoundary = dynamic(
-  () =>
-    import('@/components/monitoring/ErrorBoundary').then((m) => ({
-      default: m.ErrorBoundary,
-    })),
-  { ssr: false }
-);
+// client-logger.ts is now lazy-instantiated, so importing ErrorBoundary
+// statically no longer touches `window` during SSR.
 
 // Dynamically import DevTools with no SSR
 const ReactQueryDevtools = dynamic(
