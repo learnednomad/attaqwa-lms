@@ -12,7 +12,7 @@ export const MOSQUE_INFO = {
   email: 'almaad2674@gmail.com',
   imamEmail: 'Mohammad30360@hotmail.com',
   schoolEmail: 'Attaqwa.du@gmail.com',
-  website: 'https://masjidattaqwaatlanta.org',
+  website: 'https://attaqwamasjid.cloud',
   social: {
     facebook: 'https://www.facebook.com/MasjidAttaqwa2674WoodwinRd',
     youtube: 'https://www.youtube.com/@MasjidAttaqwa2674',

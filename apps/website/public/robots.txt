@@ -36,11 +36,10 @@ Disallow: /*.log$
 Crawl-delay: 1
 
 # XML Sitemaps
-Sitemap: https://attaqwa.org/sitemap.xml
-Sitemap: https://attaqwa.org/sitemap-islamic-content.xml
-Sitemap: https://attaqwa.org/sitemap-prayer-times.xml
-Sitemap: https://attaqwa.org/sitemap-events.xml
-Sitemap: https://attaqwa.org/sitemap-education.xml
+Sitemap: https://attaqwamasjid.cloud/sitemap-index.xml
+Sitemap: https://attaqwamasjid.cloud/sitemap.xml
+Sitemap: https://attaqwamasjid.cloud/sitemap-islamic-content.xml
+Sitemap: https://attaqwamasjid.cloud/sitemap-prayer-times.xml
 
 # Host directive for consistency
-Host: https://attaqwa.org
+Host: https://attaqwamasjid.cloud

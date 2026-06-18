@@ -9,6 +9,8 @@ export async function GET() {
   const baseURL = MOSQUE_INFO.website;
   const currentDate = new Date().toISOString();
   
+  // Note: sitemap-events.xml and sitemap-education.xml are not implemented
+  // yet — only reference the sitemaps that actually exist as routes.
   const sitemapIndex = `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
@@ -21,14 +23,6 @@ export async function GET() {
   </sitemap>
   <sitemap>
     <loc>${baseURL}/sitemap-prayer-times.xml</loc>
-    <lastmod>${currentDate}</lastmod>
-  </sitemap>
-  <sitemap>
-    <loc>${baseURL}/sitemap-events.xml</loc>
-    <lastmod>${currentDate}</lastmod>
-  </sitemap>
-  <sitemap>
-    <loc>${baseURL}/sitemap-education.xml</loc>
     <lastmod>${currentDate}</lastmod>
   </sitemap>
 </sitemapindex>`;
