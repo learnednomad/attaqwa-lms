@@ -414,7 +414,9 @@ const clientLogger: ClientLogger =
         get(_target, prop: StubKeys) {
           if (!_clientLogger) _clientLogger = new ClientLogger();
           const value = (_clientLogger as unknown as Record<string, unknown>)[prop as string];
-          return typeof value === 'function' ? (value as Function).bind(_clientLogger) : value;
+          return typeof value === 'function'
+            ? (value as (...args: unknown[]) => unknown).bind(_clientLogger)
+            : value;
         },
       });
 
