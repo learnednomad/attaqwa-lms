@@ -244,7 +244,7 @@ export default function StudentsPage() {
                     >
                       <TableCell>
                         <Link
-                          href={`/students/${user.id}`}
+                          href={`/students/${encodeURIComponent(user.id)}`}
                           className="flex items-center space-x-3"
                         >
                           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-700">
