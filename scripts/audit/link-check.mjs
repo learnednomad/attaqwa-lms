@@ -49,6 +49,66 @@ function normalize(href, base) {
   }
 }
 
+const FOLLOW_PREFIXES = ['/services', '/resources', '/education', '/admin', '/student', '/teacher'];
+
+function shouldFollow(target, seen, queueLen) {
+  if (seen.has(target) || queueLen >= 80) return false;
+  if (target.split('/').length <= 2) return true;
+  return FOLLOW_PREFIXES.some((p) => target.startsWith(p));
+}
+
+async function crawlPage(page, sitePath, linkSources, seen, queue) {
+  const url = SITE + sitePath;
+  process.stderr.write(`crawl ${sitePath}\n`);
+  try {
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 });
+    // Wait for hydration: on the deployed site every page bails out of SSR
+    // (see PR #66), so a[href] elements only appear after React mounts.
+    await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
+    await page.waitForSelector('a[href]', { timeout: 5000 }).catch(() => {});
+    const links = await collectLinks(page, url);
+    for (const href of links) {
+      const target = normalize(href, url);
+      if (!target) continue;
+      if (!linkSources.has(target)) linkSources.set(target, new Set());
+      linkSources.get(target).add(sitePath);
+      if (shouldFollow(target, seen, queue.length)) queue.push(target);
+    }
+  } catch (e) {
+    process.stderr.write(`  NAV-ERROR ${e.message}\n`);
+  }
+}
+
+async function probeTarget(target) {
+  const u = SITE + target;
+  try {
+    let res = await fetch(u, { method: 'HEAD', redirect: 'manual' });
+    if (res.status === 405 || res.status === 501) {
+      res = await fetch(u, { method: 'GET', redirect: 'manual' });
+    }
+    return { target, status: res.status };
+  } catch (e) {
+    return { target, status: 0, error: String(e.message ?? e) };
+  }
+}
+
+function renderReport(seen, results) {
+  const broken = results.filter((r) => r.status === 0 || r.status >= 400);
+  console.log(`# Link check (${SITE})\n`);
+  console.log(`**Pages crawled:** ${seen.size}`);
+  console.log(`**Unique internal links:** ${results.length}`);
+  console.log(`**Broken (4xx/5xx/net):** ${broken.length}\n`);
+  if (broken.length) {
+    console.log('## Broken targets\n');
+    broken.sort((a, b) => a.target.localeCompare(b.target));
+    for (const b of broken) {
+      const src = b.sources.slice(0, 5).join(', ') + (b.sources.length > 5 ? ', …' : '');
+      console.log(`- \`${b.target}\` → **${b.status}${b.error ? ' ' + b.error : ''}** (from: ${src})`);
+    }
+  }
+  return broken.length;
+}
+
 async function main() {
   const browser = await chromium.launch({ headless: true });
   const ctx = await browser.newContext({ userAgent: 'attaqwa-linkcheck/1.0' });
@@ -56,75 +116,20 @@ async function main() {
 
   const seen = new Set();
   const queue = [...SEED];
-  const linkSources = new Map(); // path -> Set<source-pages>
+  const linkSources = new Map();
 
   while (queue.length) {
-    const path = queue.shift();
-    if (seen.has(path)) continue;
-    seen.add(path);
-    const url = SITE + path;
-    process.stderr.write(`crawl ${path}\n`);
-    try {
-      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 });
-      const links = await collectLinks(page, url);
-      for (const href of links) {
-        const target = normalize(href, url);
-        if (!target) continue;
-        if (!linkSources.has(target)) linkSources.set(target, new Set());
-        linkSources.get(target).add(path);
-        // Only enqueue same-section follow-ups to keep crawl bounded
-        if (
-          !seen.has(target) &&
-          queue.length < 80 &&
-          (target.startsWith('/services') ||
-            target.startsWith('/resources') ||
-            target.startsWith('/education') ||
-            target.startsWith('/admin') ||
-            target.startsWith('/student') ||
-            target.startsWith('/teacher') ||
-            target.split('/').length <= 2)
-        ) {
-          queue.push(target);
-        }
-      }
-    } catch (e) {
-      process.stderr.write(`  NAV-ERROR ${e.message}\n`);
-    }
+    const sitePath = queue.shift();
+    if (seen.has(sitePath)) continue;
+    seen.add(sitePath);
+    await crawlPage(page, sitePath, linkSources, seen, queue);
   }
 
-  // Probe each target with a HEAD (or GET if HEAD not allowed)
-  const results = [];
-  for (const target of linkSources.keys()) {
-    const u = SITE + target;
-    try {
-      let res = await fetch(u, { method: 'HEAD', redirect: 'manual' });
-      if (res.status === 405 || res.status === 501) {
-        res = await fetch(u, { method: 'GET', redirect: 'manual' });
-      }
-      results.push({ target, status: res.status, sources: [...linkSources.get(target)] });
-    } catch (e) {
-      results.push({ target, status: 0, error: String(e.message ?? e), sources: [...linkSources.get(target)] });
-    }
-  }
+  const probed = await Promise.all([...linkSources.keys()].map(probeTarget));
+  const results = probed.map((r) => ({ ...r, sources: [...linkSources.get(r.target)] }));
 
   await browser.close();
-
-  const broken = results.filter((r) => r.status === 0 || r.status >= 400);
-
-  console.log(`# Link check (${SITE})\n`);
-  console.log(`**Pages crawled:** ${seen.size}`);
-  console.log(`**Unique internal links:** ${results.length}`);
-  console.log(`**Broken (4xx/5xx/net):** ${broken.length}\n`);
-
-  if (broken.length) {
-    console.log('## Broken targets\n');
-    broken.sort((a, b) => a.target.localeCompare(b.target));
-    for (const b of broken) {
-      console.log(`- \`${b.target}\` → **${b.status}${b.error ? ' ' + b.error : ''}** (from: ${b.sources.slice(0, 5).join(', ')}${b.sources.length > 5 ? ', …' : ''})`);
-    }
-  }
-
-  process.exit(broken.length ? 1 : 0);
+  process.exit(renderReport(seen, results) ? 1 : 0);
 }
 
 main().catch((e) => {

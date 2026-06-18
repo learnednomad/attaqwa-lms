@@ -158,74 +158,79 @@ async function auditOne(browser, path) {
   };
 }
 
-async function main() {
-  const browser = await chromium.launch({ headless: true });
+function safeAudit(browser, path) {
+  return auditOne(browser, path).catch((e) => ({
+    path,
+    status: 0,
+    title: '',
+    hasMain: false,
+    jsErrors: [String(e.message ?? e)],
+    consoleErrors: [],
+    badRequests: [],
+    failures: ['worker error'],
+  }));
+}
+
+async function runAudits(browser, conc) {
   const results = [];
-  // Run with a small concurrency to avoid overloading the live site.
-  const CONC = 3;
   let i = 0;
   async function worker() {
     while (i < ROUTES.length) {
       const idx = i++;
       const path = ROUTES[idx];
       process.stderr.write(`[${idx + 1}/${ROUTES.length}] ${path}\n`);
-      try {
-        results.push(await auditOne(browser, path));
-      } catch (e) {
-        results.push({
-          path,
-          status: 0,
-          title: '',
-          hasMain: false,
-          jsErrors: [String(e.message ?? e)],
-          consoleErrors: [],
-          badRequests: [],
-          failures: ['worker error'],
-        });
-      }
+      results.push(await safeAudit(browser, path));
     }
   }
-  await Promise.all(Array.from({ length: CONC }, worker));
-  await browser.close();
+  await Promise.all(Array.from({ length: conc }, worker));
+  return results;
+}
 
-  // Sort: failures first
+function renderFailedSection(failed) {
+  if (!failed.length) return '';
+  let out = `## Failed routes\n\n`;
+  for (const r of failed) {
+    out += `### ${r.path} — status ${r.status}\n`;
+    out += `- title: \`${r.title}\`\n`;
+    out += `- failures: ${r.failures.join(', ')}\n`;
+    if (r.jsErrors.length) {
+      out += `- JS errors:\n`;
+      for (const e of r.jsErrors.slice(0, 5)) out += `  - \`${e.slice(0, 300)}\`\n`;
+    }
+    if (r.consoleErrors.length) {
+      out += `- Console:\n`;
+      for (const e of r.consoleErrors.slice(0, 5)) out += `  - \`${e.slice(0, 300)}\`\n`;
+    }
+    if (r.badRequests.length) {
+      out += `- Failed requests:\n`;
+      for (const e of r.badRequests.slice(0, 10)) out += `  - ${e}\n`;
+    }
+    out += `\n`;
+  }
+  return out;
+}
+
+function renderReport(results) {
   results.sort((a, b) => (b.failures.length - a.failures.length) || a.path.localeCompare(b.path));
-
-  let out = `# Browser audit (${SITE})\n\n`;
   const failed = results.filter((r) => r.failures.length);
+  let out = `# Browser audit (${SITE})\n\n`;
   out += `**Total routes:** ${results.length}\n`;
   out += `**Failed:** ${failed.length}\n`;
   out += `**OK:** ${results.length - failed.length}\n\n`;
-
-  if (failed.length) {
-    out += `## Failed routes\n\n`;
-    for (const r of failed) {
-      out += `### ${r.path} — status ${r.status}\n`;
-      out += `- title: \`${r.title}\`\n`;
-      out += `- failures: ${r.failures.join(', ')}\n`;
-      if (r.jsErrors.length) {
-        out += `- JS errors:\n`;
-        for (const e of r.jsErrors.slice(0, 5)) out += `  - \`${e.slice(0, 300)}\`\n`;
-      }
-      if (r.consoleErrors.length) {
-        out += `- Console:\n`;
-        for (const e of r.consoleErrors.slice(0, 5)) out += `  - \`${e.slice(0, 300)}\`\n`;
-      }
-      if (r.badRequests.length) {
-        out += `- Failed requests:\n`;
-        for (const e of r.badRequests.slice(0, 10)) out += `  - ${e}\n`;
-      }
-      out += `\n`;
-    }
-  }
-
+  out += renderFailedSection(failed);
   out += `## All routes\n\n| Route | Status | Title | Failures |\n|---|---|---|---|\n`;
   for (const r of results) {
     out += `| ${r.path} | ${r.status} | ${r.title.slice(0, 50)} | ${r.failures.join('; ') || '—'} |\n`;
   }
-
   console.log(out);
-  process.exit(failed.length ? 1 : 0);
+  return failed.length;
+}
+
+async function main() {
+  const browser = await chromium.launch({ headless: true });
+  const results = await runAudits(browser, 3);
+  await browser.close();
+  process.exit(renderReport(results) ? 1 : 0);
 }
 
 main().catch((e) => {

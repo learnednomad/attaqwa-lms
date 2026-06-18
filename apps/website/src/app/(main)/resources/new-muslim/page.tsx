@@ -274,14 +274,16 @@ export default function NewMuslimGuidePage() {
                       </li>
                     ))}
                   </ul>
-                  <a
-                    href={`/pdfs/new-muslim/${topic.slug}.pdf`}
-                    download
-                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-xs font-medium text-emerald-700 transition-colors hover:bg-emerald-100 hover:border-emerald-300"
+                  {/* PDF guides are being prepared. Until they ship in
+                      /public/pdfs/new-muslim/<slug>.pdf, surface a neutral
+                      affordance instead of an <a> that 404s on click. */}
+                  <span
+                    aria-label={`${topic.title} PDF guide — coming soon`}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-xs font-medium text-neutral-500"
                   >
                     <Download className="h-3.5 w-3.5" />
-                    Download PDF Guide
-                  </a>
+                    PDF Guide — Coming Soon
+                  </span>
                 </div>
               );
             })}
