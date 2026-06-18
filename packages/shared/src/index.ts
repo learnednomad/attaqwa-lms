@@ -105,7 +105,7 @@ export const MOSQUE_INFO = {
   primaryEmail: 'almaad2674@gmail.com',
   imamEmail: 'Mohammad30360@hotmail.com',
   schoolEmail: 'Attaqwa.du@gmail.com',
-  website: 'https://masjidattaqwaatlanta.org',
+  website: 'https://attaqwamasjid.cloud',
   coordinates: {
     lat: 33.9114,
     lng: -84.2614,

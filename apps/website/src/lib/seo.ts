@@ -34,16 +34,16 @@ export const SEO_KEYWORDS = {
   ]
 } as const;
 
-// Mosque Location Data (to be updated with actual coordinates)
+// Mosque Location Data — pulled from packages/shared MOSQUE_INFO.
 const MOSQUE_LOCATION = {
   name: MOSQUE_INFO.name,
-  address: 'Your Full Address Here', // Update with actual address
-  city: 'Your City',
-  state: 'Your State', 
-  postalCode: 'Your ZIP',
+  address: MOSQUE_INFO.address,
+  city: MOSQUE_INFO.city,
+  state: MOSQUE_INFO.province,
+  postalCode: MOSQUE_INFO.postalCode,
   country: 'United States',
-  latitude: 0, // Update with actual coordinates
-  longitude: 0, // Update with actual coordinates
+  latitude: MOSQUE_INFO.coordinates.lat,
+  longitude: MOSQUE_INFO.coordinates.lng,
   phone: MOSQUE_INFO.phone,
   website: MOSQUE_INFO.website
 } as const;
